@@ -160,9 +160,8 @@ async def _probe(args: argparse.Namespace) -> int:
     """Show what a source really returns, to fix a parser after an API/layout change."""
     from tension_index.collector import make_client
     from tension_index.countries import get_country
-    from tension_index.sources import REGISTRY
-
     from tension_index.extra import PROBE_URLS
+    from tension_index.sources import REGISTRY
 
     if args.source in PROBE_URLS:
         async with make_client(get_settings()) as client:
