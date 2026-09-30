@@ -12,7 +12,7 @@ from html import escape
 
 import httpx
 
-from tension_index import storage
+from tension_index import extra, storage
 from tension_index.collector import RunResult, collect_all, make_client
 from tension_index.config import Settings
 from tension_index.pipeline import (
@@ -26,10 +26,9 @@ from tension_index.pipeline import (
 
 log = logging.getLogger(__name__)
 
-# Non-advisory collectors (aviation, news, markets) register here:
-# async def collect(db, client, settings) -> RunResult
+# Non-advisory collectors (aviation, news, markets): async def collect(db, client, settings)
 Collector = Callable[..., Awaitable[RunResult]]
-EXTRA_COLLECTORS: dict[str, Collector] = {}
+EXTRA_COLLECTORS: dict[str, Collector] = dict(extra.COLLECTORS)
 
 
 @dataclass(slots=True)

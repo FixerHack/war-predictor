@@ -165,30 +165,6 @@ async def _is_baseline(db: aiosqlite.Connection, snap: aiosqlite.Row) -> bool:
         return await cur.fetchone() is None
 
 
-async def upsert_signal(db: aiosqlite.Connection, s: Signal, ref: str) -> None:
-    await db.execute(
-        "INSERT INTO signals (country, block, kind, strength, publisher, observed_at, tier, "
-        "confirmed, reason, state, active, note, ref) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?) "
-        "ON CONFLICT (ref, kind, country) WHERE ref != '' DO UPDATE SET "
-        "strength = excluded.strength, reason = excluded.reason, note = excluded.note, active = 1",
-        (
-            s.country,
-            s.block,
-            s.kind,
-            s.strength,
-            s.publisher,
-            s.observed_at.isoformat(),
-            s.tier,
-            int(s.confirmed),
-            s.reason,
-            int(s.state),
-            s.note,
-            ref,
-        ),
-    )
-
-
 async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
     """Turn current advisories (+ their classification) into state signals and classified
     changes into event signals. Superseded advisory versions are deactivated."""
@@ -215,13 +191,13 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             "note": cls.quote,
         }
         strength = advisory_strength(cfg, snap["source"], level)
-        await upsert_signal(
+        await storage.upsert_signal(
             db, Signal(block="advisories", kind="advisory_level", strength=strength, **base), ref
         )
         count += 1
         posture = cfg["staff_posture"].get(cls.staff_posture, 0.0)
         if posture > 0:
-            await upsert_signal(
+            await storage.upsert_signal(
                 db,
                 Signal(
                     block="advisories",
@@ -233,7 +209,7 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             )
             count += 1
         if cls.airspace in ("closed", "restricted"):
-            await upsert_signal(
+            await storage.upsert_signal(
                 db,
                 Signal(
                     block="aviation",
@@ -245,7 +221,7 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             )
             count += 1
         if cls.borders_closed:
-            await upsert_signal(
+            await storage.upsert_signal(
                 db,
                 Signal(
                     block="domestic",
@@ -285,7 +261,7 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
                 state=False,
                 note=cls.summary_en or cls.quote,
             )
-            await upsert_signal(db, event, f"change:{row['id']}")
+            await storage.upsert_signal(db, event, f"change:{row['id']}")
             count += 1
     await db.commit()
     return count
@@ -325,9 +301,10 @@ COVERAGE_MAX_AGE_HOURS = 48
 
 
 def source_blocks() -> dict[str, str]:
+    from tension_index.extra import BLOCKS
     from tension_index.sources import REGISTRY
 
-    return {**dict.fromkeys(REGISTRY, "advisories"), **SOURCE_BLOCKS}
+    return {**dict.fromkeys(REGISTRY, "advisories"), **BLOCKS, **SOURCE_BLOCKS}
 
 
 async def covered_blocks(db: aiosqlite.Connection, now: datetime) -> set[str]:

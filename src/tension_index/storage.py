@@ -15,6 +15,8 @@ from pathlib import Path
 
 import aiosqlite
 
+from tension_index.scoring import Signal
+
 MIGRATIONS: list[str] = [
     # 1: snapshots, detected changes, collection runs
     """
@@ -110,6 +112,37 @@ MIGRATIONS: list[str] = [
     );
     CREATE INDEX ix_signals_country ON signals (country, active, observed_at);
     CREATE UNIQUE INDEX ux_signals_ref ON signals (ref, kind, country) WHERE ref != '';
+    """,
+    # 4: measurements of non-advisory collectors
+    """
+    CREATE TABLE traffic (
+        id              INTEGER PRIMARY KEY,
+        country         TEXT NOT NULL,
+        observed_at     TEXT NOT NULL,
+        hour_of_week    INTEGER NOT NULL,
+        aircraft        INTEGER NOT NULL
+    );
+    CREATE INDEX ix_traffic_country ON traffic (country, hour_of_week, observed_at);
+
+    CREATE TABLE news_items (
+        url             TEXT PRIMARY KEY,
+        feed            TEXT NOT NULL,
+        tier            INTEGER NOT NULL,
+        title           TEXT NOT NULL,
+        published       TEXT,
+        countries       TEXT NOT NULL,           -- comma-separated ISO codes
+        seen_at         TEXT NOT NULL,
+        classified      INTEGER NOT NULL DEFAULT 0
+    );
+
+    CREATE TABLE series (
+        source          TEXT NOT NULL,
+        country         TEXT NOT NULL,
+        key             TEXT NOT NULL,           -- e.g. bond_10y, fx, gdelt_vol, gdelt_tone
+        period          TEXT NOT NULL,
+        value           REAL NOT NULL,
+        PRIMARY KEY (source, country, key, period)
+    );
     """,
 ]
 
@@ -388,3 +421,39 @@ async def latest_snapshots(db: aiosqlite.Connection) -> list[aiosqlite.Row]:
         "GROUP BY source, country) last ON last.id = s.id ORDER BY s.country, s.source"
     ) as cur:
         return list(await cur.fetchall())
+
+
+# --- Signals --------------------------------------------------------------------------------
+
+
+async def upsert_signal(db: aiosqlite.Connection, s: Signal, ref: str) -> None:
+    """Insert a signal or refresh it (same ref/kind/country) and mark it active."""
+    await db.execute(
+        "INSERT INTO signals (country, block, kind, strength, publisher, observed_at, tier, "
+        "confirmed, reason, state, active, note, ref) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?) "
+        "ON CONFLICT (ref, kind, country) WHERE ref != '' DO UPDATE SET "
+        "strength = excluded.strength, reason = excluded.reason, note = excluded.note, "
+        "confirmed = excluded.confirmed, active = 1",
+        (s.country, s.block, s.kind, s.strength, s.publisher, s.observed_at.isoformat(), s.tier,
+         int(s.confirmed), s.reason, int(s.state), s.note, ref),
+    )  # fmt: skip
+
+
+async def deactivate_signals(db: aiosqlite.Connection, publisher: str, keep_refs: set[str]) -> None:
+    """Deactivate a publisher's state signals whose ref is no longer current."""
+    async with db.execute(
+        "SELECT id, ref FROM signals WHERE publisher = ? AND active = 1 AND state = 1", (publisher,)
+    ) as cur:
+        rows = await cur.fetchall()
+    for row in rows:
+        if row["ref"] not in keep_refs:
+            await db.execute("UPDATE signals SET active = 0 WHERE id = ?", (row["id"],))
+
+
+async def finish(db: aiosqlite.Connection, result: object, run_id: int) -> None:
+    """Close a collect_runs row from a collector.RunResult-like object."""
+    await finish_run(
+        db, run_id, ok=result.ok, fetched=result.fetched, changed=result.changed,  # type: ignore[attr-defined]
+        failed=result.failed, error="\n".join(result.errors[:20]) or None,  # type: ignore[attr-defined]
+    )  # fmt: skip
