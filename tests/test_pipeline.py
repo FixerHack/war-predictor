@@ -234,7 +234,8 @@ async def test_volcanic_ash_airspace_closure_is_not_a_security_signal(settings):
         sid = await seed(
             db, source="fr", country="IT", level=None, text="Etna ash closed a sector."
         )
-        for reason, expected in (("natural_disaster", 0), ("armed_conflict", 1)):
+        # ... and a restriction re-read as ash is switched off again (Italy stayed at 5.0).
+        for reason, expected in (("natural_disaster", 0), ("armed_conflict", 1), ("unknown", 0)):
             cls = classify_rules("x")
             cls.airspace, cls.reason, cls.method = "restricted", reason, "claude"
             await storage.save_classification(
