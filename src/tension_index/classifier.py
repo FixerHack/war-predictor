@@ -198,7 +198,10 @@ advice text (lines starting with "+" were added, "-" removed) or the full curren
 
 Fill every field of the JSON schema:
 
-- reason: the main stated reason for the advice or for the change.
+- reason: the main stated reason for the overall advice level for the country as a whole (or \
+for the change). A reason given only for some regions (e.g. areas occupied for years) counts \
+only when it sets the overall level; e.g. "Level 4 due to COVID-19, some areas have increased \
+risk due to armed conflict" is health.
   armed_conflict = fighting, military attacks, missiles, invasion, war on or near the territory.
   military_threat = troop build-ups, military exercises near the border, mobilisation, \
 threat of attack.

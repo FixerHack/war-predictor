@@ -17,7 +17,13 @@ import aiosqlite
 from tension_index import storage
 from tension_index.classifier import Classification, ClaudeClassifier, classify_rules
 from tension_index.history import Episode
-from tension_index.scoring import Signal, advisory_strength, compute_score, load_config
+from tension_index.scoring import (
+    Signal,
+    advisory_strength,
+    compute_score,
+    load_config,
+    relevance,
+)
 
 BASELINE_BACKDATE_DAYS = 30
 
@@ -196,7 +202,7 @@ def signals_at(snapshots, changes, moment: datetime, cfg: dict) -> list[Signal]:
                     **base,
                 )
             )
-        if cls.airspace in ("closed", "restricted"):
+        if cls.airspace in ("closed", "restricted") and relevance(cfg, cls.reason) >= 0.5:
             out.append(Signal(block="aviation", kind=f"aviation:airspace_{cls.airspace}",
                               strength=1.0 if cls.airspace == "closed" else 0.6, **base))  # fmt: skip
     for ch in changes:
