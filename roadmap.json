@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -120,13 +120,13 @@
         },
         {
           "id": "S0.13",
-          "status": "todo",
+          "status": "done",
           "days": 0.2,
           "owner": "human",
           "uk": "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root",
           "en": "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root",
-          "note_uk": "Сайт уже в гілці gh-pages (make pages), бо Actions заблоковані.",
-          "note_en": "Site is already on the gh-pages branch (make pages) because Actions are locked."
+          "note_uk": "Працює: fixerhack.github.io/war-predictor",
+          "note_en": "Live: fixerhack.github.io/war-predictor"
         },
         {
           "id": "S0.15",
@@ -156,19 +156,19 @@
         }
       ],
       "stats": {
-        "percent": 66,
+        "percent": 70,
         "days_total": 5.3,
-        "days_left": 1.8,
+        "days_left": 1.6,
         "counts": {
-          "done": 9,
+          "done": 10,
           "in_progress": 0,
-          "todo": 7,
+          "todo": 6,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 3.5,
+          "done": 3.7,
           "in_progress": 0,
-          "todo": 1.8,
+          "todo": 1.6,
           "blocked": 0
         },
         "tasks": 16
@@ -1106,6 +1106,18 @@
   ],
   "changelog": [
     {
+      "version": "0.2.2",
+      "date": "2026-09-30",
+      "uk": [
+        "Сторінка прогресу опублікована з гілки gh-pages",
+        "Процес pages.yml оновлює gh-pages замість прямої публікації"
+      ],
+      "en": [
+        "Progress page live from the gh-pages branch",
+        "pages.yml now refreshes gh-pages instead of deploying directly"
+      ]
+    },
+    {
       "version": "0.2.1",
       "date": "2026-09-30",
       "uk": [
@@ -1173,23 +1185,23 @@
   "stats": {
     "percent": 27,
     "days_total": 43.9,
-    "days_left": 32.1,
+    "days_left": 31.9,
     "counts": {
-      "done": 27,
+      "done": 28,
       "in_progress": 2,
-      "todo": 49,
+      "todo": 48,
       "blocked": 0
     },
     "days_by_status": {
-      "done": 11.4,
+      "done": 11.6,
       "in_progress": 0.7,
-      "todo": 31.8,
+      "todo": 31.6,
       "blocked": 0
     },
     "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T11:17:34+00:00",
-    "commit": "05c1f37"
+    "built_at": "2026-09-30T11:20:37+00:00",
+    "commit": "46b8bf4"
   }
 }
