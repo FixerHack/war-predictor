@@ -32,6 +32,30 @@ RAW = "https://web.archive.org/web/{ts}id_/{url}"
 DENSE_DAYS = 45  # daily captures in the weeks before the event, sparser before
 SPARSE_STEP = 5
 PAUSE_SECONDS = 1.0
+# The Wayback Machine is slow and often busy: long timeouts, a few retries with backoff.
+WAYBACK_TIMEOUT = httpx.Timeout(120.0, connect=30.0)
+RETRIES = 4
+RETRY_STATUS = {429, 500, 502, 503, 504}
+
+
+async def wayback_get(
+    client: httpx.AsyncClient, url: str, params: dict | None = None, backoff: float = 5.0
+) -> httpx.Response:
+    """GET with retries on timeouts, connection errors and 429/5xx."""
+    for attempt in range(1, RETRIES + 1):
+        try:
+            response = await client.get(url, params=params, timeout=WAYBACK_TIMEOUT)
+            if response.status_code not in RETRY_STATUS or attempt == RETRIES:
+                response.raise_for_status()
+                return response
+            problem = f"HTTP {response.status_code}"
+        except (httpx.TimeoutException, httpx.TransportError) as exc:
+            if attempt == RETRIES:
+                raise
+            problem = type(exc).__name__
+        log.info("wayback: %s, retry %d/%d", problem, attempt, RETRIES - 1)
+        await asyncio.sleep(backoff * 2 ** (attempt - 1))
+    raise AssertionError("unreachable")
 
 
 @dataclass(slots=True)
@@ -114,12 +138,11 @@ def pick_captures(rows: list[list[str]], episode: Episode) -> list[tuple[str, st
 
 
 async def list_captures(client: httpx.AsyncClient, url: str, episode: Episode) -> list[list[str]]:
-    response = await client.get(CDX, params={
+    response = await wayback_get(client, CDX, params={
         "url": url, "from": episode.start.strftime("%Y%m%d"), "to": episode.end.strftime("%Y%m%d"),
         "output": "json", "filter": "statuscode:200", "collapse": "timestamp:8",
         "fl": "timestamp,original",
     })  # fmt: skip
-    response.raise_for_status()
     rows = response.json() if response.text.strip() else []
     return [r for r in rows[1:] if len(r) == 2]  # first row is the header
 
@@ -137,17 +160,17 @@ async def load_episode(
         try:
             captures = pick_captures(await list_captures(client, url, episode), episode)
         except (httpx.HTTPError, ValueError) as exc:
-            log.warning("%s: CDX failed: %s", publisher, exc)
+            log.warning("%s: CDX failed: %s %s", publisher, type(exc).__name__, exc)
             stats[publisher] = -1
             continue
+        log.info("%s: %d captures to fetch", publisher, len(captures))
         stored = 0
         previous: aiosqlite.Row | None = None
         for ts, original in captures:
             try:
-                response = await client.get(RAW.format(ts=ts, url=original))
-                response.raise_for_status()
+                response = await wayback_get(client, RAW.format(ts=ts, url=original))
             except httpx.HTTPError as exc:
-                log.warning("%s %s: %s", publisher, ts, exc)
+                log.warning("%s %s: %s %s", publisher, ts, type(exc).__name__, exc)
                 continue
             text = normalize(html_to_text(main_content(response.text)))
             when = datetime.strptime(ts, "%Y%m%d%H%M%S").isoformat() + "+00:00"
@@ -173,4 +196,5 @@ async def load_episode(
             stored += 1
             await asyncio.sleep(pause)
         stats[publisher] = stored
+        log.info("%s: %d versions stored", publisher, stored)
     return stats

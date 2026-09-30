@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.62**, updated 2026-09-30.
+Version **0.2.63**, updated 2026-09-30.
 
-**Overall progress: 68%** · left ≈ 14.5 days · ✅ 50 · 🟡 19 · ⬜ 10 · ⛔ 4
+**Overall progress: 68%** · left ≈ 14.4 days · ✅ 51 · 🟡 19 · ⬜ 10 · ⛔ 4
 
 ## Milestones
 
@@ -112,7 +112,7 @@ Branch: `dev-news`
 - 🟡 **S4.5** Markets: bonds and FX via ECB Data Portal
   - ECB: 10y spread over Germany and FX (daily).
 
-## S5. Historical archive — 75%
+## S5. Historical archive — 76%
 
 _Past advisory versions to test the scale on known episodes._
 
@@ -122,6 +122,7 @@ Branch: `dev-history`
   - tension-index history: Wayback captures (daily 45 days before the event, every 5 days earlier) into data/history.sqlite3.
 - 🟡 **S5.2** Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25
   - Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.
+- ✅ **S5.5** Wayback archive: long timeouts, retries on 429/5xx, progress in logs
 
 ## S6. Change classification (Claude API) — 62%
 
@@ -261,6 +262,98 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.63** (2026-09-30)
+  - W
+  - a
+  - y
+  - b
+  - a
+  - c
+  - k
+  -  
+  - a
+  - r
+  - c
+  - h
+  - i
+  - v
+  - e
+  -  
+  - l
+  - o
+  - a
+  - d
+  - i
+  - n
+  - g
+  -  
+  - n
+  - o
+  -  
+  - l
+  - o
+  - n
+  - g
+  - e
+  - r
+  -  
+  - f
+  - a
+  - i
+  - l
+  - s
+  -  
+  - o
+  - n
+  -  
+  - s
+  - l
+  - o
+  - w
+  -  
+  - a
+  - n
+  - s
+  - w
+  - e
+  - r
+  - s
+  - :
+  -  
+  - 1
+  - 2
+  - 0
+  -  
+  - s
+  -  
+  - t
+  - i
+  - m
+  - e
+  - o
+  - u
+  - t
+  -  
+  - a
+  - n
+  - d
+  -  
+  - u
+  - p
+  -  
+  - t
+  - o
+  -  
+  - 3
+  -  
+  - r
+  - e
+  - t
+  - r
+  - i
+  - e
+  - s
+  - .
 - **0.2.62** (2026-09-30)
   - I
   - n

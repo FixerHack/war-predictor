@@ -104,3 +104,21 @@ async def test_control_episode_stays_low(tmp_path):
         report = await replay(db, fr)
     ok, detail = report.verdict()
     assert ok and report.max_score < 3
+
+
+async def test_wayback_get_retries_timeouts_and_busy_answers():
+    from tension_index.history import wayback_get
+
+    calls = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(1)
+        if len(calls) == 1:
+            raise httpx.ReadTimeout("slow", request=request)
+        if len(calls) == 2:
+            return httpx.Response(503)
+        return httpx.Response(200, text="ok")
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        response = await wayback_get(client, "https://web.archive.org/x", backoff=0)
+    assert response.text == "ok" and len(calls) == 3
