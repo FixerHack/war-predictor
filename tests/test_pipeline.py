@@ -245,3 +245,20 @@ async def test_volcanic_ash_airspace_closure_is_not_a_security_signal(settings):
             await derive_advisory_signals(db)
             aviation = [s for s in await active_signals(db, NOW) if s.block == "aviation"]
             assert len(aviation) == expected, reason
+
+
+def test_covid_measures_in_a_conflict_advisory_are_not_security_signals():
+    from tension_index.pipeline import advisory_state_signals
+    from tension_index.scoring import load_config
+
+    text = (
+        "Do not travel to areas near the border due to the Nagorno-Karabakh conflict.\n"
+        "Due to COVID-19 the airspace is closed and the embassy has limited consular services."
+    )
+    cls = classify_rules(text)
+    assert cls.airspace == "closed" and cls.measure_reason == "health"
+    cls.reason = "armed_conflict"  # the advice as a whole (as the model reads it)
+    base = {"country": "AZ", "publisher": "gov_uk", "observed_at": NOW, "reason": cls.reason,
+            "state": True, "note": ""}  # fmt: skip
+    kinds = [s.kind for s in advisory_state_signals(load_config(), cls, "none", base)]
+    assert kinds == ["advisory_level"]

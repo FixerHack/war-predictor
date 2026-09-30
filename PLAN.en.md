@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.70**, updated 2026-09-30.
+Version **0.2.71**, updated 2026-09-30.
 
 **Overall progress: 68%** · left ≈ 14.6 days · ✅ 51 · 🟡 20 · ⬜ 10 · ⛔ 4
 
@@ -239,6 +239,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-09-30: Advisory measures and floors count only for a security reason for the measure (relevance ≥ 0.7 for measures, ≥ 0.5 for floors).
 - 2026-09-30: Regional warnings: UK "avoid all travel to parts" 0.45, "all but essential to parts" 0.3, German partial warning 0.35 — they mostly cover long-occupied or border areas.
 - 2026-09-30: Airspace floors (8 / 6) only with two independent sources, like the ordered-departure floor.
 - 2026-09-30: Ordered departure of family members only = authorized staff departure (floor 7), not ordered staff departure (floor 9 with two governments).
@@ -267,6 +268,235 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.71** (2026-09-30)
+  - A
+  -  
+  - s
+  - e
+  - p
+  - a
+  - r
+  - a
+  - t
+  - e
+  -  
+  - r
+  - e
+  - a
+  - s
+  - o
+  - n
+  -  
+  - f
+  - o
+  - r
+  -  
+  - m
+  - e
+  - a
+  - s
+  - u
+  - r
+  - e
+  - s
+  -  
+  - (
+  - e
+  - m
+  - b
+  - a
+  - s
+  - s
+  - y
+  -  
+  - p
+  - o
+  - s
+  - t
+  - u
+  - r
+  - e
+  - ,
+  -  
+  - a
+  - i
+  - r
+  - s
+  - p
+  - a
+  - c
+  - e
+  - ,
+  -  
+  - b
+  - o
+  - r
+  - d
+  - e
+  - r
+  - s
+  - )
+  - :
+  -  
+  - C
+  - O
+  - V
+  - I
+  - D
+  - -
+  - 1
+  - 9
+  -  
+  - m
+  - e
+  - a
+  - s
+  - u
+  - r
+  - e
+  - s
+  -  
+  - i
+  - n
+  -  
+  - a
+  -  
+  - c
+  - o
+  - n
+  - f
+  - l
+  - i
+  - c
+  - t
+  -  
+  - a
+  - d
+  - v
+  - i
+  - s
+  - o
+  - r
+  - y
+  -  
+  - n
+  - o
+  -  
+  - l
+  - o
+  - n
+  - g
+  - e
+  - r
+  -  
+  - r
+  - a
+  - i
+  - s
+  - e
+  -  
+  - t
+  - h
+  - e
+  -  
+  - s
+  - c
+  - o
+  - r
+  - e
+  -  
+  - o
+  - r
+  -  
+  - t
+  - r
+  - i
+  - g
+  - g
+  - e
+  - r
+  -  
+  - f
+  - l
+  - o
+  - o
+  - r
+  - s
+  - ;
+  -  
+  - o
+  - n
+  - e
+  -  
+  - g
+  - o
+  - v
+  - e
+  - r
+  - n
+  - m
+  - e
+  - n
+  - t
+  - '
+  - s
+  -  
+  - "
+  - a
+  - i
+  - r
+  - s
+  - p
+  - a
+  - c
+  - e
+  -  
+  - c
+  - l
+  - o
+  - s
+  - e
+  - d
+  - "
+  -  
+  - g
+  - i
+  - v
+  - e
+  - s
+  -  
+  - t
+  - h
+  - e
+  -  
+  - a
+  - v
+  - i
+  - a
+  - t
+  - i
+  - o
+  - n
+  -  
+  - b
+  - l
+  - o
+  - c
+  - k
+  -  
+  - 0
+  - .
+  - 7
+  - ,
+  -  
+  - n
+  - o
+  - t
+  -  
+  - 1
+  - .
+  - 0
+  - .
 - **0.2.70** (2026-09-30)
   - L
   - o

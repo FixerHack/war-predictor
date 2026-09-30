@@ -76,9 +76,15 @@ verification:
 # flapping (e.g. CDN nodes serving different versions): no change, no event.
 flap_window_days: 7
 
-# Airspace closures or restrictions stated in advisories count only for a security reason
-# (armed conflict 1.0, military threat 1.0, hybrid attack 0.7), not ash, weather or "unknown".
-airspace_min_relevance: 0.7
+# Embassy posture, airspace and border measures stated in advisories count only for a security
+# reason (armed conflict 1.0, military threat 1.0, hybrid attack 0.7): not COVID-19, volcanic
+# ash, weather or "unknown". Armenia/Azerbaijan, June 2020: COVID flight bans read as war.
+measure_min_relevance: 0.7
+# Airspace measures from one government's text; the floors need two independent sources.
+airspace_strength: {closed: 0.7, restricted: 0.4}
+# Floors (below) ignore signals whose stated reason is less relevant than this (crime, health,
+# terrorism, unrest, natural disasters).
+floor_min_relevance: 0.5
 
 # Surge bonus: how far above the country's own norm it is right now.
 baseline:

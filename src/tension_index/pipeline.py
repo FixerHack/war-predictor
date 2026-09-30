@@ -209,6 +209,30 @@ async def flapping_changes(db: aiosqlite.Connection, window: timedelta) -> set[i
     return flaps
 
 
+def advisory_state_signals(
+    cfg: dict, cls: Classification, level: str | None, base: dict
+) -> list[Signal]:
+    """State signals of one current advisory: its level, and the embassy posture, airspace and
+    border measures it states - the measures only for a security reason (not COVID or ash)."""
+    publisher = base["publisher"]
+    out = [Signal(block="advisories", kind="advisory_level",
+                  strength=advisory_strength(cfg, publisher, level), **base)]  # fmt: skip
+    measure = {**base, "reason": cls.measure_reason or cls.reason}
+    if relevance(cfg, measure["reason"]) < cfg["measure_min_relevance"]:
+        return out
+    posture = cfg["staff_posture"].get(cls.staff_posture, 0.0)
+    if posture > 0:
+        out.append(Signal(block="advisories", kind=f"staff_posture:{cls.staff_posture}",
+                          strength=posture, **measure))  # fmt: skip
+    if cls.airspace in ("closed", "restricted"):
+        out.append(Signal(block="aviation", kind=f"aviation:airspace_{cls.airspace}",
+                          strength=cfg["airspace_strength"][cls.airspace], **measure))  # fmt: skip
+    if cls.borders_closed:
+        out.append(Signal(block="domestic", kind="domestic:borders_closed",
+                          strength=cfg["borders_closed_strength"], **measure))  # fmt: skip
+    return out
+
+
 async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
     """Turn current advisories (+ their classification) into state signals and classified
     changes into event signals. Superseded advisory versions are deactivated."""
@@ -241,48 +265,8 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             "note": usable_quote(cls.quote),
             "note_uk": cls.summary_uk if cls.method == "claude" else "",
         }
-        strength = advisory_strength(cfg, snap["source"], level)
-        await emit(
-            Signal(block="advisories", kind="advisory_level", strength=strength, **base), ref
-        )
-        count += 1
-        posture = cfg["staff_posture"].get(cls.staff_posture, 0.0)
-        if posture > 0:
-            await emit(
-                Signal(
-                    block="advisories",
-                    kind=f"staff_posture:{cls.staff_posture}",
-                    strength=posture,
-                    **base,
-                ),
-                ref,
-            )
-            count += 1
-        # Airspace measures for volcanic ash or weather are not a security signal.
-        if (
-            cls.airspace in ("closed", "restricted")
-            and relevance(cfg, cls.reason) >= cfg["airspace_min_relevance"]
-        ):
-            await emit(
-                Signal(
-                    block="aviation",
-                    kind=f"aviation:airspace_{cls.airspace}",
-                    strength=1.0 if cls.airspace == "closed" else 0.6,
-                    **base,
-                ),
-                ref,
-            )
-            count += 1
-        if cls.borders_closed:
-            await emit(
-                Signal(
-                    block="domestic",
-                    kind="domestic:borders_closed",
-                    strength=cfg["borders_closed_strength"],
-                    **base,
-                ),
-                ref,
-            )
+        for signal in advisory_state_signals(cfg, cls, level, base):
+            await emit(signal, ref)
             count += 1
     # Deactivate signals of superseded advisory versions.
     async with db.execute(

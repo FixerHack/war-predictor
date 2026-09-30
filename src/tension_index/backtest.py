@@ -17,12 +17,12 @@ import aiosqlite
 from tension_index import storage
 from tension_index.classifier import Classification, ClaudeClassifier, classify_rules
 from tension_index.history import Episode
+from tension_index.pipeline import advisory_state_signals
 from tension_index.scoring import (
     Signal,
     advisory_strength,
     compute_score,
     load_config,
-    relevance,
 )
 
 BASELINE_BACKDATE_DAYS = 30
@@ -190,24 +190,7 @@ def signals_at(snapshots, changes, moment: datetime, cfg: dict) -> list[Signal]:
             when -= timedelta(days=BASELINE_BACKDATE_DAYS)  # like live: first sighting is old news
         base = {"country": snap["country"], "publisher": publisher, "observed_at": when,
                 "reason": cls.reason, "state": True, "note": cls.quote}  # fmt: skip
-        out.append(Signal(block="advisories", kind="advisory_level",
-                          strength=advisory_strength(cfg, publisher, snap["level"] or cls.level), **base))  # fmt: skip
-        posture = cfg["staff_posture"].get(cls.staff_posture, 0.0)
-        if posture > 0:
-            out.append(
-                Signal(
-                    block="advisories",
-                    kind=f"staff_posture:{cls.staff_posture}",
-                    strength=posture,
-                    **base,
-                )
-            )
-        if (
-            cls.airspace in ("closed", "restricted")
-            and relevance(cfg, cls.reason) >= cfg["airspace_min_relevance"]
-        ):
-            out.append(Signal(block="aviation", kind=f"aviation:airspace_{cls.airspace}",
-                              strength=1.0 if cls.airspace == "closed" else 0.6, **base))  # fmt: skip
+        out += advisory_state_signals(cfg, cls, snap["level"] or cls.level, base)
     for ch in changes:
         when = datetime.fromisoformat(ch["detected_at"])
         if when > moment or not ch["payload"]:
