@@ -81,6 +81,18 @@ th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line
 th { color: var(--ink-2); font-weight: 600; }
 td.num { text-align: right; }
 section.method { margin-top: 28px; font-size: 0.95rem; color: var(--ink-2); }
+.summary { margin: 10px 0 4px; font-size: 0.95rem; }
+.summary p { margin: 6px 0; }
+.blocks { display: grid; grid-template-columns: minmax(0, 9.5em) minmax(0, 1fr) 3em; gap: 6px 10px; align-items: center; margin-top: 8px; font-size: 0.88rem; }
+.blocks .bar { height: 10px; background: var(--empty); border-radius: 5px; overflow: hidden; }
+.blocks .bar span { display: block; height: 100%; background: var(--l2); border-radius: 5px; }
+.blocks .pct { text-align: right; color: var(--ink-2); }
+.panel li .q { display: block; color: var(--ink-3); font-size: 0.85rem; }
+section.method h3 { font-size: 1rem; color: var(--ink); margin: 18px 0 4px; }
+section.method dl { margin: 6px 0; }
+section.method dt { font-weight: 600; color: var(--ink); margin-top: 8px; }
+section.method dd { margin: 2px 0 0; }
+section.method ul { padding-left: 20px; }
 section.method h2 { font-size: 1.1rem; color: var(--ink); }
 footer { margin-top: 28px; font-size: 0.8rem; color: var(--ink-3); }
 a { color: var(--focus); }
@@ -135,7 +147,38 @@ const T = {
         warS: { none: "збройного конфлікту немає", frozen: "заморожений конфлікт / окупація частини території", clashes: "окремі збройні інциденти", active: "збройний конфлікт", war: "війна" },
         table: "Таблиця всіх країн", country: "Країна", score: "Бал", level: "Рівень",
         methodTitle: "Як рахується", method: "Шість блоків сигналів (рекомендації урядів і статус посольств, авіація, внутрішні заходи, сигнали агресора, медіа, ринки) поєднуються як незалежні підтвердження. Важать причина, кількість незалежних джерел, синхронність держав і відхилення від звичного рівня країни. Вирішальні події (виїзд персоналу посольств, закриття неба, мобілізація) гарантують мінімальний бал. Ваги — стартова гіпотеза, їх перевіряють на історичних епізодах.",
-        algo: "Алгоритм", sources: "Джерела", progress: "Хід проєкту", empty: "Даних ще немає: панель заповниться після першого розрахунку.", tt: "бал" },
+        algo: "Алгоритм", sources: "Джерела", progress: "Хід проєкту", empty: "Даних ще немає: панель заповниться після першого розрахунку.", tt: "бал",
+        summaryT: "Пояснення", blocksT: "Блоки сигналів", govT: "Що кажуть уряди", seenT: "Що помічено", noSignals: "Інших тривожних сигналів немає.",
+        state: "триває", event: "подія", strength: "сила", normal: "звичайний рівень", raised: "підвищений рівень",
+        outOf: "з 10", levelWord: "рівень сигналів",
+        mean: { green: "Фон звичайний: джерела не показують ознак ескалації або лише рутинні зміни.",
+                yellow: "Є поодинокі зміни, які варто відстежувати, але вони поки не складаються в загальну картину.",
+                orange: "Кілька незалежних сигналів одночасно або один сильний сигнал у ключовому блоці.",
+                red: "Сильні сигнали: виїзд персоналу посольств, закриття неба або узгоджене підвищення рівня кількома урядами.",
+                critical: "Вирішальні події: наказ кількох урядів про виїзд персоналу, мобілізація, закриття неба." },
+        main: "Найбільше важать", quiet: "Жоден блок не показує тривожних сигналів: усі джерела на звичайному фоні.",
+        floorHit: "Спрацювала порогова подія, тому бал не нижчий за встановлений для неї мінімум.",
+        notForecast: "Це опис того, що зараз видно в джерелах, а не ймовірність і не прогноз.",
+        flagText: { short_history: "Історії спостережень менше 30 днів, тому порівняння зі звичним рівнем країни ще не враховується.",
+                    low_coverage: "Свіжі дані є менше ніж з половини блоків: бал не публікується (крім порогових подій).",
+                    synchrony: "Кілька урядів ({n}) посилили рекомендації протягом тижня: бал помножено на 1,2.",
+                    isolated: "Зростання лише в цій країні, сусіди спокійні: можливо, локальна причина.",
+                    regional_escalation: "Зростання в більшості сусідніх країн одночасно: регіональна ескалація." },
+        blk: { advisories: ["Рекомендації урядів", "Рівні порад щодо подорожей США, Великої Британії, Німеччини, Канади й Франції та статус їхніх посольств (дозвіл або наказ на виїзд персоналу)."],
+               aviation: ["Авіація", "Бюлетені EASA щодо зон конфлікту, закриття чи обмеження повітряного простору, різке падіння авіатрафіку за даними OpenSky."],
+               domestic: ["Внутрішні заходи", "Мобілізація, надзвичайний стан, закриття кордонів."],
+               aggressor: ["Сигнали агресора", "МЗС Росії чи Білорусі радить своїм громадянам уникати країни, прямі погрози, гібридні атаки (дрони, саботаж, глушіння GPS)."],
+               media: ["Медіа", "Новини про ескалацію, підтверджені щонайменше двома виданнями, і сплеск уваги медіа до військової теми (GDELT)."],
+               markets: ["Ринки", "Стрибки спреду державних облігацій і падіння курсу валюти (дані ЄЦБ)."] },
+        methodFull: [
+          ["Що це і чим не є", ["Індекс напруги показує, скільки сигналів ескалації зараз видно у відкритих джерелах щодо кожної з 38 країн Європи, за шкалою 0–10. Це індикатор стану, а не ймовірність війни і не прогноз. Високий бал означає «багато джерел одночасно б'ють на сполох», а не «війна почнеться».", "Бал не є порадою їхати чи залишатися. Для рішень користуйтеся офіційними рекомендаціями свого уряду."]],
+          ["Рівні шкали", "LEVELS"],
+          ["Шість блоків", "BLOCKS"],
+          ["Як блоки поєднуються", ["Кожен блок отримує значення від 0 до 100%. У кожного блоку є «стеля» (рекомендації урядів, авіація й внутрішні заходи — до 60%, сигнали агресора — 40%, медіа — 35%, ринки — 15%): один блок, навіть заповнений повністю, не дає максимального балу. Блоки поєднуються як незалежні підтвердження: кожен наступний тривожний блок наближає загальний рівень до максимуму, але ніколи не додає більше, ніж залишилося.", "Усередині блоку одне видання рахується один раз (його найсильніший сигнал), а різні видання підсилюють одне одного. Для країн ЄС і НАТО рекомендації урядів важать на чверть менше: союзники рідко заздалегідь підвищують рівень небезпеки одне для одного.", "Разові події (оновлення рекомендацій, новини, падіння трафіку) з часом згасають, а стани (поточний рівень рекомендації, закрите небо) діють, поки тривають. Підсумок перетворюється на бал 0–10 кривою, яка розтягує нижню частину шкали, щоб ранні помірні сигнали було видно."]],
+          ["Порогові події", ["Деякі події самі по собі гарантують мінімальний бал, щоб шкала лишалася зрозумілою:", "• дозвіл на виїзд персоналу посольства хоча б одного уряду — не нижче 7;", "• наказ про виїзд персоналу або закриття посольства щонайменше двома урядами — не нижче 9;", "• мобілізація — не нижче 9;", "• закриття повітряного простору — не нижче 8, обмеження — не нижче 6."]],
+          ["Позначки", ["«Коротка історія» — даних менше 30 днів, порівняння з нормою країни ще вимкнене. «Синхронність» — три й більше урядів посилили рекомендації протягом тижня (бал ×1,2). «Лише ця країна» — сусіди спокійні. «Регіональна ескалація» — зростання в більшості сусідів. Якщо свіжі дані є менше ніж з половини блоків, бал не публікується (крім порогових подій)."]],
+          ["Обмеження", ["Уряди змінюють рекомендації із запізненням і з політичних міркувань. Новини й трафік бувають шумними, тому одне джерело рідко дає високий бал. Ваги — стартова гіпотеза: їх перевіряють на історичних епізодах (Україна 2022, Вірменія й Азербайджан 2020, Ізраїль 2024). Дані оновлюються кожні 3 години, медіа (GDELT) — раз на добу."]],
+        ] },
   en: { title: "Tension Index: Europe", updated: "Updated", nodata: "no data",
         notice: "An indicator of escalation signals (0–10) from governments' travel advice, aviation, news and markets. Not a forecast and not advice to leave.",
         levels: { green: "0–2 low: baseline", yellow: "3–4 moderate: isolated changes", orange: "5–6 elevated: several blocks", red: "7–8 high: staff departure, airspace", critical: "9–10 critical" },
@@ -145,7 +188,38 @@ const T = {
         warS: { none: "no armed conflict", frozen: "frozen conflict / partial occupation", clashes: "sporadic armed clashes", active: "armed conflict", war: "war" },
         table: "Table of all countries", country: "Country", score: "Score", level: "Level",
         methodTitle: "How it is scored", method: "Six signal blocks (government advice and embassy posture, aviation, domestic measures, aggressor signals, media, markets) combine as independent confirmations. What counts: the stated reason, the number of independent sources, governments acting in sync, and deviation from the country's usual level. Decisive events (embassy staff departure, airspace closure, mobilisation) guarantee a minimum score. Weights are a starting hypothesis, tested on historical episodes.",
-        algo: "Algorithm", sources: "Sources", progress: "Project progress", empty: "No data yet: the dashboard fills in after the first scoring run.", tt: "score" },
+        algo: "Algorithm", sources: "Sources", progress: "Project progress", empty: "No data yet: the dashboard fills in after the first scoring run.", tt: "score",
+        summaryT: "Explanation", blocksT: "Signal blocks", govT: "What governments say", seenT: "What was observed", noSignals: "No other warning signals.",
+        state: "ongoing", event: "event", strength: "strength", normal: "usual level", raised: "raised level",
+        outOf: "out of 10", levelWord: "signal level",
+        mean: { green: "Usual background: sources show no signs of escalation, or only routine edits.",
+                yellow: "Isolated changes worth watching, but they do not yet add up to a pattern.",
+                orange: "Several independent signals at once, or one strong signal in a key block.",
+                red: "Strong signals: embassy staff departure, airspace closure, or several governments raising their advice together.",
+                critical: "Decisive events: ordered staff departure by several governments, mobilisation, airspace closure." },
+        main: "Weighing most", quiet: "No block shows warning signals: every source is at its usual background.",
+        floorHit: "A threshold event occurred, so the score is not below the minimum set for it.",
+        notForecast: "This describes what the sources show now; it is not a probability or a forecast.",
+        flagText: { short_history: "Less than 30 days of observations, so comparison with the country's usual level is not applied yet.",
+                    low_coverage: "Fresh data from fewer than half of the blocks: no score is published (except threshold events).",
+                    synchrony: "Several governments ({n}) tightened their advice within a week: the score is multiplied by 1.2.",
+                    isolated: "Rising in this country only while neighbours are calm: possibly a local cause.",
+                    regional_escalation: "Rising in most neighbouring countries at once: a regional escalation." },
+        blk: { advisories: ["Government advice", "Travel advice levels from the US, UK, Germany, Canada and France, and their embassies' posture (authorized or ordered staff departure)."],
+               aviation: ["Aviation", "EASA conflict zone bulletins, airspace closures or restrictions, sharp drops in air traffic from OpenSky data."],
+               domestic: ["Domestic measures", "Mobilisation, state of emergency, border closures."],
+               aggressor: ["Aggressor signals", "Russian or Belarusian foreign ministry telling its citizens to avoid the country, direct threats, hybrid attacks (drones, sabotage, GPS jamming)."],
+               media: ["Media", "Escalation news confirmed by at least two outlets, and surges of military-related coverage (GDELT)."],
+               markets: ["Markets", "Government bond spread jumps and currency drops (ECB data)."] },
+        methodFull: [
+          ["What it is and isn't", ["The Tension Index shows how many escalation signals are currently visible in open sources for each of 38 European countries, on a 0–10 scale. It is a state indicator, not a probability of war and not a forecast. A high score means \u201cmany sources are raising alarms at once\u201d, not \u201ca war will start\u201d.", "The score is not advice to leave or to stay. For decisions, follow your own government's official travel advice."]],
+          ["Scale levels", "LEVELS"],
+          ["Six blocks", "BLOCKS"],
+          ["How blocks combine", ["Each block gets a value from 0 to 100%. Every block has a cap (government advice, aviation and domestic measures up to 60%, aggressor signals 40%, media 35%, markets 15%): one block, even fully alarmed, cannot produce the maximum score. Blocks combine as independent confirmations: each further alarmed block moves the total towards the maximum but never adds more than what is left.", "Within a block one publisher counts once (its strongest signal), while different publishers reinforce each other. For EU and NATO members, government advice weighs a quarter less: allies rarely raise each other's danger level in advance.", "One-off events (advice updates, news, traffic drops) fade over time, while states (the current advice level, a closed airspace) hold while they last. The total becomes a 0–10 score through a curve that stretches the low end of the scale so early, moderate signals are visible."]],
+          ["Threshold events", ["Some events guarantee a minimum score on their own, to keep the scale interpretable:", "• authorized departure of embassy staff by at least one government: at least 7;", "• ordered departure or embassy closure by at least two governments: at least 9;", "• mobilisation: at least 9;", "• airspace closed: at least 8; restricted: at least 6."]],
+          ["Flags", ["\u201cShort history\u201d: under 30 days of data, comparison with the country's norm is off. \u201cSynchrony\u201d: three or more governments tightened their advice within a week (score ×1.2). \u201cThis country only\u201d: neighbours are calm. \u201cRegional escalation\u201d: most neighbours are rising. With fresh data from fewer than half of the blocks, no score is published (except threshold events)."]],
+          ["Limitations", ["Governments update their advice late and for political reasons. News and traffic data are noisy, so a single source rarely produces a high score. The weights are a starting hypothesis, tested on historical episodes (Ukraine 2022, Armenia and Azerbaijan 2020, Israel 2024). Data refresh every 3 hours, media (GDELT) once a day."]],
+        ] },
 };
 const REPO = "https://github.com/FixerHack/war-predictor/blob/main/";
 const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -226,6 +300,54 @@ function wireChart(history) {
   svg.addEventListener("pointermove", move); svg.addEventListener("pointerleave", hide);
 }
 
+const BLOCKS = ["advisories", "aviation", "domestic", "aggressor", "media", "markets"];
+const fmtDate = (iso) => String(iso || "").replace("T", " ").slice(0, 16);
+
+function flagText(key) {
+  const t = T[lang], [name, n] = key.split(":");
+  return t.flagText[name] ? t.flagText[name].replace("{n}", n || "") : "";
+}
+
+function summary(c) {
+  const t = T[lang], out = [];
+  if (c.score == null) return "";
+  out.push(`<strong>${esc(c.name[lang])}: ${c.score.toFixed(1)} ${esc(t.outOf)}, ${esc(t.lvl[c.level])} ${esc(t.levelWord)}.</strong> ${esc(t.mean[c.level])}`);
+  const main = (c.contributors || []).filter((x) => x.value > 0.05).slice(0, 3);
+  out.push(main.length ? `${esc(t.main)}: ${main.map((x) => `${esc(x.publisher[lang])} (${esc(x.kind[lang])})`).join("; ")}.` : esc(t.quiet));
+  if ((c.floors || []).length) out.push(esc(t.floorHit));
+  (c.flag_keys || []).map(flagText).filter(Boolean).forEach((f) => out.push(esc(f)));
+  out.push(`<span class="muted">${esc(t.notForecast)}</span>`);
+  return `<div class="sub">${esc(t.summaryT)}</div><div class="summary">${out.map((x) => `<p>${x}</p>`).join("")}</div>`;
+}
+
+function blocksView(c) {
+  const t = T[lang], b = c.blocks || {};
+  if (!Object.keys(b).length) return "";
+  return `<div class="sub">${esc(t.blocksT)}</div><div class="blocks">` + BLOCKS.map((k) => {
+    const v = Math.max(0, Math.min(1, b[k] || 0)), pct = Math.round(v * 100);
+    return `<span title="${esc(t.blk[k][1])}">${esc(t.blk[k][0])}</span>` +
+      `<span class="bar" role="img" aria-label="${esc(t.blk[k][0])}: ${pct}%"><span style="width:${pct}%"></span></span><span class="pct">${pct}%</span>`;
+  }).join("") + `</div>`;
+}
+
+function signalItem(s, gov) {
+  const t = T[lang];
+  const what = gov ? (s.strength >= 0.1 ? `${t.raised} (${t.strength} ${s.strength.toFixed(2)})` : t.normal)
+    : `${s.kind[lang]} · ${s.state ? t.state : t.event} · ${t.strength} ${s.strength.toFixed(2)}`;
+  const note = s.note ? `<span class="q">«${esc(s.note.slice(0, 220))}»</span>` : "";
+  return `<li>${esc(s.publisher[lang])}: ${esc(what)} <span class="muted">${esc(fmtDate(s.observed_at))}</span>${note}</li>`;
+}
+
+function signalsView(c) {
+  const t = T[lang], all = c.signals || [];
+  const gov = all.filter((s) => s.kind.en === "advisory level");
+  const seen = all.filter((s) => s.kind.en !== "advisory level" && s.strength > 0);
+  let html = "";
+  if (gov.length) html += `<div class="sub">${esc(t.govT)}</div><ul>${gov.map((s) => signalItem(s, true)).join("")}</ul>`;
+  if (all.length) html += `<div class="sub">${esc(t.seenT)}</div>` + (seen.length ? `<ul>${seen.map((s) => signalItem(s, false)).join("")}</ul>` : `<p class="muted">${esc(t.noSignals)}</p>`);
+  return html;
+}
+
 function renderPanel() {
   const t = T[lang], panel = document.getElementById("panel");
   if (!data) { panel.innerHTML = `<p>${esc(t.empty)}</p>`; return; }
@@ -236,12 +358,24 @@ function renderPanel() {
     ? `<div class="big"><span class="n">${c.score.toFixed(1)}</span><span class="lv">/ 10 · ${esc(t.lvl[c.level])}</span></div>`
     : `<p>${esc(t.calibrating)}</p>`;
   const war = `<div class="sub">${esc(t.war)}</div><div>${WAR[c.war.status] || "🟢"} ${esc(t.warS[c.war.status])}${c.war.note[lang] ? `<div class="muted">${esc(c.war.note[lang])}</div>` : ""}</div>`;
-  const why = c.reasons[lang].length ? `<div class="sub">${esc(t.why)}</div><ul>${c.reasons[lang].map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : "";
-  const flags = c.flags[lang].length ? `<div class="sub">${esc(t.flags)}</div><ul>${c.flags[lang].map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : "";
+  const legacy = !c.blocks && c.reasons[lang].length ? `<div class="sub">${esc(t.why)}</div><ul>${c.reasons[lang].map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : "";
   const hist = c.history.length ? `<div class="sub">${esc(t.history)}</div>${chart(c.history)}` : "";
-  panel.innerHTML = `<h2>${c.flag} ${esc(c.name[lang])}</h2>${score}${why}${flags}${war}${hist}` +
-    (c.updated ? `<p class="muted">${esc(t.updated)}: ${esc(c.updated.replace("T", " ").slice(0, 16))} UTC</p>` : "");
+  panel.innerHTML = `<h2>${c.flag} ${esc(c.name[lang])}</h2>${score}${summary(c)}${legacy}${blocksView(c)}${signalsView(c)}${war}${hist}` +
+    (c.updated ? `<p class="muted">${esc(t.updated)}: ${esc(fmtDate(c.updated))} UTC</p>` : "");
   wireChart(c.history);
+}
+
+function renderMethod() {
+  const t = T[lang];
+  const body = t.methodFull.map(([h, content]) => {
+    let inner;
+    if (content === "LEVELS") inner = `<dl>${LEVELS.map((l) => `<dt>${esc(t.levels[l])}</dt><dd>${esc(t.mean[l])}</dd>`).join("")}</dl>`;
+    else if (content === "BLOCKS") inner = `<dl>${BLOCKS.map((k) => `<dt>${esc(t.blk[k][0])}</dt><dd>${esc(t.blk[k][1])}</dd>`).join("")}</dl>`;
+    else inner = content.map((x) => `<p>${esc(x)}</p>`).join("");
+    return `<h3>${esc(h)}</h3>${inner}`;
+  }).join("");
+  document.getElementById("method").innerHTML = `<h2>${esc(t.methodTitle)}</h2><p>${esc(t.method)}</p>${body}` +
+    `<p><a href="${REPO}docs/algorithm.md">${esc(t.algo)}</a> · <a href="${REPO}docs/sources.md">${esc(t.sources)}</a> · <a href="../">${esc(t.progress)}</a></p>`;
 }
 
 function renderTable() {
@@ -264,8 +398,7 @@ function render() {
   document.getElementById("notice").textContent = t.notice;
   document.getElementById("maphint").textContent = t.hint;
   document.getElementById("meta").textContent = data ? `${t.updated}: ${data.generated_at.replace("T", " ").slice(0, 16)} UTC` : "";
-  document.getElementById("method").innerHTML = `<h2>${esc(t.methodTitle)}</h2><p>${esc(t.method)}</p>` +
-    `<p><a href="${REPO}docs/algorithm.md">${esc(t.algo)}</a> · <a href="${REPO}docs/sources.md">${esc(t.sources)}</a> · <a href="../">${esc(t.progress)}</a></p>`;
+  renderMethod();
   document.getElementById("foot").textContent = data ? `v${data.version}` : "";
   renderLegend(); renderMap(); renderPanel(); renderTable();
 }

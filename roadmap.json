@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.56",
+    "version": "0.2.59",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -449,25 +449,35 @@
           "note_uk": "Реалізовано через OpenSky (падіння трафіку); норма з’явиться після ~3 тижнів збору.",
           "note_en": "Implemented via OpenSky (traffic drop); baseline needs ~3 weeks of samples.",
           "owner": "claude"
+        },
+        {
+          "id": "S3.6",
+          "status": "done",
+          "days": 0.25,
+          "uk": "Падіння авіатрафіку: норма лише з 3+ тижнів, поріг 20 літаків і 3σ, сигнал знімається після відновлення",
+          "en": "Air traffic drop: norm only from 3+ weeks, 20-aircraft and 3σ thresholds, signal cleared on recovery",
+          "note_uk": "Хибний сигнал LU («3 літаки замість 10») більше не можливий.",
+          "note_en": "The false LU signal (\"3 aircraft vs usual 10\") can no longer happen.",
+          "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 29,
-        "days_total": 3.5,
+        "percent": 33,
+        "days_total": 3.8,
         "days_left": 2.5,
         "counts": {
-          "done": 0,
+          "done": 1,
           "in_progress": 2,
           "todo": 0,
           "blocked": 1
         },
         "days_by_status": {
-          "done": 0,
+          "done": 0.25,
           "in_progress": 2,
           "todo": 0,
           "blocked": 1.5
         },
-        "tasks": 3
+        "tasks": 4
       }
     },
     {
@@ -693,25 +703,35 @@
           "uk": "Пояснення балу у сповіщеннях і на панелі",
           "en": "Score explanation in alerts and on the dashboard",
           "owner": "claude"
+        },
+        {
+          "id": "S7.5",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Захист від «мерехтіння» джерел (A → B → A) і команда why",
+          "en": "Guard against flapping sources (A → B → A) and the why command",
+          "note_uk": "Повернення до версії, яку бачили за останні 7 днів, не вважається зміною; такі зміни не дають подій у балі. tension-index why LU показує блоки й активні сигнали.",
+          "note_en": "Returning to a version seen within 7 days is not a change; such changes produce no score events. tension-index why LU lists blocks and active signals.",
+          "owner": "claude"
         }
       ],
       "stats": {
         "percent": 100,
-        "days_total": 3.0,
+        "days_total": 3.5,
         "days_left": 0.0,
         "counts": {
-          "done": 4,
+          "done": 5,
           "in_progress": 0,
           "todo": 0,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 3.0,
+          "done": 3.5,
           "in_progress": 0,
           "todo": 0,
           "blocked": 0
         },
-        "tasks": 4
+        "tasks": 5
       }
     },
     {
@@ -981,25 +1001,33 @@
           "en": "Disclaimer and methodology on the site",
           "note_uk": "Робочий текст застереження й методології на сторінці; остаточний текст затверджує власник (S1.7).",
           "note_en": "Working disclaimer and methodology on the page; final wording approved by the owner (S1.7)."
+        },
+        {
+          "id": "S11.5",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Розгорнуте пояснення на карті (укр/англ): підсумок, блоки, що кажуть уряди, що помічено, повна методика",
+          "en": "Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method",
+          "owner": "claude"
         }
       ],
       "stats": {
         "percent": 95,
-        "days_total": 2.8,
+        "days_total": 3.3,
         "days_left": 0.1,
         "counts": {
-          "done": 3,
+          "done": 4,
           "in_progress": 1,
           "todo": 0,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 2.5,
+          "done": 3.0,
           "in_progress": 0.3,
           "todo": 0,
           "blocked": 0
         },
-        "tasks": 4
+        "tasks": 5
       }
     },
     {
@@ -1165,6 +1193,10 @@
   ],
   "risks": [
     {
+      "uk": "Справжнє повернення рекомендації до попередньої версії протягом 7 днів не буде окремою зміною (стан однаково оновлюється).",
+      "en": "A genuine revert of an advisory within 7 days is not reported as a change (the state still updates)."
+    },
+    {
       "uk": "Частина урядових сайтів блокує автоматичні запити (Австралія); джерело можна втратити без попередження",
       "en": "Some government sites block automated requests (Australia); a source can be lost without notice"
     },
@@ -1194,6 +1226,18 @@
     }
   ],
   "changelog": [
+    {
+      "version": "0.2.59",
+      "date": "2026-09-30",
+      "uk": "Карта пояснює бал кожної країни: короткий підсумок, заповненість шести блоків, рівні рекомендацій урядів і всі помічені сигнали з цитатами, плюс повна методика. Прибрано хибні сигнали падіння авіатрафіку для малих країн.",
+      "en": "The map explains every country's score: a short summary, the six blocks, government advice levels and all observed signals with quotes, plus the full method. False air-traffic-drop signals for small countries removed."
+    },
+    {
+      "version": "0.2.57",
+      "date": "2026-09-30",
+      "uk": "Джерела, що перемикаються між двома версіями тексту (як стрічка США), більше не створюють змін і не піднімають бал; нова команда why пояснює бал країни.",
+      "en": "Sources that swing between two text versions (like the US feed) no longer create changes or lift the score; new why command explains a country's score."
+    },
     {
       "version": "0.2.56",
       "date": "2026-09-30",
@@ -1550,25 +1594,25 @@
     }
   ],
   "stats": {
-    "percent": 66,
-    "days_total": 43.9,
+    "percent": 67,
+    "days_total": 45.1,
     "days_left": 14.9,
     "counts": {
-      "done": 45,
+      "done": 48,
       "in_progress": 18,
       "todo": 11,
       "blocked": 4
     },
     "days_by_status": {
-      "done": 22.2,
+      "done": 23.45,
       "in_progress": 13.5,
       "todo": 5.2,
       "blocked": 3.0
     },
-    "tasks": 78
+    "tasks": 81
   },
   "build": {
-    "built_at": "2026-09-30T14:57:35+00:00",
-    "commit": "f70a4de"
+    "built_at": "2026-09-30T15:15:54+00:00",
+    "commit": "4c112bd"
   }
 }
