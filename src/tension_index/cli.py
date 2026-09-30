@@ -162,8 +162,17 @@ async def _probe(args: argparse.Namespace) -> int:
     from tension_index.countries import get_country
     from tension_index.sources import REGISTRY
 
+    from tension_index.extra import PROBE_URLS
+
+    if args.source in PROBE_URLS:
+        async with make_client(get_settings()) as client:
+            response = await client.get(PROBE_URLS[args.source])
+            print(f"HTTP {response.status_code} {response.url} ({len(response.text)} bytes)")
+            print(response.text[: args.bytes])
+        return 0 if response.is_success else 2
     if args.source not in REGISTRY:
-        print(f"unknown source {args.source!r}; known: {', '.join(REGISTRY)}", file=sys.stderr)
+        known = ", ".join([*REGISTRY, *PROBE_URLS])
+        print(f"unknown source {args.source!r}; known: {known}", file=sys.stderr)
         return 2
     async with make_client(get_settings()) as client:
         source = REGISTRY[args.source](client)

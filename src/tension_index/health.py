@@ -13,7 +13,7 @@ from pathlib import Path
 
 from tension_index import storage
 from tension_index.config import Settings
-from tension_index.sources import REGISTRY
+from tension_index.pipeline import source_blocks
 
 
 class Status(IntEnum):
@@ -88,7 +88,7 @@ async def run_checks(settings: Settings, db_path: Path | None = None) -> Report:
         async with storage.connect(db_path) as db:
             version = await storage.migrate(db)
             checks.append(Check("database", Status.OK, f"schema v{version} at {db_path}"))
-            for name in REGISTRY:
+            for name in source_blocks():
                 last = await storage.last_success(db, name)
                 if last is None:
                     checks.append(Check(f"collector.{name}", Status.WARN, "no successful run yet"))

@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.24
+  version: 0.2.27
   updated: 2026-09-30
 
 milestones:
@@ -89,9 +89,9 @@ stages:
     goal_uk: "Офіційні попередження щодо неба і фактичне падіння трафіку."
     goal_en: "Official airspace warnings and actual traffic drops."
     tasks:
-      - {id: S3.1, status: todo, days: 1, uk: "EASA Conflict Zone Information Bulletins", en: "EASA Conflict Zone Information Bulletins"}
-      - {id: S3.2, status: todo, days: 1.5, uk: "NOTAM: обмеження і закриття повітряного простору", en: "NOTAM: airspace restrictions and closures"}
-      - {id: S3.3, status: todo, days: 1, uk: "OpenSky: падіння кількості рейсів за аеропортом", en: "OpenSky: drop in flights per airport"}
+      - {id: S3.1, status: in_progress, days: 1, uk: "EASA Conflict Zone Information Bulletins", en: "EASA Conflict Zone Information Bulletins", note_uk: "Реалізовано (парсинг сторінки); перевірити: tension-index probe easa", note_en: "Implemented (page parsing); verify: tension-index probe easa"}
+      - {id: S3.2, status: blocked, days: 1.5, uk: "NOTAM: обмеження і закриття повітряного простору", en: "NOTAM: airspace restrictions and closures", note_uk: "Безкоштовного API NOTAM для Європи немає (EUROCONTROL EAD платний). Обмеження неба беремо з текстів рекомендацій і CZIB.", note_en: "No free European NOTAM API (EUROCONTROL EAD is paid). Airspace limits come from advisory texts and CZIBs."}
+      - {id: S3.3, status: in_progress, days: 1, uk: "OpenSky: падіння кількості рейсів за аеропортом", en: "OpenSky: drop in flights per airport", note_uk: "Реалізовано через OpenSky (падіння трафіку); норма з’явиться після ~3 тижнів збору.", note_en: "Implemented via OpenSky (traffic drop); baseline needs ~3 weeks of samples."}
 
   - id: S4
     branch: dev-news
@@ -232,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.27
+    date: 2026-09-30
+    uk: ["Авіація: бюлетені EASA щодо зон конфлікту, падіння авіатрафіку (OpenSky) із захистом від збоїв даних"]
+    en: ["Aviation: EASA conflict zone bulletins, air traffic drops (OpenSky) with data-outage guard"]
   - version: 0.2.24
     date: 2026-09-30
     uk: ["Сигнали з рекомендацій, щоденний бал, пояснення", "Команда run (повний цикл) і сповіщення про зміну балу", "Бот показує бал і причини"]
