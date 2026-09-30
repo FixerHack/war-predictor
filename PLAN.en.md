@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.24**, updated 2026-09-30.
+Version **0.2.27**, updated 2026-09-30.
 
-**Overall progress: 43%** · left ≈ 24.9 days · ✅ 38 · 🟡 6 · ⬜ 33 · ⛔ 1
+**Overall progress: 46%** · left ≈ 23.9 days · ✅ 38 · 🟡 8 · ⬜ 30 · ⛔ 2
 
 ## Milestones
 
@@ -80,15 +80,18 @@ Branch: `dev-collector`
 - ✅ **S2.10** Telegram alert when a source breaks
 - ✅ **S2.11** Strip update dates and boilerplate before diffing
 
-## S3. Aviation & airspace — 0%
+## S3. Aviation & airspace — 29%
 
 _Official airspace warnings and actual traffic drops._
 
 Branch: `dev-aviation`
 
-- ⬜ **S3.1** EASA Conflict Zone Information Bulletins
-- ⬜ **S3.2** NOTAM: airspace restrictions and closures
-- ⬜ **S3.3** OpenSky: drop in flights per airport
+- 🟡 **S3.1** EASA Conflict Zone Information Bulletins
+  - Implemented (page parsing); verify: tension-index probe easa
+- ⛔ **S3.2** NOTAM: airspace restrictions and closures
+  - No free European NOTAM API (EUROCONTROL EAD is paid). Airspace limits come from advisory texts and CZIBs.
+- 🟡 **S3.3** OpenSky: drop in flights per airport
+  - Implemented via OpenSky (traffic drop); baseline needs ~3 weeks of samples.
 
 ## S4. News, analysis, domestic measures — 0%
 
@@ -227,6 +230,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.27** (2026-09-30)
+  - Aviation: EASA conflict zone bulletins, air traffic drops (OpenSky) with data-outage guard
 - **0.2.24** (2026-09-30)
   - Signals from advisories, daily score, explanations
   - run command (full cycle) and score-change alerts
