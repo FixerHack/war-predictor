@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.38**, updated 2026-09-30.
+Version **0.2.40**, updated 2026-09-30.
 
-**Overall progress: 57%** · left ≈ 18.9 days · ✅ 39 · 🟡 17 · ⬜ 20 · ⛔ 2
+**Overall progress: 59%** · left ≈ 17.9 days · ✅ 41 · 🟡 17 · ⬜ 18 · ⛔ 2
 
 ## Milestones
 
@@ -158,7 +158,7 @@ Branch: `dev-backtest`
 - ⬜ **S8.3** Weight tuning
   - Observation: surge_weight lifts a single government decision to 9+, the scale wants several. Tune on real data.
 
-## S9. Telegram bot & alerts — 80%
+## S9. Telegram bot & alerts — 100%
 
 _Bot with language and country choice, a dashboard and explained alerts._
 
@@ -170,8 +170,10 @@ Branch: `dev-tg-bot`
 - ✅ **S9.4** Change alerts to a country's subscribers in their language
 - ✅ **S9.5** Alerts on score change of 1+ with explanation and quote
   - Score moves by 1+ → subscribers get an explanation with sources and quotes.
-- ⬜ **S9.6** Daily regional digest
-- ⬜ **S9.7** Several countries per user
+- ✅ **S9.6** Daily regional digest
+  - Daily digest (toggle on the dashboard, 06:37 UTC timer): score, 24 h change, regional rises.
+- ✅ **S9.7** Several countries per user
+  - Up to 5 countries: ticked list, switch the detailed card by buttons.
 
 ## S10. War status — 57%
 
@@ -240,6 +242,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.40** (2026-09-30)
+  - Bot: up to 5 countries per user, switching between them, daily digest
 - **0.2.38** (2026-09-30)
   - Wayback archive for historical episodes (tension-index history)
   - Scale backtest with PASS/FAIL reports (tension-index backtest)

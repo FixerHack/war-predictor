@@ -7,9 +7,10 @@ from html import escape
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from tension_index.bot.callbacks import CountryCb, LangCb, MenuCb
+from tension_index.bot.callbacks import CountryCb, LangCb, MenuCb, ViewCb
 from tension_index.countries import COUNTRIES, get_country
 from tension_index.i18n import t
+from tension_index.storage import MAX_FOLLOWED
 from tension_index.war_status import ICONS, WarStatus
 
 LEVEL_ICONS = {"green": "🟢", "yellow": "🟡", "orange": "🟠", "red": "🔴", "critical": "🟥"}
@@ -34,6 +35,9 @@ class DashboardData:
     changes_7d: int
     updated: str | None
     reasons: list[str] = field(default_factory=list)  # from explain.reasons()
+    digest: bool = False
+    # other followed countries: (code, score or None, level or None, war status)
+    others: list[tuple[str, float | None, str | None, str]] = field(default_factory=list)
 
 
 def _flag(code: str) -> str:
@@ -64,24 +68,26 @@ def language_screen() -> Screen:
     return t(None, "choose_lang"), kb
 
 
-def country_screen(lang: str, can_go_back: bool) -> Screen:
+def country_screen(lang: str, followed: list[str] | None = None) -> Screen:
+    """First choice (nothing followed yet: one tap opens the dashboard) or the follow list
+    with ✅ marks and a Done button."""
+    followed = followed or []
     countries = sorted(COUNTRIES.values(), key=lambda c: c.title(lang))
     buttons = [
         InlineKeyboardButton(
-            text=f"{c.flag} {c.title(lang)}", callback_data=CountryCb(code=c.code).pack()
+            text=f"{'✅ ' if c.code in followed else ''}{c.flag} {c.title(lang)}",
+            callback_data=CountryCb(code=c.code).pack(),
         )
         for c in countries
     ]
     rows = [buttons[i : i + 2] for i in range(0, len(buttons), 2)]
-    if can_go_back:
-        rows.append(
-            [
-                InlineKeyboardButton(
-                    text=t(lang, "btn_back"), callback_data=MenuCb(action="home").pack()
-                )
-            ]
-        )
-    return t(lang, "choose_country"), InlineKeyboardMarkup(inline_keyboard=rows)
+    if not followed:
+        return t(lang, "choose_country"), InlineKeyboardMarkup(inline_keyboard=rows)
+    rows.append(
+        [InlineKeyboardButton(text=t(lang, "btn_done"), callback_data=MenuCb(action="home").pack())]
+    )
+    text = t(lang, "choose_countries", max=MAX_FOLLOWED)
+    return text, InlineKeyboardMarkup(inline_keyboard=rows)
 
 
 def dashboard_screen(d: DashboardData) -> Screen:
@@ -114,8 +120,16 @@ def dashboard_screen(d: DashboardData) -> Screen:
     if neighbours:
         lines.append(f"{t(lang, 'borders')}: " + " · ".join(neighbours))
     lines.append(f"{t(lang, 'changes_7d')}: {d.changes_7d}")
+    if d.others:
+        lines += ["", f"<b>{t(lang, 'others')}:</b>"]
+        for code, score, level, war in d.others:
+            c = get_country(code)
+            value = f"{LEVEL_ICONS[level]} {score:.1f}" if score is not None and level else "⏳"
+            war_icon = f" {ICONS[war]}" if war != "none" else ""
+            lines.append(f"{c.flag} {escape(c.title(lang))} · {value}{war_icon}")
     lines.append("")
     lines.append(f"🔔 {t(lang, 'notifications')}: {t(lang, 'on' if d.notify else 'off')}")
+    lines.append(f"📰 {t(lang, 'digest')}: {t(lang, 'on' if d.digest else 'off')}")
     lines.append(f"🌐 {t(lang, 'language')}: {t(lang, 'lang_name')}")
     if d.updated:
         lines.append(f"🕒 {t(lang, 'updated')}: {d.updated.replace('T', ' ')[:16]} UTC")
@@ -131,7 +145,14 @@ def dashboard_screen(d: DashboardData) -> Screen:
             ],
             [
                 InlineKeyboardButton(
-                    text=t(lang, "btn_country"), callback_data=MenuCb(action="country").pack()
+                    text=t(lang, "btn_digest_on" if d.digest else "btn_digest_off"),
+                    callback_data=MenuCb(action="digest").pack(),
+                )
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t(lang, "btn_countries", n=len(d.others) + 1, max=MAX_FOLLOWED),
+                    callback_data=MenuCb(action="country").pack(),
                 ),
                 InlineKeyboardButton(
                     text=t(lang, "btn_lang"), callback_data=MenuCb(action="lang").pack()
@@ -145,6 +166,16 @@ def dashboard_screen(d: DashboardData) -> Screen:
                     text=t(lang, "btn_about"), callback_data=MenuCb(action="about").pack()
                 ),
             ],
+        ]
+        + [
+            [
+                InlineKeyboardButton(
+                    text=f"{get_country(code).flag} {get_country(code).title(lang)}",
+                    callback_data=ViewCb(code=code).pack(),
+                )
+                for code, *_ in d.others[i : i + 2]
+            ]
+            for i in range(0, len(d.others), 2)
         ]
     )
     return "\n".join(lines), kb

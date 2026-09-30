@@ -9,7 +9,7 @@ from __future__ import annotations
 import hashlib
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -148,6 +148,17 @@ MIGRATIONS: list[str] = [
     """
     ALTER TABLE news_items ADD COLUMN category TEXT NOT NULL DEFAULT 'none';
     ALTER TABLE news_items ADD COLUMN severity REAL NOT NULL DEFAULT 1.0;
+    """,
+    # 6: several countries per user (users.country = the one shown in detail) and digest
+    """
+    CREATE TABLE user_countries (
+        tg_id           INTEGER NOT NULL REFERENCES users (tg_id),
+        country         TEXT NOT NULL,
+        PRIMARY KEY (tg_id, country)
+    );
+    INSERT INTO user_countries (tg_id, country)
+        SELECT tg_id, country FROM users WHERE country IS NOT NULL;
+    ALTER TABLE users ADD COLUMN digest INTEGER NOT NULL DEFAULT 0;
     """,
 ]
 
@@ -301,23 +312,55 @@ async def recent_changes(db: aiosqlite.Connection, limit: int = 10) -> list[aios
 # --- Bot users ------------------------------------------------------------------------------
 
 
+MAX_FOLLOWED = 5
+
+
 @dataclass(slots=True)
 class User:
     tg_id: int
     lang: str | None
-    country: str | None
+    country: str | None  # the country shown in detail on the dashboard
     notify: bool
+    digest: bool = False
+    followed: list[str] = field(default_factory=list)
 
 
 async def get_user(db: aiosqlite.Connection, tg_id: int) -> User | None:
     async with db.execute(
-        "SELECT tg_id, lang, country, notify FROM users WHERE tg_id = ?", (tg_id,)
+        "SELECT tg_id, lang, country, notify, digest FROM users WHERE tg_id = ?", (tg_id,)
     ) as cur:
         row = await cur.fetchone()
-    return User(row[0], row[1], row[2], bool(row[3])) if row else None
+    if not row:
+        return None
+    async with db.execute(
+        "SELECT country FROM user_countries WHERE tg_id = ? ORDER BY rowid", (tg_id,)
+    ) as cur:
+        followed = [r[0] for r in await cur.fetchall()]
+    return User(row[0], row[1], row[2], bool(row[3]), bool(row[4]), followed)
 
 
-_USER_FIELDS = {"lang", "country", "notify"}
+async def set_followed(db: aiosqlite.Connection, tg_id: int, country: str, on: bool) -> User:
+    """Follow/unfollow a country (max MAX_FOLLOWED); keeps users.country pointing at a
+    followed country (or NULL when none is left)."""
+    if on:
+        await db.execute(
+            "INSERT OR IGNORE INTO user_countries (tg_id, country) VALUES (?, ?)", (tg_id, country)
+        )
+    else:
+        await db.execute(
+            "DELETE FROM user_countries WHERE tg_id = ? AND country = ?", (tg_id, country)
+        )
+    await db.commit()
+    user = await get_user(db, tg_id)
+    assert user is not None
+    if user.country not in user.followed:
+        user = await upsert_user(db, tg_id, country=user.followed[0] if user.followed else None)
+    elif on and len(user.followed) == 1:
+        user = await upsert_user(db, tg_id, country=country)
+    return user
+
+
+_USER_FIELDS = {"lang", "country", "notify", "digest"}
 
 
 async def upsert_user(db: aiosqlite.Connection, tg_id: int, **fields: object) -> User:
@@ -344,11 +387,32 @@ async def upsert_user(db: aiosqlite.Connection, tg_id: int, **fields: object) ->
 
 
 async def subscribers(db: aiosqlite.Connection, country: str) -> list[User]:
+    """Users following `country` with alerts on."""
     async with db.execute(
-        "SELECT tg_id, lang, country, notify FROM users WHERE country = ? AND notify = 1",
+        "SELECT u.tg_id, u.lang, u.country, u.digest FROM users u JOIN user_countries f "
+        "ON f.tg_id = u.tg_id WHERE f.country = ? AND u.notify = 1",
         (country,),
     ) as cur:
-        return [User(r[0], r[1], r[2], True) for r in await cur.fetchall()]
+        return [User(r[0], r[1], r[2], True, bool(r[3])) for r in await cur.fetchall()]
+
+
+async def digest_users(db: aiosqlite.Connection) -> list[User]:
+    async with db.execute("SELECT tg_id FROM users WHERE digest = 1") as cur:
+        ids = [r[0] for r in await cur.fetchall()]
+    users = [await get_user(db, i) for i in ids]
+    return [u for u in users if u and u.followed]
+
+
+async def score_before(
+    db: aiosqlite.Connection, country: str, before_iso: str
+) -> aiosqlite.Row | None:
+    """The latest score computed before a moment (for 24 h changes in the digest)."""
+    async with db.execute(
+        "SELECT score, level FROM scores WHERE country = ? AND computed_at < ? "
+        "ORDER BY id DESC LIMIT 1",
+        (country, before_iso),
+    ) as cur:
+        return await cur.fetchone()
 
 
 # --- Scores and change stats ----------------------------------------------------------------

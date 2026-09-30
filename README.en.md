@@ -26,17 +26,18 @@ Countries: EU-27, UK, Norway, Switzerland, Iceland, Moldova, Western Balkans (38
 ## Bot
 
 1. `/start` → choose a language (Українська / English).
-2. Choose one of 38 countries.
+2. Choose one of 38 countries (up to 5 can be followed later).
 3. A dashboard, edited in place with inline buttons. It shows:
-   - the tension score (or "calibrating" while data is thin);
+   - the tension score (or "calibrating" while data is thin) and the main reasons with quotes;
+   - a short line for each other followed country;
    - the war status on the country's territory;
    - borders with a country at war or with the aggressor;
    - advisory changes in the last 7 days;
    - the current notification and language settings.
 
-   Buttons: 🔔 alerts on/off · 🌍 change country · 🌐 change language · 🔄 refresh · ℹ️ how it works.
+   Buttons: 🔔 alerts · 📰 daily digest · 🌍 countries (up to 5) · 🌐 language · 🔄 refresh · ℹ️ how it works · buttons for the other countries to switch.
 
-When an advisory for a country changes, its subscribers with alerts on get a message in their language.
+Alerts (in the user's language): a changed advisory for a followed country (editorial edits skipped) and score moves of 1 or more with who says what and why. Digest: every morning, each followed country's score, its 24 h change and the largest rises in the region.
 Admin commands (`TELEGRAM_ADMIN_IDS`): `/status`, `/collect`, `/warcheck`.
 
 **War status** comes from the curated, RULAC-based [`config/conflicts.yaml`](config/conflicts.yaml). Every day `tension-index war-check` compares it with Wikipedia's list of ongoing conflicts and sends any mismatches to admins. The file is never changed automatically.
@@ -123,6 +124,7 @@ What runs:
 | `tension-health.timer` | health check every 15 minutes, Telegram alert on FAIL |
 | `tension-backup.timer` | daily SQLite backup, last 14 kept |
 | `tension-warcheck.timer` | daily war status check against Wikipedia |
+| `tension-digest.timer` | daily digest to subscribers (06:37 UTC) |
 
 Update: `./scripts/deploy.sh` (branch `main`) or `./scripts/deploy.sh dev-tg-bot` to test a branch.
 Status: `./scripts/healthcheck.sh` (exit codes: 0 OK, 1 WARN, 2 FAIL); logs: `journalctl -u tension-bot -f`.
