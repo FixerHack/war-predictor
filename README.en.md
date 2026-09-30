@@ -86,7 +86,9 @@ Then fill in `.env` (bot token, channel ID, your Telegram ID in `TELEGRAM_ADMIN_
 ```bash
 make test                  # tests
 make lint                  # ruff
-./scripts/run.sh collect --countries PL,EE   # collect a few countries
+./scripts/run.sh run       # full cycle: collect → classify → score
+./scripts/run.sh collect --countries PL,EE   # collection only, a few countries
+./scripts/run.sh probe us --country PL      # what a source really returns
 ./scripts/run.sh health    # system health
 ./scripts/run.sh bot       # bot (Ctrl+C to stop)
 make plan                  # regenerate PLAN.md after editing roadmap.yaml
@@ -117,7 +119,7 @@ What runs:
 | Unit | Purpose |
 |---|---|
 | `tension-bot.service` | the bot, restarted on failure |
-| `tension-collect.timer` | collection every 3 hours, alerts on changes and failures |
+| `tension-collect.timer` | full cycle every 3 hours: collect, classify, score, alerts |
 | `tension-health.timer` | health check every 15 minutes, Telegram alert on FAIL |
 | `tension-backup.timer` | daily SQLite backup, last 14 kept |
 | `tension-warcheck.timer` | daily war status check against Wikipedia |

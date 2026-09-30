@@ -34,7 +34,7 @@ async def test_baseline_then_change(settings):
         changed["details"]["parts"][0]["body"] = "<p>FCDO advises against all travel.</p>"
         result = await collect_source(db, make_source(changed), ["PL"])
         assert result.changed == 1
-        country, diff = result.changes[0]
+        country, diff, _ = result.changes[0]
         assert country == "PL"
         assert diff.startswith("LEVEL: none -> avoid_all_travel_to_whole_country")
         assert "+FCDO advises against all travel." in diff

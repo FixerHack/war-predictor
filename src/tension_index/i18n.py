@@ -86,6 +86,32 @@ TEXTS: dict[str, dict[str, str]] = {
     "war_clashes": {"uk": "окремі збройні інциденти", "en": "sporadic armed clashes"},
     "war_active": {"uk": "збройний конфлікт", "en": "armed conflict"},
     "war_war": {"uk": "війна", "en": "war"},
+    "kind_update": {"uk": "оновлення тексту рекомендації", "en": "advisory text update"},
+    "flag_synchrony": {
+        "uk": "{n} держав(и) посилили позицію за тиждень",
+        "en": "{n} governments tightened their advice within a week",
+    },
+    "flag_isolated": {
+        "uk": "зростання лише в цій країні, сусіди без змін (можливий політичний сигнал)",
+        "en": "rise in this country only, neighbours unchanged (possibly a political signal)",
+    },
+    "flag_regional_escalation": {
+        "uk": "одночасне зростання в регіоні",
+        "en": "simultaneous rise across the region",
+    },
+    "flag_low_coverage": {
+        "uk": "недостатньо свіжих даних для балу",
+        "en": "not enough fresh data for a score",
+    },
+    "floor_hit": {
+        "uk": "спрацювала порогова подія (мінімальний бал за правилами шкали)",
+        "en": "a threshold event applies (minimum score by the scale rules)",
+    },
+    "why": {"uk": "Чому", "en": "Why"},
+    "alert_score": {
+        "uk": "{arrow} {flag} <b>{country}</b>: напруга {old} → <b>{new}</b> ({level})",
+        "en": "{arrow} {flag} <b>{country}</b>: tension {old} → <b>{new}</b> ({level})",
+    },
     "alert_change": {
         "uk": "🔔 {flag} <b>{country}</b>: змінилась рекомендація ({source})",
         "en": "🔔 {flag} <b>{country}</b>: travel advice changed ({source})",

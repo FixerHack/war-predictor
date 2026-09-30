@@ -28,7 +28,8 @@ class RunResult:
     changed: int = 0
     failed: int = 0
     errors: list[str] = field(default_factory=list)
-    changes: list[tuple[str, str]] = field(default_factory=list)  # (country, diff)
+    # (country, diff, change id)
+    changes: list[tuple[str, str, int]] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -97,7 +98,7 @@ async def collect_source(db, source: Source, countries: list[str] | None = None)
         diff = changed_fragment(previous.text, text)
         if previous.level != advisory.level:
             diff = f"LEVEL: {previous.level} -> {advisory.level}\n{diff}"
-        await storage.insert_change(
+        change_id = await storage.insert_change(
             db,
             source=source.name,
             country=country.code,
@@ -106,7 +107,7 @@ async def collect_source(db, source: Source, countries: list[str] | None = None)
             diff=diff,
         )
         result.changed += 1
-        result.changes.append((country.code, diff))
+        result.changes.append((country.code, diff, change_id))
     await db.commit()
     await storage.finish_run(
         db,

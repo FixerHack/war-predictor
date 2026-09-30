@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.21**, updated 2026-09-30.
+Version **0.2.24**, updated 2026-09-30.
 
-**Overall progress: 38%** · left ≈ 27.4 days · ✅ 35 · 🟡 6 · ⬜ 36 · ⛔ 1
+**Overall progress: 43%** · left ≈ 24.9 days · ✅ 38 · 🟡 6 · ⬜ 33 · ⛔ 1
 
 ## Milestones
 
@@ -123,7 +123,7 @@ Branch: `dev-classifier`
 - ⬜ **S6.3** Manual check on 50 examples _(manual)_
   - Needs an API key and real changes; review 50 classifications by hand.
 
-## S7. Scoring 0–10 — 50%
+## S7. Scoring 0–10 — 100%
 
 _Weighted score with modifiers, numbers in config/weights.yaml._
 
@@ -131,8 +131,9 @@ Branch: `dev-scoring`
 
 - ✅ **S7.1** Scoring engine: blocks A–F, caps, reasons, decay, verification, floors
 - ✅ **S7.2** Country baseline and deviation, cross-government synchrony, regional divergence
-- ⬜ **S7.3** Signals table and daily score computation for all countries
-- ⬜ **S7.4** Score explanation in alerts and on the dashboard
+- ✅ **S7.3** Signals table and daily score computation for all countries
+  - tension-index run: collect → classify → signals → score; no score without enough coverage (except threshold events).
+- ✅ **S7.4** Score explanation in alerts and on the dashboard
 
 ## S8. Backtesting — 0%
 
@@ -144,7 +145,7 @@ Branch: `dev-backtest`
 - ⬜ **S8.2** False alarm and miss report
 - ⬜ **S8.3** Weight tuning
 
-## S9. Telegram bot & alerts — 60%
+## S9. Telegram bot & alerts — 80%
 
 _Bot with language and country choice, a dashboard and explained alerts._
 
@@ -154,7 +155,8 @@ Branch: `dev-tg-bot`
 - ✅ **S9.2** Onboarding: language (uk/en) → country → dashboard
 - ✅ **S9.3** Inline dashboard: score, war status, neighbours, 7-day changes; toggles for alerts, country, language
 - ✅ **S9.4** Change alerts to a country's subscribers in their language
-- ⬜ **S9.5** Alerts on score change of 1+ with explanation and quote
+- ✅ **S9.5** Alerts on score change of 1+ with explanation and quote
+  - Score moves by 1+ → subscribers get an explanation with sources and quotes.
 - ⬜ **S9.6** Daily regional digest
 - ⬜ **S9.7** Several countries per user
 
@@ -225,6 +227,10 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.24** (2026-09-30)
+  - Signals from advisories, daily score, explanations
+  - run command (full cycle) and score-change alerts
+  - Bot shows the score and reasons
 - **0.2.21** (2026-09-30)
   - Change classifier: rules + Claude (strict JSON schema, caching, call cap)
   - classify command
