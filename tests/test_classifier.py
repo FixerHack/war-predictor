@@ -263,3 +263,14 @@ def test_staff_posture_wordings_2022():
     }
     for text, posture in cases.items():
         assert classify_rules(text).staff_posture == posture, text
+
+
+def test_routine_flight_notes_are_not_airspace_restrictions():
+    routine = (
+        "Check NOTAMs before flying drones. Flight restrictions apply near airports.",
+        "The FAA has issued a NOTAM prohibiting U.S. civil aviation in Crimea.",
+    )
+    for text in routine:
+        assert classify_rules(text).airspace == "unknown", text
+    assert classify_rules("Moldova has closed parts of its airspace.").airspace == "restricted"
+    assert classify_rules("The airspace is closed to civil flights.").airspace == "closed"

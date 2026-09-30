@@ -86,7 +86,9 @@ def test_floors():
     )
     assert two.score >= 9.0 and two.level == "critical"
     closed = Signal("EE", "aviation", "aviation:airspace_closed", 1.0, "easa", NOW, state=True)
-    assert compute_score("EE", [closed], NOW).score >= 8.0
+    assert compute_score("EE", [closed], NOW).score < 8.0  # one publisher: no floor
+    also = Signal("EE", "aviation", "aviation:airspace_closed", 1.0, "gov_uk", NOW, state=True)
+    assert compute_score("EE", [closed, also], NOW).score >= 8.0
 
 
 def test_unconfirmed_low_tier_is_ignored():

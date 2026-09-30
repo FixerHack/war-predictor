@@ -102,8 +102,10 @@ floors:
   - {when: ["staff_posture:ordered_departure", "staff_posture:embassy_suspended"], min_governments: 2, score: 9.0}
   - {when: ["staff_posture:authorized_departure", "staff_posture:ordered_departure", "staff_posture:embassy_suspended"], min_governments: 1, score: 7.0}
   - {when: "domestic:mobilisation", min_governments: 0, score: 9.0}
-  - {when: "aviation:airspace_closed", min_governments: 0, score: 8.0}
-  - {when: "aviation:airspace_restricted", min_governments: 0, score: 6.0}
+  # Airspace floors need two independent publishers: one government's wording (or a
+  # classifier reading a regional NOTAM as "restricted") must not set the score alone.
+  - {when: "aviation:airspace_closed", min_governments: 2, score: 8.0}
+  - {when: "aviation:airspace_restricted", min_governments: 2, score: 6.0}
 
 # Minimum share of blocks with fresh data to publish a score.
 min_coverage: 0.5
