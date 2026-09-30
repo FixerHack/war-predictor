@@ -229,3 +229,12 @@ def test_make_classifier_needs_the_providers_key(settings):
     assert make_classifier(settings) is None  # anthropic key alone is not enough
     settings.openrouter_api_key = "sk-or"
     assert make_classifier(settings).provider == "openrouter"
+
+
+def test_usable_quote_drops_page_fragments():
+    from tension_index.classifier import usable_quote
+
+    assert usable_quote("3 pays") == ""
+    assert usable_quote("Voir aussi") == ""
+    quote = "Petty crime can occur,  especially in popular tourist locations."
+    assert usable_quote(quote) == "Petty crime can occur, especially in popular tourist locations."
