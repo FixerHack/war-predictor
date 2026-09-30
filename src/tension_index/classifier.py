@@ -89,7 +89,10 @@ _REASON_RULES = {  # order = severity for ties
 _AIRSPACE_RULES = [
     ("closed", r"airspace (is |has been |remains )?closed|closed (its |the )?airspace|"
      r"espace aérien (est )?fermé|luftraum (ist )?gesperrt"),
-    ("restricted", r"airspace restrictions?|restricted airspace|flight restrictions|notam"),
+    # Country-level wording only: "NOTAM" or drone rules near an airport are routine.
+    ("restricted", r"airspace (is |has been |remains )?(partially )?(restricted|limited)|"
+     r"closed (parts|part|sections) of (its |the )?airspace|restrictions on (the use of )?"
+     r"(its |the )?airspace"),
 ]  # fmt: skip
 _BORDERS = re.compile(
     r"borders? (crossings? )?(are |is |has been |have been |remain )?closed|"
@@ -214,8 +217,11 @@ stated for the whole country); otherwise an empty string.
 voluntary departure of staff/families allowed; ordered_departure = departure ordered; \
 embassy_suspended = embassy closed or operations suspended; limited_consular_services; \
 normal if explicitly normal; unknown if not mentioned.
-- airspace: closed / restricted if the text says so for the country, normal if it explicitly \
-says flights operate normally, unknown otherwise.
+- airspace: closed / restricted if the text says the country's airspace is closed or \
+restricted as a whole or over a large part of it because of a security threat, normal if it \
+explicitly says flights operate normally, unknown otherwise. Routine NOTAMs, drone rules near \
+airports, strikes, weather, and restrictions limited to occupied or separatist areas that have \
+been in place for years are unknown.
 - borders_closed: true only if land borders of the country are stated to be closed.
 - quote: one sentence copied verbatim from the added or current text that best supports the \
 classification (max 300 characters). Empty if nothing substantive.

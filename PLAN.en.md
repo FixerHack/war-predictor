@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.64**, updated 2026-09-30.
+Version **0.2.65**, updated 2026-09-30.
 
 **Overall progress: 68%** · left ≈ 14.4 days · ✅ 51 · 🟡 19 · ⬜ 10 · ⛔ 4
 
@@ -158,7 +158,7 @@ _The scale must fire on known episodes in time and without mass false alarms._
 Branch: `dev-backtest`
 
 - 🟡 **S8.1** Replay the scale on historical episodes
-  - First run on the Wayback archive (Ukraine 2022): PASS, but 7 only on 12 Feb — rules missed embassy posture on full pages (lines starting with -/+ were read as a diff). Fixed; awaiting a re-run.
+  - Wayback archive, Ukraine 2022: rules PASS, 7 from 24 Jan 2022 (31 days ahead). With the model 7 came as early as 9 Oct 2021 via "airspace restricted" (Crimea since 2014) — airspace floors now need two sources; awaiting a re-run.
 - 🟡 **S8.2** False alarm and miss report
   - Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms.
 - 🟡 **S8.3** Weight tuning
@@ -237,6 +237,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-09-30: Airspace floors (8 / 6) only with two independent sources, like the ordered-departure floor.
 - 2026-09-30: Ordered departure of family members only = authorized staff departure (floor 7), not ordered staff departure (floor 9 with two governments).
 - 2026-09-30: Surge bonus at most 0.10 to R; synchrony counts only level raises, staff posture, consular/border/airspace measures with reason relevance ≥ 0.5.
 - 2026-09-30: Change classification: Claude Haiku 4.5 via OpenRouter
@@ -263,6 +264,195 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.65** (2026-09-30)
+  - A
+  - i
+  - r
+  - s
+  - p
+  - a
+  - c
+  - e
+  -  
+  - c
+  - l
+  - o
+  - s
+  - e
+  - d
+  - /
+  - r
+  - e
+  - s
+  - t
+  - r
+  - i
+  - c
+  - t
+  - e
+  - d
+  -  
+  - f
+  - l
+  - o
+  - o
+  - r
+  - s
+  -  
+  - n
+  - o
+  - w
+  -  
+  - n
+  - e
+  - e
+  - d
+  -  
+  - t
+  - w
+  - o
+  -  
+  - i
+  - n
+  - d
+  - e
+  - p
+  - e
+  - n
+  - d
+  - e
+  - n
+  - t
+  -  
+  - s
+  - o
+  - u
+  - r
+  - c
+  - e
+  - s
+  - ;
+  -  
+  - r
+  - u
+  - l
+  - e
+  - s
+  -  
+  - a
+  - n
+  - d
+  -  
+  - t
+  - h
+  - e
+  -  
+  - m
+  - o
+  - d
+  - e
+  - l
+  -  
+  - n
+  - o
+  -  
+  - l
+  - o
+  - n
+  - g
+  - e
+  - r
+  -  
+  - t
+  - r
+  - e
+  - a
+  - t
+  -  
+  - r
+  - o
+  - u
+  - t
+  - i
+  - n
+  - e
+  -  
+  - N
+  - O
+  - T
+  - A
+  - M
+  - s
+  - ,
+  -  
+  - d
+  - r
+  - o
+  - n
+  - e
+  -  
+  - r
+  - u
+  - l
+  - e
+  - s
+  -  
+  - o
+  - r
+  -  
+  - l
+  - o
+  - n
+  - g
+  - -
+  - s
+  - t
+  - a
+  - n
+  - d
+  - i
+  - n
+  - g
+  -  
+  - r
+  - e
+  - g
+  - i
+  - o
+  - n
+  - a
+  - l
+  -  
+  - b
+  - a
+  - n
+  - s
+  -  
+  - a
+  - s
+  -  
+  - a
+  - i
+  - r
+  - s
+  - p
+  - a
+  - c
+  - e
+  -  
+  - r
+  - e
+  - s
+  - t
+  - r
+  - i
+  - c
+  - t
+  - i
+  - o
+  - n
+  - s
+  - .
 - **0.2.64** (2026-09-30)
   - F
   - i
