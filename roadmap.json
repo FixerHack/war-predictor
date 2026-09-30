@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.53",
+    "version": "0.2.54",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -1195,6 +1195,20 @@
   ],
   "changelog": [
     {
+      "version": "0.2.54",
+      "date": "2026-09-30",
+      "uk": [
+        "run: прогрес і ліміти часу для авіації, новин, GDELT, ЄЦБ",
+        "США: детермінований вибір запису країни (менше хибних «змін»)",
+        "Команда changes: останні зміни з diff"
+      ],
+      "en": [
+        "run: progress and time limits for aviation, news, GDELT, ECB",
+        "US: deterministic item choice per country (fewer false changes)",
+        "changes command: recent changes with diff"
+      ]
+    },
+    {
       "version": "0.2.53",
       "date": "2026-09-30",
       "uk": [
@@ -1532,7 +1546,7 @@
     "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T14:44:47+00:00",
-    "commit": "c399bec"
+    "built_at": "2026-09-30T14:50:17+00:00",
+    "commit": "a7e52c6"
   }
 }
