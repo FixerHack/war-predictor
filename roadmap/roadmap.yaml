@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.1
+  version: 0.2.2
   updated: 2026-09-30
 
 milestones:
@@ -41,7 +41,7 @@ stages:
       - {id: S0.10, status: todo, days: 0.2, owner: human, uk: "Anthropic Console: поповнення, ключ API, місячний ліміт витрат", en: "Anthropic Console: top-up, API key, monthly spend cap"}
       - {id: S0.11, status: todo, days: 0.2, owner: human, uk: "Створити бота в @BotFather, тестовий канал, заповнити .env", en: "Create bot via @BotFather, test channel, fill in .env"}
       - {id: S0.12, status: todo, days: 0.5, owner: human, uk: "Перший деплой на сервер: install_server.sh, перевірка healthcheck", en: "First server deploy: install_server.sh, verify healthcheck"}
-      - {id: S0.13, status: todo, days: 0.2, owner: human, uk: "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root", en: "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root", note_uk: "Сайт уже в гілці gh-pages (make pages), бо Actions заблоковані.", note_en: "Site is already on the gh-pages branch (make pages) because Actions are locked."}
+      - {id: S0.13, status: done, days: 0.2, owner: human, uk: "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root", en: "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root", note_uk: "Працює: fixerhack.github.io/war-predictor", note_en: "Live: fixerhack.github.io/war-predictor"}
       - {id: S0.15, status: todo, days: 0.2, owner: human, uk: "Зняти блокування GitHub Actions: Settings → Billing and plans (рахунок / картка)", en: "Unlock GitHub Actions: Settings → Billing and plans (invoice / card)", note_uk: "CI не стартує: «account is locked due to a billing issue».", note_en: "CI does not start: \"account is locked due to a billing issue\"."}
       - {id: S0.16, status: done, days: 0.2, uk: "Публікація сторінки прогресу без Actions (make pages → гілка gh-pages)", en: "Publish the progress page without Actions (make pages → gh-pages branch)"}
       - {id: S0.14, status: todo, days: 0.2, owner: human, uk: "Захист гілки main (тільки через PR, CI зелений); видалити гілку claude/funny-planck-leoxip", en: "Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip"}
@@ -230,6 +230,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.2
+    date: 2026-09-30
+    uk: ["Сторінка прогресу опублікована з гілки gh-pages", "Процес pages.yml оновлює gh-pages замість прямої публікації"]
+    en: ["Progress page live from the gh-pages branch", "pages.yml now refreshes gh-pages instead of deploying directly"]
   - version: 0.2.1
     date: 2026-09-30
     uk: ["Публікація сторінки прогресу без GitHub Actions: make pages → гілка gh-pages"]

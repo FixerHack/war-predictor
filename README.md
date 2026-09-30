@@ -9,7 +9,7 @@
 - 📋 План робіт: [PLAN.md](PLAN.md) (генерується з [`roadmap/roadmap.yaml`](roadmap/roadmap.yaml))
 - 🧮 Алгоритм шкали: [docs/algorithm.md](docs/algorithm.md)
 - 🗂 Джерела даних і трекери війн: [docs/sources.md](docs/sources.md)
-- 📊 Прогрес: GitHub Pages проєкту (`https://fixerhack.github.io/war-predictor/` після увімкнення Pages)
+- 📊 Прогрес: https://fixerhack.github.io/war-predictor/
 
 ## Шкала
 
@@ -95,10 +95,10 @@ make pages                 # опублікувати сторінку прог�
 ```
 
 **Сторінка прогресу.** Є два способи публікації:
-- автоматично через GitHub Actions (`.github/workflows/pages.yml`, Settings → Pages → Source: GitHub Actions);
+- автоматично через GitHub Actions (`.github/workflows/pages.yml` оновлює гілку `gh-pages` після кожного push у `main`);
 - без Actions: `make pages` збирає сайт і пушить його в гілку `gh-pages` (Settings → Pages → Source: Deploy from a branch → `gh-pages` / `root`).
 
-Треба вибрати один із них.
+Pages налаштовано на гілку `gh-pages` (Settings → Pages → Deploy from a branch).
 
 ## Сервер
 
