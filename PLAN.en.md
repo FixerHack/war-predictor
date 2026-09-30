@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.6**, updated 2026-09-30.
+Version **0.2.7**, updated 2026-09-30.
 
 **Overall progress: 29%** · left ≈ 31.0 days · ✅ 31 · 🟡 2 · ⬜ 45 · ⛔ 0
 
@@ -28,6 +28,7 @@ Branch: `dev-bootstrap`
 - ⬜ **S0.10** Anthropic Console: top-up, API key, monthly spend cap _(manual)_
 - ✅ **S0.11** Create bot via @BotFather, test channel, fill in .env _(manual)_
 - ⬜ **S0.12** First server deploy: install_server.sh, verify healthcheck _(manual)_
+  - Postponed: bot and system first.
 - ✅ **S0.13** Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root _(manual)_
   - Live: fixerhack.github.io/war-predictor
 - ⬜ **S0.15** Unlock GitHub Actions: Settings → Billing and plans (invoice / card) _(manual)_
@@ -159,7 +160,7 @@ Branch: `dev-war-status`
 - ⬜ **S10.3** Obtain a UCDP API token _(manual)_
 - ⬜ **S10.4** UCDP Candidate Events as a second automatic source
 - 🟡 **S10.5** Verify the Wikipedia parser against the live page
-  - Request works; layout-change guard added, re-run war-check to confirm.
+  - Guard showed wikitext parsing found no sections; parser moved to rendered HTML, run war-check --headings to confirm.
 
 ## S11. Public dashboard — 0%
 
@@ -194,6 +195,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-09-30: Server deploy postponed; priority is the bot and system on the MacBook
 - 2026-09-27: 0–10 scale instead of a probability: describes signals, does not forecast war
 - 2026-09-27: Advisories weigh less for EU/NATO members: allies rarely raise levels in advance
 - 2026-09-27: Compare against the country's own baseline, not absolute levels
@@ -213,6 +215,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.7** (2026-09-30)
+  - Wikipedia parser works on rendered HTML and headings of any level
+  - war-check --headings: page structure diagnostics
 - **0.2.6** (2026-09-30)
   - Verified on the MacBook: bootstrap, bot (onboarding and dashboard), GOV.UK collection, healthcheck
   - war-check: fails if the Wikipedia layout changes; prints recognised countries
