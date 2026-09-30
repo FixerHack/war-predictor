@@ -120,3 +120,27 @@ async def test_wayback_get_retries_timeouts_and_busy_answers():
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
         response = await wayback_get(client, "https://web.archive.org/x", backoff=0)
     assert response.text == "ok" and len(calls) == 3
+
+
+async def test_loading_twice_does_not_duplicate_and_old_duplicates_go(tmp_path):
+    from tension_index.history import drop_duplicates
+
+    async with storage.connect(tmp_path / "history.sqlite3") as db:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(wayback)) as client:
+            first = await load_episode(db, client, UA, pause=0)
+            again = await load_episode(db, client, UA, pause=0)
+        assert first == again == {"us": 3, "gov_uk": 2}
+        async with db.execute("SELECT COUNT(*) FROM changes") as cur:
+            changes = (await cur.fetchone())[0]
+        # A database from before this fix: every version and change loaded twice.
+        await db.execute(
+            "INSERT INTO snapshots (source, country, fetched_at, source_updated, url, title, level, "
+            "content_hash, text) SELECT source, country, fetched_at, source_updated, url, title, "
+            "level, content_hash, text FROM snapshots"
+        )
+        await db.commit()
+        assert await drop_duplicates(db) == 5
+        async with db.execute("SELECT COUNT(*) FROM changes") as cur:
+            assert (await cur.fetchone())[0] == changes
+        async with httpx.AsyncClient(transport=httpx.MockTransport(wayback)) as client:
+            assert await load_episode(db, client, UA, pause=0, refresh=True) == first

@@ -256,14 +256,14 @@ async def _history(args: argparse.Namespace) -> int:
     ids = list(episodes) if args.episode == "all" else [args.episode]
     async with make_client(get_settings()) as client, storage.connect(_history_db(args)) as db:
         for eid in ids:
-            stats = await load_episode(db, client, episodes[eid])
+            stats = await load_episode(db, client, episodes[eid], refresh=args.refresh)
             print(f"{eid}: versions stored per publisher {stats}")
     return 0
 
 
 async def _backtest(args: argparse.Namespace) -> int:
     from tension_index.backtest import classify_history, replay
-    from tension_index.history import load_episodes
+    from tension_index.history import drop_duplicates, load_episodes
     from tension_index.pipeline import make_classifier
 
     settings = get_settings()
@@ -274,6 +274,7 @@ async def _backtest(args: argparse.Namespace) -> int:
     failed = 0
     async with storage.connect(_history_db(args)) as db:
         await storage.migrate(db)
+        await drop_duplicates(db)
         claude = make_classifier(settings) if args.claude else None
         await classify_history(db, claude)
         for eid in ids:
@@ -395,6 +396,7 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("history", help="load archived advisories (Wayback) for an episode")
     p.add_argument("--episode", default="all", help="id from config/episodes.yaml or 'all'")
     p.add_argument("--db", default="data/history.sqlite3")
+    p.add_argument("--refresh", action="store_true", help="download again what is loaded")
 
     p = sub.add_parser("backtest", help="replay the scale on archived episodes")
     p.add_argument("--episode", default="all")

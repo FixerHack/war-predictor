@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.69**, updated 2026-09-30.
+Version **0.2.70**, updated 2026-09-30.
 
 **Overall progress: 68%** · left ≈ 14.6 days · ✅ 51 · 🟡 20 · ⬜ 10 · ⛔ 4
 
@@ -160,7 +160,7 @@ _The scale must fire on known episodes in time and without mass false alarms._
 Branch: `dev-backtest`
 
 - 🟡 **S8.1** Replay the scale on historical episodes
-  - Wayback archive, Ukraine 2022: rules — 7 from 24 Jan 2022 (31 days ahead), model — 7 from 20 Dec 2021 (troop build-up), 9 after the invasion. Both PASS; control episodes not run yet.
+  - 4 episodes run. France 2016 (control): max 3.0 — PASS. Israel 2024: PASS (war already ongoing). Armenia–Azerbaijan 2020: FAIL, 5 never reached (0 US versions archived). Ukraine was loaded over itself — duplicates removed, loading is now repeatable.
 - 🟡 **S8.2** False alarm and miss report
   - Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms.
 - 🟡 **S8.3** Weight tuning
@@ -267,6 +267,143 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.70** (2026-09-30)
+  - L
+  - o
+  - a
+  - d
+  - i
+  - n
+  - g
+  -  
+  - t
+  - h
+  - e
+  -  
+  - a
+  - r
+  - c
+  - h
+  - i
+  - v
+  - e
+  -  
+  - a
+  - g
+  - a
+  - i
+  - n
+  -  
+  - s
+  - k
+  - i
+  - p
+  - s
+  -  
+  - w
+  - h
+  - a
+  - t
+  -  
+  - i
+  - s
+  -  
+  - a
+  - l
+  - r
+  - e
+  - a
+  - d
+  - y
+  -  
+  - l
+  - o
+  - a
+  - d
+  - e
+  - d
+  -  
+  - (
+  - -
+  - -
+  - r
+  - e
+  - f
+  - r
+  - e
+  - s
+  - h
+  -  
+  - r
+  - e
+  - l
+  - o
+  - a
+  - d
+  - s
+  - )
+  - ,
+  -  
+  - a
+  - n
+  - d
+  -  
+  - d
+  - u
+  - p
+  - l
+  - i
+  - c
+  - a
+  - t
+  - e
+  - s
+  -  
+  - i
+  - n
+  -  
+  - o
+  - l
+  - d
+  - e
+  - r
+  -  
+  - d
+  - a
+  - t
+  - a
+  - b
+  - a
+  - s
+  - e
+  - s
+  -  
+  - a
+  - r
+  - e
+  -  
+  - r
+  - e
+  - m
+  - o
+  - v
+  - e
+  - d
+  -  
+  - a
+  - u
+  - t
+  - o
+  - m
+  - a
+  - t
+  - i
+  - c
+  - a
+  - l
+  - l
+  - y
+  - .
 - **0.2.69** (2026-09-30)
   - A
   - d
