@@ -7,6 +7,8 @@
 > ⚠️ Це індикатор стану сигналів, а не прогноз і не порада щодо виїзду. Рішення людина ухвалює самостійно.
 
 - 📋 План робіт: [PLAN.md](PLAN.md) (генерується з [`roadmap/roadmap.yaml`](roadmap/roadmap.yaml))
+- 🧮 Алгоритм шкали: [docs/algorithm.md](docs/algorithm.md)
+- 🗂 Джерела даних і трекери війн: [docs/sources.md](docs/sources.md)
 - 📊 Прогрес: GitHub Pages проєкту (`https://fixerhack.github.io/war-predictor/` після увімкнення Pages)
 
 ## Шкала
@@ -21,6 +23,24 @@
 
 Країни: ЄС-27, Велика Британія, Норвегія, Швейцарія, Ісландія, Молдова, Західні Балкани (38).
 
+## Бот
+
+1. `/start` → вибір мови (українська / English).
+2. Вибір країни з 38.
+3. Панель, яка редагується на місці інлайн-кнопками. Вона показує:
+   - бал напруги (або «калібрування», поки даних мало);
+   - статус війни на території країни;
+   - сусідство з країною у стані війни чи з агресором;
+   - зміни рекомендацій за 7 днів;
+   - поточні налаштування сповіщень і мови.
+
+   Кнопки: 🔔 увімк./вимк. сповіщення · 🌍 змінити країну · 🌐 змінити мову · 🔄 оновити · ℹ️ як рахується.
+
+Коли змінюється рекомендація щодо країни, підписники з увімкненими сповіщеннями отримують повідомлення своєю мовою.
+Адмінські команди (`TELEGRAM_ADMIN_IDS`): `/status`, `/collect`, `/warcheck`.
+
+**Статус війни** береться з вручну перевіреного довідника [`config/conflicts.yaml`](config/conflicts.yaml), складеного на основі RULAC. Щодня `tension-index war-check` звіряє його зі списком конфліктів Wikipedia і надсилає розбіжності адміну. Автоматично довідник не змінюється.
+
 ## Стек
 
 Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite (aiosqlite) · Claude API (з етапу S6) · systemd на власному сервері · GitHub Actions (CI і Pages).
@@ -29,7 +49,7 @@ Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite 
 
 ```
 src/tension_index/
-  cli.py           команди: init-db, collect, health, bot, roadmap
+  cli.py           команди: init-db, collect, health, bot, war-check, roadmap
   config.py        налаштування з .env
   countries.py     38 країн моніторингу
   storage.py       SQLite + міграції
@@ -38,10 +58,15 @@ src/tension_index/
   sources/         джерела рекомендацій (gov_uk.py — Велика Британія)
   health.py        перевірки стану
   notify.py        надсилання в Telegram
-  bot/             Telegram-бот (aiogram)
+  bot/             Telegram-бот (aiogram): handlers, views, callbacks
+  i18n.py          тексти бота укр/англ
+  scoring.py       шкала 0–10 (config/weights.yaml)
+  war_status.py    статус війни (config/conflicts.yaml + Wikipedia)
   roadmap.py       генерація PLAN.md і сторінки прогресу
 scripts/           bootstrap, run, healthcheck, deploy, backup, install_server
 deploy/systemd/    юніти: бот, таймери збору, healthcheck і бекапу
+config/           weights.yaml (шкала), conflicts.yaml (статус війни)
+docs/             алгоритм і джерела
 roadmap/           roadmap.yaml — єдине джерело плану
 site/              шаблон сторінки прогресу
 tests/
@@ -88,6 +113,7 @@ nano .env                     # заповнити
 | `tension-collect.timer` | збір кожні 3 години, сповіщення про зміни й збої |
 | `tension-health.timer` | healthcheck кожні 15 хвилин, алерт у Telegram при FAIL |
 | `tension-backup.timer` | щоденний бекап SQLite, зберігаються останні 14 |
+| `tension-warcheck.timer` | щоденна звірка статусу війни з Wikipedia |
 
 Оновлення: `./scripts/deploy.sh` (гілка `main`) або `./scripts/deploy.sh dev-tg-bot` для тесту гілки.
 Стан: `./scripts/healthcheck.sh` (коди виходу: 0 OK, 1 WARN, 2 FAIL), логи: `journalctl -u tension-bot -f`.

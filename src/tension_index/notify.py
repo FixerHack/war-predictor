@@ -36,3 +36,50 @@ async def send(settings: Settings, text: str) -> bool:
         return False
     finally:
         await bot.session.close()
+
+
+async def broadcast_change(settings: Settings, country: str, source_label: str, diff: str) -> int:
+    """Send an advisory-change alert to every user following `country` with alerts on,
+    each in their own language. Returns the number of messages delivered."""
+    import asyncio
+    from html import escape
+
+    from aiogram.exceptions import TelegramForbiddenError
+
+    from tension_index import storage
+    from tension_index.countries import get_country
+    from tension_index.i18n import t
+
+    if not settings.telegram_bot_token:
+        return 0
+    c = get_country(country)
+    async with storage.connect(settings.database_path) as db:
+        users = await storage.subscribers(db, country)
+        if not users:
+            return 0
+        bot = make_bot(settings)
+        sent = 0
+        try:
+            for user in users:
+                text = (
+                    t(
+                        user.lang,
+                        "alert_change",
+                        flag=c.flag,
+                        country=escape(c.title(user.lang or "uk")),
+                        source=escape(source_label),
+                    )
+                    + f"\n<pre>{escape(diff[:2500])}</pre>\n<i>{t(user.lang, 'disclaimer')}</i>"
+                )
+                try:
+                    await bot.send_message(user.tg_id, text[:TELEGRAM_LIMIT])
+                    sent += 1
+                except TelegramForbiddenError:
+                    # User blocked the bot: stop sending until they come back.
+                    await storage.upsert_user(db, user.tg_id, notify=False)
+                except Exception:
+                    log.exception("Failed to notify %s", user.tg_id)
+                await asyncio.sleep(0.05)  # stay well under Telegram's 30 msg/s
+        finally:
+            await bot.session.close()
+    return sent

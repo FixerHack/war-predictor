@@ -1,0 +1,12 @@
+[Unit]
+Description=Tension Index: compare curated war status with Wikipedia
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=@APP_USER@
+WorkingDirectory=@APP_DIR@
+ExecStart=@UV@ run --frozen --no-dev tension-index war-check --notify
+# 1 = mismatches found (reported to Telegram), not a unit failure
+SuccessExitStatus=1

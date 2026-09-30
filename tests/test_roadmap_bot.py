@@ -13,8 +13,8 @@ def test_roadmap_is_valid_and_renders(tmp_path):
     assert 0 <= data["stats"]["percent"] <= 100
     assert (tmp_path / "site" / "index.html").exists()
     assert json.loads((tmp_path / "site" / "roadmap.json").read_text())["stages"]
-    assert "# Tension Index — План робіт" in (tmp_path / "PLAN.md").read_text()
-    assert "# Tension Index — Project plan" in (tmp_path / "PLAN.en.md").read_text()
+    assert "# Індекс напруги: Європа — План робіт" in (tmp_path / "PLAN.md").read_text()
+    assert "# Tension Index: Europe — Project plan" in (tmp_path / "PLAN.en.md").read_text()
 
 
 def test_branch_names_follow_convention():
@@ -30,3 +30,16 @@ def test_dispatcher_builds(settings):
 def test_cli_parses():
     args = build_parser().parse_args(["collect", "--countries", "PL,EE", "--notify"])
     assert args.countries == ["PL", "EE"] and args.notify
+
+
+def test_every_bot_text_has_both_languages():
+    from tension_index.i18n import LANGS, TEXTS
+
+    for key, entry in TEXTS.items():
+        assert set(entry) == set(LANGS), key
+
+
+def test_package_version_matches_roadmap():
+    from tension_index import __version__
+
+    assert str(load(ROOT / "roadmap" / "roadmap.yaml")["project"]["version"]) == __version__

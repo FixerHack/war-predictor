@@ -1,0 +1,37 @@
+# Curated war/conflict status on each monitored country's own territory.
+# Source of truth for the bot's "war status" line. Changes are made by a human after review:
+# `tension-index war-check --notify` compares this file with automatic trackers and alerts
+# admins about mismatches, it never edits this file itself.
+#
+# status: none | frozen | clashes | active | war
+#   frozen  - occupation or frozen conflict without regular hostilities (RULAC "military occupation")
+#   clashes - sporadic armed incidents (Wikipedia: fewer than 100 deaths/yr)
+#   active  - ongoing armed conflict (100-999 deaths/yr)
+#   war     - war (1,000+ deaths/yr)
+# borders_war: neighbours with a war on their territory (context line in the bot)
+# borders_aggressor: land borders with Russia / Belarus
+
+reviewed: 2026-09-30
+default: {status: none}
+
+countries:
+  MD:
+    status: frozen
+    note_uk: "Придністров'я: військова присутність Росії з 1992 року (RULAC: окупація)"
+    note_en: "Transnistria: Russian military presence since 1992 (RULAC: military occupation)"
+    source: "RULAC (https://www.rulac.org), Moldova: military occupation of Transdniestria"
+    borders_war: [UA]
+  CY:
+    status: frozen
+    note_uk: "Північ острова під контролем Туреччини з 1974 року (RULAC: окупація)"
+    note_en: "Northern Cyprus under Turkish control since 1974 (RULAC: military occupation)"
+    source: "RULAC (https://www.rulac.org), Cyprus: military occupation by Turkey"
+  PL: {status: none, borders_war: [UA], borders_aggressor: [BY, RU]}
+  LT: {status: none, borders_aggressor: [BY, RU]}
+  LV: {status: none, borders_aggressor: [BY, RU]}
+  EE: {status: none, borders_aggressor: [RU]}
+  FI: {status: none, borders_aggressor: [RU]}
+  NO: {status: none, borders_aggressor: [RU]}
+  SK: {status: none, borders_war: [UA]}
+  HU: {status: none, borders_war: [UA]}
+  RO: {status: none, borders_war: [UA]}

@@ -31,6 +31,8 @@ def load(path: Path) -> dict:
                 raise ValueError(f"duplicate task id {task['id']}")
             seen.add(task["id"])
             task.setdefault("owner", "claude")
+            if task["owner"] not in ("claude", "human"):
+                raise ValueError(f"{task['id']}: owner must be claude or human")
     return data
 
 
@@ -72,33 +74,46 @@ def render_markdown(data: dict, lang: str) -> str:
             "note": "Файл згенеровано з `roadmap/roadmap.yaml` командою "
             "`uv run tension-index roadmap`. Не редагуйте вручну.",
             "other": "English version",
+            "version": "Версія",
+            "updated": "оновлено",
             "overall": "Загальний прогрес",
             "left": "лишилось",
             "days": "днів",
             "branch": "Гілка",
             "milestones": "Віхи",
+            "decisions": "Зафіксовані рішення",
+            "risks": "Ризики",
+            "changelog": "Журнал змін",
             "ideas": "Ідеї",
-            "owner": "виконує Дмитро",
+            "owner": "вручну",
         },
         "en": {
             "title": "Project plan",
             "note": "Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. "
             "Do not edit by hand.",
             "other": "Українська версія",
+            "version": "Version",
+            "updated": "updated",
             "overall": "Overall progress",
             "left": "left",
             "days": "days",
             "branch": "Branch",
             "milestones": "Milestones",
+            "decisions": "Decisions",
+            "risks": "Risks",
+            "changelog": "Changelog",
             "ideas": "Ideas",
-            "owner": "owner: Dmytro",
+            "owner": "manual",
         },
     }[lang]
+    project = data["project"]
     st = data["stats"]
     lines = [
-        f"# {data['project']['name']} — {t['title']}",
+        f"# {project['name_' + lang]} — {t['title']}",
         "",
         f"> {t['note']} [{t['other']}]({other})",
+        "",
+        f"{t['version']} **{project['version']}**, {t['updated']} {project['updated']}.",
         "",
         f"**{t['overall']}: {st['percent']}%** · {t['left']} ≈ {st['days_left']} {t['days']} "
         f"· " + " · ".join(f"{ICONS[s]} {st['counts'][s]}" for s in STATUSES),
@@ -109,16 +124,26 @@ def render_markdown(data: dict, lang: str) -> str:
     lines += [f"- **{m['id']}** — {m[lang]}" for m in data.get("milestones", [])]
     for stage in data["stages"]:
         s = stage["stats"]
-        lines += [
-            "",
-            f"## {stage['id']}. {stage[lang]} — {s['percent']}%",
-            "",
-            f"{t['branch']}: `{stage['branch']}`",
-            "",
-        ]
+        lines += ["", f"## {stage['id']}. {stage[lang]} — {s['percent']}%", ""]
+        if stage.get("goal_" + lang):
+            lines += [f"_{stage['goal_' + lang]}_", ""]
+        lines += [f"{t['branch']}: `{stage['branch']}`", ""]
         for task in stage["tasks"]:
-            owner = f" _({t['owner']})_" if task["owner"] == "dmytro" else ""
+            owner = f" _({t['owner']})_" if task["owner"] == "human" else ""
             lines.append(f"- {ICONS[task['status']]} **{task['id']}** {task[lang]}{owner}")
+            if task.get("note_" + lang):
+                lines.append(f"  - {task['note_' + lang]}")
+    if data.get("decisions"):
+        lines += ["", f"## {t['decisions']}", ""]
+        lines += [f"- {d['date']}: {d[lang]}" for d in data["decisions"]]
+    if data.get("risks"):
+        lines += ["", f"## {t['risks']}", ""]
+        lines += [f"- {r[lang]}" for r in data["risks"]]
+    if data.get("changelog"):
+        lines += ["", f"## {t['changelog']}", ""]
+        for entry in data["changelog"]:
+            lines.append(f"- **{entry['version']}** ({entry['date']})")
+            lines += [f"  - {change}" for change in entry[lang]]
     if data.get("ideas"):
         lines += ["", f"## {t['ideas']}", ""]
         lines += [f"- {idea[lang]}" for idea in data["ideas"]]

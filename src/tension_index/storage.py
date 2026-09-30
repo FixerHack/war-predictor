@@ -56,6 +56,28 @@ MIGRATIONS: list[str] = [
     );
     CREATE INDEX ix_collect_runs_source ON collect_runs (source, id);
     """,
+    # 2: bot users and computed scores
+    """
+    CREATE TABLE users (
+        tg_id           INTEGER PRIMARY KEY,
+        lang            TEXT,
+        country         TEXT,
+        notify          INTEGER NOT NULL DEFAULT 1,
+        created_at      TEXT NOT NULL,
+        updated_at      TEXT NOT NULL
+    );
+    CREATE INDEX ix_users_country ON users (country, notify);
+
+    CREATE TABLE scores (
+        id              INTEGER PRIMARY KEY,
+        country         TEXT NOT NULL,
+        computed_at     TEXT NOT NULL,
+        score           REAL,
+        level           TEXT,
+        payload         TEXT NOT NULL
+    );
+    CREATE INDEX ix_scores_country ON scores (country, id);
+    """,
 ]
 
 
@@ -200,3 +222,86 @@ async def recent_changes(db: aiosqlite.Connection, limit: int = 10) -> list[aios
         "SELECT id, source, country, detected_at FROM changes ORDER BY id DESC LIMIT ?", (limit,)
     ) as cur:
         return list(await cur.fetchall())
+
+
+# --- Bot users ------------------------------------------------------------------------------
+
+
+@dataclass(slots=True)
+class User:
+    tg_id: int
+    lang: str | None
+    country: str | None
+    notify: bool
+
+
+async def get_user(db: aiosqlite.Connection, tg_id: int) -> User | None:
+    async with db.execute(
+        "SELECT tg_id, lang, country, notify FROM users WHERE tg_id = ?", (tg_id,)
+    ) as cur:
+        row = await cur.fetchone()
+    return User(row[0], row[1], row[2], bool(row[3])) if row else None
+
+
+_USER_FIELDS = {"lang", "country", "notify"}
+
+
+async def upsert_user(db: aiosqlite.Connection, tg_id: int, **fields: object) -> User:
+    unknown = set(fields) - _USER_FIELDS
+    if unknown:
+        raise ValueError(f"unknown user fields: {unknown}")
+    now = utcnow()
+    await db.execute(
+        "INSERT INTO users (tg_id, created_at, updated_at) VALUES (?, ?, ?) "
+        "ON CONFLICT(tg_id) DO NOTHING",
+        (tg_id, now, now),
+    )
+    if fields:
+        assignments = ", ".join(f"{name} = ?" for name in fields)
+        values = [int(v) if isinstance(v, bool) else v for v in fields.values()]
+        await db.execute(
+            f"UPDATE users SET {assignments}, updated_at = ? WHERE tg_id = ?",
+            (*values, now, tg_id),
+        )
+    await db.commit()
+    user = await get_user(db, tg_id)
+    assert user is not None
+    return user
+
+
+async def subscribers(db: aiosqlite.Connection, country: str) -> list[User]:
+    async with db.execute(
+        "SELECT tg_id, lang, country, notify FROM users WHERE country = ? AND notify = 1",
+        (country,),
+    ) as cur:
+        return [User(r[0], r[1], r[2], True) for r in await cur.fetchall()]
+
+
+# --- Scores and change stats ----------------------------------------------------------------
+
+
+async def insert_score(
+    db: aiosqlite.Connection, country: str, score: float | None, level: str | None, payload: str
+) -> None:
+    await db.execute(
+        "INSERT INTO scores (country, computed_at, score, level, payload) VALUES (?, ?, ?, ?, ?)",
+        (country, utcnow(), score, level, payload),
+    )
+    await db.commit()
+
+
+async def latest_score(db: aiosqlite.Connection, country: str) -> aiosqlite.Row | None:
+    async with db.execute(
+        "SELECT country, computed_at, score, level, payload FROM scores "
+        "WHERE country = ? ORDER BY id DESC LIMIT 1",
+        (country,),
+    ) as cur:
+        return await cur.fetchone()
+
+
+async def changes_since(db: aiosqlite.Connection, country: str, since_iso: str) -> int:
+    async with db.execute(
+        "SELECT COUNT(*) FROM changes WHERE country = ? AND detected_at >= ?", (country, since_iso)
+    ) as cur:
+        row = await cur.fetchone()
+    return int(row[0]) if row else 0

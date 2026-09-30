@@ -2,69 +2,92 @@
 <html lang="uk">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Tension Index · Progress</title>
 <meta name="description" content="Development progress of the Tension Index project">
+<!-- Rendered from roadmap.json, which `tension-index roadmap` builds from roadmap/roadmap.yaml.
+     Do not put project data here. -->
 <style>
-  :root {
-    --bg: #f6f7f9; --surface: #ffffff; --text: #16181d; --muted: #5d6470; --line: #e3e6eb;
-    --track: #e8ebf0; --done: #1f9d55; --progress: #d99a06; --todo: #aab1bc; --blocked: #d64545;
-    --accent: #2f6fdb; --chip: #eef2f8;
+:root {
+  --bg: #EDF0EE; --surface: #F8FAF8; --ink: #1B2430; --ink-2: #4A5563; --line: #CBD2CE;
+  --done: #2F6B4F; --progress: #B7791F; --blocked: #A33A2B; --todo: #8A949E; --focus: #2D5B8C;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141A20; --surface: #1C242C; --ink: #E4E9EC; --ink-2: #A3AEB8; --line: #34404B;
+    --done: #5BA37F; --progress: #D9A043; --blocked: #D46A58; --todo: #6F7A85; --focus: #7FA9D6;
   }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --bg: #0f1115; --surface: #171a21; --text: #e7e9ee; --muted: #9aa2af; --line: #262b35;
-      --track: #252a33; --done: #3fbf74; --progress: #e8b23a; --todo: #5f6775; --blocked: #ef6b6b;
-      --accent: #6c9cf0; --chip: #1f2530;
-    }
-  }
-  :root[data-theme="dark"] {
-    --bg: #0f1115; --surface: #171a21; --text: #e7e9ee; --muted: #9aa2af; --line: #262b35;
-    --track: #252a33; --done: #3fbf74; --progress: #e8b23a; --todo: #5f6775; --blocked: #ef6b6b;
-    --accent: #6c9cf0; --chip: #1f2530;
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--text);
-    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 28px 16px 64px; }
-  header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; }
-  h1 { font-size: 22px; margin: 0; }
-  .sub { color: var(--muted); font-size: 13px; }
-  .controls { display: flex; gap: 6px; }
-  button {
-    font: inherit; font-size: 13px; color: var(--text); background: var(--chip);
-    border: 1px solid var(--line); border-radius: 8px; padding: 5px 10px; cursor: pointer;
-  }
-  button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
-  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-top: 16px; }
-  .hero { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: center; }
-  .big { font-size: 48px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
-  .bar { height: 10px; border-radius: 6px; background: var(--track); overflow: hidden; display: flex; }
-  .bar span { display: block; height: 100%; }
-  .bar .d { background: var(--done); } .bar .p { background: var(--progress); } .bar .b { background: var(--blocked); }
-  .stats { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; color: var(--muted); }
-  .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: 0; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin-top: 16px; }
-  .stage { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
-  .stage h3 { margin: 0 0 2px; font-size: 15px; display: flex; justify-content: space-between; gap: 8px; }
-  .stage h3 .pct { font-variant-numeric: tabular-nums; color: var(--muted); font-weight: 600; }
-  .branch { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); }
-  details { margin-top: 10px; }
-  summary { cursor: pointer; font-size: 13px; color: var(--accent); }
-  ul.tasks { list-style: none; padding: 0; margin: 8px 0 0; }
-  ul.tasks li { display: grid; grid-template-columns: 14px 1fr; gap: 8px; padding: 5px 0; border-top: 1px solid var(--line); font-size: 13px; }
-  ul.tasks li:first-child { border-top: 0; }
-  ul.tasks li .dot { margin-top: 5px; }
-  .id { color: var(--muted); font-variant-numeric: tabular-nums; margin-right: 4px; }
-  .owner { font-size: 11px; background: var(--chip); border-radius: 6px; padding: 1px 6px; margin-left: 4px; color: var(--muted); white-space: nowrap; }
-  h2 { font-size: 16px; margin: 28px 0 0; }
-  .now li { grid-template-columns: 14px auto 1fr; }
-  footer { margin-top: 32px; color: var(--muted); font-size: 12px; }
-  a { color: var(--accent); }
-  .err { color: var(--blocked); }
-  @media (max-width: 520px) { .hero { grid-template-columns: 1fr; } .big { font-size: 40px; } }
+}
+:root[data-theme="dark"] {
+  --bg: #141A20; --surface: #1C242C; --ink: #E4E9EC; --ink-2: #A3AEB8; --line: #34404B;
+  --done: #5BA37F; --progress: #D9A043; --blocked: #D46A58; --todo: #6F7A85; --focus: #7FA9D6;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-variant-numeric: tabular-nums;
+  padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 64px; }
+header { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 24px; }
+h1 { font-size: clamp(1.5rem, 4vw, 2.2rem); line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.01em; }
+.meta { color: var(--ink-2); font-size: 0.95rem; }
+.meta strong { color: var(--ink); }
+.controls { display: flex; gap: 6px; }
+.btn { font: inherit; font-size: 0.85rem; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.btn[aria-pressed="true"] { border-color: var(--focus); color: var(--focus); }
+.btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.rail { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 4px; margin: 8px 0 6px; }
+.seg { appearance: none; border: 0; padding: 0; background: none; cursor: pointer; color: inherit; font: inherit; text-align: left; }
+.seg .bar { height: 28px; border-radius: 3px; background: var(--line); position: relative; overflow: hidden; }
+.seg .fill { position: absolute; inset: 0 auto 0 0; background: var(--done); }
+.seg .fill.part { background: var(--progress); }
+.seg .num { display: block; font-size: 0.75rem; color: var(--ink-2); margin-top: 4px; }
+.seg:focus-visible .bar { outline: 2px solid var(--focus); outline-offset: 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 0.85rem; color: var(--ink-2); margin-bottom: 24px; }
+.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+
+.next { border-left: 4px solid var(--progress); background: var(--surface); padding: 14px 18px; margin-bottom: 32px; border-radius: 0 6px 6px 0; }
+.next p { margin: 0; }
+.next .t { font-weight: 600; font-size: 1.05rem; }
+
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 32px; align-items: start; }
+@media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+
+.stage { margin-bottom: 28px; scroll-margin-top: 12px; }
+.stage h2 { font-size: 1.15rem; margin: 0 0 4px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.stage h2 .n { color: var(--ink-2); font-weight: 500; }
+.stage .count { margin-left: auto; font-size: 0.85rem; color: var(--ink-2); font-weight: 400; white-space: nowrap; }
+.stage .goal { color: var(--ink-2); margin: 0 0 4px; font-size: 0.95rem; }
+.branch { font: 0.8rem ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--ink-2); margin-bottom: 8px; }
+ul.tasks { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+ul.tasks li { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; padding: 10px 4px; border-bottom: 1px solid var(--line); align-items: start; }
+.mark { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--todo); margin-top: 4px; }
+.s-done .mark { background: var(--done); border-color: var(--done); }
+.s-in_progress .mark { border-color: var(--progress); background: linear-gradient(90deg, var(--progress) 50%, transparent 50%); }
+.s-blocked .mark { border-color: var(--blocked); background: var(--blocked); border-radius: 2px; }
+.s-done .title { color: var(--ink-2); }
+.id { color: var(--ink-2); margin-right: 6px; font-size: 0.85rem; }
+.note { display: block; font-size: 0.87rem; color: var(--ink-2); margin-top: 2px; }
+.owner { font-size: 0.72rem; padding: 1px 6px; border-radius: 8px; border: 1px dashed var(--ink-2); color: var(--ink-2); margin-left: 6px; white-space: nowrap; }
+.badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--line); color: var(--ink-2); white-space: nowrap; }
+.s-in_progress .badge { border-color: var(--progress); color: var(--progress); }
+.s-blocked .badge { border-color: var(--blocked); color: var(--blocked); }
+.s-done .badge { border-color: var(--done); color: var(--done); }
+@media (max-width: 520px) { ul.tasks li { grid-template-columns: 22px 1fr; } .badge { display: none; } }
+
+aside section { margin-bottom: 28px; }
+aside h3 { font-size: 1rem; margin: 0 0 8px; }
+.item { font-size: 0.9rem; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.item .d { color: var(--ink-2); font-size: 0.8rem; display: block; }
+.log .v { font-weight: 600; }
+.log ul { margin: 4px 0 12px; padding-left: 18px; color: var(--ink-2); font-size: 0.9rem; }
+footer { margin-top: 32px; color: var(--ink-2); font-size: 0.8rem; }
+a { color: var(--focus); }
+@media (prefers-reduced-motion: no-preference) { .seg .fill { transition: width .4s ease; } }
 </style>
 </head>
 <body>
@@ -72,113 +95,129 @@
   <header>
     <div>
       <h1 id="title">Tension Index</h1>
-      <div class="sub" id="subtitle"></div>
+      <div class="meta" id="meta"></div>
     </div>
     <div class="controls">
-      <button data-lang="uk">УКР</button>
-      <button data-lang="en">ENG</button>
-      <button id="theme" title="Theme">◐</button>
+      <button class="btn" data-lang="uk" type="button">УКР</button>
+      <button class="btn" data-lang="en" type="button">ENG</button>
+      <button class="btn" id="themeBtn" type="button" aria-label="Theme">◐</button>
     </div>
   </header>
-  <main id="app"><p class="sub">…</p></main>
+  <nav class="rail" id="rail"></nav>
+  <div class="legend" id="legend"></div>
+  <div class="next" id="next"></div>
+  <div class="cols">
+    <main id="stages"></main>
+    <aside id="aside"></aside>
+  </div>
   <footer id="foot"></footer>
 </div>
 <script>
 const T = {
-  uk: { subtitle: "Прогрес розробки", overall: "Загальний прогрес", left: "лишилось ≈", days: "дн.",
-        done: "готово", in_progress: "в роботі", todo: "заплановано", blocked: "блок",
-        stages: "Етапи", now: "Зараз у роботі", nothing: "Немає задач у роботі", tasks: "задач",
-        show: "Задачі", milestones: "Віхи", ideas: "Ідеї", owner: "Дмитро", built: "Оновлено",
-        plan: "Повний план", err: "Не вдалося завантажити roadmap.json" },
-  en: { subtitle: "Development progress", overall: "Overall progress", left: "≈ left", days: "days",
-        done: "done", in_progress: "in progress", todo: "todo", blocked: "blocked",
-        stages: "Stages", now: "In progress now", nothing: "Nothing in progress", tasks: "tasks",
-        show: "Tasks", milestones: "Milestones", ideas: "Ideas", owner: "Dmytro", built: "Updated",
-        plan: "Full plan", err: "Failed to load roadmap.json" },
+  uk: { version: "Версія", updated: "оновлено", done_of: "Виконано", of: "з", tasks: "завдань",
+        in_progress_n: "у роботі", left: "лишилось ≈", days: "дн.",
+        done: "виконано", in_progress: "у роботі", todo: "не розпочато", blocked: "заблоковано",
+        next: "Наступний крок, етап", all_done: "Усі завдання виконано.", owner: "вручну",
+        milestones: "Віхи", decisions: "Зафіксовані рішення", risks: "Ризики", changelog: "Журнал змін",
+        ideas: "Ідеї", built: "Зібрано", plan: "План у репозиторії", branch: "гілка",
+        err: "Не вдалося завантажити roadmap.json", title: "хід проєкту" },
+  en: { version: "Version", updated: "updated", done_of: "Done", of: "of", tasks: "tasks",
+        in_progress_n: "in progress", left: "≈ left", days: "days",
+        done: "done", in_progress: "in progress", todo: "not started", blocked: "blocked",
+        next: "Next step, stage", all_done: "All tasks are done.", owner: "manual",
+        milestones: "Milestones", decisions: "Decisions", risks: "Risks", changelog: "Changelog",
+        ideas: "Ideas", built: "Built", plan: "Plan in the repository", branch: "branch",
+        err: "Failed to load roadmap.json", title: "progress" },
 };
-const COLORS = { done: "var(--done)", in_progress: "var(--progress)", todo: "var(--todo)", blocked: "var(--blocked)" };
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
   set(k, v) { try { localStorage.setItem(k, v); } catch {} },
 };
-let lang = store.get("lang") || "uk";
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let lang = store.get("lang") === "en" ? "en" : "uk";
 let data = null;
-
-const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const dot = (s) => `<span class="dot" style="background:${COLORS[s]}"></span>`;
-
-function bar(stats) {
-  // Segments are weighted by estimated effort, matching the percentage.
-  const n = stats.days_total || 1, d = stats.days_by_status;
-  const w = (k) => (100 * d[k] / n).toFixed(1);
-  return `<div class="bar" role="progressbar" aria-valuenow="${stats.percent}" aria-valuemin="0" aria-valuemax="100">
-    <span class="d" style="width:${w("done")}%"></span><span class="p" style="width:${w("in_progress")}%"></span><span class="b" style="width:${w("blocked")}%"></span></div>`;
-}
-
-function task(t) {
-  const owner = t.owner === "dmytro" ? `<span class="owner">${T[lang].owner}</span>` : "";
-  return `<li>${dot(t.status)}<span><span class="id">${esc(t.id)}</span>${esc(t[lang])}${owner}</span></li>`;
-}
 
 function render() {
   const t = T[lang];
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang));
-  document.getElementById("subtitle").textContent = t.subtitle;
   if (!data) return;
-  const s = data.stats;
-  const legend = ["done", "in_progress", "todo", "blocked"].filter((k) => s.counts[k])
-    .map((k) => `<span>${dot(k)}${t[k]}: ${s.counts[k]}</span>`).join("");
-  const active = data.stages.flatMap((st) => st.tasks.filter((x) => x.status === "in_progress"));
-  const repo = data.project.repo;
-  document.getElementById("app").innerHTML = `
-    <section class="card hero">
-      <div class="big">${s.percent}%</div>
-      <div>
-        <div style="font-weight:600;margin-bottom:8px">${t.overall}</div>
-        ${bar(s)}
-        <div class="stats">${legend}<span>${t.left} ${s.days_left} ${t.days}</span></div>
-      </div>
-    </section>
-    ${(data.milestones || []).map((m) => `<section class="card"><b>${esc(m.id)}</b> · ${esc(m[lang])}</section>`).join("")}
-    <h2>${t.now}</h2>
-    <section class="card"><ul class="tasks" style="margin:0">${active.length ? active.map((x) => task(x)).join("") : `<li><span></span>${t.nothing}</li>`}</ul></section>
-    <h2>${t.stages}</h2>
-    <div class="grid">
-      ${data.stages.map((st) => `
-        <article class="stage">
-          <h3><span>${esc(st.id)}. ${esc(st[lang])}</span><span class="pct">${st.stats.percent}%</span></h3>
-          <div class="branch">${esc(st.branch)}</div>
-          <div style="margin-top:10px">${bar(st.stats)}</div>
-          <details ${st.stats.counts.in_progress ? "open" : ""}>
-            <summary>${t.show} · ${st.stats.counts.done}/${st.stats.tasks}</summary>
-            <ul class="tasks">${st.tasks.map((x) => task(x)).join("")}</ul>
-          </details>
-        </article>`).join("")}
-    </div>
-    ${data.ideas && data.ideas.length ? `<h2>${t.ideas}</h2><section class="card"><ul style="margin:0;padding-left:18px">${data.ideas.map((i) => `<li>${esc(i[lang])}</li>`).join("")}</ul></section>` : ""}`;
-  const commit = data.build.commit ? ` · <a href="https://github.com/${esc(repo)}/commit/${esc(data.build.commit)}">${esc(data.build.commit)}</a>` : "";
+  const p = data.project, s = data.stats, stages = data.stages;
+  const name = p["name_" + lang];
+  document.getElementById("title").textContent = name;
+  document.title = `${name} — ${t.title}`;
+  document.getElementById("meta").innerHTML =
+    `${t.version} <strong>${esc(p.version)}</strong>, ${t.updated} ${esc(p.updated)}. ` +
+    `${t.done_of} <strong>${s.counts.done} ${t.of} ${s.tasks}</strong> ${t.tasks} (<strong>${s.percent}%</strong>), ` +
+    `${t.in_progress_n} ${s.counts.in_progress}, ${t.left} ${s.days_left} ${t.days}`;
+
+  const rail = document.getElementById("rail");
+  rail.style.setProperty("--n", stages.length);
+  rail.innerHTML = stages.map((st) => {
+    const d = st.stats.days_by_status, total = st.stats.days_total || 1;
+    const w = (100 * d.done / total).toFixed(1), wp = (100 * (d.done + d.in_progress) / total).toFixed(1);
+    return `<button class="seg" type="button" data-target="${esc(st.id)}" title="${esc(st[lang])}: ${st.stats.percent}%">
+      <div class="bar"><div class="fill part" style="width:${wp}%"></div><div class="fill" style="width:${w}%"></div></div>
+      <span class="num">${esc(st.id)}</span></button>`;
+  }).join("");
+  rail.querySelectorAll(".seg").forEach((b) => b.onclick = () => {
+    const el = document.getElementById(b.dataset.target);
+    if (el) el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  });
+  document.getElementById("legend").innerHTML = [["done", "--done"], ["in_progress", "--progress"], ["blocked", "--blocked"], ["todo", "--line"]]
+    .map(([k, v]) => `<span><span class="dot" style="background:var(${v})"></span>${t[k]}</span>`).join("");
+
+  let nxt = null, nxtStage = null;
+  for (const st of stages) {
+    const task = st.tasks.find((x) => x.status === "in_progress") || st.tasks.find((x) => x.status !== "done");
+    if (task) { nxt = task; nxtStage = st; break; }
+  }
+  document.getElementById("next").innerHTML = nxt
+    ? `<p class="meta">${t.next} ${esc(nxtStage.id)}: ${esc(nxtStage[lang])}</p><p class="t">${esc(nxt[lang])}</p>`
+    : `<p class="t">${t.all_done}</p>`;
+
+  document.getElementById("stages").innerHTML = stages.map((st) => `
+    <section class="stage" id="${esc(st.id)}">
+      <h2><span class="n">${esc(st.id)}</span>${esc(st[lang])}<span class="count">${st.stats.counts.done} ${t.of} ${st.stats.tasks} · ${st.stats.percent}%</span></h2>
+      ${st["goal_" + lang] ? `<p class="goal">${esc(st["goal_" + lang])}</p>` : ""}
+      <div class="branch">${t.branch}: ${esc(st.branch)}</div>
+      <ul class="tasks">${st.tasks.map((x) => `
+        <li class="s-${esc(x.status)}"><span class="mark"></span>
+          <span><span class="id">${esc(x.id)}</span><span class="title">${esc(x[lang])}</span>${x.owner === "human" ? `<span class="owner">${t.owner}</span>` : ""}
+            ${x["note_" + lang] ? `<span class="note">${esc(x["note_" + lang])}</span>` : ""}</span>
+          <span class="badge">${t[x.status]}</span></li>`).join("")}
+      </ul>
+    </section>`).join("");
+
+  const sec = (title, body) => body ? `<section><h3>${title}</h3>${body}</section>` : "";
+  document.getElementById("aside").innerHTML =
+    sec(t.milestones, (data.milestones || []).map((m) => `<div class="item"><b>${esc(m.id)}</b> · ${esc(m[lang])}</div>`).join("")) +
+    sec(t.decisions, (data.decisions || []).map((d) => `<div class="item">${esc(d[lang])}<span class="d">${esc(d.date)}</span></div>`).join("")) +
+    sec(t.risks, (data.risks || []).map((r) => `<div class="item">${esc(r[lang])}</div>`).join("")) +
+    sec(t.changelog, `<div class="log">${(data.changelog || []).map((c) => `<div><span class="v">${esc(c.version)}</span> <span class="meta">${esc(c.date)}</span><ul>${c[lang].map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>`) +
+    sec(t.ideas, (data.ideas || []).map((i) => `<div class="item">${esc(i[lang])}</div>`).join(""));
+
+  const repo = esc(p.repo), commit = esc(data.build.commit);
   document.getElementById("foot").innerHTML =
-    `${t.built}: ${esc(data.build.built_at.replace("T", " ").replace("+00:00", " UTC"))}${commit} · ` +
-    `<a href="https://github.com/${esc(repo)}/blob/main/${lang === "uk" ? "PLAN.md" : "PLAN.en.md"}">${t.plan}</a>`;
+    `${t.built}: ${esc(data.build.built_at.replace("T", " ").replace("+00:00", " UTC"))}` +
+    (commit ? ` · <a href="https://github.com/${repo}/commit/${commit}">${commit}</a>` : "") +
+    ` · <a href="https://github.com/${repo}/blob/main/${lang === "uk" ? "PLAN.md" : "PLAN.en.md"}">${t.plan}</a>`;
 }
 
 document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; store.set("lang", lang); render(); }));
 const savedTheme = store.get("theme");
-if (savedTheme) document.documentElement.dataset.theme = savedTheme;
-document.getElementById("theme").addEventListener("click", () => {
-  const dark = document.documentElement.dataset.theme
-    ? document.documentElement.dataset.theme === "dark"
-    : matchMedia("(prefers-color-scheme: dark)").matches;
+if (savedTheme === "light" || savedTheme === "dark") document.documentElement.dataset.theme = savedTheme;
+document.getElementById("themeBtn").addEventListener("click", () => {
+  const cur = document.documentElement.dataset.theme;
+  const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
   const next = dark ? "light" : "dark";
   document.documentElement.dataset.theme = next; store.set("theme", next);
 });
-
 render();
 fetch("roadmap.json", { cache: "no-store" })
   .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-  .then((json) => { data = json; document.getElementById("title").textContent = json.project.name; render(); })
-  .catch(() => { document.getElementById("app").innerHTML = `<p class="err">${T[lang].err}</p>`; });
+  .then((json) => { data = json; render(); })
+  .catch(() => { document.getElementById("stages").innerHTML = `<p>${T[lang].err}</p>`; });
 </script>
 </body>
 </html>
