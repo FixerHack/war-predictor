@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.9",
+    "version": "0.2.10",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -852,28 +852,28 @@
         },
         {
           "id": "S10.5",
-          "status": "in_progress",
+          "status": "done",
           "days": 0.3,
           "uk": "Перевірити парсер Wikipedia на живій сторінці",
           "en": "Verify the Wikipedia parser against the live page",
-          "note_uk": "Розділи розпізнаються на живій сторінці; враховується лише колонка Location, перевірити war-check --explain FR.",
-          "note_en": "Sections recognised on the live page; only the Location column counts, check war-check --explain FR.",
+          "note_uk": "Перевірено на живій сторінці: розділи, колонка Location; Франція (Французька Гвіана) виключена вручну.",
+          "note_en": "Verified on the live page: sections, Location column; France (French Guiana) excluded by review.",
           "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 50,
+        "percent": 57,
         "days_total": 2.3,
-        "days_left": 1.1,
+        "days_left": 1.0,
         "counts": {
-          "done": 2,
-          "in_progress": 1,
+          "done": 3,
+          "in_progress": 0,
           "todo": 2,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 1.0,
-          "in_progress": 0.3,
+          "done": 1.3,
+          "in_progress": 0,
           "todo": 1.0,
           "blocked": 0
         },
@@ -1048,6 +1048,11 @@
   "decisions": [
     {
       "date": "2026-09-30",
+      "uk": "Заморські території європейських країн не впливають на статус війни; винятки фіксуються вручну в wikipedia_ignore",
+      "en": "Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore"
+    },
+    {
+      "date": "2026-09-30",
       "uk": "Деплой на сервер відкладено; пріоритет — бот і система на MacBook",
       "en": "Server deploy postponed; priority is the bot and system on the MacBook"
     },
@@ -1114,6 +1119,18 @@
     }
   ],
   "changelog": [
+    {
+      "version": "0.2.10",
+      "date": "2026-09-30",
+      "uk": [
+        "Статус війни: список ручних винятків wikipedia_ignore; Франція — Brazilian drug war (Французька Гвіана)",
+        "Звірка з Wikipedia перевірена на живій сторінці"
+      ],
+      "en": [
+        "War status: reviewed exclusions via wikipedia_ignore; France — Brazilian drug war (French Guiana)",
+        "Wikipedia check verified on the live page"
+      ]
+    },
     {
       "version": "0.2.9",
       "date": "2026-09-30",
@@ -1238,25 +1255,25 @@
     }
   ],
   "stats": {
-    "percent": 29,
+    "percent": 30,
     "days_total": 43.9,
-    "days_left": 31.0,
+    "days_left": 30.9,
     "counts": {
-      "done": 31,
-      "in_progress": 2,
+      "done": 32,
+      "in_progress": 1,
       "todo": 45,
       "blocked": 0
     },
     "days_by_status": {
-      "done": 12.6,
-      "in_progress": 0.5,
+      "done": 12.9,
+      "in_progress": 0.2,
       "todo": 30.8,
       "blocked": 0
     },
     "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T11:37:04+00:00",
-    "commit": "dcf5b8e"
+    "built_at": "2026-09-30T11:38:37+00:00",
+    "commit": "854b7d5"
   }
 }
