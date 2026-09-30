@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.40**, updated 2026-09-30.
+Version **0.2.44**, updated 2026-09-30.
 
-**Overall progress: 59%** · left ≈ 17.9 days · ✅ 41 · 🟡 17 · ⬜ 18 · ⛔ 2
+**Overall progress: 65%** · left ≈ 15.2 days · ✅ 44 · 🟡 18 · ⬜ 14 · ⛔ 2
 
 ## Milestones
 
@@ -188,16 +188,20 @@ Branch: `dev-war-status`
 - ✅ **S10.5** Verify the Wikipedia parser against the live page
   - Verified on the live page: sections, Location column; France (French Guiana) excluded by review.
 
-## S11. Public dashboard — 0%
+## S11. Public dashboard — 95%
 
 _Country map and score history on free hosting._
 
 Branch: `dev-dashboard`
 
-- ⬜ **S11.1** Export scores.json (read-only public API)
-- ⬜ **S11.2** Map of Europe coloured by level
-- ⬜ **S11.3** Country page: score history and change explanations
-- ⬜ **S11.4** Disclaimer and methodology on the site
+- ✅ **S11.1** Export scores.json (read-only public API)
+  - tension-index export → dashboard/scores.json (score, level, reasons, war status, 90-day history).
+- ✅ **S11.2** Map of Europe coloured by level
+  - Tile map of 38 countries, single-hue scale validated for colour blindness, light and dark.
+- ✅ **S11.3** Country page: score history and change explanations
+  - Country card: score, reasons with quotes, flags, war status, 90-day chart; table of all countries; #PL links.
+- 🟡 **S11.4** Disclaimer and methodology on the site _(manual)_
+  - Working disclaimer and methodology on the page; final wording approved by the owner (S1.7).
 
 ## S12. Operations — 20%
 
@@ -242,6 +246,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.44** (2026-09-30)
+  - Public dashboard: map of Europe, country card with chart, table, methodology (/dashboard/)
+  - scores.json export
 - **0.2.40** (2026-09-30)
   - Bot: up to 5 countries per user, switching between them, daily digest
 - **0.2.38** (2026-09-30)

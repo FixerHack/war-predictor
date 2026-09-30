@@ -7,7 +7,14 @@ source "$(dirname "$0")/_common.sh"
 require_uv
 
 export GITHUB_SHA="${GITHUB_SHA:-$(git rev-parse HEAD)}"
+rm -rf _site  # never publish leftovers (e.g. test data) from an earlier build
 uv run tension-index roadmap --out _site >/dev/null
+# Public dashboard data from the local database (skipped when there is none yet).
+if [[ -f data/tension.sqlite3 ]]; then
+  uv run tension-index export --out _site/dashboard/scores.json
+else
+  log "No data/tension.sqlite3: dashboard published without scores.json"
+fi
 
 WORKTREE="$(mktemp -d)"
 trap 'git worktree remove --force "$WORKTREE" >/dev/null 2>&1 || true' EXIT

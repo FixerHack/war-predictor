@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.40
+  version: 0.2.44
   updated: 2026-09-30
 
 milestones:
@@ -185,10 +185,10 @@ stages:
     goal_uk: "Карта країн і історія балу на безкоштовному хостингу."
     goal_en: "Country map and score history on free hosting."
     tasks:
-      - {id: S11.1, status: todo, days: 0.5, uk: "Експорт scores.json (публічне API тільки для читання)", en: "Export scores.json (read-only public API)"}
-      - {id: S11.2, status: todo, days: 1, uk: "Карта Європи з кольорами рівнів", en: "Map of Europe coloured by level"}
-      - {id: S11.3, status: todo, days: 1, uk: "Сторінка країни: історія балу і пояснення змін", en: "Country page: score history and change explanations"}
-      - {id: S11.4, status: todo, days: 0.3, uk: "Юридичне застереження і методологія на сайті", en: "Disclaimer and methodology on the site"}
+      - {id: S11.1, status: done, days: 0.5, uk: "Експорт scores.json (публічне API тільки для читання)", en: "Export scores.json (read-only public API)", note_uk: "tension-index export → dashboard/scores.json (бал, рівень, причини, статус війни, 90 днів історії).", note_en: "tension-index export → dashboard/scores.json (score, level, reasons, war status, 90-day history)."}
+      - {id: S11.2, status: done, days: 1, uk: "Карта Європи з кольорами рівнів", en: "Map of Europe coloured by level", note_uk: "Карта-сітка 38 країн, одновідтінкова шкала, перевірена на кольоросліпість, у світлій і темній темах.", note_en: "Tile map of 38 countries, single-hue scale validated for colour blindness, light and dark."}
+      - {id: S11.3, status: done, days: 1, uk: "Сторінка країни: історія балу і пояснення змін", en: "Country page: score history and change explanations", note_uk: "Картка країни: бал, причини з цитатами, позначки, статус війни, графік 90 днів; таблиця всіх країн; посилання #PL.", note_en: "Country card: score, reasons with quotes, flags, war status, 90-day chart; table of all countries; #PL links."}
+      - {id: S11.4, status: in_progress, days: 0.3, owner: human, uk: "Юридичне застереження і методологія на сайті", en: "Disclaimer and methodology on the site", note_uk: "Робочий текст застереження й методології на сторінці; остаточний текст затверджує власник (S1.7).", note_en: "Working disclaimer and methodology on the page; final wording approved by the owner (S1.7)."}
 
   - id: S12
     branch: dev-ops
@@ -232,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.44
+    date: 2026-09-30
+    uk: ["Публічна панель: карта Європи, картка країни з графіком, таблиця, методологія (/dashboard/)", "Експорт scores.json"]
+    en: ["Public dashboard: map of Europe, country card with chart, table, methodology (/dashboard/)", "scores.json export"]
   - version: 0.2.40
     date: 2026-09-30
     uk: ["Бот: до 5 країн на користувача, перемикання між ними, щоденний дайджест"]
