@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.2",
+    "version": "0.2.6",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -88,7 +88,7 @@
         },
         {
           "id": "S0.9",
-          "status": "todo",
+          "status": "done",
           "days": 0.3,
           "owner": "human",
           "uk": "MacBook: встановити uv і Claude Code, клонувати репозиторій, ./scripts/bootstrap.sh",
@@ -104,7 +104,7 @@
         },
         {
           "id": "S0.11",
-          "status": "todo",
+          "status": "done",
           "days": 0.2,
           "owner": "human",
           "uk": "Створити бота в @BotFather, тестовий канал, заповнити .env",
@@ -156,19 +156,19 @@
         }
       ],
       "stats": {
-        "percent": 70,
+        "percent": 79,
         "days_total": 5.3,
-        "days_left": 1.6,
+        "days_left": 1.1,
         "counts": {
-          "done": 10,
+          "done": 12,
           "in_progress": 0,
-          "todo": 6,
+          "todo": 4,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 3.7,
+          "done": 4.2,
           "in_progress": 0,
-          "todo": 1.6,
+          "todo": 1.1,
           "blocked": 0
         },
         "tasks": 16
@@ -296,12 +296,12 @@
         },
         {
           "id": "S2.2",
-          "status": "in_progress",
+          "status": "done",
           "days": 0.5,
           "uk": "Велика Британія (GOV.UK Content API)",
           "en": "UK (GOV.UK Content API)",
-          "note_uk": "Реалізовано; потрібна перевірка на живих даних.",
-          "note_en": "Implemented; needs live verification.",
+          "note_uk": "Перевірено на живих даних (PL, EE, MD).",
+          "note_en": "Verified on live data (PL, EE, MD).",
           "owner": "claude"
         },
         {
@@ -378,18 +378,18 @@
         }
       ],
       "stats": {
-        "percent": 15,
+        "percent": 19,
         "days_total": 6.2,
-        "days_left": 5.2,
+        "days_left": 5.0,
         "counts": {
-          "done": 2,
-          "in_progress": 1,
+          "done": 3,
+          "in_progress": 0,
           "todo": 8,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 0.7,
-          "in_progress": 0.5,
+          "done": 1.2,
+          "in_progress": 0,
           "todo": 5.0,
           "blocked": 0
         },
@@ -850,27 +850,29 @@
         },
         {
           "id": "S10.5",
-          "status": "todo",
+          "status": "in_progress",
           "days": 0.3,
           "uk": "Перевірити парсер Wikipedia на живій сторінці",
           "en": "Verify the Wikipedia parser against the live page",
+          "note_uk": "Запит працює; додано захист від зміни розмітки, потрібен повторний запуск war-check.",
+          "note_en": "Request works; layout-change guard added, re-run war-check to confirm.",
           "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 43,
+        "percent": 50,
         "days_total": 2.3,
-        "days_left": 1.3,
+        "days_left": 1.1,
         "counts": {
           "done": 2,
-          "in_progress": 0,
-          "todo": 3,
+          "in_progress": 1,
+          "todo": 2,
           "blocked": 0
         },
         "days_by_status": {
           "done": 1.0,
-          "in_progress": 0,
-          "todo": 1.3,
+          "in_progress": 0.3,
+          "todo": 1.0,
           "blocked": 0
         },
         "tasks": 5
@@ -1106,6 +1108,18 @@
   ],
   "changelog": [
     {
+      "version": "0.2.6",
+      "date": "2026-09-30",
+      "uk": [
+        "Перевірено на MacBook: bootstrap, бот (онбординг і панель), збір GOV.UK, healthcheck",
+        "war-check: помилка, якщо розмітка Wikipedia змінилась; вивід розпізнаних країн"
+      ],
+      "en": [
+        "Verified on the MacBook: bootstrap, bot (onboarding and dashboard), GOV.UK collection, healthcheck",
+        "war-check: fails if the Wikipedia layout changes; prints recognised countries"
+      ]
+    },
+    {
       "version": "0.2.2",
       "date": "2026-09-30",
       "uk": [
@@ -1183,25 +1197,25 @@
     }
   ],
   "stats": {
-    "percent": 27,
+    "percent": 29,
     "days_total": 43.9,
-    "days_left": 31.9,
+    "days_left": 31.0,
     "counts": {
-      "done": 28,
+      "done": 31,
       "in_progress": 2,
-      "todo": 48,
+      "todo": 45,
       "blocked": 0
     },
     "days_by_status": {
-      "done": 11.6,
-      "in_progress": 0.7,
-      "todo": 31.6,
+      "done": 12.6,
+      "in_progress": 0.5,
+      "todo": 30.8,
       "blocked": 0
     },
     "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T11:20:37+00:00",
-    "commit": "46b8bf4"
+    "built_at": "2026-09-30T11:28:29+00:00",
+    "commit": "4fe7c17"
   }
 }
