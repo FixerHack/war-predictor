@@ -27,6 +27,11 @@ async def test_export_shape(settings, tmp_path):
     assert md["reasons"]["uk"] == ["✈️ EASA: бюлетень EASA щодо зони конфлікту — «CZIB»"]
     assert md["flags"]["en"][0].startswith("rise in this country only")
     assert data["countries"]["PL"]["score"] is None and data["countries"]["PL"]["history"] == []
+    contributor = md["contributors"][0]
+    assert (
+        contributor["kind"]["en"] == "EASA conflict zone bulletin" and contributor["value"] == 0.8
+    )
+    assert md["raw"] == 0.5 and md["flag_keys"] == ["isolated"] and md["signals"] == []
     out = tmp_path / "d" / "scores.json"
     write(data, out)
     assert json.loads(out.read_text())["countries"]["MD"]["name"]["uk"] == "Молдова"

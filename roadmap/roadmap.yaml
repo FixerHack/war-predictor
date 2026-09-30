@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.57
+  version: 0.2.59
   updated: 2026-09-30
 
 milestones:
@@ -93,6 +93,7 @@ stages:
       - {id: S3.2, status: blocked, days: 1.5, uk: "NOTAM: обмеження і закриття повітряного простору", en: "NOTAM: airspace restrictions and closures", note_uk: "Безкоштовного API NOTAM для Європи немає (EUROCONTROL EAD платний). Обмеження неба беремо з текстів рекомендацій і CZIB.", note_en: "No free European NOTAM API (EUROCONTROL EAD is paid). Airspace limits come from advisory texts and CZIBs."}
       - {id: S3.3, status: in_progress, days: 1, uk: "OpenSky: падіння кількості рейсів за аеропортом", en: "OpenSky: drop in flights per airport", note_uk: "Реалізовано через OpenSky (падіння трафіку); норма з’явиться після ~3 тижнів збору.", note_en: "Implemented via OpenSky (traffic drop); baseline needs ~3 weeks of samples."}
 
+      - {id: S3.6, status: done, days: 0.25, uk: "Падіння авіатрафіку: норма лише з 3+ тижнів, поріг 20 літаків і 3σ, сигнал знімається після відновлення", en: "Air traffic drop: norm only from 3+ weeks, 20-aircraft and 3σ thresholds, signal cleared on recovery", note_uk: "Хибний сигнал LU («3 літаки замість 10») більше не можливий.", note_en: "The false LU signal (\"3 aircraft vs usual 10\") can no longer happen."}
   - id: S4
     branch: dev-news
     uk: Новини, аналітика, внутрішні заходи
@@ -191,6 +192,7 @@ stages:
       - {id: S11.3, status: done, days: 1, uk: "Сторінка країни: історія балу і пояснення змін", en: "Country page: score history and change explanations", note_uk: "Картка країни: бал, причини з цитатами, позначки, статус війни, графік 90 днів; таблиця всіх країн; посилання #PL.", note_en: "Country card: score, reasons with quotes, flags, war status, 90-day chart; table of all countries; #PL links."}
       - {id: S11.4, status: in_progress, days: 0.3, owner: human, uk: "Юридичне застереження і методологія на сайті", en: "Disclaimer and methodology on the site", note_uk: "Робочий текст застереження й методології на сторінці; остаточний текст затверджує власник (S1.7).", note_en: "Working disclaimer and methodology on the page; final wording approved by the owner (S1.7)."}
 
+      - {id: S11.5, status: done, days: 0.5, uk: "Розгорнуте пояснення на карті (укр/англ): підсумок, блоки, що кажуть уряди, що помічено, повна методика", en: "Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method"}
   - id: S12
     branch: dev-ops
     uk: Експлуатація
@@ -236,6 +238,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.59
+    date: 2026-09-30
+    uk: "Карта пояснює бал кожної країни: короткий підсумок, заповненість шести блоків, рівні рекомендацій урядів і всі помічені сигнали з цитатами, плюс повна методика. Прибрано хибні сигнали падіння авіатрафіку для малих країн."
+    en: "The map explains every country's score: a short summary, the six blocks, government advice levels and all observed signals with quotes, plus the full method. False air-traffic-drop signals for small countries removed."
   - version: 0.2.57
     date: 2026-09-30
     uk: "Джерела, що перемикаються між двома версіями тексту (як стрічка США), більше не створюють змін і не піднімають бал; нова команда why пояснює бал країни."
