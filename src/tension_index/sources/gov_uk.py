@@ -7,7 +7,7 @@ Endpoint: https://www.gov.uk/api/content/foreign-travel-advice/<slug>
 from __future__ import annotations
 
 from tension_index.countries import Country
-from tension_index.sources.base import Advisory, Source, html_to_text
+from tension_index.sources.base import Advisory, Source, SourceFormatError, html_to_text
 
 API = "https://www.gov.uk/api/content/foreign-travel-advice/{slug}"
 PUBLIC = "https://www.gov.uk/foreign-travel-advice/{slug}"
@@ -15,15 +15,16 @@ PUBLIC = "https://www.gov.uk/foreign-travel-advice/{slug}"
 
 class GovUkSource(Source):
     name = "gov_uk"
-    label = "UK FCDO"
+    label = "🇬🇧 UK FCDO"
 
     def supports(self, country: Country) -> bool:
         return bool(country.gov_uk_slug)
 
     async def fetch(self, country: Country) -> Advisory:
-        response = await self.client.get(API.format(slug=country.gov_uk_slug))
-        response.raise_for_status()
-        return parse(country.code, country.gov_uk_slug, response.json())
+        data = await self.get_json(API.format(slug=country.gov_uk_slug))
+        if not isinstance(data, dict):
+            raise SourceFormatError("gov_uk: expected a JSON object")
+        return parse(country.code, country.gov_uk_slug, data)
 
 
 def parse(country_code: str, slug: str, data: dict) -> Advisory:

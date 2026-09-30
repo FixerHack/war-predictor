@@ -122,6 +122,31 @@ async def _war_check(args: argparse.Namespace) -> int:
     return 1 if diff else 0
 
 
+async def _probe(args: argparse.Namespace) -> int:
+    """Show what a source really returns, to fix a parser after an API/layout change."""
+    from tension_index.collector import make_client
+    from tension_index.countries import get_country
+    from tension_index.sources import REGISTRY
+
+    if args.source not in REGISTRY:
+        print(f"unknown source {args.source!r}; known: {', '.join(REGISTRY)}", file=sys.stderr)
+        return 2
+    async with make_client(get_settings()) as client:
+        source = REGISTRY[args.source](client)
+        status = 0
+        try:
+            await source.prepare()
+            advisory = await source.fetch(get_country(args.country))
+            print(f"OK level={advisory.level!r} title={advisory.title!r} url={advisory.url}")
+            print(f"text ({len(advisory.text)} chars):\n{advisory.text[:800]}\n")
+        except Exception as exc:
+            print(f"FAILED: {type(exc).__name__}: {exc}\n")
+            status = 2
+        for url, body in source.raw.items():
+            print(f"--- raw {url} ({len(body)} bytes)\n{body[: args.bytes]}\n")
+    return status
+
+
 async def _bot() -> int:
     from tension_index.bot.app import run_bot
 
@@ -154,6 +179,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("bot", help="run the Telegram bot (long polling)")
 
+    p = sub.add_parser("probe", help="show a source's raw response and parsed result")
+    p.add_argument("source")
+    p.add_argument("--country", default="PL")
+    p.add_argument("--bytes", type=int, default=3000, help="raw bytes to print per response")
+
     p = sub.add_parser("war-check", help="compare config/conflicts.yaml with Wikipedia")
     p.add_argument("--notify", action="store_true", help="alert Telegram on mismatches")
     p.add_argument(
@@ -181,6 +211,7 @@ def main(argv: list[str] | None = None) -> None:
         "health": lambda: _health(args),
         "bot": lambda: _bot(),
         "war-check": lambda: _war_check(args),
+        "probe": lambda: _probe(args),
     }
     try:
         sys.exit(asyncio.run(handlers[args.command]()))

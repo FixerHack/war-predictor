@@ -41,7 +41,7 @@ advisory_levels:
     avoid_all_travel_to_whole_country: 0.85
   ca: {"normal": 0.0, "high_caution": 0.2, "avoid_non_essential": 0.55, "avoid_all": 0.85}
   au: {"1": 0.0, "2": 0.2, "3": 0.55, "4": 0.85}
-  de: {"none": 0.0, "partial_warning": 0.5, "travel_warning": 0.85}
+  de: {"none": 0.0, "security_notice": 0.2, "partial_warning": 0.5, "travel_warning": 0.85}
   fr: {"vert": 0.0, "jaune": 0.2, "orange": 0.55, "rouge": 0.85}
   il: {"1": 0.0, "2": 0.1, "3": 0.4, "4": 0.8}   # NSC levels for Europe mostly reflect antisemitism/terror
 

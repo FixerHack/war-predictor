@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.10
+  version: 0.2.18
   updated: 2026-09-30
 
 milestones:
@@ -72,15 +72,15 @@ stages:
     tasks:
       - {id: S2.1, status: done, days: 0.5, uk: "Каркас джерел, збереження версій, виявлення змін (diff)", en: "Source framework, version storage, change detection (diff)"}
       - {id: S2.2, status: done, days: 0.5, uk: "Велика Британія (GOV.UK Content API)", en: "UK (GOV.UK Content API)", note_uk: "Перевірено на живих даних (PL, EE, MD).", note_en: "Verified on live data (PL, EE, MD)."}
-      - {id: S2.3, status: todo, days: 0.5, uk: "Німеччина (Auswärtiges Amt OpenData API)", en: "Germany (Auswärtiges Amt OpenData API)"}
-      - {id: S2.4, status: todo, days: 1, uk: "США (RSS TAsTWs + сторінки країн + Security Alerts посольств)", en: "US (TAsTWs RSS + country pages + embassy Security Alerts)"}
-      - {id: S2.5, status: todo, days: 0.5, uk: "Канада (open data JSON)", en: "Canada (open data JSON)"}
-      - {id: S2.6, status: todo, days: 0.5, uk: "Австралія (Smartraveller destinations-export)", en: "Australia (Smartraveller destinations-export)"}
-      - {id: S2.7, status: todo, days: 0.5, uk: "Франція (diplomatie.gouv.fr, парсинг)", en: "France (diplomatie.gouv.fr, scraping)"}
-      - {id: S2.8, status: todo, days: 0.5, uk: "Ізраїль (NSC travel warnings)", en: "Israel (NSC travel warnings)"}
-      - {id: S2.9, status: todo, days: 1, uk: "МЗС РФ і Білорусі: рекомендації своїм громадянам", en: "Russian and Belarusian MFA advisories to own citizens"}
+      - {id: S2.3, status: in_progress, days: 0.5, uk: "Німеччина (Auswärtiges Amt OpenData API)", en: "Germany (Auswärtiges Amt OpenData API)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
+      - {id: S2.4, status: in_progress, days: 1, uk: "США (RSS TAsTWs + сторінки країн + Security Alerts посольств)", en: "US (TAsTWs RSS + country pages + embassy Security Alerts)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
+      - {id: S2.5, status: in_progress, days: 0.5, uk: "Канада (open data JSON)", en: "Canada (open data JSON)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
+      - {id: S2.6, status: in_progress, days: 0.5, uk: "Австралія (Smartraveller destinations-export)", en: "Australia (Smartraveller destinations-export)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
+      - {id: S2.7, status: in_progress, days: 0.5, uk: "Франція (diplomatie.gouv.fr, парсинг)", en: "France (diplomatie.gouv.fr, scraping)", note_uk: "Лише текст сторінки, рівень визначає класифікатор; перевірити probe fr", note_en: "Page text only, level set by the classifier; verify with probe fr"}
+      - {id: S2.8, status: blocked, days: 0.5, uk: "Ізраїль (NSC travel warnings)", en: "Israel (NSC travel warnings)", note_uk: "Сторінка NSC — JS-застосунок без відомого API; потрібен зразок відповіді. Для Європи вага низька.", note_en: "NSC page is a JS app with no known API; needs a sample response. Low weight for Europe."}
+      - {id: S2.9, status: todo, days: 1, uk: "МЗС РФ і Білорусі: рекомендації своїм громадянам", en: "Russian and Belarusian MFA advisories to own citizens", note_uk: "Переноситься в S4: збір через новини/GDELT (mid.ru блокує іноземні запити).", note_en: "Moved to S4: collected via news/GDELT (mid.ru blocks foreign requests)."}
       - {id: S2.10, status: done, days: 0.2, uk: "Алерт у Telegram, якщо джерело зламалося", en: "Telegram alert when a source breaks"}
-      - {id: S2.11, status: todo, days: 0.5, uk: "Очищення тексту від дат оновлення і службових елементів", en: "Strip update dates and boilerplate before diffing"}
+      - {id: S2.11, status: done, days: 0.5, uk: "Очищення тексту від дат оновлення і службових елементів", en: "Strip update dates and boilerplate before diffing"}
 
   - id: S3
     branch: dev-aviation
@@ -232,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.18
+    date: 2026-09-30
+    uk: ["Джерела: Німеччина, США, Канада, Австралія, Франція", "Очищення службових рядків (дати оновлення)", "Команда probe для перевірки джерел"]
+    en: ["Sources: Germany, US, Canada, Australia, France", "Boilerplate (update dates) stripped before diffing", "probe command to inspect sources"]
   - version: 0.2.10
     date: 2026-09-30
     uk: ["Статус війни: список ручних винятків wikipedia_ignore; Франція — Brazilian drug war (Французька Гвіана)", "Звірка з Wikipedia перевірена на живій сторінці"]
