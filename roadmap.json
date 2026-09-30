@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.44",
+    "version": "0.2.47",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -896,10 +896,12 @@
         },
         {
           "id": "S10.4",
-          "status": "todo",
+          "status": "blocked",
           "days": 0.5,
           "uk": "UCDP Candidate Events як друге автоматичне джерело",
           "en": "UCDP Candidate Events as a second automatic source",
+          "note_uk": "Чекає токена UCDP (S10.3).",
+          "note_en": "Waiting for the UCDP token (S10.3).",
           "owner": "claude"
         },
         {
@@ -920,14 +922,14 @@
         "counts": {
           "done": 3,
           "in_progress": 0,
-          "todo": 2,
-          "blocked": 0
+          "todo": 1,
+          "blocked": 1
         },
         "days_by_status": {
           "done": 1.3,
           "in_progress": 0,
-          "todo": 1.0,
-          "blocked": 0
+          "todo": 0.5,
+          "blocked": 0.5
         },
         "tasks": 5
       }
@@ -1026,27 +1028,29 @@
         },
         {
           "id": "S12.3",
-          "status": "todo",
+          "status": "in_progress",
           "days": 0.5,
           "uk": "Автодеплой з main (GitHub Actions → SSH)",
           "en": "Auto-deploy from main (GitHub Actions → SSH)",
+          "note_uk": "Процес .github/workflows/deploy.yml готовий (SSH → scripts/deploy.sh); запрацює після розблокування Actions і секретів DEPLOY_*.",
+          "note_en": ".github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set.",
           "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 20,
+        "percent": 45,
         "days_total": 1.0,
-        "days_left": 0.8,
+        "days_left": 0.6,
         "counts": {
           "done": 1,
-          "in_progress": 0,
-          "todo": 2,
+          "in_progress": 1,
+          "todo": 1,
           "blocked": 0
         },
         "days_by_status": {
           "done": 0.2,
-          "in_progress": 0,
-          "todo": 0.8,
+          "in_progress": 0.5,
+          "todo": 0.3,
           "blocked": 0
         },
         "tasks": 3
@@ -1078,27 +1082,29 @@
         },
         {
           "id": "S13.3",
-          "status": "todo",
+          "status": "done",
           "days": 0.3,
           "uk": "Кожне сповіщення містить джерело, опис зміни і цитату",
           "en": "Every alert contains the source, a description of the change and a quote",
+          "note_uk": "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.",
+          "note_en": "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes.",
           "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 0,
+        "percent": 23,
         "days_total": 1.3,
-        "days_left": 1.3,
+        "days_left": 1.0,
         "counts": {
-          "done": 0,
+          "done": 1,
           "in_progress": 0,
-          "todo": 3,
+          "todo": 2,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 0,
+          "done": 0.3,
           "in_progress": 0,
-          "todo": 1.3,
+          "todo": 1.0,
           "blocked": 0
         },
         "tasks": 3
@@ -1179,6 +1185,18 @@
     }
   ],
   "changelog": [
+    {
+      "version": "0.2.47",
+      "date": "2026-09-30",
+      "uk": [
+        "Автодеплой з main через SSH (після розблокування Actions)",
+        "Стан реалізації джерел у docs/sources.md"
+      ],
+      "en": [
+        "Auto-deploy from main over SSH (once Actions are unlocked)",
+        "Source implementation status in docs/sources.md"
+      ]
+    },
     {
       "version": "0.2.44",
       "date": "2026-09-30",
@@ -1415,25 +1433,25 @@
     }
   ],
   "stats": {
-    "percent": 65,
+    "percent": 67,
     "days_total": 43.9,
-    "days_left": 15.2,
+    "days_left": 14.7,
     "counts": {
-      "done": 44,
-      "in_progress": 18,
-      "todo": 14,
-      "blocked": 2
+      "done": 45,
+      "in_progress": 19,
+      "todo": 11,
+      "blocked": 3
     },
     "days_by_status": {
-      "done": 21.9,
-      "in_progress": 13.5,
-      "todo": 6.5,
-      "blocked": 2.0
+      "done": 22.2,
+      "in_progress": 14.0,
+      "todo": 5.2,
+      "blocked": 2.5
     },
     "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T12:17:04+00:00",
-    "commit": "1a64d56"
+    "built_at": "2026-09-30T12:17:55+00:00",
+    "commit": "e79e31f"
   }
 }
