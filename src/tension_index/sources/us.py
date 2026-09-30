@@ -15,12 +15,22 @@ from tension_index.sources.base import Advisory, Source, SourceFormatError, html
 
 FEED = "https://travel.state.gov/_res/rss/TAsTWs.xml"
 ALIASES = {
+    "BA": ["bosnia and herzegovina", "bosnia-herzegovina"],
     "CZ": ["czechia", "czech republic"],
     "MK": ["north macedonia", "macedonia"],
     "NL": ["netherlands", "the netherlands"],
     "GB": ["united kingdom", "the united kingdom"],
     "XK": ["kosovo"],
 }
+# ISO 3166 -> FIPS 10-4 codes used in the feed's Country-Tag.
+FIPS = {
+    "AT": "AU", "BE": "BE", "BG": "BU", "HR": "HR", "CY": "CY", "CZ": "EZ", "DK": "DA",
+    "EE": "EN", "FI": "FI", "FR": "FR", "DE": "GM", "GR": "GR", "HU": "HU", "IE": "EI",
+    "IT": "IT", "LV": "LG", "LT": "LH", "LU": "LU", "MT": "MT", "NL": "NL", "PL": "PL",
+    "PT": "PO", "RO": "RO", "SK": "LO", "SI": "SI", "ES": "SP", "SE": "SW", "GB": "UK",
+    "NO": "NO", "CH": "SZ", "IS": "IC", "MD": "MD", "RS": "RI", "ME": "MJ", "MK": "MK",
+    "AL": "AL", "BA": "BK", "XK": "KV",
+}  # fmt: skip
 _LEVEL = re.compile(r"Level\s*([1-4])", re.I)
 
 
@@ -56,12 +66,15 @@ class UsSource(Source):
         return True
 
     def _find(self, country: Country) -> dict:
-        for item in self.items:
-            if country.code in item["tags"]:
-                return item
+        # The title names the country; the Country-Tag is a FIPS code, not ISO (Sweden is
+        # "SW", while "SE" is Seychelles), so it is only a fallback via the FIPS table.
         for item in self.items:
             head = item["title"].split(" - ")[0].strip().lower()
             if head in _names(country):
+                return item
+        fips = FIPS.get(country.code)
+        for item in self.items:
+            if fips and fips in item["tags"]:
                 return item
         raise SourceFormatError(f"us: {country.name} not in feed")
 

@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.48
+  version: 0.2.49
   updated: 2026-09-30
 
 milestones:
@@ -232,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.49
+    date: 2026-09-30
+    uk: ["США: країна визначається за назвою (теги у стрічці — FIPS, не ISO)", "Австралія: довший тайм-аут; Франція: нова адреса сторінки й очищення від меню", "Новини: прибрано NATO/ISW/ECFR (недоступні), додано Politico Europe і Kyiv Independent", "GDELT: повтор після 429; probe easa показує знайдені бюлетені"]
+    en: ["US: country matched by name (feed tags are FIPS, not ISO)", "Australia: longer timeout; France: new page URL and menu stripping", "News: dropped NATO/ISW/ECFR (unreachable), added Politico Europe and Kyiv Independent", "GDELT: retry after 429; probe easa shows parsed bulletins"]
   - version: 0.2.48
     date: 2026-09-30
     uk: ["GDELT: зупинка після 3 невдач поспіль, якщо сервіс недоступний"]
