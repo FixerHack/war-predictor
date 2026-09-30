@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.8
+  version: 0.2.9
   updated: 2026-09-30
 
 milestones:
@@ -231,6 +231,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.9
+    date: 2026-09-30
+    uk: ["war-check --explain: правильна назва конфлікту і текст клітинки Location"]
+    en: ["war-check --explain: correct conflict name and Location cell text"]
   - version: 0.2.8
     date: 2026-09-30
     uk: ["Статус війни за Wikipedia: лише колонка Location (учасники конфліктів за кордоном не рахуються)", "war-check --explain: звідки взялася згадка країни"]

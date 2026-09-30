@@ -16,7 +16,8 @@ def flag(name: str) -> str:
 
 def table(*rows: str) -> str:
     head = (
-        "<tr><th>Start</th><th>Conflict</th><th>Continent</th><th>Location</th><th>Deaths</th></tr>"
+        "<tr><th>Start of conflict</th><th>Conflict</th><th>Continent</th>"
+        "<th>Location</th><th>Deaths</th></tr>"
     )
     return f'<table class="wikitable sortable"><tbody>{head}{"".join(rows)}</tbody></table>'
 
@@ -98,6 +99,7 @@ def test_explain_mentions():
     fr = [m for m in war_status.mentions(HTML) if m.country == "FR"]
     assert len(fr) == 1
     assert fr[0].conflict == "New Caledonia unrest" and fr[0].column == "location"
+    assert fr[0].cell == "France (New Caledonia)"
 
 
 def test_table_without_location_column_is_scanned_whole():
