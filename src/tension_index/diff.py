@@ -18,6 +18,10 @@ _BOILERPLATE = [
         rf"^(stand|letzte änderung|mise à jour)( le| am)?:? {_DATE}$",
         rf"^(unverändert )?gültig seit:? {_DATE}$",
         r"^\d{1,2}[./ ]\w+[./ ]\d{2,4}$",  # a bare date
+        # US State Department reissue notes (the level itself is compared separately)
+        r"^there were no changes to the advisory level or risk indicators\b.{0,80}$",
+        r"^reissued (after|with) .{0,80}$",
+        r"^advisory summary:?$",
     )
 ]
 
