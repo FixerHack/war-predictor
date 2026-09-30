@@ -147,16 +147,89 @@ async def list_captures(client: httpx.AsyncClient, url: str, episode: Episode) -
     return [r for r in rows[1:] if len(r) == 2]  # first row is the header
 
 
+async def drop_duplicates(db: aiosqlite.Connection) -> int:
+    """Remove versions loaded twice (same publisher, country, time and text) with the changes
+    and classifications that point at them. Older databases got them from repeated loads."""
+    async with db.execute(
+        "SELECT id FROM snapshots s WHERE EXISTS (SELECT 1 FROM snapshots o WHERE "
+        "o.source = s.source AND o.country = s.country AND o.fetched_at = s.fetched_at "
+        "AND o.content_hash = s.content_hash AND o.id < s.id)"
+    ) as cur:
+        dupes = [r[0] for r in await cur.fetchall()]
+    if not dupes:
+        return 0
+    marks = ",".join("?" * len(dupes))
+    async with db.execute(
+        f"SELECT id FROM changes WHERE new_snapshot IN ({marks}) OR prev_snapshot IN ({marks})",
+        dupes * 2,
+    ) as cur:
+        changes = [r[0] for r in await cur.fetchall()]
+    for ref_type, ids in (("snapshot", dupes), ("change", changes)):
+        if ids:
+            await db.execute(
+                f"DELETE FROM classifications WHERE ref_type = ? AND ref_id IN "
+                f"({','.join('?' * len(ids))})",
+                [ref_type, *ids],
+            )
+    if changes:
+        await db.execute(
+            f"DELETE FROM changes WHERE id IN ({','.join('?' * len(changes))})", changes
+        )
+    await db.execute(f"DELETE FROM snapshots WHERE id IN ({marks})", dupes)
+    await db.commit()
+    log.info("removed %d duplicate versions and %d changes", len(dupes), len(changes))
+    return len(dupes)
+
+
+async def _loaded(db: aiosqlite.Connection, publisher: str, episode: Episode) -> int:
+    async with db.execute(
+        "SELECT COUNT(*) FROM snapshots WHERE source = ? AND country = ? "
+        "AND fetched_at >= ? AND fetched_at <= ?",
+        (publisher, episode.country, episode.start.isoformat(),
+         (episode.end + timedelta(days=1)).isoformat()),
+    ) as cur:  # fmt: skip
+        return (await cur.fetchone())[0]
+
+
+async def _forget(db: aiosqlite.Connection, publisher: str, episode: Episode) -> None:
+    """Drop a publisher's archived versions for the episode (before a refresh)."""
+    window = (publisher, episode.country, episode.start.isoformat(),
+              (episode.end + timedelta(days=1)).isoformat())  # fmt: skip
+    where = "source = ? AND country = ? AND fetched_at >= ? AND fetched_at <= ?"
+    async with db.execute(f"SELECT id FROM snapshots WHERE {where}", window) as cur:
+        ids = [r[0] for r in await cur.fetchall()]
+    marks = ",".join("?" * len(ids))
+    await db.execute(
+        f"DELETE FROM classifications WHERE (ref_type = 'snapshot' AND ref_id IN ({marks})) "
+        f"OR (ref_type = 'change' AND ref_id IN (SELECT id FROM changes WHERE new_snapshot "
+        f"IN ({marks})))",
+        ids * 2,
+    )
+    await db.execute(f"DELETE FROM changes WHERE new_snapshot IN ({marks})", ids)
+    await db.execute(f"DELETE FROM snapshots WHERE id IN ({marks})", ids)
+    await db.commit()
+
+
 async def load_episode(
     db: aiosqlite.Connection,
     client: httpx.AsyncClient,
     episode: Episode,
     pause: float = PAUSE_SECONDS,
+    refresh: bool = False,
 ) -> dict[str, int]:
-    """Store archived versions (only when the text changed) and the changes between them."""
+    """Store archived versions (only when the text changed) and the changes between them.
+    A publisher already loaded for this episode is skipped unless `refresh`."""
     await storage.migrate(db)
+    await drop_duplicates(db)
     stats: dict[str, int] = {}
     for publisher, url in episode.urls.items():
+        existing = await _loaded(db, publisher, episode)
+        if existing and not refresh:
+            log.info("%s: already loaded (%d versions), skipped", publisher, existing)
+            stats[publisher] = existing
+            continue
+        if existing:
+            await _forget(db, publisher, episode)
         try:
             captures = pick_captures(await list_captures(client, url, episode), episode)
         except (httpx.HTTPError, ValueError) as exc:

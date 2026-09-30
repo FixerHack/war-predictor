@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.69
+  version: 0.2.70
   updated: 2026-09-30
 
 milestones:
@@ -151,7 +151,7 @@ stages:
     goal_uk: "Шкала має спрацьовувати на відомих епізодах вчасно і без масових хибних тривог."
     goal_en: "The scale must fire on known episodes in time and without mass false alarms."
     tasks:
-      - {id: S8.1, status: in_progress, days: 1.5, uk: "Прогін шкали на історичних епізодах", en: "Replay the scale on historical episodes", note_uk: "Архів Wayback, Україна-2022: правила — 7 з 24.01.2022 (за 31 день), модель — 7 з 20.12.2021 (нарощування військ), 9 після вторгнення. Обидва PASS; контрольні епізоди ще не прогнані.", note_en: "Wayback archive, Ukraine 2022: rules — 7 from 24 Jan 2022 (31 days ahead), model — 7 from 20 Dec 2021 (troop build-up), 9 after the invasion. Both PASS; control episodes not run yet."}
+      - {id: S8.1, status: in_progress, days: 1.5, uk: "Прогін шкали на історичних епізодах", en: "Replay the scale on historical episodes", note_uk: "Прогнано 4 епізоди. Франція-2016 (контроль): максимум 3.0 — PASS. Ізраїль-2024: PASS (війна вже йшла). Вірменія–Азербайджан-2020: FAIL, 5 не досягнуто (США в архіві 0 версій). Україна повторно завантажилась поверх себе — дублікати прибрано, завантаження тепер повторюване.", note_en: "4 episodes run. France 2016 (control): max 3.0 — PASS. Israel 2024: PASS (war already ongoing). Armenia–Azerbaijan 2020: FAIL, 5 never reached (0 US versions archived). Ukraine was loaded over itself — duplicates removed, loading is now repeatable."}
       - {id: S8.2, status: in_progress, days: 0.5, uk: "Звіт про хибні тривоги і пропуски", en: "False alarm and miss report", note_uk: "Звіт: PASS/FAIL за очікуванням епізоду, перші дні досягнення 3/5/7/9, контрольний епізод на хибні тривоги.", note_en: "Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms."}
       - {id: S8.3, status: in_progress, days: 1, uk: "Коригування ваг", en: "Weight tuning", note_uk: "Перший крок зроблено на відтворених хронологіях: надбавка за сплеск обмежена 0.10, синхронність рахує лише справжнє посилення (без тероризму й редакційних змін). Франція-2015: 7.3 → 4.5; один уряд із наказом про виїзд: 7.6 → 7.0; Україна-2022 без змін (8.3 / 9.0). Далі — прогін на реальному архіві.", note_en: "First step done on reconstructed timelines: surge bonus capped at 0.10, synchrony counts only real tightening (no terrorism or rewording). France 2015: 7.3 → 4.5; one government ordering departure: 7.6 → 7.0; Ukraine 2022 unchanged (8.3 / 9.0). Next: run on the real archive."}
 
@@ -246,6 +246,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.70
+    date: 2026-09-30
+    uk: "Повторне завантаження архіву пропускає вже завантажене (--refresh — завантажити заново), а дублікати зі старих баз прибираються автоматично."
+    en: "Loading the archive again skips what is already loaded (--refresh reloads), and duplicates in older databases are removed automatically."
   - version: 0.2.69
     date: 2026-09-30
     uk: "Сигнали з рекомендацій (небо, статус посольства, кордони) вимикаються, коли нова класифікація того самого тексту їх більше не підтверджує."
