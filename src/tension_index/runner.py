@@ -5,6 +5,7 @@ Run by the systemd timer (`tension-index run --notify`) or by hand.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
@@ -29,6 +30,8 @@ log = logging.getLogger(__name__)
 # Non-advisory collectors (aviation, news, markets): async def collect(db, client, settings)
 Collector = Callable[..., Awaitable[RunResult]]
 EXTRA_COLLECTORS: dict[str, Collector] = dict(extra.COLLECTORS)
+# Seconds per collector; GDELT asks for one request per 5 s (38 countries once a day).
+EXTRA_DEADLINES = {"gdelt": 420.0, "news": 180.0}
 
 
 @dataclass(slots=True)
@@ -62,9 +65,15 @@ async def run_cycle(settings: Settings, notify: bool = False) -> CycleReport:
     async with make_client(settings) as client, storage.connect(settings.database_path) as db:
         await storage.migrate(db)
         for name, collect in EXTRA_COLLECTORS.items():
+            log.info("collecting %s", name)
             try:
-                report.results.append(await collect(db, client, settings))
-            except (httpx.HTTPError, ValueError, KeyError) as exc:
+                result = await asyncio.wait_for(
+                    collect(db, client, settings), EXTRA_DEADLINES.get(name, 120.0)
+                )
+                log.info("%s: fetched=%d changed=%d failed=%d ok=%s", name, result.fetched,
+                         result.changed, result.failed, result.ok)  # fmt: skip
+                report.results.append(result)
+            except (httpx.HTTPError, ValueError, KeyError, TimeoutError) as exc:
                 log.warning("collector %s failed: %s", name, exc)
                 bad = RunResult(source=name, failed=1, errors=[f"{type(exc).__name__}: {exc}"])
                 run_id = await storage.start_run(db, name)

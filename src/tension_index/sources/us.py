@@ -38,6 +38,16 @@ def _names(country: Country) -> list[str]:
     return ALIASES.get(country.code, [country.name.lower()])
 
 
+def _rank(item: dict) -> tuple:
+    from email.utils import parsedate_to_datetime
+
+    try:
+        when = parsedate_to_datetime(item["date"]).timestamp() if item["date"] else 0.0
+    except (TypeError, ValueError):
+        when = 0.0
+    return (bool(_LEVEL.search(item["title"])), when, item["link"])
+
+
 class UsSource(Source):
     name = "us"
     label = "🇺🇸 State Department"
@@ -68,15 +78,17 @@ class UsSource(Source):
     def _find(self, country: Country) -> dict:
         # The title names the country; the Country-Tag is a FIPS code, not ISO (Sweden is
         # "SW", while "SE" is Seychelles), so it is only a fallback via the FIPS table.
-        for item in self.items:
-            head = item["title"].split(" - ")[0].strip().lower()
-            if head in _names(country):
-                return item
-        fips = FIPS.get(country.code)
-        for item in self.items:
-            if fips and fips in item["tags"]:
-                return item
-        raise SourceFormatError(f"us: {country.name} not in feed")
+        matches = [
+            i for i in self.items if i["title"].split(" - ")[0].strip().lower() in _names(country)
+        ]
+        if not matches:
+            fips = FIPS.get(country.code)
+            matches = [i for i in self.items if fips and fips in i["tags"]]
+        if not matches:
+            raise SourceFormatError(f"us: {country.name} not in feed")
+        # Several items for one country (feed order varies between downloads): pick the same
+        # one every time - an advisory with a level first, then the newest, then by link.
+        return max(matches, key=_rank)
 
     async def fetch(self, country: Country) -> Advisory:
         item = self._find(country)
