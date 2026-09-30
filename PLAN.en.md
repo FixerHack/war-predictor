@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.56**, updated 2026-09-30.
+Version **0.2.57**, updated 2026-09-30.
 
-**Overall progress: 66%** · left ≈ 14.9 days · ✅ 45 · 🟡 18 · ⬜ 11 · ⛔ 4
+**Overall progress: 66%** · left ≈ 14.9 days · ✅ 46 · 🟡 18 · ⬜ 11 · ⛔ 4
 
 ## Milestones
 
@@ -144,6 +144,8 @@ Branch: `dev-scoring`
 - ✅ **S7.3** Signals table and daily score computation for all countries
   - tension-index run: collect → classify → signals → score; no score without enough coverage (except threshold events).
 - ✅ **S7.4** Score explanation in alerts and on the dashboard
+- ✅ **S7.5** Guard against flapping sources (A → B → A) and the why command
+  - Returning to a version seen within 7 days is not a change; such changes produce no score events. tension-index why LU lists blocks and active signals.
 
 ## S8. Backtesting — 33%
 
@@ -241,6 +243,7 @@ Branch: `—`
 
 ## Risks
 
+- A genuine revert of an advisory within 7 days is not reported as a change (the state still updates).
 - Some government sites block automated requests (Australia); a source can be lost without notice
 - GitHub Actions locked by an account billing issue: no CI until unlocked, checks run locally only (make check)
 - Collection blocking: government sites may block requests from the server
@@ -251,6 +254,158 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.57** (2026-09-30)
+  - S
+  - o
+  - u
+  - r
+  - c
+  - e
+  - s
+  -  
+  - t
+  - h
+  - a
+  - t
+  -  
+  - s
+  - w
+  - i
+  - n
+  - g
+  -  
+  - b
+  - e
+  - t
+  - w
+  - e
+  - e
+  - n
+  -  
+  - t
+  - w
+  - o
+  -  
+  - t
+  - e
+  - x
+  - t
+  -  
+  - v
+  - e
+  - r
+  - s
+  - i
+  - o
+  - n
+  - s
+  -  
+  - (
+  - l
+  - i
+  - k
+  - e
+  -  
+  - t
+  - h
+  - e
+  -  
+  - U
+  - S
+  -  
+  - f
+  - e
+  - e
+  - d
+  - )
+  -  
+  - n
+  - o
+  -  
+  - l
+  - o
+  - n
+  - g
+  - e
+  - r
+  -  
+  - c
+  - r
+  - e
+  - a
+  - t
+  - e
+  -  
+  - c
+  - h
+  - a
+  - n
+  - g
+  - e
+  - s
+  -  
+  - o
+  - r
+  -  
+  - l
+  - i
+  - f
+  - t
+  -  
+  - t
+  - h
+  - e
+  -  
+  - s
+  - c
+  - o
+  - r
+  - e
+  - ;
+  -  
+  - n
+  - e
+  - w
+  -  
+  - w
+  - h
+  - y
+  -  
+  - c
+  - o
+  - m
+  - m
+  - a
+  - n
+  - d
+  -  
+  - e
+  - x
+  - p
+  - l
+  - a
+  - i
+  - n
+  - s
+  -  
+  - a
+  -  
+  - c
+  - o
+  - u
+  - n
+  - t
+  - r
+  - y
+  - '
+  - s
+  -  
+  - s
+  - c
+  - o
+  - r
+  - e
+  - .
 - **0.2.56** (2026-09-30)
   - GDELT is its own daily command and timer; run no longer waits for it
   - US: duplicate items with different text no longer cause false changes

@@ -90,6 +90,7 @@ make test                  # tests
 make lint                  # ruff
 ./scripts/run.sh run       # full cycle: collect → classify → score (~1 min)
 ./scripts/run.sh gdelt     # daily GDELT collection on its own (a few minutes)
+./scripts/run.sh why LU       # what a country's score is made of (blocks, signals)
 ./scripts/run.sh collect --countries PL,EE   # collection only, a few countries
 ./scripts/run.sh probe us --country PL      # what a source really returns
 ./scripts/run.sh health    # system health

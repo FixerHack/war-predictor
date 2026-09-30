@@ -174,6 +174,41 @@ async def _changes(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _why(args: argparse.Namespace) -> int:
+    """What the latest score of a country is made of: blocks, flags and active signals."""
+    from datetime import UTC, datetime
+
+    from tension_index.pipeline import active_signals
+
+    code = args.country.upper()
+    settings = get_settings()
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        row = await storage.latest_score(db, code)
+        signals = [s for s in await active_signals(db, datetime.now(UTC)) if s.country == code]
+    if row is None:
+        print(f"{code}: no score yet (run `tension-index run`)")
+        return 1
+    payload = json.loads(row["payload"])
+    print(
+        f"{code} {row['score']} {row['level']} at {row['computed_at']} (raw {payload['raw']:.3f})"
+    )
+    print("blocks: " + ", ".join(f"{k}={v:.2f}" for k, v in payload["blocks"].items()))
+    for key in ("flags", "floors"):
+        if payload.get(key):
+            print(f"{key}: {', '.join(payload[key])}")
+    print(f"active signals ({len(signals)}):")
+    for s in sorted(signals, key=lambda s: (s.block, -s.strength)):
+        kind = "state" if s.state else "event"
+        print(
+            f"  {s.block:<11} {s.publisher:<7} {s.kind:<34} {s.strength:.2f} {kind:<5} "
+            f"{s.observed_at:%Y-%m-%d %H:%M} {s.reason}"
+        )
+        if s.note:
+            print(f"      «{s.note[:150]}»")
+    return 0
+
+
 async def _digest() -> int:
     from tension_index.digest import send_digests
 
@@ -373,6 +408,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("gdelt", help="daily GDELT collection (media volume, RU/BY MFA advice)")
 
+    p = sub.add_parser("why", help="explain a country's latest score (blocks and signals)")
+    p.add_argument("country", help="ISO code, e.g. LU")
+
     p = sub.add_parser("probe", help="show a source's raw response and parsed result")
     p.add_argument("source")
     p.add_argument("--country", default="PL")
@@ -418,6 +456,7 @@ def main(argv: list[str] | None = None) -> None:
         "gdelt": lambda: _gdelt(),
         "digest": lambda: _digest(),
         "changes": lambda: _changes(args),
+        "why": lambda: _why(args),
         "export": lambda: _export(args),
         "history": lambda: _history(args),
         "backtest": lambda: _backtest(args),

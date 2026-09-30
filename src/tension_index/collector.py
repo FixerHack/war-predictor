@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from dataclasses import dataclass, field
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import httpx
@@ -13,6 +14,7 @@ from tension_index import storage
 from tension_index.config import Settings
 from tension_index.countries import COUNTRIES
 from tension_index.diff import changed_fragment, normalize
+from tension_index.scoring import load_config
 from tension_index.sources import REGISTRY, Source
 
 log = logging.getLogger(__name__)
@@ -81,6 +83,8 @@ async def collect_source(
                 raise TimeoutError(f"{source.name}: {deadline_seconds:.0f} s limit reached")
             return country, await asyncio.wait_for(source.fetch(country), left)
 
+    flap_days = load_config()["flap_window_days"]
+    flap_since = (datetime.now(UTC) - timedelta(days=flap_days)).isoformat(timespec="seconds")
     outcomes = await asyncio.gather(*(one(c) for c in targets), return_exceptions=True)
     for country, outcome in zip(targets, outcomes, strict=True):
         if isinstance(outcome, BaseException):
@@ -96,6 +100,10 @@ async def collect_source(
         # boilerplate filter doesn't register as a change everywhere.
         if previous and normalize(previous.text) == text and previous.level == advisory.level:
             continue
+        flapping = previous is not None and (
+            storage.content_hash(text),
+            advisory.level,
+        ) in await storage.seen_versions(db, source.name, country.code, flap_since)
         snapshot_id = await storage.insert_snapshot(
             db,
             source=source.name,
@@ -108,6 +116,11 @@ async def collect_source(
         )
         if previous is None:
             continue  # first sighting is the baseline, not a change
+        if flapping:
+            # Back to a version seen a few days ago (A -> B -> A): keep the snapshot so the
+            # current state is right, but it is not news.
+            log.info("%s %s: flapping between versions, no change", source.name, country.code)
+            continue
         diff = changed_fragment(previous.text, text)
         if previous.level != advisory.level:
             diff = f"LEVEL: {previous.level} -> {advisory.level}\n{diff}"
