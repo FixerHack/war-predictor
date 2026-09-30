@@ -156,6 +156,48 @@ async def _classify() -> int:
     return 0
 
 
+def _history_db(args: argparse.Namespace) -> Path:
+    return Path(args.db)
+
+
+async def _history(args: argparse.Namespace) -> int:
+    from tension_index.collector import make_client
+    from tension_index.history import load_episode, load_episodes
+
+    episodes = load_episodes()
+    ids = list(episodes) if args.episode == "all" else [args.episode]
+    async with make_client(get_settings()) as client, storage.connect(_history_db(args)) as db:
+        for eid in ids:
+            stats = await load_episode(db, client, episodes[eid])
+            print(f"{eid}: versions stored per publisher {stats}")
+    return 0
+
+
+async def _backtest(args: argparse.Namespace) -> int:
+    from tension_index.backtest import classify_history, replay
+    from tension_index.history import load_episodes
+    from tension_index.pipeline import make_classifier
+
+    settings = get_settings()
+    episodes = load_episodes()
+    ids = list(episodes) if args.episode == "all" else [args.episode]
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)  # noqa: ASYNC240 - one-off CLI setup
+    failed = 0
+    async with storage.connect(_history_db(args)) as db:
+        await storage.migrate(db)
+        claude = make_classifier(settings) if args.claude else None
+        await classify_history(db, claude)
+        for eid in ids:
+            report = await replay(db, episodes[eid])
+            (out / f"{eid}.md").write_text(report.markdown(), encoding="utf-8")
+            (out / f"{eid}.csv").write_text(report.csv(), encoding="utf-8")
+            ok, detail = report.verdict()
+            failed += not ok
+            print(f"{'PASS' if ok else 'FAIL'} {eid}: {detail} -> {out / (eid + '.md')}")
+    return 1 if failed else 0
+
+
 async def _probe_news() -> int:
     from tension_index.collector import make_client
     from tension_index.extra.news import load_config, parse_feed
@@ -245,6 +287,16 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("classify", help="classify new changes and current advisories")
 
+    p = sub.add_parser("history", help="load archived advisories (Wayback) for an episode")
+    p.add_argument("--episode", default="all", help="id from config/episodes.yaml or 'all'")
+    p.add_argument("--db", default="data/history.sqlite3")
+
+    p = sub.add_parser("backtest", help="replay the scale on archived episodes")
+    p.add_argument("--episode", default="all")
+    p.add_argument("--db", default="data/history.sqlite3")
+    p.add_argument("--out", default="reports/backtest")
+    p.add_argument("--claude", action="store_true", help="classify with Claude (API key)")
+
     p = sub.add_parser("run", help="full cycle: collect, classify, score, notify")
     p.add_argument("--notify", action="store_true", help="send alerts to Telegram")
 
@@ -283,6 +335,8 @@ def main(argv: list[str] | None = None) -> None:
         "probe": lambda: _probe(args),
         "classify": lambda: _classify(),
         "run": lambda: _run(args),
+        "history": lambda: _history(args),
+        "backtest": lambda: _backtest(args),
     }
     try:
         sys.exit(asyncio.run(handlers[args.command]()))

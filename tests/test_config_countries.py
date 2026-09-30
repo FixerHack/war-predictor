@@ -18,5 +18,7 @@ def test_country_set():
     assert len(COUNTRIES) == 38
     assert "UA" not in COUNTRIES
     assert get_country("pl").name == "Poland"
+    # Ukraine is not monitored, but exists for replaying the 2022 episode.
+    assert get_country("UA").region == "backtest"
     with pytest.raises(KeyError):
-        get_country("UA")
+        get_country("XX")

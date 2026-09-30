@@ -1,0 +1,47 @@
+# Historical episodes for backtesting (stage S8). Pages are loaded from the Wayback Machine
+# into data/history.sqlite3 by `tension-index history --episode <id>`, then replayed by
+# `tension-index backtest --episode <id>`. `expect` states what a good scale should do.
+episodes:
+  ukraine-2022:
+    country: UA
+    from: 2021-10-01
+    to: 2022-03-10
+    event: 2022-02-24
+    expect: {min_score: 7, before_event_days: 1}   # MVP criterion M1
+    urls:
+      us: https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/ukraine-travel-advisory.html
+      gov_uk: https://www.gov.uk/foreign-travel-advice/ukraine
+      ca: https://travel.gc.ca/destinations/ukraine
+      au: https://www.smartraveller.gov.au/destinations/europe/ukraine
+      de: https://www.auswaertiges-amt.de/de/ReiseUndSicherheit/ukrainesicherheit/201946
+  armenia-azerbaijan-2020:
+    country: AZ
+    from: 2020-06-01
+    to: 2020-10-15
+    event: 2020-09-27
+    expect: {min_score: 5, before_event_days: 0}
+    urls:
+      us: https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/azerbaijan-travel-advisory.html
+      gov_uk: https://www.gov.uk/foreign-travel-advice/azerbaijan
+      ca: https://travel.gc.ca/destinations/azerbaijan
+  israel-2024:
+    country: IL
+    from: 2023-12-01
+    to: 2024-04-30
+    event: 2024-04-13
+    expect: {min_score: 7, before_event_days: 0}
+    urls:
+      us: https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/israel-west-bank-and-gaza-travel-advisory.html
+      gov_uk: https://www.gov.uk/foreign-travel-advice/israel
+      ca: https://travel.gc.ca/destinations/israel-west-bank-and-gaza
+      au: https://www.smartraveller.gov.au/destinations/middle-east/israel
+  france-2016-control:
+    country: FR
+    from: 2015-10-01
+    to: 2016-08-31
+    event: null
+    expect: {max_score: 4.9}   # terrorism, not war: must stay yellow or below
+    urls:
+      us: https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/france-travel-advisory.html
+      gov_uk: https://www.gov.uk/foreign-travel-advice/france
+      ca: https://travel.gc.ca/destinations/france
