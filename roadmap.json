@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -123,8 +123,28 @@
           "status": "todo",
           "days": 0.2,
           "owner": "human",
-          "uk": "Увімкнути GitHub Pages (Settings → Pages → Source: GitHub Actions)",
-          "en": "Enable GitHub Pages (Settings → Pages → Source: GitHub Actions)"
+          "uk": "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root",
+          "en": "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root",
+          "note_uk": "Сайт уже в гілці gh-pages (make pages), бо Actions заблоковані.",
+          "note_en": "Site is already on the gh-pages branch (make pages) because Actions are locked."
+        },
+        {
+          "id": "S0.15",
+          "status": "todo",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Зняти блокування GitHub Actions: Settings → Billing and plans (рахунок / картка)",
+          "en": "Unlock GitHub Actions: Settings → Billing and plans (invoice / card)",
+          "note_uk": "CI не стартує: «account is locked due to a billing issue».",
+          "note_en": "CI does not start: \"account is locked due to a billing issue\"."
+        },
+        {
+          "id": "S0.16",
+          "status": "done",
+          "days": 0.2,
+          "uk": "Публікація сторінки прогресу без Actions (make pages → гілка gh-pages)",
+          "en": "Publish the progress page without Actions (make pages → gh-pages branch)",
+          "owner": "claude"
         },
         {
           "id": "S0.14",
@@ -136,22 +156,22 @@
         }
       ],
       "stats": {
-        "percent": 67,
-        "days_total": 4.9,
-        "days_left": 1.6,
+        "percent": 66,
+        "days_total": 5.3,
+        "days_left": 1.8,
         "counts": {
-          "done": 8,
+          "done": 9,
           "in_progress": 0,
-          "todo": 6,
+          "todo": 7,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 3.3,
+          "done": 3.5,
           "in_progress": 0,
-          "todo": 1.6,
+          "todo": 1.8,
           "blocked": 0
         },
-        "tasks": 14
+        "tasks": 16
       }
     },
     {
@@ -1060,6 +1080,10 @@
   ],
   "risks": [
     {
+      "uk": "GitHub Actions заблоковані через білінг акаунта: CI не перевіряє зміни, до розблокування перевірки лише локально (make check)",
+      "en": "GitHub Actions locked by an account billing issue: no CI until unlocked, checks run locally only (make check)"
+    },
+    {
       "uk": "Блокування збору: сайти держав можуть блокувати запити з сервера",
       "en": "Collection blocking: government sites may block requests from the server"
     },
@@ -1081,6 +1105,16 @@
     }
   ],
   "changelog": [
+    {
+      "version": "0.2.1",
+      "date": "2026-09-30",
+      "uk": [
+        "Публікація сторінки прогресу без GitHub Actions: make pages → гілка gh-pages"
+      ],
+      "en": [
+        "Publish the progress page without GitHub Actions: make pages → gh-pages branch"
+      ]
+    },
     {
       "version": "0.2.0",
       "date": "2026-09-30",
@@ -1138,24 +1172,24 @@
   ],
   "stats": {
     "percent": 27,
-    "days_total": 43.5,
-    "days_left": 31.9,
+    "days_total": 43.9,
+    "days_left": 32.1,
     "counts": {
-      "done": 26,
+      "done": 27,
       "in_progress": 2,
-      "todo": 48,
+      "todo": 49,
       "blocked": 0
     },
     "days_by_status": {
-      "done": 11.2,
+      "done": 11.4,
       "in_progress": 0.7,
-      "todo": 31.6,
+      "todo": 31.8,
       "blocked": 0
     },
-    "tasks": 76
+    "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T11:16:57+00:00",
-    "commit": "662a666"
+    "built_at": "2026-09-30T11:17:34+00:00",
+    "commit": "05c1f37"
   }
 }
