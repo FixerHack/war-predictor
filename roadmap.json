@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.6",
+    "version": "0.2.7",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -116,7 +116,9 @@
           "days": 0.5,
           "owner": "human",
           "uk": "Перший деплой на сервер: install_server.sh, перевірка healthcheck",
-          "en": "First server deploy: install_server.sh, verify healthcheck"
+          "en": "First server deploy: install_server.sh, verify healthcheck",
+          "note_uk": "Відкладено: спершу бот і система.",
+          "note_en": "Postponed: bot and system first."
         },
         {
           "id": "S0.13",
@@ -854,8 +856,8 @@
           "days": 0.3,
           "uk": "Перевірити парсер Wikipedia на живій сторінці",
           "en": "Verify the Wikipedia parser against the live page",
-          "note_uk": "Запит працює; додано захист від зміни розмітки, потрібен повторний запуск war-check.",
-          "note_en": "Request works; layout-change guard added, re-run war-check to confirm.",
+          "note_uk": "Захист виявив, що розбір вікітексту не бачить розділів; парсер переведено на відрендерений HTML, потрібен запуск war-check --headings.",
+          "note_en": "Guard showed wikitext parsing found no sections; parser moved to rendered HTML, run war-check --headings to confirm.",
           "owner": "claude"
         }
       ],
@@ -1045,6 +1047,11 @@
   ],
   "decisions": [
     {
+      "date": "2026-09-30",
+      "uk": "Деплой на сервер відкладено; пріоритет — бот і система на MacBook",
+      "en": "Server deploy postponed; priority is the bot and system on the MacBook"
+    },
+    {
       "date": "2026-09-27",
       "uk": "Шкала 0–10 замість ймовірності: описує стан сигналів, а не прогнозує війну",
       "en": "0–10 scale instead of a probability: describes signals, does not forecast war"
@@ -1107,6 +1114,18 @@
     }
   ],
   "changelog": [
+    {
+      "version": "0.2.7",
+      "date": "2026-09-30",
+      "uk": [
+        "Парсер Wikipedia працює з відрендереним HTML і підзаголовками будь-якого рівня",
+        "war-check --headings: діагностика структури сторінки"
+      ],
+      "en": [
+        "Wikipedia parser works on rendered HTML and headings of any level",
+        "war-check --headings: page structure diagnostics"
+      ]
+    },
     {
       "version": "0.2.6",
       "date": "2026-09-30",
@@ -1215,7 +1234,7 @@
     "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T11:28:29+00:00",
-    "commit": "4fe7c17"
+    "built_at": "2026-09-30T11:32:11+00:00",
+    "commit": "b883965"
   }
 }
