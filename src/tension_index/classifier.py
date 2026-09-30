@@ -61,11 +61,16 @@ QUOTE_MIN_CHARS = 20
 
 # --- Rules ----------------------------------------------------------------------------------
 
+_FAMILY = r" of (eligible )?(family members|dependents|dependants)"
 _STAFF_RULES = [  # most severe first
-    ("embassy_suspended", r"suspended (its |all )?operations|embassy (is |has )?(closed|suspended)|"
-     r"ambassade (est )?fermée|botschaft (ist )?geschlossen"),
-    ("ordered_departure", r"ordered (the )?departure|départ ordonné"),
-    ("authorized_departure", r"authori[sz]ed (the )?(voluntary )?departure"),
+    ("embassy_suspended", r"suspend(ed|ing|s)? (its |all )?(embassy )?operations|"
+     r"embassy (is |has )?(closed|suspended)|ambassade (est )?fermée|botschaft (ist )?geschlossen"),
+    # Ordering only families out is the step before ordering staff out: counted as authorized.
+    ("ordered_departure", rf"ordered (the )?departure(?!{_FAMILY})|départ ordonné|"
+     r"relocat(ed|ing) (its |our )?(embassy|embassy staff|diplomatic staff) (operations )?to"),
+    ("authorized_departure", rf"authori[sz]ed (the )?(voluntary )?departure|ordered (the )?departure{_FAMILY}|"
+     r"(staff|dependants|dependents)[\w ,]{0,40}(are being|have been|being) withdrawn|"
+     r"withdraw(ing|n)? (some |non-essential )?(embassy )?staff"),
     ("limited_consular_services", r"limited consular (services|assistance)|"
      r"(unable|not able) to provide consular"),
 ]  # fmt: skip
@@ -96,8 +101,10 @@ _LEVEL_LINE = re.compile(r"^LEVEL: (.*?) -> (.*)$", re.M)
 
 def _added_lines(diff: str) -> str:
     """For a unified diff keep only added lines; for plain text return it unchanged."""
+    # Only our own diffs count as diffs (hunk headers or a LEVEL line): a page with a bullet
+    # "- ..." or a phone "+1 ..." is still a full text.
     lines = diff.splitlines()
-    if any(line.startswith(("+", "-", "@@")) for line in lines):
+    if lines and (lines[0].startswith("LEVEL:") or any(line.startswith("@@") for line in lines)):
         return "\n".join(line[1:] for line in lines if line.startswith("+"))
     return diff
 

@@ -52,7 +52,7 @@ PAGES = {
                              "On January 23, the Department ordered the departure of eligible family members.",
                        "gov_uk": "Normal travel advice for Ukraine."},
     "20220213000000": {"us": "Ukraine - Level 4: Do Not Travel due to the increased threats of Russian military action. "
-                             "On January 23, the Department ordered the departure of eligible family members.",
+                             "On February 12, the Department ordered the departure of most U.S. direct hire employees.",
                        "gov_uk": "The FCDO advises against all travel to the whole of Ukraine due to the threat of Russian military action. "
                                  "British nationals should leave now. The embassy ordered the departure of staff."},
 }  # fmt: skip
@@ -72,14 +72,12 @@ async def test_load_and_replay_ukraine(tmp_path, settings):
     async with storage.connect(tmp_path / "history.sqlite3") as db:
         async with httpx.AsyncClient(transport=httpx.MockTransport(wayback)) as client:
             stats = await load_episode(db, client, UA, pause=0)
-        assert stats == {"us": 2, "gov_uk": 2}  # unchanged versions are skipped
+        assert stats == {"us": 3, "gov_uk": 2}  # unchanged versions are skipped
         await classify_history(db, None)
         report = await replay(db, UA)
     assert report.days[0].score < 3
-    assert report.first_reaching(7) == date(2022, 1, 24)  # ordered departure (US)
-    # Currently the surge bonus alone lifts one government's ordered departure to 9+;
-    # the scale definition wants several governments for "critical" (tuning task S8.3).
-    assert report.first_reaching(9) <= date(2022, 2, 13)
+    assert report.first_reaching(7) == date(2022, 1, 24)  # families ordered out (US)
+    assert report.first_reaching(9) == date(2022, 2, 13)  # staff ordered out by two governments
     last = report.days[-1]
     assert last.top == [
         "us:staff_posture:ordered_departure",

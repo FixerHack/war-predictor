@@ -164,6 +164,11 @@ MIGRATIONS: list[str] = [
     """
     ALTER TABLE signals ADD COLUMN note_uk TEXT NOT NULL DEFAULT '';
     """,
+    # 8: rule classifications of full texts missed everything when a page had a line starting
+    # with "-" or "+" (read as a diff); redo them
+    """
+    DELETE FROM classifications WHERE method = 'rules';
+    """,
 ]
 
 

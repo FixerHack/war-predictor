@@ -95,6 +95,15 @@ class Report:
         return "\n".join(lines) + "\n"
 
 
+async def _cached(
+    db: aiosqlite.Connection, ref_type: str, ref_id: int, claude: ClaudeClassifier | None
+) -> bool:
+    """Already classified - by Claude, or by rules when Claude is not asked for (so a later
+    `backtest --claude` upgrades earlier rule-based results)."""
+    row = await storage.get_classification(db, ref_type, ref_id)
+    return row is not None and (claude is None or row["method"] == "claude")
+
+
 async def classify_history(db: aiosqlite.Connection, claude: ClaudeClassifier | None) -> int:
     """Classify every archived version and change (cached in the history DB)."""
     cfg = load_config()
@@ -102,7 +111,7 @@ async def classify_history(db: aiosqlite.Connection, claude: ClaudeClassifier | 
     async with db.execute("SELECT * FROM snapshots ORDER BY id") as cur:
         snapshots = await cur.fetchall()
     for snap in snapshots:
-        if await storage.get_classification(db, "snapshot", snap["id"]):
+        if await _cached(db, "snapshot", snap["id"], claude):
             continue
         result = classify_rules(snap["text"])
         if claude is not None and advisory_strength(cfg, snap["source"], snap["level"]) > 0:
@@ -120,7 +129,7 @@ async def classify_history(db: aiosqlite.Connection, claude: ClaudeClassifier | 
     ) as cur:
         changes = await cur.fetchall()  # fmt: skip
     for ch in changes:
-        if await storage.get_classification(db, "change", ch["id"]):
+        if await _cached(db, "change", ch["id"], claude):
             continue
         levels = (advisory_strength(cfg, ch["source"], ch["before"]),
                   advisory_strength(cfg, ch["source"], ch["after"]))  # fmt: skip

@@ -32,3 +32,9 @@ def test_us_reissue_notes_are_boilerplate():
     old = "There were no changes to the advisory level or risk indicators. Advisory summary was updated.\nAdvisory summary\nExercise normal precautions in Estonia."
     new = "Reissued after periodic review with minor edits.\nAdvisory Summary\nExercise normal precautions in Estonia."
     assert changed_fragment(old, new) == ""
+
+
+def test_restamped_dates_are_not_changes():
+    old = "Destinations\nStill valid: March 9, 2022 15:42 ET\nTravel Advisory\nFebruary 10, 2022\nText."
+    new = "Destinations\nStill valid: March 10, 2022 15:31 ET\nTravel Advisory\nFebruary 12, 2022\nText."
+    assert changed_fragment(old, new) == ""
