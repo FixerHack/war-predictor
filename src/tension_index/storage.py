@@ -169,6 +169,10 @@ MIGRATIONS: list[str] = [
     """
     DELETE FROM classifications WHERE method = 'rules';
     """,
+    # 9: airspace rules narrowed (bare "NOTAM" no longer means restricted); redo rule results
+    """
+    DELETE FROM classifications WHERE method = 'rules';
+    """,
 ]
 
 
