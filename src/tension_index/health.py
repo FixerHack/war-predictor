@@ -13,6 +13,7 @@ from pathlib import Path
 
 from tension_index import storage
 from tension_index.config import Settings
+from tension_index.extra import MAX_AGE_HOURS
 from tension_index.pipeline import source_blocks
 
 
@@ -94,7 +95,8 @@ async def run_checks(settings: Settings, db_path: Path | None = None) -> Report:
                     checks.append(Check(f"collector.{name}", Status.WARN, "no successful run yet"))
                     continue
                 age = _age_hours(last)
-                status = Status.OK if age <= settings.health_max_collect_age_hours else Status.FAIL
+                limit = MAX_AGE_HOURS.get(name, settings.health_max_collect_age_hours)
+                status = Status.OK if age <= limit else Status.FAIL
                 checks.append(
                     Check(f"collector.{name}", status, f"last success {age:.1f} h ago ({last})")
                 )
