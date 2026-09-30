@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.47**, updated 2026-09-30.
+Version **0.2.48**, updated 2026-09-30.
 
 **Overall progress: 67%** · left ≈ 14.7 days · ✅ 45 · 🟡 19 · ⬜ 11 · ⛔ 3
 
@@ -249,6 +249,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.48** (2026-09-30)
+  - GDELT: stop after 3 consecutive failures when the service is unreachable
 - **0.2.47** (2026-09-30)
   - Auto-deploy from main over SSH (once Actions are unlocked)
   - Source implementation status in docs/sources.md

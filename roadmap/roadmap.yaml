@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.47
+  version: 0.2.48
   updated: 2026-09-30
 
 milestones:
@@ -232,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.48
+    date: 2026-09-30
+    uk: ["GDELT: зупинка після 3 невдач поспіль, якщо сервіс недоступний"]
+    en: ["GDELT: stop after 3 consecutive failures when the service is unreachable"]
   - version: 0.2.47
     date: 2026-09-30
     uk: ["Автодеплой з main через SSH (після розблокування Actions)", "Стан реалізації джерел у docs/sources.md"]
