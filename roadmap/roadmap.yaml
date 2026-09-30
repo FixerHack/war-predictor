@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.67
+  version: 0.2.68
   updated: 2026-09-30
 
 milestones:
@@ -220,6 +220,7 @@ stages:
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
+  - {date: 2026-09-30, uk: "Регіональні попередження: Британія «avoid all travel to parts» 0.45, «all but essential to parts» 0.3, Німеччина Teilreisewarnung 0.35 — вони здебільшого стосуються давно окупованих чи прикордонних районів.", en: "Regional warnings: UK \"avoid all travel to parts\" 0.45, \"all but essential to parts\" 0.3, German partial warning 0.35 — they mostly cover long-occupied or border areas."}
   - {date: 2026-09-30, uk: "Пороги неба (8 / 6) — лише за двох незалежних джерел, як і поріг наказу про виїзд персоналу.", en: "Airspace floors (8 / 6) only with two independent sources, like the ordered-departure floor."}
   - {date: 2026-09-30, uk: "Наказ про виїзд лише родин дипломатів = дозволений виїзд персоналу (поріг 7), не наказ про виїзд персоналу (поріг 9 при двох урядах).", en: "Ordered departure of family members only = authorized staff departure (floor 7), not ordered staff departure (floor 9 with two governments)."}
   - {date: 2026-09-30, uk: "Надбавка за відхилення від норми не більше 0.10 до R; синхронність — лише підвищення рівня, статус персоналу, консульські/прикордонні/авіаційні заходи з релевантністю причини ≥ 0.5.", en: "Surge bonus at most 0.10 to R; synchrony counts only level raises, staff posture, consular/border/airspace measures with reason relevance ≥ 0.5."}
@@ -245,6 +246,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.68
+    date: 2026-09-30
+    uk: "Версії, що чергуються, більше не зберігаються й не класифікуються повторно (економія викликів моделі); регіональні попередження (Британія «to parts», Німеччина Teilreisewarnung) важать менше; закриття неба зараховується лише з безпекової причини."
+    en: "Alternating versions are no longer stored or re-classified (saves model calls); regional warnings (UK \"to parts\", German partial warning) weigh less; airspace closures count only for a security reason."
   - version: 0.2.67
     date: 2026-09-30
     uk: "Держдеп: резервне джерело після зникнення RSS; закриття неба через вулканічний попіл чи погоду більше не рахується сигналом безпеки; модель визначає причину за загальним рівнем країни, а не за окремими регіонами."

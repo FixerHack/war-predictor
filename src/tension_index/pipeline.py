@@ -254,7 +254,10 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             )
             count += 1
         # Airspace measures for volcanic ash or weather are not a security signal.
-        if cls.airspace in ("closed", "restricted") and relevance(cfg, cls.reason) >= 0.5:
+        if (
+            cls.airspace in ("closed", "restricted")
+            and relevance(cfg, cls.reason) >= cfg["airspace_min_relevance"]
+        ):
             await storage.upsert_signal(
                 db,
                 Signal(

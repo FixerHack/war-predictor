@@ -85,6 +85,7 @@ async def collect_source(
 
     flap_days = load_config()["flap_window_days"]
     flap_since = (datetime.now(UTC) - timedelta(days=flap_days)).isoformat(timespec="seconds")
+    flapping: list[str] = []
     outcomes = await asyncio.gather(*(one(c) for c in targets), return_exceptions=True)
     for country, outcome in zip(targets, outcomes, strict=True):
         if isinstance(outcome, BaseException):
@@ -100,10 +101,13 @@ async def collect_source(
         # boilerplate filter doesn't register as a change everywhere.
         if previous and normalize(previous.text) == text and previous.level == advisory.level:
             continue
-        flapping = previous is not None and (
-            storage.content_hash(text),
-            advisory.level,
-        ) in await storage.seen_versions(db, source.name, country.code, flap_since)
+        if previous is not None and (storage.content_hash(text), advisory.level) in (
+            await storage.seen_versions(db, source.name, country.code, flap_since)
+        ):
+            # A version seen a few days ago (A -> B -> A, e.g. CDN nodes serving different
+            # copies): not news, and not stored again, so it is not re-classified each run.
+            flapping.append(country.code)
+            continue
         snapshot_id = await storage.insert_snapshot(
             db,
             source=source.name,
@@ -116,11 +120,6 @@ async def collect_source(
         )
         if previous is None:
             continue  # first sighting is the baseline, not a change
-        if flapping:
-            # Back to a version seen a few days ago (A -> B -> A): keep the snapshot so the
-            # current state is right, but it is not news.
-            log.info("%s %s: flapping between versions, no change", source.name, country.code)
-            continue
         diff = changed_fragment(previous.text, text)
         if previous.level != advisory.level:
             diff = f"LEVEL: {previous.level} -> {advisory.level}\n{diff}"
@@ -134,6 +133,9 @@ async def collect_source(
         )
         result.changed += 1
         result.changes.append((country.code, diff, change_id))
+    if flapping:
+        log.info("%s: %d countries alternate between known versions, ignored: %s",
+                 source.name, len(flapping), ",".join(flapping))  # fmt: skip
     await db.commit()
     await storage.finish_run(
         db,

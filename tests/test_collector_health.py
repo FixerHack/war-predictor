@@ -151,6 +151,6 @@ async def test_flapping_source_records_one_change(settings):
             for p in (other, PAYLOAD, other, PAYLOAD)
         ]
         assert swings == [1, 0, 0, 0]
-        # The current version is still the latest snapshot.
-        latest = await storage.latest_snapshot(db, "gov_uk", "PL")
-        assert latest is not None and "Another version" not in latest.text
+        # Known versions are not stored again (so they are not re-classified every run).
+        async with db.execute("SELECT COUNT(*) FROM snapshots") as cur:
+            assert (await cur.fetchone())[0] == 2

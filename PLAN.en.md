@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.67**, updated 2026-09-30.
+Version **0.2.68**, updated 2026-09-30.
 
 **Overall progress: 68%** · left ≈ 14.6 days · ✅ 51 · 🟡 20 · ⬜ 10 · ⛔ 4
 
@@ -239,6 +239,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-09-30: Regional warnings: UK "avoid all travel to parts" 0.45, "all but essential to parts" 0.3, German partial warning 0.35 — they mostly cover long-occupied or border areas.
 - 2026-09-30: Airspace floors (8 / 6) only with two independent sources, like the ordered-departure floor.
 - 2026-09-30: Ordered departure of family members only = authorized staff departure (floor 7), not ordered staff departure (floor 9 with two governments).
 - 2026-09-30: Surge bonus at most 0.10 to R; synchrony counts only level raises, staff posture, consular/border/airspace measures with reason relevance ≥ 0.5.
@@ -266,6 +267,208 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.68** (2026-09-30)
+  - A
+  - l
+  - t
+  - e
+  - r
+  - n
+  - a
+  - t
+  - i
+  - n
+  - g
+  -  
+  - v
+  - e
+  - r
+  - s
+  - i
+  - o
+  - n
+  - s
+  -  
+  - a
+  - r
+  - e
+  -  
+  - n
+  - o
+  -  
+  - l
+  - o
+  - n
+  - g
+  - e
+  - r
+  -  
+  - s
+  - t
+  - o
+  - r
+  - e
+  - d
+  -  
+  - o
+  - r
+  -  
+  - r
+  - e
+  - -
+  - c
+  - l
+  - a
+  - s
+  - s
+  - i
+  - f
+  - i
+  - e
+  - d
+  -  
+  - (
+  - s
+  - a
+  - v
+  - e
+  - s
+  -  
+  - m
+  - o
+  - d
+  - e
+  - l
+  -  
+  - c
+  - a
+  - l
+  - l
+  - s
+  - )
+  - ;
+  -  
+  - r
+  - e
+  - g
+  - i
+  - o
+  - n
+  - a
+  - l
+  -  
+  - w
+  - a
+  - r
+  - n
+  - i
+  - n
+  - g
+  - s
+  -  
+  - (
+  - U
+  - K
+  -  
+  - "
+  - t
+  - o
+  -  
+  - p
+  - a
+  - r
+  - t
+  - s
+  - "
+  - ,
+  -  
+  - G
+  - e
+  - r
+  - m
+  - a
+  - n
+  -  
+  - p
+  - a
+  - r
+  - t
+  - i
+  - a
+  - l
+  -  
+  - w
+  - a
+  - r
+  - n
+  - i
+  - n
+  - g
+  - )
+  -  
+  - w
+  - e
+  - i
+  - g
+  - h
+  -  
+  - l
+  - e
+  - s
+  - s
+  - ;
+  -  
+  - a
+  - i
+  - r
+  - s
+  - p
+  - a
+  - c
+  - e
+  -  
+  - c
+  - l
+  - o
+  - s
+  - u
+  - r
+  - e
+  - s
+  -  
+  - c
+  - o
+  - u
+  - n
+  - t
+  -  
+  - o
+  - n
+  - l
+  - y
+  -  
+  - f
+  - o
+  - r
+  -  
+  - a
+  -  
+  - s
+  - e
+  - c
+  - u
+  - r
+  - i
+  - t
+  - y
+  -  
+  - r
+  - e
+  - a
+  - s
+  - o
+  - n
+  - .
 - **0.2.67** (2026-09-30)
   - S
   - t
