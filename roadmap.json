@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.62",
+    "version": "0.2.68",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -391,25 +391,35 @@
           "uk": "Очищення тексту від дат оновлення і службових елементів",
           "en": "Strip update dates and boilerplate before diffing",
           "owner": "claude"
+        },
+        {
+          "id": "S2.12",
+          "status": "in_progress",
+          "days": 0.3,
+          "uk": "США: стрічка RSS зникла (404) — резерв через API cadataapi.state.gov (RSS/Atom/JSON)",
+          "en": "US: RSS feed gone (404) — fallback to the cadataapi.state.gov API (RSS/Atom/JSON)",
+          "note_uk": "Формат API перевірено лише на припущеннях; потрібна перевірка probe us.",
+          "note_en": "API format only assumed; needs a probe us check.",
+          "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 56,
-        "days_total": 6.2,
-        "days_left": 2.8,
+        "percent": 55,
+        "days_total": 6.5,
+        "days_left": 2.9,
         "counts": {
           "done": 4,
-          "in_progress": 5,
+          "in_progress": 6,
           "todo": 0,
           "blocked": 2
         },
         "days_by_status": {
           "done": 1.7,
-          "in_progress": 3.5,
+          "in_progress": 3.8,
           "todo": 0,
           "blocked": 1.0
         },
-        "tasks": 11
+        "tasks": 12
       }
     },
     {
@@ -585,25 +595,33 @@
           "note_uk": "Епізоди в config/episodes.yaml (Україна 2022, Азербайджан 2020, Ізраїль 2024, контроль Франція 2016); завантаження потребує мережі, запустити локально.",
           "note_en": "Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.",
           "owner": "claude"
+        },
+        {
+          "id": "S5.5",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Архів Wayback: довгі таймаути, повтори при 429/5xx, прогрес у логах",
+          "en": "Wayback archive: long timeouts, retries on 429/5xx, progress in logs",
+          "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 75,
-        "days_total": 2,
+        "percent": 76,
+        "days_total": 2.1,
         "days_left": 0.5,
         "counts": {
-          "done": 1,
+          "done": 2,
           "in_progress": 1,
           "todo": 0,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 1,
+          "done": 1.1,
           "in_progress": 1,
           "todo": 0,
           "blocked": 0
         },
-        "tasks": 2
+        "tasks": 3
       }
     },
     {
@@ -756,8 +774,8 @@
           "days": 1.5,
           "uk": "Прогін шкали на історичних епізодах",
           "en": "Replay the scale on historical episodes",
-          "note_uk": "tension-index backtest: день за днем, звіти в reports/backtest; перевірено на синтетичних даних, чекає реального архіву.",
-          "note_en": "tension-index backtest: day-by-day replay, reports in reports/backtest; tested on synthetic data, awaiting the real archive.",
+          "note_uk": "Архів Wayback, Україна-2022: правила — PASS, 7 з 24.01.2022 (за 31 день). З моделлю 7 з'являлось уже 09.10.2021 через «обмеження неба» (Крим з 2014 р.) — пороги неба тепер вимагають двох джерел; чекає повторного прогону.",
+          "note_en": "Wayback archive, Ukraine 2022: rules PASS, 7 from 24 Jan 2022 (31 days ahead). With the model 7 came as early as 9 Oct 2021 via \"airspace restricted\" (Crimea since 2014) — airspace floors now need two sources; awaiting a re-run.",
           "owner": "claude"
         },
         {
@@ -1160,6 +1178,21 @@
   "decisions": [
     {
       "date": "2026-09-30",
+      "uk": "Регіональні попередження: Британія «avoid all travel to parts» 0.45, «all but essential to parts» 0.3, Німеччина Teilreisewarnung 0.35 — вони здебільшого стосуються давно окупованих чи прикордонних районів.",
+      "en": "Regional warnings: UK \"avoid all travel to parts\" 0.45, \"all but essential to parts\" 0.3, German partial warning 0.35 — they mostly cover long-occupied or border areas."
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Пороги неба (8 / 6) — лише за двох незалежних джерел, як і поріг наказу про виїзд персоналу.",
+      "en": "Airspace floors (8 / 6) only with two independent sources, like the ordered-departure floor."
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Наказ про виїзд лише родин дипломатів = дозволений виїзд персоналу (поріг 7), не наказ про виїзд персоналу (поріг 9 при двох урядах).",
+      "en": "Ordered departure of family members only = authorized staff departure (floor 7), not ordered staff departure (floor 9 with two governments)."
+    },
+    {
+      "date": "2026-09-30",
       "uk": "Надбавка за відхилення від норми не більше 0.10 до R; синхронність — лише підвищення рівня, статус персоналу, консульські/прикордонні/авіаційні заходи з релевантністю причини ≥ 0.5.",
       "en": "Surge bonus at most 0.10 to R; synchrony counts only level raises, staff posture, consular/border/airspace measures with reason relevance ≥ 0.5."
     },
@@ -1249,6 +1282,42 @@
     }
   ],
   "changelog": [
+    {
+      "version": "0.2.68",
+      "date": "2026-09-30",
+      "uk": "Версії, що чергуються, більше не зберігаються й не класифікуються повторно (економія викликів моделі); регіональні попередження (Британія «to parts», Німеччина Teilreisewarnung) важать менше; закриття неба зараховується лише з безпекової причини.",
+      "en": "Alternating versions are no longer stored or re-classified (saves model calls); regional warnings (UK \"to parts\", German partial warning) weigh less; airspace closures count only for a security reason."
+    },
+    {
+      "version": "0.2.67",
+      "date": "2026-09-30",
+      "uk": "Держдеп: резервне джерело після зникнення RSS; закриття неба через вулканічний попіл чи погоду більше не рахується сигналом безпеки; модель визначає причину за загальним рівнем країни, а не за окремими регіонами.",
+      "en": "State Department: fallback source after the RSS feed disappeared; airspace closures for volcanic ash or weather no longer count as security signals; the model takes the reason for the country's overall level, not for single regions."
+    },
+    {
+      "version": "0.2.66",
+      "date": "2026-09-30",
+      "uk": "Класифікації правилами перераховуються ще раз після звуження правил для неба.",
+      "en": "Rule-based classifications are redone once more after narrowing the airspace rules."
+    },
+    {
+      "version": "0.2.65",
+      "date": "2026-09-30",
+      "uk": "Пороги для закритого чи обмеженого неба тепер вимагають двох незалежних джерел; правила й модель не вважають обмеженням неба рутинні NOTAM, правила для дронів і давні регіональні заборони.",
+      "en": "Airspace closed/restricted floors now need two independent sources; rules and the model no longer treat routine NOTAMs, drone rules or long-standing regional bans as airspace restrictions."
+    },
+    {
+      "version": "0.2.64",
+      "date": "2026-09-30",
+      "uk": "Виправлено правила класифікації: повні сторінки з маркерами списку чи телефонами більше не сприймаються як diff; нові формулювання статусу посольств (відкликання, переїзд, призупинення); шум «Still valid» і голих дат прибрано. Правилові класифікації буде перераховано.",
+      "en": "Fixed rule classification: full pages with bullets or phone numbers are no longer read as diffs; new embassy posture wordings (withdrawal, relocation, suspension); \"Still valid\" and bare-date noise removed. Rule-based classifications are redone."
+    },
+    {
+      "version": "0.2.63",
+      "date": "2026-09-30",
+      "uk": "Завантаження архіву Wayback більше не обривається на повільних відповідях: таймаут 120 с і до 3 повторів.",
+      "en": "Wayback archive loading no longer fails on slow answers: 120 s timeout and up to 3 retries."
+    },
     {
       "version": "0.2.62",
       "date": "2026-09-30",
@@ -1636,24 +1705,24 @@
   ],
   "stats": {
     "percent": 68,
-    "days_total": 45.6,
-    "days_left": 14.5,
+    "days_total": 46.0,
+    "days_left": 14.6,
     "counts": {
-      "done": 50,
-      "in_progress": 19,
+      "done": 51,
+      "in_progress": 20,
       "todo": 10,
       "blocked": 4
     },
     "days_by_status": {
-      "done": 23.85,
-      "in_progress": 14.5,
+      "done": 23.95,
+      "in_progress": 14.8,
       "todo": 4.2,
       "blocked": 3.0
     },
-    "tasks": 83
+    "tasks": 85
   },
   "build": {
-    "built_at": "2026-09-30T15:26:25+00:00",
-    "commit": "16e4045"
+    "built_at": "2026-09-30T17:32:18+00:00",
+    "commit": "6b96e9d"
   }
 }
