@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.63
+  version: 0.2.64
   updated: 2026-09-30
 
 milestones:
@@ -150,7 +150,7 @@ stages:
     goal_uk: "Шкала має спрацьовувати на відомих епізодах вчасно і без масових хибних тривог."
     goal_en: "The scale must fire on known episodes in time and without mass false alarms."
     tasks:
-      - {id: S8.1, status: in_progress, days: 1.5, uk: "Прогін шкали на історичних епізодах", en: "Replay the scale on historical episodes", note_uk: "tension-index backtest: день за днем, звіти в reports/backtest; перевірено на синтетичних даних, чекає реального архіву.", note_en: "tension-index backtest: day-by-day replay, reports in reports/backtest; tested on synthetic data, awaiting the real archive."}
+      - {id: S8.1, status: in_progress, days: 1.5, uk: "Прогін шкали на історичних епізодах", en: "Replay the scale on historical episodes", note_uk: "Перший прогін на архіві Wayback (Україна-2022): PASS, але 7 лише 12.02 — правила не бачили статусу посольства на повних сторінках (рядки з «-»/«+» сприймались як diff). Виправлено; чекає повторного прогону.", note_en: "First run on the Wayback archive (Ukraine 2022): PASS, but 7 only on 12 Feb — rules missed embassy posture on full pages (lines starting with -/+ were read as a diff). Fixed; awaiting a re-run."}
       - {id: S8.2, status: in_progress, days: 0.5, uk: "Звіт про хибні тривоги і пропуски", en: "False alarm and miss report", note_uk: "Звіт: PASS/FAIL за очікуванням епізоду, перші дні досягнення 3/5/7/9, контрольний епізод на хибні тривоги.", note_en: "Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms."}
       - {id: S8.3, status: in_progress, days: 1, uk: "Коригування ваг", en: "Weight tuning", note_uk: "Перший крок зроблено на відтворених хронологіях: надбавка за сплеск обмежена 0.10, синхронність рахує лише справжнє посилення (без тероризму й редакційних змін). Франція-2015: 7.3 → 4.5; один уряд із наказом про виїзд: 7.6 → 7.0; Україна-2022 без змін (8.3 / 9.0). Далі — прогін на реальному архіві.", note_en: "First step done on reconstructed timelines: surge bonus capped at 0.10, synchrony counts only real tightening (no terrorism or rewording). France 2015: 7.3 → 4.5; one government ordering departure: 7.6 → 7.0; Ukraine 2022 unchanged (8.3 / 9.0). Next: run on the real archive."}
 
@@ -219,6 +219,7 @@ stages:
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
+  - {date: 2026-09-30, uk: "Наказ про виїзд лише родин дипломатів = дозволений виїзд персоналу (поріг 7), не наказ про виїзд персоналу (поріг 9 при двох урядах).", en: "Ordered departure of family members only = authorized staff departure (floor 7), not ordered staff departure (floor 9 with two governments)."}
   - {date: 2026-09-30, uk: "Надбавка за відхилення від норми не більше 0.10 до R; синхронність — лише підвищення рівня, статус персоналу, консульські/прикордонні/авіаційні заходи з релевантністю причини ≥ 0.5.", en: "Surge bonus at most 0.10 to R; synchrony counts only level raises, staff posture, consular/border/airspace measures with reason relevance ≥ 0.5."}
   - {date: 2026-09-30, uk: "Класифікація змін: Claude Haiku 4.5 через OpenRouter", en: "Change classification: Claude Haiku 4.5 via OpenRouter"}
   - {date: 2026-09-30, uk: "Заморські території європейських країн не впливають на статус війни; винятки фіксуються вручну в wikipedia_ignore", en: "Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore"}
@@ -242,6 +243,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.64
+    date: 2026-09-30
+    uk: "Виправлено правила класифікації: повні сторінки з маркерами списку чи телефонами більше не сприймаються як diff; нові формулювання статусу посольств (відкликання, переїзд, призупинення); шум «Still valid» і голих дат прибрано. Правилові класифікації буде перераховано."
+    en: "Fixed rule classification: full pages with bullets or phone numbers are no longer read as diffs; new embassy posture wordings (withdrawal, relocation, suspension); \"Still valid\" and bare-date noise removed. Rule-based classifications are redone."
   - version: 0.2.63
     date: 2026-09-30
     uk: "Завантаження архіву Wayback більше не обривається на повільних відповідях: таймаут 120 с і до 3 повторів."

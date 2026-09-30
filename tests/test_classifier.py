@@ -17,7 +17,7 @@ def test_rules_staff_posture_and_reason():
         "due to the continued threat of Russian military action.\n"
     )
     c = classify_rules(diff, level_change=(0.2, 0.85))
-    assert c.staff_posture == "ordered_departure"
+    assert c.staff_posture == "authorized_departure"  # families only: the step before staff
     assert c.reason == "armed_conflict"
     assert c.change_type == "level_raised"
     assert c.quote.startswith("On 23 January")
@@ -238,3 +238,28 @@ def test_usable_quote_drops_page_fragments():
     assert usable_quote("Voir aussi") == ""
     quote = "Petty crime can occur,  especially in popular tourist locations."
     assert usable_quote(quote) == "Petty crime can occur, especially in popular tourist locations."
+
+
+def test_full_page_with_bullets_is_not_read_as_a_diff():
+    """Ukraine, 23 Jan 2022: the page has bullet and phone lines; rules must still see it."""
+    page = (
+        "Ukraine Related Calls\n+1-606-260-4379 (overseas)\n- Enroll in STEP\n"
+        "On January 23, 2022, the Department of State authorized the voluntary departure of "
+        "U.S. direct hire employees (USDH) and ordered the departure of eligible family members "
+        "(EFM) from Embassy Kyiv due to the continued threat of Russian military action."
+    )
+    result = classify_rules(page)
+    assert result.staff_posture == "authorized_departure"  # families ordered out = step before
+    assert result.reason == "armed_conflict"
+
+
+def test_staff_posture_wordings_2022():
+    cases = {
+        "On February 12, 2022, the Department of State ordered the departure of most U.S. direct "
+        "hire employees from Embassy Kyiv.": "ordered_departure",
+        "Some embassy staff and dependants are being withdrawn from Kyiv.": "authorized_departure",
+        "Canada is temporarily suspending operations at its embassy in Kyiv.": "embassy_suspended",
+        "We are relocating our embassy staff to Lviv.": "ordered_departure",
+    }
+    for text, posture in cases.items():
+        assert classify_rules(text).staff_posture == posture, text

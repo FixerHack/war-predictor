@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.63**, updated 2026-09-30.
+Version **0.2.64**, updated 2026-09-30.
 
 **Overall progress: 68%** · left ≈ 14.4 days · ✅ 51 · 🟡 19 · ⬜ 10 · ⛔ 4
 
@@ -158,7 +158,7 @@ _The scale must fire on known episodes in time and without mass false alarms._
 Branch: `dev-backtest`
 
 - 🟡 **S8.1** Replay the scale on historical episodes
-  - tension-index backtest: day-by-day replay, reports in reports/backtest; tested on synthetic data, awaiting the real archive.
+  - First run on the Wayback archive (Ukraine 2022): PASS, but 7 only on 12 Feb — rules missed embassy posture on full pages (lines starting with -/+ were read as a diff). Fixed; awaiting a re-run.
 - 🟡 **S8.2** False alarm and miss report
   - Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms.
 - 🟡 **S8.3** Weight tuning
@@ -237,6 +237,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-09-30: Ordered departure of family members only = authorized staff departure (floor 7), not ordered staff departure (floor 9 with two governments).
 - 2026-09-30: Surge bonus at most 0.10 to R; synchrony counts only level raises, staff posture, consular/border/airspace measures with reason relevance ≥ 0.5.
 - 2026-09-30: Change classification: Claude Haiku 4.5 via OpenRouter
 - 2026-09-30: Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore
@@ -262,6 +263,252 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.64** (2026-09-30)
+  - F
+  - i
+  - x
+  - e
+  - d
+  -  
+  - r
+  - u
+  - l
+  - e
+  -  
+  - c
+  - l
+  - a
+  - s
+  - s
+  - i
+  - f
+  - i
+  - c
+  - a
+  - t
+  - i
+  - o
+  - n
+  - :
+  -  
+  - f
+  - u
+  - l
+  - l
+  -  
+  - p
+  - a
+  - g
+  - e
+  - s
+  -  
+  - w
+  - i
+  - t
+  - h
+  -  
+  - b
+  - u
+  - l
+  - l
+  - e
+  - t
+  - s
+  -  
+  - o
+  - r
+  -  
+  - p
+  - h
+  - o
+  - n
+  - e
+  -  
+  - n
+  - u
+  - m
+  - b
+  - e
+  - r
+  - s
+  -  
+  - a
+  - r
+  - e
+  -  
+  - n
+  - o
+  -  
+  - l
+  - o
+  - n
+  - g
+  - e
+  - r
+  -  
+  - r
+  - e
+  - a
+  - d
+  -  
+  - a
+  - s
+  -  
+  - d
+  - i
+  - f
+  - f
+  - s
+  - ;
+  -  
+  - n
+  - e
+  - w
+  -  
+  - e
+  - m
+  - b
+  - a
+  - s
+  - s
+  - y
+  -  
+  - p
+  - o
+  - s
+  - t
+  - u
+  - r
+  - e
+  -  
+  - w
+  - o
+  - r
+  - d
+  - i
+  - n
+  - g
+  - s
+  -  
+  - (
+  - w
+  - i
+  - t
+  - h
+  - d
+  - r
+  - a
+  - w
+  - a
+  - l
+  - ,
+  -  
+  - r
+  - e
+  - l
+  - o
+  - c
+  - a
+  - t
+  - i
+  - o
+  - n
+  - ,
+  -  
+  - s
+  - u
+  - s
+  - p
+  - e
+  - n
+  - s
+  - i
+  - o
+  - n
+  - )
+  - ;
+  -  
+  - "
+  - S
+  - t
+  - i
+  - l
+  - l
+  -  
+  - v
+  - a
+  - l
+  - i
+  - d
+  - "
+  -  
+  - a
+  - n
+  - d
+  -  
+  - b
+  - a
+  - r
+  - e
+  - -
+  - d
+  - a
+  - t
+  - e
+  -  
+  - n
+  - o
+  - i
+  - s
+  - e
+  -  
+  - r
+  - e
+  - m
+  - o
+  - v
+  - e
+  - d
+  - .
+  -  
+  - R
+  - u
+  - l
+  - e
+  - -
+  - b
+  - a
+  - s
+  - e
+  - d
+  -  
+  - c
+  - l
+  - a
+  - s
+  - s
+  - i
+  - f
+  - i
+  - c
+  - a
+  - t
+  - i
+  - o
+  - n
+  - s
+  -  
+  - a
+  - r
+  - e
+  -  
+  - r
+  - e
+  - d
+  - o
+  - n
+  - e
+  - .
 - **0.2.63** (2026-09-30)
   - W
   - a

@@ -14,10 +14,12 @@ _BOILERPLATE = [
     for p in (
         rf"^(last |latest )?(updated|reviewed)( on)?:? {_DATE}$",
         rf"^still current at:? {_DATE}$",
+        rf"^still valid:? {_DATE}$",  # Canada: re-stamped on every check
         rf"^(date|published|issued)( on)?:? {_DATE}$",
         rf"^(stand|letzte änderung|mise à jour)( le| am)?:? {_DATE}$",
         rf"^(unverändert )?gültig seit:? {_DATE}$",
         r"^\d{1,2}[./ ]\w+[./ ]\d{2,4}$",  # a bare date
+        r"^[a-z]+ \d{1,2},? \d{4}$",  # a bare date, US style ("February 12, 2022")
         # US State Department reissue notes (the level itself is compared separately)
         r"^there were no changes to the advisory level or risk indicators\b.{0,80}$",
         r"^reissued (after|with) .{0,80}$",
