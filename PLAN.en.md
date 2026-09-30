@@ -2,15 +2,15 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.2**, updated 2026-09-30.
+Version **0.2.6**, updated 2026-09-30.
 
-**Overall progress: 27%** · left ≈ 31.9 days · ✅ 28 · 🟡 2 · ⬜ 48 · ⛔ 0
+**Overall progress: 29%** · left ≈ 31.0 days · ✅ 31 · 🟡 2 · ⬜ 45 · ⛔ 0
 
 ## Milestones
 
 - **M1** — MVP: 14 days of unattended collection, backtest scores Ukraine 7+ before 2022-02-24, every alert explained
 
-## S0. Foundation & infrastructure — 70%
+## S0. Foundation & infrastructure — 79%
 
 _Repository, working environment on the MacBook and server, keys, Telegram bot._
 
@@ -24,9 +24,9 @@ Branch: `dev-bootstrap`
 - ✅ **S0.6** CI: ruff + pytest via uv
 - ✅ **S0.7** Plan + progress page on GitHub Pages
 - ✅ **S0.8** README in Ukrainian and English
-- ⬜ **S0.9** MacBook: install uv and Claude Code, clone the repo, ./scripts/bootstrap.sh _(manual)_
+- ✅ **S0.9** MacBook: install uv and Claude Code, clone the repo, ./scripts/bootstrap.sh _(manual)_
 - ⬜ **S0.10** Anthropic Console: top-up, API key, monthly spend cap _(manual)_
-- ⬜ **S0.11** Create bot via @BotFather, test channel, fill in .env _(manual)_
+- ✅ **S0.11** Create bot via @BotFather, test channel, fill in .env _(manual)_
 - ⬜ **S0.12** First server deploy: install_server.sh, verify healthcheck _(manual)_
 - ✅ **S0.13** Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root _(manual)_
   - Live: fixerhack.github.io/war-predictor
@@ -53,15 +53,15 @@ Branch: `—`
 - ✅ **S1.8** 0–10 scale algorithm (docs/algorithm.md)
 - ✅ **S1.9** Research of sources and war trackers (docs/sources.md)
 
-## S2. Official advisory collection — 15%
+## S2. Official advisory collection — 19%
 
 _Regular collection of advisories, storing every text version._
 
 Branch: `dev-collector`
 
 - ✅ **S2.1** Source framework, version storage, change detection (diff)
-- 🟡 **S2.2** UK (GOV.UK Content API)
-  - Implemented; needs live verification.
+- ✅ **S2.2** UK (GOV.UK Content API)
+  - Verified on live data (PL, EE, MD).
 - ⬜ **S2.3** Germany (Auswärtiges Amt OpenData API)
 - ⬜ **S2.4** US (TAsTWs RSS + country pages + embassy Security Alerts)
 - ⬜ **S2.5** Canada (open data JSON)
@@ -148,7 +148,7 @@ Branch: `dev-tg-bot`
 - ⬜ **S9.6** Daily regional digest
 - ⬜ **S9.7** Several countries per user
 
-## S10. War status — 43%
+## S10. War status — 50%
 
 _Show whether a war is already under way on the country's territory, separately from the escalation scale._
 
@@ -158,7 +158,8 @@ Branch: `dev-war-status`
 - ✅ **S10.2** Daily check against Wikipedia, mismatches to admins (war-check)
 - ⬜ **S10.3** Obtain a UCDP API token _(manual)_
 - ⬜ **S10.4** UCDP Candidate Events as a second automatic source
-- ⬜ **S10.5** Verify the Wikipedia parser against the live page
+- 🟡 **S10.5** Verify the Wikipedia parser against the live page
+  - Request works; layout-change guard added, re-run war-check to confirm.
 
 ## S11. Public dashboard — 0%
 
@@ -212,6 +213,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.6** (2026-09-30)
+  - Verified on the MacBook: bootstrap, bot (onboarding and dashboard), GOV.UK collection, healthcheck
+  - war-check: fails if the Wikipedia layout changes; prints recognised countries
 - **0.2.2** (2026-09-30)
   - Progress page live from the gh-pages branch
   - pages.yml now refreshes gh-pages instead of deploying directly

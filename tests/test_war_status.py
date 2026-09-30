@@ -46,3 +46,10 @@ async def test_fetch_wikipedia():
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
         assert "Russo-Ukrainian" in await war_status.fetch_wikipedia(client)
+
+
+def test_unrecognised_layout_fails_loudly():
+    import pytest
+
+    with pytest.raises(ValueError, match="no conflict sections"):
+        war_status.parse_wikipedia("== Background ==\n{{flag|Poland}}\n== See also ==\n")
