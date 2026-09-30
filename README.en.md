@@ -91,7 +91,14 @@ make lint                  # ruff
 ./scripts/run.sh bot       # bot (Ctrl+C to stop)
 make plan                  # regenerate PLAN.md after editing roadmap.yaml
 make site                  # preview the progress page at http://localhost:8000
+make pages                 # publish the progress page to the gh-pages branch
 ```
+
+**Progress page.** There are two ways to publish it:
+- automatically via GitHub Actions (`.github/workflows/pages.yml`, Settings → Pages → Source: GitHub Actions);
+- without Actions: `make pages` builds the site and pushes it to the `gh-pages` branch (Settings → Pages → Source: Deploy from a branch → `gh-pages` / `root`).
+
+Pick one of the two.
 
 ## Server
 

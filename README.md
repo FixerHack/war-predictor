@@ -91,7 +91,14 @@ make lint                  # ruff
 ./scripts/run.sh bot       # бот (Ctrl+C для зупинки)
 make plan                  # перегенерувати PLAN.md після зміни roadmap.yaml
 make site                  # переглянути сторінку прогресу на http://localhost:8000
+make pages                 # опублікувати сторінку прогресу в гілку gh-pages
 ```
+
+**Сторінка прогресу.** Є два способи публікації:
+- автоматично через GitHub Actions (`.github/workflows/pages.yml`, Settings → Pages → Source: GitHub Actions);
+- без Actions: `make pages` збирає сайт і пушить його в гілку `gh-pages` (Settings → Pages → Source: Deploy from a branch → `gh-pages` / `root`).
+
+Треба вибрати один із них.
 
 ## Сервер
 
