@@ -91,6 +91,9 @@ async def collect_gdelt(
         except (httpx.HTTPError, ValueError) as exc:
             result.failed += 1
             result.errors.append(f"{code}: {type(exc).__name__}: {exc}")
+            if result.fetched == 0 and result.failed >= 3:
+                result.errors.append("GDELT unreachable: stopped after 3 failures")
+                break
             await asyncio.sleep(pause)
             continue
         result.fetched += 1

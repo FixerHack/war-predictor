@@ -176,3 +176,17 @@ async def test_markets_collect(settings):
 
 def test_gdelt_window_constant():
     assert gdelt.MIN_INTERVAL_HOURS < 24 and timedelta(hours=gdelt.MIN_INTERVAL_HOURS)
+
+
+async def test_gdelt_gives_up_when_unreachable(settings):
+    calls = []
+
+    def handler(request):
+        calls.append(1)
+        raise httpx.ConnectError("proxy says no")
+
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as c:
+            result = await gdelt.collect_gdelt(db, c, settings, pause=0)
+    assert not result.ok and len(calls) <= 4  # 3 countries + the MFA query
