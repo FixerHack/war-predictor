@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from html import escape
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
@@ -33,6 +33,7 @@ class DashboardData:
     war: WarStatus
     changes_7d: int
     updated: str | None
+    reasons: list[str] = field(default_factory=list)  # from explain.reasons()
 
 
 def _flag(code: str) -> str:
@@ -100,6 +101,9 @@ def dashboard_screen(d: DashboardData) -> Screen:
             f"{t(lang, 'level_' + d.level)}"
         )
         lines.append(bar(d.score))
+        if d.reasons:
+            lines.append(f"<b>{t(lang, 'why')}:</b>")
+            lines += [f"• {escape(r)}" for r in d.reasons]
 
     war = d.war
     lines.append(f"{t(lang, 'war_status')}: {ICONS[war.status]} {t(lang, 'war_' + war.status)}")

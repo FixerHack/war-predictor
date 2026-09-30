@@ -40,7 +40,7 @@ async def _collect(args: argparse.Namespace) -> int:
     results = await collect_all(settings, sources=args.sources, countries=args.countries)
     for r in results:
         label = REGISTRY[r.source].label if r.source in REGISTRY else r.source
-        for country, diff in r.changes:
+        for country, diff, _ in r.changes:
             if args.notify:
                 await send(
                     settings,
@@ -122,6 +122,23 @@ async def _war_check(args: argparse.Namespace) -> int:
     return 1 if diff else 0
 
 
+async def _run(args: argparse.Namespace) -> int:
+    from tension_index.runner import run_cycle, score_alerts
+
+    report = await run_cycle(get_settings(), notify=args.notify)
+    for r in report.results:
+        print(f"{r.source}: fetched={r.fetched} changed={r.changed} failed={r.failed} ok={r.ok}")
+    print(f"classified: {report.classified}")
+    scored = [u for u in report.updates if u.result.score is not None]
+    print(f"scores: {len(scored)}/{len(report.updates)} published", end="")
+    if len(scored) < len(report.updates):
+        print(" (the rest: not enough fresh data yet)", end="")
+    print(f"; alerts: {len(score_alerts(report.updates))}")
+    for u in sorted(scored, key=lambda u: -(u.result.score or 0))[:10]:
+        print(f"  {u.country} {u.result.score:>4} {u.result.level} {' '.join(u.result.flags)}")
+    return 0 if report.ok else 2
+
+
 async def _classify() -> int:
     from tension_index.pipeline import classify_pending, make_classifier
 
@@ -198,6 +215,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("classify", help="classify new changes and current advisories")
 
+    p = sub.add_parser("run", help="full cycle: collect, classify, score, notify")
+    p.add_argument("--notify", action="store_true", help="send alerts to Telegram")
+
     p = sub.add_parser("probe", help="show a source's raw response and parsed result")
     p.add_argument("source")
     p.add_argument("--country", default="PL")
@@ -232,6 +252,7 @@ def main(argv: list[str] | None = None) -> None:
         "war-check": lambda: _war_check(args),
         "probe": lambda: _probe(args),
         "classify": lambda: _classify(),
+        "run": lambda: _run(args),
     }
     try:
         sys.exit(asyncio.run(handlers[args.command]()))

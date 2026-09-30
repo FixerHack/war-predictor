@@ -86,7 +86,9 @@ cd war-predictor
 ```bash
 make test                  # тести
 make lint                  # ruff
-./scripts/run.sh collect --countries PL,EE   # збір для кількох країн
+./scripts/run.sh run       # повний цикл: збір → класифікація → бал
+./scripts/run.sh collect --countries PL,EE   # лише збір для кількох країн
+./scripts/run.sh probe us --country PL      # що насправді віддає джерело
 ./scripts/run.sh health    # стан системи
 ./scripts/run.sh bot       # бот (Ctrl+C для зупинки)
 make plan                  # перегенерувати PLAN.md після зміни roadmap.yaml
@@ -117,7 +119,7 @@ nano .env                     # заповнити
 | Юніт | Що робить |
 |---|---|
 | `tension-bot.service` | бот, перезапуск при падінні |
-| `tension-collect.timer` | збір кожні 3 години, сповіщення про зміни й збої |
+| `tension-collect.timer` | повний цикл кожні 3 години: збір, класифікація, бал, сповіщення |
 | `tension-health.timer` | healthcheck кожні 15 хвилин, алерт у Telegram при FAIL |
 | `tension-backup.timer` | щоденний бекап SQLite, зберігаються останні 14 |
 | `tension-warcheck.timer` | щоденна звірка статусу війни з Wikipedia |

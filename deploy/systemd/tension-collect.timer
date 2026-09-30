@@ -1,5 +1,5 @@
 [Unit]
-Description=Collect advisories every 3 hours
+Description=Full cycle every 3 hours
 
 [Timer]
 OnCalendar=*-*-* 00/3:07:00

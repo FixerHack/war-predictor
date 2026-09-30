@@ -207,7 +207,11 @@ def compute_score(
         coverage = sum(caps[b] for b in covered_blocks if b in caps) / sum(caps.values())
         if coverage < cfg["min_coverage"]:
             flags.append("low_coverage")
-            return ScoreResult(country, None, None, raw, blocks, flags, hit_floors, top, dropped)
+            # Decisive events are published even when other blocks lack data.
+            if not hit_floors:
+                return ScoreResult(
+                    country, None, None, raw, blocks, flags, hit_floors, top, dropped
+                )
 
     score = round(min(10.0, score), 1)
     return ScoreResult(

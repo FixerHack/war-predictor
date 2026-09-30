@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Callable
+from html import escape
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
@@ -38,21 +40,17 @@ async def send(settings: Settings, text: str) -> bool:
         await bot.session.close()
 
 
-async def broadcast_change(settings: Settings, country: str, source_label: str, diff: str) -> int:
-    """Send an advisory-change alert to every user following `country` with alerts on,
-    each in their own language. Returns the number of messages delivered."""
+async def broadcast(settings: Settings, country: str, render: Callable[[str], str]) -> int:
+    """Send `render(lang)` to every user following `country` with alerts on, each in their
+    own language. Returns the number of messages delivered."""
     import asyncio
-    from html import escape
 
     from aiogram.exceptions import TelegramForbiddenError
 
     from tension_index import storage
-    from tension_index.countries import get_country
-    from tension_index.i18n import t
 
     if not settings.telegram_bot_token:
         return 0
-    c = get_country(country)
     async with storage.connect(settings.database_path) as db:
         users = await storage.subscribers(db, country)
         if not users:
@@ -61,18 +59,8 @@ async def broadcast_change(settings: Settings, country: str, source_label: str, 
         sent = 0
         try:
             for user in users:
-                text = (
-                    t(
-                        user.lang,
-                        "alert_change",
-                        flag=c.flag,
-                        country=escape(c.title(user.lang or "uk")),
-                        source=escape(source_label),
-                    )
-                    + f"\n<pre>{escape(diff[:2500])}</pre>\n<i>{t(user.lang, 'disclaimer')}</i>"
-                )
                 try:
-                    await bot.send_message(user.tg_id, text[:TELEGRAM_LIMIT])
+                    await bot.send_message(user.tg_id, render(user.lang or "uk")[:TELEGRAM_LIMIT])
                     sent += 1
                 except TelegramForbiddenError:
                     # User blocked the bot: stop sending until they come back.
@@ -83,3 +71,56 @@ async def broadcast_change(settings: Settings, country: str, source_label: str, 
         finally:
             await bot.session.close()
     return sent
+
+
+def render_change(
+    country: str, source_label: str, diff: str, summary: dict[str, str] | None, quote: str
+) -> Callable[[str], str]:
+    from tension_index.countries import get_country
+    from tension_index.i18n import t
+
+    c = get_country(country)
+
+    def render(lang: str) -> str:
+        head = t(lang, "alert_change", flag=c.flag, country=escape(c.title(lang)),
+                 source=escape(source_label))  # fmt: skip
+        text = (summary or {}).get(lang, "")
+        body = escape(text) if text else f"<pre>{escape(diff[:1500])}</pre>"
+        if quote:
+            body += f"\n<i>«{escape(quote[:300])}»</i>"
+        return f"{head}\n{body}\n\n<i>{t(lang, 'disclaimer')}</i>"
+
+    return render
+
+
+async def broadcast_change(
+    settings: Settings,
+    country: str,
+    source_label: str,
+    diff: str,
+    summary: dict[str, str] | None = None,
+    quote: str = "",
+) -> int:
+    return await broadcast(
+        settings, country, render_change(country, source_label, diff, summary, quote)
+    )
+
+
+def render_score(country: str, previous: float, payload: dict) -> Callable[[str], str]:
+    from tension_index.countries import get_country
+    from tension_index.explain import explain
+    from tension_index.i18n import t
+
+    c = get_country(country)
+    score, level = payload["score"], payload["level"]
+    arrow = "⬆️" if score > previous else "⬇️"
+
+    def render(lang: str) -> str:
+        return (
+            t(lang, "alert_score", arrow=arrow, flag=c.flag, country=escape(c.title(lang)),
+              old=f"{previous:.1f}", new=f"{score:.1f}", level=t(lang, "level_" + level))
+            + f"\n\n<b>{t(lang, 'why')}:</b>\n{escape(explain(payload, lang))}"
+            + f"\n\n<i>{t(lang, 'disclaimer')}</i>"
+        )  # fmt: skip
+
+    return render

@@ -53,6 +53,19 @@ staff_posture:
   ordered_departure: 1.0
   embassy_suspended: 1.0
 
+# One-off advisory updates without a level change (e.g. new wording about troop build-ups).
+# Event signals in block A: they decay with the block half-life; reason relevance applies.
+advisory_events:
+  level_raised: 0.4
+  staff_posture: 0.6
+  consular: 0.4
+  borders: 0.4
+  airspace: 0.4
+  security_update: 0.25
+
+# Border closures stated in advisories (block C, state while the advisory says so).
+borders_closed_strength: 0.7
+
 # Only tier 1-2 sources count on their own; tier 3-4 need confirmation.
 verification:
   max_unconfirmed_tier: 2

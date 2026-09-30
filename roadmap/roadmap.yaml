@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.21
+  version: 0.2.24
   updated: 2026-09-30
 
 milestones:
@@ -136,8 +136,8 @@ stages:
     tasks:
       - {id: S7.1, status: done, days: 1, uk: "Рушій балу: блоки А–Е, стелі, причини, згасання, верифікація, порогові події", en: "Scoring engine: blocks A–F, caps, reasons, decay, verification, floors"}
       - {id: S7.2, status: done, days: 0.5, uk: "Норма країни і відхилення, синхронність держав, регіональна розбіжність", en: "Country baseline and deviation, cross-government synchrony, regional divergence"}
-      - {id: S7.3, status: todo, days: 1, uk: "Таблиця сигналів і щоденний розрахунок балу для всіх країн", en: "Signals table and daily score computation for all countries"}
-      - {id: S7.4, status: todo, days: 0.5, uk: "Пояснення балу у сповіщеннях і на панелі", en: "Score explanation in alerts and on the dashboard"}
+      - {id: S7.3, status: done, days: 1, uk: "Таблиця сигналів і щоденний розрахунок балу для всіх країн", en: "Signals table and daily score computation for all countries", note_uk: "tension-index run: збір → класифікація → сигнали → бал; бал без достатнього покриття не публікується (крім порогових подій).", note_en: "tension-index run: collect → classify → signals → score; no score without enough coverage (except threshold events)."}
+      - {id: S7.4, status: done, days: 0.5, uk: "Пояснення балу у сповіщеннях і на панелі", en: "Score explanation in alerts and on the dashboard"}
 
   - id: S8
     branch: dev-backtest
@@ -161,7 +161,7 @@ stages:
       - {id: S9.2, status: done, days: 1, uk: "Онбординг: мова (укр/англ) → країна → панель", en: "Onboarding: language (uk/en) → country → dashboard"}
       - {id: S9.3, status: done, days: 1, uk: "Інлайн-панель: бал, статус війни, сусіди, зміни за 7 днів; перемикачі сповіщень, країни, мови", en: "Inline dashboard: score, war status, neighbours, 7-day changes; toggles for alerts, country, language"}
       - {id: S9.4, status: done, days: 0.5, uk: "Розсилка змін підписникам країни їхньою мовою", en: "Change alerts to a country's subscribers in their language"}
-      - {id: S9.5, status: todo, days: 1, uk: "Сповіщення при зміні балу на 1+ з поясненням і цитатою", en: "Alerts on score change of 1+ with explanation and quote"}
+      - {id: S9.5, status: done, days: 1, uk: "Сповіщення при зміні балу на 1+ з поясненням і цитатою", en: "Alerts on score change of 1+ with explanation and quote", note_uk: "Бал змінився на 1+ → підписникам приходить пояснення з джерелами й цитатами.", note_en: "Score moves by 1+ → subscribers get an explanation with sources and quotes."}
       - {id: S9.6, status: todo, days: 0.5, uk: "Щоденний підсумок по регіону", en: "Daily regional digest"}
       - {id: S9.7, status: todo, days: 0.5, uk: "Кілька країн на одного користувача", en: "Several countries per user"}
 
@@ -232,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.24
+    date: 2026-09-30
+    uk: ["Сигнали з рекомендацій, щоденний бал, пояснення", "Команда run (повний цикл) і сповіщення про зміну балу", "Бот показує бал і причини"]
+    en: ["Signals from advisories, daily score, explanations", "run command (full cycle) and score-change alerts", "Bot shows the score and reasons"]
   - version: 0.2.21
     date: 2026-09-30
     uk: ["Класифікатор змін: правила + Claude (строга JSON-схема, кешування, ліміт викликів)", "Команда classify"]

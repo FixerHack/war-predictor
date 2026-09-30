@@ -7,6 +7,7 @@ Admin commands (/status, /collect, /warcheck) are gated by TELEGRAM_ADMIN_IDS.
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime, timedelta
 from html import escape
 
@@ -17,7 +18,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandStart
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, Message
 
-from tension_index import storage, war_status
+from tension_index import explain, storage, war_status
 from tension_index.bot import views
 from tension_index.bot.callbacks import CountryCb, LangCb, MenuCb
 from tension_index.collector import collect_all, make_client
@@ -42,6 +43,9 @@ async def build_dashboard(db: aiosqlite.Connection, user: storage.User) -> views
         war=war_status.get(user.country),
         changes_7d=await storage.changes_since(db, user.country, since),
         updated=score_row["computed_at"] if score_row else None,
+        reasons=explain.reasons(json.loads(score_row["payload"]), user.lang, limit=2)
+        if score_row and score_row["score"] is not None
+        else [],
     )
     return views.dashboard_screen(data)
 

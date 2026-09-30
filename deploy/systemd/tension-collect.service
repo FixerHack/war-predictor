@@ -1,5 +1,5 @@
 [Unit]
-Description=Tension Index: collect advisories
+Description=Tension Index: collect, classify, score, notify
 After=network-online.target
 Wants=network-online.target
 
@@ -7,5 +7,5 @@ Wants=network-online.target
 Type=oneshot
 User=@APP_USER@
 WorkingDirectory=@APP_DIR@
-ExecStart=@UV@ run --frozen --no-dev tension-index collect --notify
+ExecStart=@UV@ run --frozen --no-dev tension-index run --notify
 TimeoutStartSec=20min

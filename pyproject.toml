@@ -1,6 +1,6 @@
 [project]
 name = "tension-index"
-version = "0.2.21"
+version = "0.2.24"
 description = "Early-warning tension index (0-10) for European countries based on travel advisories and other open signals"
 readme = "README.md"
 requires-python = ">=3.12"
