@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.8**, updated 2026-09-30.
+Version **0.2.9**, updated 2026-09-30.
 
 **Overall progress: 29%** · left ≈ 31.0 days · ✅ 31 · 🟡 2 · ⬜ 45 · ⛔ 0
 
@@ -215,6 +215,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.9** (2026-09-30)
+  - war-check --explain: correct conflict name and Location cell text
 - **0.2.8** (2026-09-30)
   - Wikipedia war status: Location column only (parties to conflicts abroad no longer count)
   - war-check --explain: where a country mention comes from
