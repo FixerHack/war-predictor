@@ -215,6 +215,12 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
     cfg = load_config()
     count = 0
     current_refs: dict[tuple[str, str], str] = {}
+    emitted: set[tuple[str, str]] = set()  # (ref, kind) derived from current advisories
+
+    async def emit(signal: Signal, ref: str) -> None:
+        emitted.add((ref, signal.kind))
+        await storage.upsert_signal(db, signal, ref)
+
     for snap in await storage.latest_snapshots(db):
         cls = await classification_of(db, "snapshot", snap["id"]) or classify_rules(snap["text"])
         ref = f"snapshot:{snap['id']}"
@@ -236,14 +242,13 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             "note_uk": cls.summary_uk if cls.method == "claude" else "",
         }
         strength = advisory_strength(cfg, snap["source"], level)
-        await storage.upsert_signal(
-            db, Signal(block="advisories", kind="advisory_level", strength=strength, **base), ref
+        await emit(
+            Signal(block="advisories", kind="advisory_level", strength=strength, **base), ref
         )
         count += 1
         posture = cfg["staff_posture"].get(cls.staff_posture, 0.0)
         if posture > 0:
-            await storage.upsert_signal(
-                db,
+            await emit(
                 Signal(
                     block="advisories",
                     kind=f"staff_posture:{cls.staff_posture}",
@@ -258,8 +263,7 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             cls.airspace in ("closed", "restricted")
             and relevance(cfg, cls.reason) >= cfg["airspace_min_relevance"]
         ):
-            await storage.upsert_signal(
-                db,
+            await emit(
                 Signal(
                     block="aviation",
                     kind=f"aviation:airspace_{cls.airspace}",
@@ -270,8 +274,7 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             )
             count += 1
         if cls.borders_closed:
-            await storage.upsert_signal(
-                db,
+            await emit(
                 Signal(
                     block="domestic",
                     kind="domestic:borders_closed",
@@ -283,10 +286,18 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             count += 1
     # Deactivate signals of superseded advisory versions.
     async with db.execute(
-        "SELECT id, country, publisher, ref FROM signals WHERE active = 1 AND ref LIKE 'snapshot:%'"
+        "SELECT id, country, publisher, ref, kind FROM signals "
+        "WHERE active = 1 AND ref LIKE 'snapshot:%'"
     ) as cur:
         rows = await cur.fetchall()
-    stale = [r["id"] for r in rows if current_refs.get((r["country"], r["publisher"])) != r["ref"]]
+    # Superseded versions, and signals the current classification no longer supports
+    # (e.g. an airspace restriction re-read as volcanic ash).
+    stale = [
+        r["id"]
+        for r in rows
+        if current_refs.get((r["country"], r["publisher"])) != r["ref"]
+        or (r["ref"], r["kind"]) not in emitted
+    ]
     for sid in stale:
         await db.execute("UPDATE signals SET active = 0 WHERE id = ?", (sid,))
 

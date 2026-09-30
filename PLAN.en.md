@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.68**, updated 2026-09-30.
+Version **0.2.69**, updated 2026-09-30.
 
 **Overall progress: 68%** · left ≈ 14.6 days · ✅ 51 · 🟡 20 · ⬜ 10 · ⛔ 4
 
@@ -160,7 +160,7 @@ _The scale must fire on known episodes in time and without mass false alarms._
 Branch: `dev-backtest`
 
 - 🟡 **S8.1** Replay the scale on historical episodes
-  - Wayback archive, Ukraine 2022: rules PASS, 7 from 24 Jan 2022 (31 days ahead). With the model 7 came as early as 9 Oct 2021 via "airspace restricted" (Crimea since 2014) — airspace floors now need two sources; awaiting a re-run.
+  - Wayback archive, Ukraine 2022: rules — 7 from 24 Jan 2022 (31 days ahead), model — 7 from 20 Dec 2021 (troop build-up), 9 after the invasion. Both PASS; control episodes not run yet.
 - 🟡 **S8.2** False alarm and miss report
   - Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms.
 - 🟡 **S8.3** Weight tuning
@@ -267,6 +267,147 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.69** (2026-09-30)
+  - A
+  - d
+  - v
+  - i
+  - s
+  - o
+  - r
+  - y
+  - -
+  - d
+  - e
+  - r
+  - i
+  - v
+  - e
+  - d
+  -  
+  - s
+  - i
+  - g
+  - n
+  - a
+  - l
+  - s
+  -  
+  - (
+  - a
+  - i
+  - r
+  - s
+  - p
+  - a
+  - c
+  - e
+  - ,
+  -  
+  - e
+  - m
+  - b
+  - a
+  - s
+  - s
+  - y
+  -  
+  - p
+  - o
+  - s
+  - t
+  - u
+  - r
+  - e
+  - ,
+  -  
+  - b
+  - o
+  - r
+  - d
+  - e
+  - r
+  - s
+  - )
+  -  
+  - s
+  - w
+  - i
+  - t
+  - c
+  - h
+  -  
+  - o
+  - f
+  - f
+  -  
+  - w
+  - h
+  - e
+  - n
+  -  
+  - a
+  -  
+  - n
+  - e
+  - w
+  -  
+  - c
+  - l
+  - a
+  - s
+  - s
+  - i
+  - f
+  - i
+  - c
+  - a
+  - t
+  - i
+  - o
+  - n
+  -  
+  - o
+  - f
+  -  
+  - t
+  - h
+  - e
+  -  
+  - s
+  - a
+  - m
+  - e
+  -  
+  - t
+  - e
+  - x
+  - t
+  -  
+  - n
+  - o
+  -  
+  - l
+  - o
+  - n
+  - g
+  - e
+  - r
+  -  
+  - s
+  - u
+  - p
+  - p
+  - o
+  - r
+  - t
+  - s
+  -  
+  - t
+  - h
+  - e
+  - m
+  - .
 - **0.2.68** (2026-09-30)
   - A
   - l
