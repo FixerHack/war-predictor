@@ -144,6 +144,11 @@ MIGRATIONS: list[str] = [
         PRIMARY KEY (source, country, key, period)
     );
     """,
+    # 5: headline category (rules or Claude) and its severity
+    """
+    ALTER TABLE news_items ADD COLUMN category TEXT NOT NULL DEFAULT 'none';
+    ALTER TABLE news_items ADD COLUMN severity REAL NOT NULL DEFAULT 1.0;
+    """,
 ]
 
 
@@ -434,7 +439,8 @@ async def upsert_signal(db: aiosqlite.Connection, s: Signal, ref: str) -> None:
         "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?) "
         "ON CONFLICT (ref, kind, country) WHERE ref != '' DO UPDATE SET "
         "strength = excluded.strength, reason = excluded.reason, note = excluded.note, "
-        "confirmed = excluded.confirmed, active = 1",
+        "confirmed = excluded.confirmed, tier = excluded.tier, "
+        "observed_at = excluded.observed_at, active = 1",
         (s.country, s.block, s.kind, s.strength, s.publisher, s.observed_at.isoformat(), s.tier,
          int(s.confirmed), s.reason, int(s.state), s.note, ref),
     )  # fmt: skip

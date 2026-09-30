@@ -156,6 +156,26 @@ async def _classify() -> int:
     return 0
 
 
+async def _probe_news() -> int:
+    from tension_index.collector import make_client
+    from tension_index.extra.news import load_config, parse_feed
+
+    bad = 0
+    async with make_client(get_settings()) as client:
+        for feed in load_config()["feeds"]:
+            try:
+                response = await client.get(feed["url"])
+                items = parse_feed(response.content) if response.is_success else []
+                detail = f"HTTP {response.status_code} items={len(items)}"
+            except Exception as exc:  # report every feed, whatever breaks
+                items, detail = [], f"{type(exc).__name__}: {str(exc)[:80]}"
+            bad += not items
+            print(f"{'OK ' if items else 'BAD'} {feed['name']:<18} {detail}")
+            if items:
+                print(f"    e.g. {items[0][0][:90]}")
+    return 2 if bad else 0
+
+
 async def _probe(args: argparse.Namespace) -> int:
     """Show what a source really returns, to fix a parser after an API/layout change."""
     from tension_index.collector import make_client
@@ -163,6 +183,8 @@ async def _probe(args: argparse.Namespace) -> int:
     from tension_index.extra import PROBE_URLS
     from tension_index.sources import REGISTRY
 
+    if args.source == "news":
+        return await _probe_news()
     if args.source in PROBE_URLS:
         async with make_client(get_settings()) as client:
             response = await client.get(PROBE_URLS[args.source])

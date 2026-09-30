@@ -1,0 +1,31 @@
+# News feeds for blocks C (domestic measures), D (aggressor) and E (media).
+# tier: 1 = agencies, public broadcasters, official; 2 = analysis. Headlines and links only
+# are stored (no article text). URLs marked "check" were not verified from the build
+# environment: `tension-index probe news` shows which ones respond.
+feeds:
+  - {name: bbc_europe, tier: 1, url: "https://feeds.bbci.co.uk/news/world/europe/rss.xml"}
+  - {name: dw_europe, tier: 1, url: "https://rss.dw.com/rdf/rss-en-eu"}  # check
+  - {name: euronews, tier: 1, url: "https://www.euronews.com/rss?level=theme&name=news"}  # check
+  - {name: err_news, tier: 1, url: "https://news.err.ee/rss"}  # check
+  - {name: lsm_eng, tier: 1, url: "https://eng.lsm.lv/rss/"}  # check
+  - {name: lrt_en, tier: 1, url: "https://www.lrt.lt/en/news-in-english?rss"}  # check
+  - {name: yle_news, tier: 1, url: "https://yle.fi/rss/t/18-34837/en"}  # check
+  - {name: nato, tier: 1, url: "https://www.nato.int/cps/rss/en/natohq/rssFeed.xsl/rssFeed.xml"}  # check
+  - {name: notes_from_poland, tier: 1, url: "https://notesfrompoland.com/feed/"}  # check
+  - {name: balkan_insight, tier: 1, url: "https://balkaninsight.com/feed/"}  # check
+  - {name: isw, tier: 2, url: "https://www.understandingwar.org/rss.xml"}  # check
+  - {name: crisis_group, tier: 2, url: "https://www.crisisgroup.org/rss.xml"}  # check
+  - {name: ecfr, tier: 2, url: "https://ecfr.eu/feed/"}  # check
+
+# Headline categories -> signal. Rules run always; Claude refines when a key is set.
+# A category counts only when reported by at least `min_feeds` different feeds within
+# `window_hours` (one outlet's headline never moves the score on its own).
+confirmation: {min_feeds: 2, window_hours: 72}
+categories:
+  domestic_emergency: {block: domestic, kind: "domestic:emergency", strength: 0.6}
+  mobilisation: {block: domestic, kind: "domestic:mobilisation", strength: 1.0}
+  military_threat: {block: aggressor, kind: "aggressor:military_threat", strength: 0.6}
+  hybrid_attack: {block: aggressor, kind: "aggressor:hybrid_attack", strength: 0.5}
+  armed_attack: {block: aggressor, kind: "aggressor:armed_attack", strength: 1.0}
+  aggressor_advisory: {block: aggressor, kind: "aggressor:mfa_advisory", strength: 0.8}
+  escalation_news: {block: media, kind: "media:escalation_news", strength: 0.4}
