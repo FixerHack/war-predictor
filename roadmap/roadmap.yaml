@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.62
+  version: 0.2.63
   updated: 2026-09-30
 
 milestones:
@@ -117,6 +117,7 @@ stages:
       - {id: S5.1, status: done, days: 1, uk: "Завантаження старих версій з Wayback Machine (CDX API)", en: "Download past versions from the Wayback Machine (CDX API)", note_uk: "tension-index history: знімки Wayback (щодня за 45 днів до події, раз на 5 днів раніше) в окрему базу data/history.sqlite3.", note_en: "tension-index history: Wayback captures (daily 45 days before the event, every 5 days earlier) into data/history.sqlite3."}
       - {id: S5.2, status: in_progress, days: 1, uk: "Епізоди: Україна 2021–22, Вірменія/Азербайджан 2020, Ізраїль/Іран 2024–25", en: "Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25", note_uk: "Епізоди в config/episodes.yaml (Україна 2022, Азербайджан 2020, Ізраїль 2024, контроль Франція 2016); завантаження потребує мережі, запустити локально.", note_en: "Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally."}
 
+      - {id: S5.5, status: done, days: 0.1, uk: "Архів Wayback: довгі таймаути, повтори при 429/5xx, прогрес у логах", en: "Wayback archive: long timeouts, retries on 429/5xx, progress in logs"}
   - id: S6
     branch: dev-classifier
     uk: Класифікація змін (Claude API)
@@ -241,6 +242,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.63
+    date: 2026-09-30
+    uk: "Завантаження архіву Wayback більше не обривається на повільних відповідях: таймаут 120 с і до 3 повторів."
+    en: "Wayback archive loading no longer fails on slow answers: 120 s timeout and up to 3 retries."
   - version: 0.2.62
     date: 2026-09-30
     uk: "Українською мовою пояснення тепер показують короткий виклад українською замість англійської цитати; шаблонні примітки (авіатрафік, медіа, ринки) перекладено."
