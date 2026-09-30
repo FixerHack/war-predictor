@@ -67,9 +67,12 @@ def load_config(path: Path = CONFIG_PATH) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
-def advisory_strength(cfg: dict, publisher: str, level: str) -> float:
-    """Map a publisher-specific advisory level (e.g. US "3") to 0..1."""
-    return float(cfg["advisory_levels"].get(publisher, {}).get(str(level), 0.0))
+def advisory_strength(cfg: dict, publisher: str, level: str | None) -> float:
+    """Map a publisher-specific advisory level (e.g. US "3") to 0..1. Several statuses
+    joined by commas (GOV.UK alert_status) take the strongest."""
+    table = cfg["advisory_levels"].get(publisher, {})
+    parts = [p.strip() for p in str(level or "").split(",") if p.strip()]
+    return max((float(table.get(p, 0.0)) for p in parts), default=0.0)
 
 
 def level_for(cfg: dict, score: float) -> str:

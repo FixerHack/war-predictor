@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.10**, updated 2026-09-30.
+Version **0.2.18**, updated 2026-09-30.
 
-**Overall progress: 30%** · left ≈ 30.9 days · ✅ 32 · 🟡 1 · ⬜ 45 · ⛔ 0
+**Overall progress: 34%** · left ≈ 28.9 days · ✅ 33 · 🟡 6 · ⬜ 38 · ⛔ 1
 
 ## Milestones
 
@@ -54,7 +54,7 @@ Branch: `—`
 - ✅ **S1.8** 0–10 scale algorithm (docs/algorithm.md)
 - ✅ **S1.9** Research of sources and war trackers (docs/sources.md)
 
-## S2. Official advisory collection — 19%
+## S2. Official advisory collection — 52%
 
 _Regular collection of advisories, storing every text version._
 
@@ -63,15 +63,22 @@ Branch: `dev-collector`
 - ✅ **S2.1** Source framework, version storage, change detection (diff)
 - ✅ **S2.2** UK (GOV.UK Content API)
   - Verified on live data (PL, EE, MD).
-- ⬜ **S2.3** Germany (Auswärtiges Amt OpenData API)
-- ⬜ **S2.4** US (TAsTWs RSS + country pages + embassy Security Alerts)
-- ⬜ **S2.5** Canada (open data JSON)
-- ⬜ **S2.6** Australia (Smartraveller destinations-export)
-- ⬜ **S2.7** France (diplomatie.gouv.fr, scraping)
-- ⬜ **S2.8** Israel (NSC travel warnings)
+- 🟡 **S2.3** Germany (Auswärtiges Amt OpenData API)
+  - Implemented; verify live: tension-index probe
+- 🟡 **S2.4** US (TAsTWs RSS + country pages + embassy Security Alerts)
+  - Implemented; verify live: tension-index probe
+- 🟡 **S2.5** Canada (open data JSON)
+  - Implemented; verify live: tension-index probe
+- 🟡 **S2.6** Australia (Smartraveller destinations-export)
+  - Implemented; verify live: tension-index probe
+- 🟡 **S2.7** France (diplomatie.gouv.fr, scraping)
+  - Page text only, level set by the classifier; verify with probe fr
+- ⛔ **S2.8** Israel (NSC travel warnings)
+  - NSC page is a JS app with no known API; needs a sample response. Low weight for Europe.
 - ⬜ **S2.9** Russian and Belarusian MFA advisories to own citizens
+  - Moved to S4: collected via news/GDELT (mid.ru blocks foreign requests).
 - ✅ **S2.10** Telegram alert when a source breaks
-- ⬜ **S2.11** Strip update dates and boilerplate before diffing
+- ✅ **S2.11** Strip update dates and boilerplate before diffing
 
 ## S3. Aviation & airspace — 0%
 
@@ -216,6 +223,10 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.18** (2026-09-30)
+  - Sources: Germany, US, Canada, Australia, France
+  - Boilerplate (update dates) stripped before diffing
+  - probe command to inspect sources
 - **0.2.10** (2026-09-30)
   - War status: reviewed exclusions via wikipedia_ignore; France — Brazilian drug war (French Guiana)
   - Wikipedia check verified on the live page

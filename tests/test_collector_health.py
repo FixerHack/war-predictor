@@ -76,3 +76,13 @@ async def test_health_fails_on_stale_collector(settings):
         await db.commit()
     report = await run_checks(settings)
     assert report.status == Status.FAIL
+
+
+async def test_prepare_failure_fails_the_run(settings):
+    from tension_index.sources.ca import CaSource
+
+    transport = httpx.MockTransport(lambda r: httpx.Response(503))
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        result = await collect_source(db, CaSource(httpx.AsyncClient(transport=transport)), ["PL"])
+    assert not result.ok and result.failed == 1 and result.errors[0].startswith("prepare:")

@@ -46,6 +46,22 @@ async def collect_source(db, source: Source, countries: list[str] | None = None)
         if (not countries or code in countries) and source.supports(c)
     ]
     semaphore = asyncio.Semaphore(CONCURRENCY)
+    try:
+        await source.prepare()
+    except Exception as exc:  # index unavailable: every country fails, report once
+        result.failed = len(targets)
+        result.errors.append(f"prepare: {type(exc).__name__}: {exc}")
+        log.warning("%s prepare failed: %s", source.name, exc)
+        await storage.finish_run(
+            db,
+            run_id,
+            ok=False,
+            fetched=0,
+            changed=0,
+            failed=result.failed,
+            error=result.errors[0],
+        )
+        return result
 
     async def one(country):
         async with semaphore:
@@ -62,7 +78,9 @@ async def collect_source(db, source: Source, countries: list[str] | None = None)
         result.fetched += 1
         text = normalize(advisory.text)
         previous = await storage.latest_snapshot(db, source.name, country.code)
-        if previous and previous.content_hash == storage.content_hash(text):
+        # Compare against the previous text re-normalised with today's rules, so a new
+        # boilerplate filter doesn't register as a change everywhere.
+        if previous and normalize(previous.text) == text and previous.level == advisory.level:
             continue
         snapshot_id = await storage.insert_snapshot(
             db,
