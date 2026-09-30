@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -856,8 +856,8 @@
           "days": 0.3,
           "uk": "Перевірити парсер Wikipedia на живій сторінці",
           "en": "Verify the Wikipedia parser against the live page",
-          "note_uk": "Захист виявив, що розбір вікітексту не бачить розділів; парсер переведено на відрендерений HTML, потрібен запуск war-check --headings.",
-          "note_en": "Guard showed wikitext parsing found no sections; parser moved to rendered HTML, run war-check --headings to confirm.",
+          "note_uk": "Розділи розпізнаються на живій сторінці; враховується лише колонка Location, перевірити war-check --explain FR.",
+          "note_en": "Sections recognised on the live page; only the Location column counts, check war-check --explain FR.",
           "owner": "claude"
         }
       ],
@@ -1115,6 +1115,18 @@
   ],
   "changelog": [
     {
+      "version": "0.2.8",
+      "date": "2026-09-30",
+      "uk": [
+        "Статус війни за Wikipedia: лише колонка Location (учасники конфліктів за кордоном не рахуються)",
+        "war-check --explain: звідки взялася згадка країни"
+      ],
+      "en": [
+        "Wikipedia war status: Location column only (parties to conflicts abroad no longer count)",
+        "war-check --explain: where a country mention comes from"
+      ]
+    },
+    {
       "version": "0.2.7",
       "date": "2026-09-30",
       "uk": [
@@ -1234,7 +1246,7 @@
     "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T11:32:11+00:00",
-    "commit": "b883965"
+    "built_at": "2026-09-30T11:35:00+00:00",
+    "commit": "20d40a9"
   }
 }
