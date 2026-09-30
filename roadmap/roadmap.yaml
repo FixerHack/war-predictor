@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.65
+  version: 0.2.66
   updated: 2026-09-30
 
 milestones:
@@ -244,6 +244,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.66
+    date: 2026-09-30
+    uk: "Класифікації правилами перераховуються ще раз після звуження правил для неба."
+    en: "Rule-based classifications are redone once more after narrowing the airspace rules."
   - version: 0.2.65
     date: 2026-09-30
     uk: "Пороги для закритого чи обмеженого неба тепер вимагають двох незалежних джерел; правила й модель не вважають обмеженням неба рутинні NOTAM, правила для дронів і давні регіональні заборони."
