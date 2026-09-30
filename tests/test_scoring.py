@@ -151,3 +151,10 @@ def test_surge_above_own_norm_and_isolation():
 def test_low_coverage_withholds_score():
     result = compute_score("PL", [], NOW, covered_blocks={"markets"})
     assert result.score is None and "low_coverage" in result.flags
+
+
+def test_measures_for_covid_do_not_trigger_floors():
+    """Armenia/Azerbaijan, June 2020: COVID flight bans and reduced consular services."""
+    covid = staff("us", "authorized_departure")
+    covid.reason = "health"
+    assert compute_score("PL", [covid], NOW).score < 7.0

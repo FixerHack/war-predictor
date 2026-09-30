@@ -182,14 +182,13 @@ def compute_score(
     recent = now - timedelta(days=syn["window_days"])
     # Only real tightening counts: a raised level, staff posture, consular/border/airspace
     # measures - for a relevant reason. Routine rewording and terrorism notes do not.
-    relevance = cfg["reason_relevance"]
     tightening = {
         s.publisher
         for s in usable
         if s.block == "advisories"
         and s.kind not in syn["ignore_kinds"]
         and s.observed_at >= recent
-        and relevance.get(s.reason, relevance["unknown"]) >= syn["min_relevance"]
+        and relevance(cfg, s.reason) >= syn["min_relevance"]
         and _effective(cfg, s, now) > 0
     }
     if len(tightening) >= syn["min_governments"]:
@@ -213,7 +212,11 @@ def compute_score(
     hit_floors: list[str] = []
     for rule in cfg["floors"]:
         kinds = {rule["when"]} if isinstance(rule["when"], str) else set(rule["when"])
-        publishers = {s.publisher for s in usable if s.kind in kinds}
+        publishers = {
+            s.publisher
+            for s in usable
+            if s.kind in kinds and relevance(cfg, s.reason) >= cfg["floor_min_relevance"]
+        }
         needed = max(1, rule["min_governments"])
         if len(publishers) >= needed and score < rule["score"]:
             score = rule["score"]

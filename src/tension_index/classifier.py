@@ -41,6 +41,9 @@ class Classification:
     staff_posture: str = "unknown"
     airspace: str = "unknown"
     borders_closed: bool = False
+    # Why the staff posture / airspace / border measure was taken, when it differs from the
+    # advice as a whole (e.g. COVID-19 border closures in an advisory about a conflict).
+    measure_reason: str = ""
     quote: str = ""
     summary_uk: str = ""
     summary_en: str = ""
@@ -112,6 +115,19 @@ def _added_lines(diff: str) -> str:
     return diff
 
 
+_PANDEMIC = re.compile(r"covid|coronavirus|pandemic|quarantine|sanitary|epidemi", re.I)
+
+
+def _measure_reason(text: str) -> str:
+    """health when the sentence stating a measure (posture, airspace, borders) is about COVID."""
+    patterns = [p for _, p in _STAFF_RULES] + [p for _, p in _AIRSPACE_RULES] + [_BORDERS.pattern]
+    for sentence in re.split(r"(?<=[.!?])\s+|\n", text):
+        low = sentence.lower()
+        if any(re.search(p, low) for p in patterns) and _PANDEMIC.search(sentence):
+            return "health"
+    return ""
+
+
 def classify_rules(text: str, *, level_change: tuple[float, float] | None = None) -> Classification:
     """`text`: a unified diff (only added lines are read) or a full advisory text.
     `level_change`: (old, new) strength when the publisher's level changed."""
@@ -128,6 +144,7 @@ def classify_rules(text: str, *, level_change: tuple[float, float] | None = None
             result.airspace = state
             break
     result.borders_closed = bool(_BORDERS.search(added))
+    result.measure_reason = _measure_reason(added)
 
     hits = {r: len(re.findall(p, low)) for r, p in _REASON_RULES.items()}
     best = max(hits.values(), default=0)
@@ -178,13 +195,14 @@ SCHEMA = {
         "staff_posture": {"type": "string", "enum": list(STAFF)},
         "airspace": {"type": "string", "enum": list(AIRSPACE)},
         "borders_closed": {"type": "boolean"},
+        "measure_reason": {"type": "string", "enum": list(REASONS)},
         "quote": {"type": "string"},
         "summary_uk": {"type": "string"},
         "summary_en": {"type": "string"},
     },
     "required": [
         "reason", "change_type", "level", "staff_posture", "airspace", "borders_closed",
-        "quote", "summary_uk", "summary_en",
+        "measure_reason", "quote", "summary_uk", "summary_en",
     ],
     "additionalProperties": False,
 }  # fmt: skip
@@ -226,6 +244,9 @@ explicitly says flights operate normally, unknown otherwise. Routine NOTAMs, dro
 airports, strikes, weather, and restrictions limited to occupied or separatist areas that have \
 been in place for years are unknown.
 - borders_closed: true only if land borders of the country are stated to be closed.
+- measure_reason: the reason for the staff posture, airspace or border measure you reported \
+(same values as reason; health for COVID-19 measures such as flight bans or reduced consular \
+services). Use unknown when no such measure is reported.
 - quote: one sentence copied verbatim from the added or current text that best supports the \
 classification (max 300 characters). Empty if nothing substantive.
 - summary_uk / summary_en: one short neutral sentence each (Ukrainian / English) saying what \
@@ -372,7 +393,10 @@ class ClaudeClassifier:
             return fallback
         try:
             data = json.loads(text_out)
-            result = Classification(**{k: data[k] for k in SCHEMA["required"]})
+            optional = {"measure_reason"}  # added later; older outputs lack it
+            result = Classification(**{
+                k: data[k] for k in SCHEMA["required"] if k in data or k not in optional
+            })  # fmt: skip
         except (ValueError, KeyError, TypeError):
             fallback.notes.append("claude: unparseable output, rules used")
             return fallback
