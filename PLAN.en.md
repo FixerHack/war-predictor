@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.7**, updated 2026-09-30.
+Version **0.2.8**, updated 2026-09-30.
 
 **Overall progress: 29%** · left ≈ 31.0 days · ✅ 31 · 🟡 2 · ⬜ 45 · ⛔ 0
 
@@ -160,7 +160,7 @@ Branch: `dev-war-status`
 - ⬜ **S10.3** Obtain a UCDP API token _(manual)_
 - ⬜ **S10.4** UCDP Candidate Events as a second automatic source
 - 🟡 **S10.5** Verify the Wikipedia parser against the live page
-  - Guard showed wikitext parsing found no sections; parser moved to rendered HTML, run war-check --headings to confirm.
+  - Sections recognised on the live page; only the Location column counts, check war-check --explain FR.
 
 ## S11. Public dashboard — 0%
 
@@ -215,6 +215,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.8** (2026-09-30)
+  - Wikipedia war status: Location column only (parties to conflicts abroad no longer count)
+  - war-check --explain: where a country mention comes from
 - **0.2.7** (2026-09-30)
   - Wikipedia parser works on rendered HTML and headings of any level
   - war-check --headings: page structure diagnostics

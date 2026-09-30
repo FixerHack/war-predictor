@@ -4,22 +4,60 @@ import pytest
 
 from tension_index import war_status
 
+
 # Shape of the rendered page (MediaWiki wraps headings in <div class="mw-heading">).
-HTML = """
-<p>Intro <a href="/wiki/Poland" title="Poland">Poland</a> outside any section.</p>
-<div class="mw-heading mw-heading2"><h2 id="Major_wars">Major wars (10,000 or more deaths in current or past year)</h2></div>
-<table><tr><td><a href="/wiki/Russo-Ukrainian_war_(2022%E2%80%93present)">Russo-Ukrainian war</a></td>
-<td><span class="flagicon"><img alt=""></span>&nbsp;<a href="/wiki/Ukraine" title="Ukraine">Ukraine</a></td></tr></table>
-<div class="mw-heading mw-heading2"><h2 id="Minor_wars">Minor wars (1,000&#8211;9,999 deaths in current or past year)</h2></div>
-<a href="/wiki/Syria" title="Syria">Syria</a>
-<div class="mw-heading mw-heading2"><h2 id="Conflicts">Conflicts (100&#8211;999 deaths in current or past year)</h2></div>
-<div class="mw-heading mw-heading3"><h3 id="Europe">Europe</h3></div>
-<a href="/wiki/Moldova" title="Moldova">Moldova</a>
-<div class="mw-heading mw-heading2"><h2 id="Skirmishes">Skirmishes and clashes (fewer than 100 deaths in current or past year)</h2></div>
-<a href="/wiki/Kosovo" title="Kosovo">Kosovo</a>, <a href="/wiki/Serbia" title="Serbia">Serbia</a>,
-<a href="/wiki/Bosnia_and_Herzegovina" title="Bosnia and Herzegovina">BiH</a>
-<div class="mw-heading mw-heading2"><h2 id="See_also">See also</h2></div>
-<a href="/wiki/Estonia" title="Estonia">Estonia</a>
+def link(name: str) -> str:
+    return f'<a href="/wiki/{name.replace(" ", "_")}" title="{name}">{name}</a>'
+
+
+def flag(name: str) -> str:
+    return f'<span class="flagicon"><img alt=""></span>&nbsp;{link(name)}'
+
+
+def table(*rows: str) -> str:
+    head = (
+        "<tr><th>Start</th><th>Conflict</th><th>Continent</th><th>Location</th><th>Deaths</th></tr>"
+    )
+    return f'<table class="wikitable sortable"><tbody>{head}{"".join(rows)}</tbody></table>'
+
+
+# Shape of the rendered page: h2 "List of current wars and conflicts" with h3 death-toll
+# sections, each holding a wikitable (Location column, rowspans for continents).
+HTML = f"""
+<div class="mw-heading mw-heading2"><h2 id="Criteria">Criteria</h2></div>
+<p>{link("Poland")} mentioned in the intro.</p>
+<div class="mw-heading mw-heading2"><h2 id="List">List of current wars and conflicts</h2></div>
+<div class="mw-heading mw-heading3"><h3>Major wars (10,000 or more combat-related deaths in current or previous year)</h3></div>
+{
+    table(
+        f'<tr><td>2022</td><td>{link("Russo-Ukrainian war")}</td><td rowspan="2">Europe</td>'
+        f"<td>{flag('Ukraine')}<br>{flag('Russia')}</td><td>100000</td></tr>",
+        f"<tr><td>2011</td><td>{link('Syrian civil war')} (belligerents: {flag('France')})</td>"
+        f"<td>{flag('Syria')}</td><td>20000</td></tr>",
+    )
+}
+<div class="mw-heading mw-heading3"><h3>Minor wars (1,000&#8211;9,999 combat-related deaths in current or previous year)</h3></div>
+{table()}
+<div class="mw-heading mw-heading3"><h3>Conflicts (100&#8211;999 combat-related deaths in current or previous year)</h3></div>
+{
+    table(
+        f"<tr><td>2012</td><td>Mali War, supported by {flag('France')}</td><td>Africa</td>"
+        f"<td>{flag('Mali')}</td><td>900</td></tr>",
+        f"<tr><td>1992</td><td>Transnistria incidents</td><td>Europe</td>"
+        f"<td>{flag('Moldova')}</td><td>150</td></tr>",
+    )
+}
+<div class="mw-heading mw-heading3"><h3>Skirmishes and clashes (fewer than 100 combat-related deaths in current and previous year)</h3></div>
+{
+    table(
+        f'<tr><td>1998</td><td>Kosovo–Serbia tensions</td><td rowspan="2">Europe</td>'
+        f"<td>{flag('Kosovo')}<br>{flag('Serbia')}</td><td>5</td></tr>",
+        f"<tr><td>2024</td><td>New Caledonia unrest</td><td>{flag('France')} (New Caledonia)</td><td>13</td></tr>",
+    )
+}
+<div class="mw-heading mw-heading2"><h2>Conflict deaths in the 2020s</h2></div>
+<div class="mw-heading mw-heading3"><h3>Deaths by country</h3></div>
+<table class="wikitable"><tr><th>Country</th></tr><tr><td>{flag("Estonia")}</td></tr></table>
 """
 
 
@@ -49,21 +87,39 @@ def test_section_severity(heading, severity):
     assert war_status.section_severity(heading) == severity
 
 
-def test_parse_rendered_html_with_subsections():
+def test_only_location_column_counts():
     found = war_status.parse_wikipedia(HTML)
-    # Moldova sits in an h3 "Europe" under the 100-999 section -> inherits "active".
-    assert found == {"MD": "active", "XK": "clashes", "RS": "clashes", "BA": "clashes"}
+    # France as a belligerent (Syria, Mali) is ignored; its overseas unrest is in Location.
+    # The rowspanned "Europe" cell must not shift the Location column of the next row.
+    assert found == {"MD": "active", "XK": "clashes", "RS": "clashes", "FR": "clashes"}
+
+
+def test_explain_mentions():
+    fr = [m for m in war_status.mentions(HTML) if m.country == "FR"]
+    assert len(fr) == 1
+    assert fr[0].conflict == "New Caledonia unrest" and fr[0].column == "location"
+
+
+def test_table_without_location_column_is_scanned_whole():
+    html = (
+        "<h3>Conflicts (100–999 deaths)</h3>"
+        '<table class="wikitable"><tr><th>Conflict</th><th>Where</th></tr>'
+        f"<tr><td>Something</td><td>{flag('Latvia')}</td></tr></table>"
+    )
+    assert [(m.country, m.column) for m in war_status.mentions(html)] == [("LV", "*")]
 
 
 def test_headings_diagnostics():
     hs = war_status.headings(HTML)
     assert [(h.level, h.severity) for h in hs] == [
-        (2, "war"),
-        (2, "war"),
-        (2, "active"),
-        (3, "active"),
-        (2, "clashes"),
         (2, None),
+        (2, None),
+        (3, "war"),
+        (3, "war"),
+        (3, "active"),
+        (3, "clashes"),
+        (2, None),
+        (3, None),
     ]
 
 

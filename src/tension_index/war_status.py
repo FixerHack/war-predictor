@@ -15,6 +15,7 @@ import html as html_lib
 import re
 from dataclasses import dataclass, field
 from functools import lru_cache
+from html.parser import HTMLParser
 from pathlib import Path
 
 import httpx
@@ -126,31 +127,177 @@ def headings(html: str) -> list[Heading]:
     return [h for h, _ in _sections(html)]
 
 
-def _mentions(body: str, name: str) -> bool:
+def _mentions(fragment: str, name: str) -> bool:
     # Rendered links: <a href="/wiki/Poland" title="Poland">
     return bool(
-        re.search(rf'title="{re.escape(name)}"', body)
-        or re.search(rf'href="/wiki/{re.escape(name.replace(" ", "_"))}"', body)
+        re.search(rf'title="{re.escape(name)}"', fragment)
+        or re.search(rf'href="/wiki/{re.escape(name.replace(" ", "_"))}"', fragment)
     )
 
 
-def parse_wikipedia(html: str) -> dict[str, str]:
-    """Return {country_code: highest severity} for monitored countries named in the list.
+@dataclass(slots=True)
+class _Cell:
+    header: bool
+    html: str
+    rowspan: int = 1
+    colspan: int = 1
 
-    Works on the rendered page (templates transcluded). Raises ValueError when no death-toll
-    section is recognised: a changed layout must fail loudly, not look like "no conflicts".
+    @property
+    def text(self) -> str:
+        return " ".join(html_lib.unescape(_TAG.sub(" ", self.html)).split())
+
+
+class _TableParser(HTMLParser):
+    """Collects rows of top-level `wikitable` tables; nested tables stay inside cell HTML."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=False)
+        self.tables: list[list[list[_Cell]]] = []
+        self._depth = 0  # nesting depth of <table> inside a wikitable
+        self._cell: _Cell | None = None
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        a = dict(attrs)
+        if tag == "table":
+            if self._depth == 0 and "wikitable" in (a.get("class") or ""):
+                self.tables.append([])
+                self._depth = 1
+                return
+            if self._depth:
+                self._depth += 1
+        if not self._depth:
+            return
+        if self._depth == 1 and tag == "tr":
+            self.tables[-1].append([])
+            return
+        if self._depth == 1 and tag in ("td", "th") and self.tables[-1]:
+            span = lambda key: int(re.sub(r"\D", "", a.get(key) or "1") or 1)  # noqa: E731
+            self._cell = _Cell(tag == "th", "", span("rowspan"), span("colspan"))
+            self.tables[-1][-1].append(self._cell)
+            return
+        if self._cell is not None:
+            self._cell.html += self.get_starttag_text() or ""
+
+    def handle_endtag(self, tag: str) -> None:
+        if not self._depth:
+            return
+        if tag == "table":
+            self._depth -= 1
+            if self._depth == 0:
+                self._cell = None
+                return
+        if self._depth == 1 and tag in ("td", "th", "tr"):
+            self._cell = None
+            return
+        if self._cell is not None:
+            self._cell.html += f"</{tag}>"
+
+    def handle_data(self, data: str) -> None:
+        if self._cell is not None:
+            self._cell.html += data
+
+    def handle_entityref(self, name: str) -> None:
+        self.handle_data(f"&{name};")
+
+    def handle_charref(self, name: str) -> None:
+        self.handle_data(f"&#{name};")
+
+
+def _grid(rows: list[list[_Cell]]) -> list[list[_Cell | None]]:
+    """Expand rowspan/colspan so that each row has one entry per column."""
+    out: list[list[_Cell | None]] = []
+    carry: dict[int, tuple[_Cell, int]] = {}  # column -> (cell, rows still covered)
+    for row in rows:
+        line: list[_Cell | None] = []
+        cells = iter(row)
+        col = 0
+        pending = True
+        while pending or col in carry:
+            if col in carry:
+                cell, left = carry[col]
+                line.append(cell)
+                if left > 1:
+                    carry[col] = (cell, left - 1)
+                else:
+                    del carry[col]
+                col += 1
+                continue
+            cell = next(cells, None)
+            if cell is None:
+                pending = False
+                continue
+            for _ in range(cell.colspan):
+                line.append(cell)
+                if cell.rowspan > 1:
+                    carry[col] = (cell, cell.rowspan - 1)
+                col += 1
+        out.append(line)
+    return out
+
+
+@dataclass(slots=True)
+class Mention:
+    country: str
+    severity: str
+    section: str
+    conflict: str
+    column: str  # header of the column the country was found in ("*" = whole table)
+
+
+def mentions(html: str) -> list[Mention]:
+    """Every monitored country named in the Location column of the death-toll tables.
+
+    Only "Location" counts: belligerents and notes also link to countries (e.g. France as
+    a party to a conflict abroad), which says nothing about fighting on their territory.
+    A table without a Location column is scanned whole, so a layout change over-reports
+    (and reaches a human) rather than silently missing a war.
     """
-    found: dict[str, str] = {}
     sections = [(h, body) for h, body in _sections(html) if h.severity]
     if not sections:
         raise ValueError("no conflict sections recognised on the Wikipedia page; layout changed?")
+    out: list[Mention] = []
     for heading, body in sections:
-        for code in COUNTRIES:
-            if any(_mentions(body, name) for name in _names(code)):
-                severity = heading.severity
-                assert severity is not None
-                if SEVERITY.index(severity) > SEVERITY.index(found.get(code, "none")):
-                    found[code] = severity
+        severity = heading.severity
+        assert severity is not None
+        parser = _TableParser()
+        parser.feed(body)
+        for table in parser.tables:
+            grid = _grid(table)
+            header_idx = next(
+                (i for i, r in enumerate(grid) if r and all(c and c.header for c in r)), None
+            )
+            headers = (
+                [c.text.lower() if c else "" for c in grid[header_idx]]
+                if header_idx is not None
+                else []
+            )
+            loc_cols = [i for i, h in enumerate(headers) if "location" in h]
+            name_col = next((i for i, h in enumerate(headers) if "conflict" in h), None)
+            for row in grid[(header_idx or 0) + (1 if header_idx is not None else 0) :]:
+                if not row:
+                    continue
+                cols = loc_cols or range(len(row))
+                conflict = (
+                    row[name_col].text
+                    if name_col is not None and name_col < len(row) and row[name_col]
+                    else ""
+                )
+                for code in COUNTRIES:
+                    for col in cols:
+                        cell = row[col] if col < len(row) else None
+                        if cell and any(_mentions(cell.html, n) for n in _names(code)):
+                            column = headers[col] if loc_cols else "*"
+                            out.append(Mention(code, severity, heading.text, conflict, column))
+                            break
+    return out
+
+
+def parse_wikipedia(html: str) -> dict[str, str]:
+    """Return {country_code: highest severity} from the Location columns (see `mentions`)."""
+    found: dict[str, str] = {}
+    for m in mentions(html):
+        if SEVERITY.index(m.severity) > SEVERITY.index(found.get(m.country, "none")):
+            found[m.country] = m.severity
     return found
 
 
