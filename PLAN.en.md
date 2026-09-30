@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.61**, updated 2026-09-30.
+Version **0.2.62**, updated 2026-09-30.
 
-**Overall progress: 68%** · left ≈ 14.4 days · ✅ 49 · 🟡 19 · ⬜ 10 · ⛔ 4
+**Overall progress: 68%** · left ≈ 14.5 days · ✅ 50 · 🟡 19 · ⬜ 10 · ⛔ 4
 
 ## Milestones
 
@@ -194,7 +194,7 @@ Branch: `dev-war-status`
 - ✅ **S10.5** Verify the Wikipedia parser against the live page
   - Verified on the live page: sections, Location column; France (French Guiana) excluded by review.
 
-## S11. Public dashboard — 95%
+## S11. Public dashboard — 96%
 
 _Country map and score history on free hosting._
 
@@ -208,6 +208,8 @@ Branch: `dev-dashboard`
   - Country card: score, reasons with quotes, flags, war status, 90-day chart; table of all countries; #PL links.
 - 🟡 **S11.4** Disclaimer and methodology on the site _(manual)_
   - Working disclaimer and methodology on the page; final wording approved by the owner (S1.7).
+- ✅ **S11.6** Ukrainian explanations: the classifier's summary instead of the English quote (map, bot, alerts)
+  - English quotes remain for ENG and where no Ukrainian summary exists yet (news, rule-based classification).
 - ✅ **S11.5** Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method
 
 ## S12. Operations — 45%
@@ -259,6 +261,154 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.62** (2026-09-30)
+  - I
+  - n
+  -  
+  - U
+  - k
+  - r
+  - a
+  - i
+  - n
+  - i
+  - a
+  - n
+  - ,
+  -  
+  - e
+  - x
+  - p
+  - l
+  - a
+  - n
+  - a
+  - t
+  - i
+  - o
+  - n
+  - s
+  -  
+  - n
+  - o
+  - w
+  -  
+  - s
+  - h
+  - o
+  - w
+  -  
+  - a
+  -  
+  - U
+  - k
+  - r
+  - a
+  - i
+  - n
+  - i
+  - a
+  - n
+  -  
+  - s
+  - u
+  - m
+  - m
+  - a
+  - r
+  - y
+  -  
+  - i
+  - n
+  - s
+  - t
+  - e
+  - a
+  - d
+  -  
+  - o
+  - f
+  -  
+  - t
+  - h
+  - e
+  -  
+  - E
+  - n
+  - g
+  - l
+  - i
+  - s
+  - h
+  -  
+  - q
+  - u
+  - o
+  - t
+  - e
+  - ;
+  -  
+  - t
+  - e
+  - m
+  - p
+  - l
+  - a
+  - t
+  - e
+  - d
+  -  
+  - n
+  - o
+  - t
+  - e
+  - s
+  -  
+  - (
+  - a
+  - i
+  - r
+  -  
+  - t
+  - r
+  - a
+  - f
+  - f
+  - i
+  - c
+  - ,
+  -  
+  - m
+  - e
+  - d
+  - i
+  - a
+  - ,
+  -  
+  - m
+  - a
+  - r
+  - k
+  - e
+  - t
+  - s
+  - )
+  -  
+  - a
+  - r
+  - e
+  -  
+  - t
+  - r
+  - a
+  - n
+  - s
+  - l
+  - a
+  - t
+  - e
+  - d
+  - .
 - **0.2.61** (2026-09-30)
   - S
   - c

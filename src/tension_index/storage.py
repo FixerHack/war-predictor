@@ -160,6 +160,10 @@ MIGRATIONS: list[str] = [
         SELECT tg_id, country FROM users WHERE country IS NOT NULL;
     ALTER TABLE users ADD COLUMN digest INTEGER NOT NULL DEFAULT 0;
     """,
+    # 7: Ukrainian explanation next to the (usually English) quote
+    """
+    ALTER TABLE signals ADD COLUMN note_uk TEXT NOT NULL DEFAULT '';
+    """,
 ]
 
 
@@ -514,14 +518,14 @@ async def upsert_signal(db: aiosqlite.Connection, s: Signal, ref: str) -> None:
     """Insert a signal or refresh it (same ref/kind/country) and mark it active."""
     await db.execute(
         "INSERT INTO signals (country, block, kind, strength, publisher, observed_at, tier, "
-        "confirmed, reason, state, active, note, ref) "
-        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?) "
+        "confirmed, reason, state, active, note, note_uk, ref) "
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?) "
         "ON CONFLICT (ref, kind, country) WHERE ref != '' DO UPDATE SET "
-        "strength = excluded.strength, reason = excluded.reason, note = excluded.note, "
+        "strength = excluded.strength, reason = excluded.reason, note = excluded.note, note_uk = excluded.note_uk, "
         "confirmed = excluded.confirmed, tier = excluded.tier, "
         "observed_at = excluded.observed_at, active = 1",
         (s.country, s.block, s.kind, s.strength, s.publisher, s.observed_at.isoformat(), s.tier,
-         int(s.confirmed), s.reason, int(s.state), s.note, ref),
+         int(s.confirmed), s.reason, int(s.state), s.note, s.note_uk, ref),
     )  # fmt: skip
 
 

@@ -35,6 +35,7 @@ class Signal:
     reason: str = "unknown"  # classifier reason (advisories/aggressor only)
     state: bool = False  # True: holds while active (no decay); False: one-off event (decays)
     note: str = ""  # quote / human explanation shown to users
+    note_uk: str = ""  # the same in Ukrainian when available (Claude summary, templates)
 
 
 @dataclass(slots=True)
@@ -44,6 +45,7 @@ class Contribution:
     kind: str
     value: float
     note: str
+    note_uk: str = ""
 
 
 @dataclass(slots=True)
@@ -102,7 +104,7 @@ def block_scores(
         value = _effective(cfg, s, now)
         key = (s.block, s.publisher)
         if key not in per_pub or value > per_pub[key].value:
-            per_pub[key] = Contribution(s.block, s.publisher, s.kind, value, s.note)
+            per_pub[key] = Contribution(s.block, s.publisher, s.kind, value, s.note, s.note_uk)
     blocks = dict.fromkeys(cfg["blocks"], 0.0)
     for block in blocks:
         remaining = 1.0

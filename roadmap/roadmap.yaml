@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.61
+  version: 0.2.62
   updated: 2026-09-30
 
 milestones:
@@ -192,6 +192,7 @@ stages:
       - {id: S11.2, status: done, days: 1, uk: "Карта Європи з кольорами рівнів", en: "Map of Europe coloured by level", note_uk: "Карта-сітка 38 країн, одновідтінкова шкала, перевірена на кольоросліпість, у світлій і темній темах.", note_en: "Tile map of 38 countries, single-hue scale validated for colour blindness, light and dark."}
       - {id: S11.3, status: done, days: 1, uk: "Сторінка країни: історія балу і пояснення змін", en: "Country page: score history and change explanations", note_uk: "Картка країни: бал, причини з цитатами, позначки, статус війни, графік 90 днів; таблиця всіх країн; посилання #PL.", note_en: "Country card: score, reasons with quotes, flags, war status, 90-day chart; table of all countries; #PL links."}
       - {id: S11.4, status: in_progress, days: 0.3, owner: human, uk: "Юридичне застереження і методологія на сайті", en: "Disclaimer and methodology on the site", note_uk: "Робочий текст застереження й методології на сторінці; остаточний текст затверджує власник (S1.7).", note_en: "Working disclaimer and methodology on the page; final wording approved by the owner (S1.7)."}
+      - {id: S11.6, status: done, days: 0.3, uk: "Пояснення українською: короткий виклад від класифікатора замість англійської цитати (карта, бот, сповіщення)", en: "Ukrainian explanations: the classifier's summary instead of the English quote (map, bot, alerts)", note_uk: "Цитати англійською лишаються для ENG і там, де українського викладу ще немає (новини, класифікація правилами).", note_en: "English quotes remain for ENG and where no Ukrainian summary exists yet (news, rule-based classification)."}
 
       - {id: S11.5, status: done, days: 0.5, uk: "Розгорнуте пояснення на карті (укр/англ): підсумок, блоки, що кажуть уряди, що помічено, повна методика", en: "Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method"}
   - id: S12
@@ -240,6 +241,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.62
+    date: 2026-09-30
+    uk: "Українською мовою пояснення тепер показують короткий виклад українською замість англійської цитати; шаблонні примітки (авіатрафік, медіа, ринки) перекладено."
+    en: "In Ukrainian, explanations now show a Ukrainian summary instead of the English quote; templated notes (air traffic, media, markets) are translated."
   - version: 0.2.61
     date: 2026-09-30
     uk: "Налаштування шкали: обмежено надбавку за сплеск і звужено синхронність урядів до справжнього посилення рекомендацій; хибна тривога для Франції-2015 зникла."

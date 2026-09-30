@@ -214,6 +214,7 @@ async def collect_traffic(
                 strength=drop_strength(counts[code] / base), publisher="opensky",
                 observed_at=now, state=True,
                 note=f"{counts[code]} aircraft vs usual {base:.0f} at this hour",
+                note_uk=f"{counts[code]} літаків замість звичних {base:.0f} о цій годині",
             )  # fmt: skip
             await storage.upsert_signal(db, signal, f"opensky:{code}")
             result.changed += 1
