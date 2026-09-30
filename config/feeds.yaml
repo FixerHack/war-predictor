@@ -1,7 +1,8 @@
 # News feeds for blocks C (domestic measures), D (aggressor) and E (media).
 # tier: 1 = agencies, public broadcasters, official; 2 = analysis. Headlines and links only
 # are stored (no article text). URLs marked "check" are not verified yet: `tension-index probe news` shows which ones respond.
-# Removed after checking live (2026-09-30): NATO (404), ISW and ECFR (403, bot blocking).
+# Removed after checking live (2026-09-30): NATO (404), ISW and ECFR (403, bot blocking),
+# Kyiv Independent (404).
 feeds:
   - {name: bbc_europe, tier: 1, url: "https://feeds.bbci.co.uk/news/world/europe/rss.xml"}
   - {name: dw_europe, tier: 1, url: "https://rss.dw.com/rdf/rss-en-eu"}
@@ -10,8 +11,7 @@ feeds:
   - {name: lsm_eng, tier: 1, url: "https://eng.lsm.lv/rss/"}
   - {name: lrt_en, tier: 1, url: "https://www.lrt.lt/en/news-in-english?rss"}
   - {name: yle_news, tier: 1, url: "https://yle.fi/rss/t/18-34837/en"}
-  - {name: politico_eu, tier: 1, url: "https://www.politico.eu/feed/"}  # check
-  - {name: kyiv_independent, tier: 1, url: "https://kyivindependent.com/rss/"}  # check
+  - {name: politico_eu, tier: 1, url: "https://www.politico.eu/feed/"}
   - {name: notes_from_poland, tier: 1, url: "https://notesfrompoland.com/feed/"}
   - {name: balkan_insight, tier: 1, url: "https://balkaninsight.com/feed/"}
   - {name: crisis_group, tier: 2, url: "https://www.crisisgroup.org/rss.xml"}

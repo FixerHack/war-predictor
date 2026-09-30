@@ -21,7 +21,7 @@ import yaml
 
 from tension_index import storage
 from tension_index.diff import changed_fragment, normalize
-from tension_index.sources.au import level_from_text as au_level
+from tension_index.sources.au import overall_level as au_level
 from tension_index.sources.base import html_to_text, main_content
 
 log = logging.getLogger(__name__)

@@ -113,29 +113,23 @@ async def test_ca():
     assert md.level == "high_caution" and "Regional advisories" in md.text
 
 
-async def test_au_tolerant_parsing():
-    payload = [
-        {
-            "title": "Poland",
-            "url": "/destinations/europe/poland",
-            "overall_advice_level": "Exercise normal safety precautions",
-            "summary": "<p>Exercise normal safety precautions in Poland.</p>",
-        },
-        {
-            "title": "Moldova",
-            "advice_level": "Reconsider your need to travel",
-            "summary": "<p>Do not travel to Transnistria.</p>",
-        },
-    ]
-    async with client({"https://www.smartraveller.gov.au": payload}) as c:
+async def test_au_country_page():
+    page = """<html><nav>Menu Do not travel list</nav><main><h1>Moldova</h1>
+<p>Overall advice level</p><p>Reconsider your need to travel</p>
+<p>Do not travel to Transnistria due to the security situation.</p></main></html>"""
+    async with client({"https://www.smartraveller.gov.au/destinations/europe/moldova": page}) as c:
         src = AuSource(c)
-        await src.prepare()
-        pl = await src.fetch(get_country("PL"))
         md = await src.fetch(get_country("MD"))
-    assert pl.level == "1" and pl.url.startswith("https://www.smartraveller.gov.au/destinations")
-    # The overall level field wins over "do not travel" for a region in the text.
-    assert md.level == "3"
+    assert md.level == "3"  # overall level wins over the regional "do not travel"
+    assert "Transnistria" in md.text and md.url.endswith("/moldova")
+    assert AuSource(c).supports(get_country("GB"))
     assert level_from_text("Do not travel") == "4"
+
+
+async def test_au_page_without_level_is_a_format_error():
+    async with client({"https://www.smartraveller.gov.au": "<main>Page moved</main>"}) as c:
+        with pytest.raises(SourceFormatError):
+            await AuSource(c).fetch(get_country("PL"))
 
 
 US_FEED = b"""<?xml version="1.0"?><rss><channel>
