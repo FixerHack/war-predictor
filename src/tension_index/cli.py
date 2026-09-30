@@ -122,6 +122,23 @@ async def _war_check(args: argparse.Namespace) -> int:
     return 1 if diff else 0
 
 
+async def _classify() -> int:
+    from tension_index.pipeline import classify_pending, make_classifier
+
+    settings = get_settings()
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        claude = make_classifier(settings)
+        if claude is None:
+            print("ANTHROPIC_API_KEY not set: keyword rules only")
+        stats = await classify_pending(db, settings, claude)
+    print(
+        f"classified changes={stats['changes']} snapshots={stats['snapshots']} "
+        f"(claude={stats['claude']})"
+    )
+    return 0
+
+
 async def _probe(args: argparse.Namespace) -> int:
     """Show what a source really returns, to fix a parser after an API/layout change."""
     from tension_index.collector import make_client
@@ -179,6 +196,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("bot", help="run the Telegram bot (long polling)")
 
+    sub.add_parser("classify", help="classify new changes and current advisories")
+
     p = sub.add_parser("probe", help="show a source's raw response and parsed result")
     p.add_argument("source")
     p.add_argument("--country", default="PL")
@@ -212,6 +231,7 @@ def main(argv: list[str] | None = None) -> None:
         "bot": lambda: _bot(),
         "war-check": lambda: _war_check(args),
         "probe": lambda: _probe(args),
+        "classify": lambda: _classify(),
     }
     try:
         sys.exit(asyncio.run(handlers[args.command]()))

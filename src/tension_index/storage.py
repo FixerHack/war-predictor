@@ -78,6 +78,39 @@ MIGRATIONS: list[str] = [
     );
     CREATE INDEX ix_scores_country ON scores (country, id);
     """,
+    # 3: classifier output and scoring signals
+    """
+    CREATE TABLE classifications (
+        id              INTEGER PRIMARY KEY,
+        ref_type        TEXT NOT NULL,           -- change | snapshot | news
+        ref_id          INTEGER NOT NULL,
+        country         TEXT NOT NULL,
+        publisher       TEXT NOT NULL,
+        method          TEXT NOT NULL,           -- rules | claude
+        payload         TEXT NOT NULL,           -- JSON (see classifier.Classification)
+        created_at      TEXT NOT NULL,
+        UNIQUE (ref_type, ref_id)
+    );
+
+    CREATE TABLE signals (
+        id              INTEGER PRIMARY KEY,
+        country         TEXT NOT NULL,
+        block           TEXT NOT NULL,
+        kind            TEXT NOT NULL,
+        strength        REAL NOT NULL,
+        publisher       TEXT NOT NULL,
+        observed_at     TEXT NOT NULL,
+        tier            INTEGER NOT NULL DEFAULT 1,
+        confirmed       INTEGER NOT NULL DEFAULT 0,
+        reason          TEXT NOT NULL DEFAULT 'unknown',
+        state           INTEGER NOT NULL DEFAULT 0,
+        active          INTEGER NOT NULL DEFAULT 1, -- states: 0 once superseded
+        note            TEXT NOT NULL DEFAULT '',
+        ref             TEXT NOT NULL DEFAULT ''    -- e.g. "snapshot:12", "news:<url>"
+    );
+    CREATE INDEX ix_signals_country ON signals (country, active, observed_at);
+    CREATE UNIQUE INDEX ux_signals_ref ON signals (ref, kind, country) WHERE ref != '';
+    """,
 ]
 
 
@@ -305,3 +338,53 @@ async def changes_since(db: aiosqlite.Connection, country: str, since_iso: str) 
     ) as cur:
         row = await cur.fetchone()
     return int(row[0]) if row else 0
+
+
+# --- Classifications ------------------------------------------------------------------------
+
+
+async def save_classification(
+    db: aiosqlite.Connection,
+    *,
+    ref_type: str,
+    ref_id: int,
+    country: str,
+    publisher: str,
+    method: str,
+    payload: str,
+) -> None:
+    await db.execute(
+        "INSERT INTO classifications (ref_type, ref_id, country, publisher, method, payload, "
+        "created_at) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(ref_type, ref_id) DO UPDATE SET "
+        "method = excluded.method, payload = excluded.payload, created_at = excluded.created_at",
+        (ref_type, ref_id, country, publisher, method, payload, utcnow()),
+    )
+    await db.commit()
+
+
+async def get_classification(
+    db: aiosqlite.Connection, ref_type: str, ref_id: int
+) -> aiosqlite.Row | None:
+    async with db.execute(
+        "SELECT * FROM classifications WHERE ref_type = ? AND ref_id = ?", (ref_type, ref_id)
+    ) as cur:
+        return await cur.fetchone()
+
+
+async def unclassified_changes(db: aiosqlite.Connection, limit: int = 100) -> list[aiosqlite.Row]:
+    async with db.execute(
+        "SELECT c.id, c.source, c.country, c.diff, c.new_snapshot FROM changes c "
+        "LEFT JOIN classifications k ON k.ref_type = 'change' AND k.ref_id = c.id "
+        "WHERE k.id IS NULL ORDER BY c.id LIMIT ?",
+        (limit,),
+    ) as cur:
+        return list(await cur.fetchall())
+
+
+async def latest_snapshots(db: aiosqlite.Connection) -> list[aiosqlite.Row]:
+    """Current version of every (source, country) advisory."""
+    async with db.execute(
+        "SELECT s.* FROM snapshots s JOIN (SELECT source, country, MAX(id) AS id FROM snapshots "
+        "GROUP BY source, country) last ON last.id = s.id ORDER BY s.country, s.source"
+    ) as cur:
+        return list(await cur.fetchall())

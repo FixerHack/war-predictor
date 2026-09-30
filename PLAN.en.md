@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.18**, updated 2026-09-30.
+Version **0.2.21**, updated 2026-09-30.
 
-**Overall progress: 34%** · left ≈ 28.9 days · ✅ 33 · 🟡 6 · ⬜ 38 · ⛔ 1
+**Overall progress: 38%** · left ≈ 27.4 days · ✅ 35 · 🟡 6 · ⬜ 36 · ⛔ 1
 
 ## Milestones
 
@@ -111,15 +111,17 @@ Branch: `dev-history`
 - ⬜ **S5.1** Download past versions from the Wayback Machine (CDX API)
 - ⬜ **S5.2** Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25
 
-## S6. Change classification (Claude API) — 0%
+## S6. Change classification (Claude API) — 60%
 
 _Claude determines the reason and type of each change and turns it into a signal._
 
 Branch: `dev-classifier`
 
-- ⬜ **S6.1** Prompt and JSON schema: reason, change type, staff, borders, quote
-- ⬜ **S6.2** Call only on changed fragments, prompt caching, spend cap
-- ⬜ **S6.3** Manual check on 50 examples
+- ✅ **S6.1** Prompt and JSON schema: reason, change type, staff, borders, quote
+- ✅ **S6.2** Call only on changed fragments, prompt caching, spend cap
+  - Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key.
+- ⬜ **S6.3** Manual check on 50 examples _(manual)_
+  - Needs an API key and real changes; review 50 classifications by hand.
 
 ## S7. Scoring 0–10 — 50%
 
@@ -223,6 +225,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.21** (2026-09-30)
+  - Change classifier: rules + Claude (strict JSON schema, caching, call cap)
+  - classify command
 - **0.2.18** (2026-09-30)
   - Sources: Germany, US, Canada, Australia, France
   - Boilerplate (update dates) stripped before diffing
