@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.66
+  version: 0.2.67
   updated: 2026-09-30
 
 milestones:
@@ -82,6 +82,7 @@ stages:
       - {id: S2.10, status: done, days: 0.2, uk: "Алерт у Telegram, якщо джерело зламалося", en: "Telegram alert when a source breaks"}
       - {id: S2.11, status: done, days: 0.5, uk: "Очищення тексту від дат оновлення і службових елементів", en: "Strip update dates and boilerplate before diffing"}
 
+      - {id: S2.12, status: in_progress, days: 0.3, uk: "США: стрічка RSS зникла (404) — резерв через API cadataapi.state.gov (RSS/Atom/JSON)", en: "US: RSS feed gone (404) — fallback to the cadataapi.state.gov API (RSS/Atom/JSON)", note_uk: "Формат API перевірено лише на припущеннях; потрібна перевірка probe us.", note_en: "API format only assumed; needs a probe us check."}
   - id: S3
     branch: dev-aviation
     uk: Авіація і повітряний простір
@@ -244,6 +245,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.67
+    date: 2026-09-30
+    uk: "Держдеп: резервне джерело після зникнення RSS; закриття неба через вулканічний попіл чи погоду більше не рахується сигналом безпеки; модель визначає причину за загальним рівнем країни, а не за окремими регіонами."
+    en: "State Department: fallback source after the RSS feed disappeared; airspace closures for volcanic ash or weather no longer count as security signals; the model takes the reason for the country's overall level, not for single regions."
   - version: 0.2.66
     date: 2026-09-30
     uk: "Класифікації правилами перераховуються ще раз після звуження правил для неба."

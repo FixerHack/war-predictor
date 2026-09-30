@@ -69,6 +69,11 @@ def load_config(path: Path = CONFIG_PATH) -> dict:
     return yaml.safe_load(path.read_text(encoding="utf-8"))
 
 
+def relevance(cfg: dict, reason: str) -> float:
+    table = cfg["reason_relevance"]
+    return table.get(reason, table["unknown"])
+
+
 def advisory_strength(cfg: dict, publisher: str, level: str | None) -> float:
     """Map a publisher-specific advisory level (e.g. US "3") to 0..1. Several statuses
     joined by commas (GOV.UK alert_status) take the strongest."""

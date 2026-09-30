@@ -30,6 +30,7 @@ from tension_index.scoring import (
     advisory_strength,
     compute_score,
     load_config,
+    relevance,
 )
 
 log = logging.getLogger(__name__)
@@ -252,7 +253,8 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
                 ref,
             )
             count += 1
-        if cls.airspace in ("closed", "restricted"):
+        # Airspace measures for volcanic ash or weather are not a security signal.
+        if cls.airspace in ("closed", "restricted") and relevance(cfg, cls.reason) >= 0.5:
             await storage.upsert_signal(
                 db,
                 Signal(

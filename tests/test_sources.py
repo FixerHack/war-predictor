@@ -246,3 +246,32 @@ async def test_us_duplicate_items_differing_only_in_text():
             await src.prepare()
             texts.add((await src.fetch(get_country("EE"))).text)
     assert len(texts) == 1
+
+
+async def test_us_falls_back_to_the_data_api_json():
+    """The RSS feed is gone (404): the data API answers, in JSON with its own casing."""
+    api = [
+        {"Title": "Poland - Level 1: Exercise Normal Precautions", "Link": "https://travel.state.gov/pl",
+         "Published": "2026-09-01T00:00:00Z", "Summary": "<p>Exercise normal precautions.</p>",
+         "Category": ["PL"]},
+        {"Title": "Moldova - Level 2: Exercise Increased Caution", "Link": "https://travel.state.gov/md",
+         "Published": "2026-09-30T00:00:00Z", "Summary": "<p>Reconsider travel to Transnistria.</p>",
+         "Category": [{"value": "MD"}]},
+    ]  # fmt: skip
+    async with client({"https://cadataapi.state.gov": api}) as c:
+        src = UsSource(c)
+        await src.prepare()
+        pl = await src.fetch(get_country("PL"))
+        md = await src.fetch(get_country("MD"))
+    assert src.feed.startswith("https://cadataapi") and pl.level == "1" and md.level == "2"
+    assert md.url == "https://travel.state.gov/md" and "Transnistria" in md.text
+
+
+async def test_us_api_as_xml_and_all_feeds_down():
+    async with client({"https://cadataapi.state.gov": US_FEED}) as c:
+        src = UsSource(c)
+        await src.prepare()
+        assert (await src.fetch(get_country("PL"))).level == "1"
+    async with client({}) as c:
+        with pytest.raises(SourceFormatError, match="no usable feed"):
+            await UsSource(c).prepare()

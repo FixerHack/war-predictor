@@ -226,3 +226,21 @@ async def test_claude_summary_becomes_ukrainian_note(settings):
                         "note_uk": level.note_uk}]}  # fmt: skip
     assert reasons(payload, "uk")[0].endswith("— США радять не їхати через збройний конфлікт.")
     assert reasons(payload, "en")[0].endswith("«Do not travel due to armed conflict.»")
+
+
+async def test_volcanic_ash_airspace_closure_is_not_a_security_signal(settings):
+    """Italy, September 2026: France reported an airspace sector closed by Etna ash."""
+    async with storage.connect(settings.database_path) as db:
+        sid = await seed(
+            db, source="fr", country="IT", level=None, text="Etna ash closed a sector."
+        )
+        for reason, expected in (("natural_disaster", 0), ("armed_conflict", 1)):
+            cls = classify_rules("x")
+            cls.airspace, cls.reason, cls.method = "restricted", reason, "claude"
+            await storage.save_classification(
+                db, ref_type="snapshot", ref_id=sid, country="IT", publisher="fr",
+                method="claude", payload=cls.to_json(),
+            )  # fmt: skip
+            await derive_advisory_signals(db)
+            aviation = [s for s in await active_signals(db, NOW) if s.block == "aviation"]
+            assert len(aviation) == expected, reason

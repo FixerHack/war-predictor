@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.66**, updated 2026-09-30.
+Version **0.2.67**, updated 2026-09-30.
 
-**Overall progress: 68%** · left ≈ 14.4 days · ✅ 51 · 🟡 19 · ⬜ 10 · ⛔ 4
+**Overall progress: 68%** · left ≈ 14.6 days · ✅ 51 · 🟡 20 · ⬜ 10 · ⛔ 4
 
 ## Milestones
 
@@ -54,7 +54,7 @@ Branch: `—`
 - ✅ **S1.8** 0–10 scale algorithm (docs/algorithm.md)
 - ✅ **S1.9** Research of sources and war trackers (docs/sources.md)
 
-## S2. Official advisory collection — 56%
+## S2. Official advisory collection — 55%
 
 _Regular collection of advisories, storing every text version._
 
@@ -79,6 +79,8 @@ Branch: `dev-collector`
   - Via GDELT: Russian-language reports of RU/BY MFA advice, 2+ outlets = confirmed.
 - ✅ **S2.10** Telegram alert when a source breaks
 - ✅ **S2.11** Strip update dates and boilerplate before diffing
+- 🟡 **S2.12** US: RSS feed gone (404) — fallback to the cadataapi.state.gov API (RSS/Atom/JSON)
+  - API format only assumed; needs a probe us check.
 
 ## S3. Aviation & airspace — 33%
 
@@ -264,6 +266,239 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.67** (2026-09-30)
+  - S
+  - t
+  - a
+  - t
+  - e
+  -  
+  - D
+  - e
+  - p
+  - a
+  - r
+  - t
+  - m
+  - e
+  - n
+  - t
+  - :
+  -  
+  - f
+  - a
+  - l
+  - l
+  - b
+  - a
+  - c
+  - k
+  -  
+  - s
+  - o
+  - u
+  - r
+  - c
+  - e
+  -  
+  - a
+  - f
+  - t
+  - e
+  - r
+  -  
+  - t
+  - h
+  - e
+  -  
+  - R
+  - S
+  - S
+  -  
+  - f
+  - e
+  - e
+  - d
+  -  
+  - d
+  - i
+  - s
+  - a
+  - p
+  - p
+  - e
+  - a
+  - r
+  - e
+  - d
+  - ;
+  -  
+  - a
+  - i
+  - r
+  - s
+  - p
+  - a
+  - c
+  - e
+  -  
+  - c
+  - l
+  - o
+  - s
+  - u
+  - r
+  - e
+  - s
+  -  
+  - f
+  - o
+  - r
+  -  
+  - v
+  - o
+  - l
+  - c
+  - a
+  - n
+  - i
+  - c
+  -  
+  - a
+  - s
+  - h
+  -  
+  - o
+  - r
+  -  
+  - w
+  - e
+  - a
+  - t
+  - h
+  - e
+  - r
+  -  
+  - n
+  - o
+  -  
+  - l
+  - o
+  - n
+  - g
+  - e
+  - r
+  -  
+  - c
+  - o
+  - u
+  - n
+  - t
+  -  
+  - a
+  - s
+  -  
+  - s
+  - e
+  - c
+  - u
+  - r
+  - i
+  - t
+  - y
+  -  
+  - s
+  - i
+  - g
+  - n
+  - a
+  - l
+  - s
+  - ;
+  -  
+  - t
+  - h
+  - e
+  -  
+  - m
+  - o
+  - d
+  - e
+  - l
+  -  
+  - t
+  - a
+  - k
+  - e
+  - s
+  -  
+  - t
+  - h
+  - e
+  -  
+  - r
+  - e
+  - a
+  - s
+  - o
+  - n
+  -  
+  - f
+  - o
+  - r
+  -  
+  - t
+  - h
+  - e
+  -  
+  - c
+  - o
+  - u
+  - n
+  - t
+  - r
+  - y
+  - '
+  - s
+  -  
+  - o
+  - v
+  - e
+  - r
+  - a
+  - l
+  - l
+  -  
+  - l
+  - e
+  - v
+  - e
+  - l
+  - ,
+  -  
+  - n
+  - o
+  - t
+  -  
+  - f
+  - o
+  - r
+  -  
+  - s
+  - i
+  - n
+  - g
+  - l
+  - e
+  -  
+  - r
+  - e
+  - g
+  - i
+  - o
+  - n
+  - s
+  - .
 - **0.2.66** (2026-09-30)
   - R
   - u
