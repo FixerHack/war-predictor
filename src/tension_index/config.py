@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     classifier_effort: str = "low"  # Anthropic API only; empty for models without effort
     classifier_max_calls: int = 60  # per run; beyond it rules are used (spend guard)
 
+    # Sources skipped by the regular cycle (comma-separated). Australia's site does not
+    # answer automated requests (tested 2026-09-30); `probe au` still works.
+    disabled_sources: Annotated[list[str], NoDecode] = Field(default_factory=lambda: ["au"])
+
     database_path: Path = Path("data/tension.sqlite3")
 
     http_timeout_seconds: float = 30.0
@@ -57,6 +61,13 @@ class Settings(BaseSettings):
         elif provider:
             data = {**data, "classifier_provider": provider.lower()}
         return data
+
+    @field_validator("disabled_sources", mode="before")
+    @classmethod
+    def _split_names(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [part.strip() for part in value.split(",") if part.strip()]
+        return value
 
     @field_validator("telegram_admin_ids", mode="before")
     @classmethod

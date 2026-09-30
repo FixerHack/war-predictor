@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.52**, updated 2026-09-30.
+Version **0.2.53**, updated 2026-09-30.
 
-**Overall progress: 67%** · left ≈ 14.7 days · ✅ 45 · 🟡 19 · ⬜ 11 · ⛔ 3
+**Overall progress: 66%** · left ≈ 14.9 days · ✅ 45 · 🟡 18 · ⬜ 11 · ⛔ 4
 
 ## Milestones
 
@@ -54,7 +54,7 @@ Branch: `—`
 - ✅ **S1.8** 0–10 scale algorithm (docs/algorithm.md)
 - ✅ **S1.9** Research of sources and war trackers (docs/sources.md)
 
-## S2. Official advisory collection — 60%
+## S2. Official advisory collection — 56%
 
 _Regular collection of advisories, storing every text version._
 
@@ -69,8 +69,8 @@ Branch: `dev-collector`
   - Implemented; verify live: tension-index probe
 - 🟡 **S2.5** Canada (open data JSON)
   - Implemented; verify live: tension-index probe
-- 🟡 **S2.6** Australia (Smartraveller destinations-export)
-  - Implemented; verify live: tension-index probe
+- ⛔ **S2.6** Australia (Smartraveller destinations-export)
+  - Smartraveller does not answer automated requests (export and pages, tested 2026-09-30); disabled via DISABLED_SOURCES=au.
 - 🟡 **S2.7** France (diplomatie.gouv.fr, scraping)
   - Page text only, level set by the classifier; verify with probe fr
 - ⛔ **S2.8** Israel (NSC travel warnings)
@@ -241,6 +241,7 @@ Branch: `—`
 
 ## Risks
 
+- Some government sites block automated requests (Australia); a source can be lost without notice
 - GitHub Actions locked by an account billing issue: no CI until unlocked, checks run locally only (make check)
 - Collection blocking: government sites may block requests from the server
 - Terms of use: no open Reuters/AP RSS; ACLED licence for a public service
@@ -250,6 +251,10 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.53** (2026-09-30)
+  - 2-minute limit per source: a hanging site no longer stalls the cycle
+  - Australia disabled by default (DISABLED_SOURCES)
+  - "collecting …" log line before each source
 - **0.2.52** (2026-09-30)
   - Australia: country pages instead of the slow export (level after "Overall advice level")
   - News: dropped Kyiv Independent (404)

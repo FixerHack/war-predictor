@@ -307,10 +307,13 @@ COVERAGE_MAX_AGE_HOURS = 48
 
 
 def source_blocks() -> dict[str, str]:
+    from tension_index.config import get_settings
     from tension_index.extra import BLOCKS
     from tension_index.sources import REGISTRY
 
-    return {**dict.fromkeys(REGISTRY, "advisories"), **BLOCKS, **SOURCE_BLOCKS}
+    disabled = set(get_settings().disabled_sources)
+    advisory = {name: "advisories" for name in REGISTRY if name not in disabled}
+    return {**advisory, **BLOCKS, **SOURCE_BLOCKS}
 
 
 async def covered_blocks(db: aiosqlite.Connection, now: datetime) -> set[str]:

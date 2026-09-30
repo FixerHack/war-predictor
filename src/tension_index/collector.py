@@ -19,6 +19,8 @@ log = logging.getLogger(__name__)
 
 # Be polite to government sites: few parallel requests per source.
 CONCURRENCY = 4
+# A source that stops answering must not stall the whole cycle.
+SOURCE_DEADLINE_SECONDS = 120.0
 
 
 @dataclass(slots=True)
@@ -38,7 +40,12 @@ class RunResult:
         return self.fetched > 0 and self.failed <= max(1, self.fetched // 10)
 
 
-async def collect_source(db, source: Source, countries: list[str] | None = None) -> RunResult:
+async def collect_source(
+    db,
+    source: Source,
+    countries: list[str] | None = None,
+    deadline_seconds: float = SOURCE_DEADLINE_SECONDS,
+) -> RunResult:
     result = RunResult(source=source.name)
     run_id = await storage.start_run(db, source.name)
     targets = [
@@ -47,8 +54,11 @@ async def collect_source(db, source: Source, countries: list[str] | None = None)
         if (not countries or code in countries) and source.supports(c)
     ]
     semaphore = asyncio.Semaphore(CONCURRENCY)
+    loop = asyncio.get_running_loop()
+    deadline = loop.time() + deadline_seconds
+    log.info("collecting %s (%d countries)", source.name, len(targets))
     try:
-        await source.prepare()
+        await asyncio.wait_for(source.prepare(), deadline_seconds)
     except Exception as exc:  # index unavailable: every country fails, report once
         result.failed = len(targets)
         result.errors.append(f"prepare: {type(exc).__name__}: {exc}")
@@ -66,7 +76,10 @@ async def collect_source(db, source: Source, countries: list[str] | None = None)
 
     async def one(country):
         async with semaphore:
-            return country, await source.fetch(country)
+            left = deadline - loop.time()
+            if left <= 0:
+                raise TimeoutError(f"{source.name}: {deadline_seconds:.0f} s limit reached")
+            return country, await asyncio.wait_for(source.fetch(country), left)
 
     outcomes = await asyncio.gather(*(one(c) for c in targets), return_exceptions=True)
     for country, outcome in zip(targets, outcomes, strict=True):
@@ -144,6 +157,8 @@ async def collect_all(
         for name, cls in REGISTRY.items():
             if sources and name not in sources:
                 continue
+            if not sources and name in settings.disabled_sources:
+                continue  # switched off in settings (DISABLED_SOURCES)
             result = await collect_source(db, cls(client), countries)
             log.info(
                 "%s: fetched=%d changed=%d failed=%d ok=%s",

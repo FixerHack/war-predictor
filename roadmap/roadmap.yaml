@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.52
+  version: 0.2.53
   updated: 2026-09-30
 
 milestones:
@@ -75,7 +75,7 @@ stages:
       - {id: S2.3, status: in_progress, days: 0.5, uk: "Німеччина (Auswärtiges Amt OpenData API)", en: "Germany (Auswärtiges Amt OpenData API)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
       - {id: S2.4, status: in_progress, days: 1, uk: "США (RSS TAsTWs + сторінки країн + Security Alerts посольств)", en: "US (TAsTWs RSS + country pages + embassy Security Alerts)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
       - {id: S2.5, status: in_progress, days: 0.5, uk: "Канада (open data JSON)", en: "Canada (open data JSON)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
-      - {id: S2.6, status: in_progress, days: 0.5, uk: "Австралія (Smartraveller destinations-export)", en: "Australia (Smartraveller destinations-export)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
+      - {id: S2.6, status: blocked, days: 0.5, uk: "Австралія (Smartraveller destinations-export)", en: "Australia (Smartraveller destinations-export)", note_uk: "Сайт Smartraveller не відповідає на автоматичні запити (експорт і сторінки, перевірено 30.09.2026); вимкнено через DISABLED_SOURCES=au.", note_en: "Smartraveller does not answer automated requests (export and pages, tested 2026-09-30); disabled via DISABLED_SOURCES=au."}
       - {id: S2.7, status: in_progress, days: 0.5, uk: "Франція (diplomatie.gouv.fr, парсинг)", en: "France (diplomatie.gouv.fr, scraping)", note_uk: "Лише текст сторінки, рівень визначає класифікатор; перевірити probe fr", note_en: "Page text only, level set by the classifier; verify with probe fr"}
       - {id: S2.8, status: blocked, days: 0.5, uk: "Ізраїль (NSC travel warnings)", en: "Israel (NSC travel warnings)", note_uk: "Сторінка NSC — JS-застосунок без відомого API; потрібен зразок відповіді. Для Європи вага низька.", note_en: "NSC page is a JS app with no known API; needs a sample response. Low weight for Europe."}
       - {id: S2.9, status: in_progress, days: 1, uk: "МЗС РФ і Білорусі: рекомендації своїм громадянам", en: "Russian and Belarusian MFA advisories to own citizens", note_uk: "Через GDELT: російськомовні публікації про поради МЗС РФ/РБ, 2+ видання = підтверджено.", note_en: "Via GDELT: Russian-language reports of RU/BY MFA advice, 2+ outlets = confirmed."}
@@ -225,6 +225,7 @@ decisions:
   - {date: 2026-09-30, uk: "Статус війни окремо від шкали; довідник ведеться вручну, автоматика лише пропонує зміни", en: "War status is separate from the scale; curated by hand, automation only proposes changes"}
 
 risks:
+  - {uk: "Частина урядових сайтів блокує автоматичні запити (Австралія); джерело можна втратити без попередження", en: "Some government sites block automated requests (Australia); a source can be lost without notice"}
   - {uk: "GitHub Actions заблоковані через білінг акаунта: CI не перевіряє зміни, до розблокування перевірки лише локально (make check)", en: "GitHub Actions locked by an account billing issue: no CI until unlocked, checks run locally only (make check)"}
   - {uk: "Блокування збору: сайти держав можуть блокувати запити з сервера", en: "Collection blocking: government sites may block requests from the server"}
   - {uk: "Умови використання: Reuters і AP без відкритих RSS; ліцензія ACLED для публічного сервісу", en: "Terms of use: no open Reuters/AP RSS; ACLED licence for a public service"}
@@ -233,6 +234,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.53
+    date: 2026-09-30
+    uk: ["Ліміт 2 хвилини на джерело: сайт, що завис, не зупиняє цикл", "Австралію вимкнено за замовчуванням (DISABLED_SOURCES)", "Лог «collecting …» перед кожним джерелом"]
+    en: ["2-minute limit per source: a hanging site no longer stalls the cycle", "Australia disabled by default (DISABLED_SOURCES)", "\"collecting …\" log line before each source"]
   - version: 0.2.52
     date: 2026-09-30
     uk: ["Австралія: сторінки країн замість повільного експорту (рівень після «Overall advice level»)", "Новини: прибрано Kyiv Independent (404)"]
