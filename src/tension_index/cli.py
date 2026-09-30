@@ -33,18 +33,21 @@ async def _init_db() -> int:
 
 async def _collect(args: argparse.Namespace) -> int:
     from tension_index.collector import collect_all
-    from tension_index.notify import send
+    from tension_index.notify import broadcast_change, send
+    from tension_index.sources import REGISTRY
 
     settings = get_settings()
     results = await collect_all(settings, sources=args.sources, countries=args.countries)
     for r in results:
+        label = REGISTRY[r.source].label if r.source in REGISTRY else r.source
         for country, diff in r.changes:
             if args.notify:
                 await send(
                     settings,
-                    f"🔔 <b>{country}</b> · {escape(r.source)}: advisory changed\n"
+                    f"🔔 <b>{country}</b> · {escape(label)}: advisory changed\n"
                     f"<pre>{escape(diff[:3000])}</pre>",
                 )
+                await broadcast_change(settings, country, label, diff)
         if not r.ok and args.notify:
             await send(
                 settings,
@@ -74,6 +77,32 @@ async def _health(args: argparse.Namespace) -> int:
         except httpx.HTTPError as exc:
             log.warning("Dead-man ping failed: %s", exc)
     return int(report.status)
+
+
+async def _war_check(args: argparse.Namespace) -> int:
+    from tension_index import war_status
+    from tension_index.collector import make_client
+    from tension_index.notify import send
+
+    settings = get_settings()
+    try:
+        async with make_client(settings) as client:
+            detected = war_status.parse_wikipedia(await war_status.fetch_wikipedia(client))
+    except (httpx.HTTPError, KeyError, ValueError) as exc:
+        print(f"war-check failed: {type(exc).__name__}: {exc}", file=sys.stderr)
+        if args.notify:
+            await send(settings, f"❌ war-check failed: {escape(str(exc))}")
+        return 2
+    diff = war_status.mismatches(war_status.load(), detected)
+    print("\n".join(diff) or "No mismatches with Wikipedia")
+    if diff and args.notify:
+        await send(
+            settings,
+            "⚠️ <b>War status: review config/conflicts.yaml</b>\n<pre>"
+            + escape("\n".join(diff))
+            + "</pre>",
+        )
+    return 1 if diff else 0
 
 
 async def _bot() -> int:
@@ -108,6 +137,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("bot", help="run the Telegram bot (long polling)")
 
+    p = sub.add_parser("war-check", help="compare config/conflicts.yaml with Wikipedia")
+    p.add_argument("--notify", action="store_true", help="alert Telegram on mismatches")
+
     p = sub.add_parser("roadmap", help="render PLAN.md + progress site from roadmap.yaml")
     p.add_argument("--source", default="roadmap/roadmap.yaml")
     p.add_argument("--out", default="_site")
@@ -125,6 +157,7 @@ def main(argv: list[str] | None = None) -> None:
         "collect": lambda: _collect(args),
         "health": lambda: _health(args),
         "bot": lambda: _bot(),
+        "war-check": lambda: _war_check(args),
     }
     try:
         sys.exit(asyncio.run(handlers[args.command]()))

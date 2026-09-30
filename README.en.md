@@ -7,6 +7,8 @@ An escalation-signal indicator for European countries on a 0–10 scale. The sys
 > ⚠️ This is an indicator of the state of signals, not a forecast and not advice to leave a country. Decisions are up to each person.
 
 - 📋 Plan: [PLAN.en.md](PLAN.en.md) (generated from [`roadmap/roadmap.yaml`](roadmap/roadmap.yaml))
+- 🧮 Scale algorithm: [docs/algorithm.md](docs/algorithm.md) (Ukrainian)
+- 🗂 Data sources and war trackers: [docs/sources.md](docs/sources.md) (Ukrainian)
 - 📊 Progress: the project's GitHub Pages (`https://fixerhack.github.io/war-predictor/` once Pages is enabled)
 
 ## Scale
@@ -21,6 +23,24 @@ An escalation-signal indicator for European countries on a 0–10 scale. The sys
 
 Countries: EU-27, UK, Norway, Switzerland, Iceland, Moldova, Western Balkans (38).
 
+## Bot
+
+1. `/start` → choose a language (Українська / English).
+2. Choose one of 38 countries.
+3. A dashboard, edited in place with inline buttons. It shows:
+   - the tension score (or "calibrating" while data is thin);
+   - the war status on the country's territory;
+   - borders with a country at war or with the aggressor;
+   - advisory changes in the last 7 days;
+   - the current notification and language settings.
+
+   Buttons: 🔔 alerts on/off · 🌍 change country · 🌐 change language · 🔄 refresh · ℹ️ how it works.
+
+When an advisory for a country changes, its subscribers with alerts on get a message in their language.
+Admin commands (`TELEGRAM_ADMIN_IDS`): `/status`, `/collect`, `/warcheck`.
+
+**War status** comes from the curated, RULAC-based [`config/conflicts.yaml`](config/conflicts.yaml). Every day `tension-index war-check` compares it with Wikipedia's list of ongoing conflicts and sends any mismatches to admins. The file is never changed automatically.
+
 ## Stack
 
 Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite (aiosqlite) · Claude API (from stage S6) · systemd on our own server · GitHub Actions (CI and Pages).
@@ -29,7 +49,7 @@ Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite 
 
 ```
 src/tension_index/
-  cli.py           commands: init-db, collect, health, bot, roadmap
+  cli.py           commands: init-db, collect, health, bot, war-check, roadmap
   config.py        settings from .env
   countries.py     the 38 monitored countries
   storage.py       SQLite + migrations
@@ -38,10 +58,15 @@ src/tension_index/
   sources/         advisory sources (gov_uk.py — United Kingdom)
   health.py        health checks
   notify.py        Telegram delivery
-  bot/             Telegram bot (aiogram)
+  bot/             Telegram bot (aiogram): handlers, views, callbacks
+  i18n.py          bot texts uk/en
+  scoring.py       0-10 scale (config/weights.yaml)
+  war_status.py    war status (config/conflicts.yaml + Wikipedia)
   roadmap.py       renders PLAN.md and the progress page
 scripts/           bootstrap, run, healthcheck, deploy, backup, install_server
 deploy/systemd/    units: bot, collect/health/backup timers
+config/           weights.yaml (scale), conflicts.yaml (war status)
+docs/             algorithm and sources
 roadmap/           roadmap.yaml — single source of the plan
 site/              progress page template
 tests/
@@ -88,6 +113,7 @@ What runs:
 | `tension-collect.timer` | collection every 3 hours, alerts on changes and failures |
 | `tension-health.timer` | health check every 15 minutes, Telegram alert on FAIL |
 | `tension-backup.timer` | daily SQLite backup, last 14 kept |
+| `tension-warcheck.timer` | daily war status check against Wikipedia |
 
 Update: `./scripts/deploy.sh` (branch `main`) or `./scripts/deploy.sh dev-tg-bot` to test a branch.
 Status: `./scripts/healthcheck.sh` (exit codes: 0 OK, 1 WARN, 2 FAIL); logs: `journalctl -u tension-bot -f`.

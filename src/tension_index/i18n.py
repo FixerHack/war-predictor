@@ -1,0 +1,99 @@
+"""User-facing strings for the bot (uk/en)."""
+
+from __future__ import annotations
+
+LANGS = ("uk", "en")
+DEFAULT_LANG = "uk"
+
+TEXTS: dict[str, dict[str, str]] = {
+    "choose_lang": {
+        "uk": "Оберіть мову · Choose your language",
+        "en": "Оберіть мову · Choose your language",
+    },
+    "choose_country": {
+        "uk": "Оберіть країну, за якою стежити:",
+        "en": "Choose the country to follow:",
+    },
+    "title": {"uk": "Tension Index · панель", "en": "Tension Index · dashboard"},
+    "tension": {"uk": "Напруга", "en": "Tension"},
+    "calibrating": {
+        "uk": "⏳ калібрування: даних ще недостатньо",
+        "en": "⏳ calibrating: not enough data yet",
+    },
+    "war_status": {"uk": "Статус війни", "en": "War status"},
+    "borders": {"uk": "Межує з", "en": "Borders"},
+    "at_war": {"uk": "війна", "en": "at war"},
+    "changes_7d": {"uk": "Зміни рекомендацій за 7 днів", "en": "Advisory changes, last 7 days"},
+    "notifications": {"uk": "Сповіщення", "en": "Notifications"},
+    "on": {"uk": "увімкнено", "en": "on"},
+    "off": {"uk": "вимкнено", "en": "off"},
+    "language": {"uk": "Мова", "en": "Language"},
+    "lang_name": {"uk": "українська", "en": "English"},
+    "updated": {"uk": "Оновлено", "en": "Updated"},
+    "disclaimer": {
+        "uk": "Це індикатор стану сигналів, а не прогноз і не порада щодо виїзду.",
+        "en": "This is an indicator of signals, not a forecast or advice to leave.",
+    },
+    "btn_notify_on": {"uk": "🔔 Сповіщення: увімк.", "en": "🔔 Notifications: on"},
+    "btn_notify_off": {"uk": "🔕 Сповіщення: вимк.", "en": "🔕 Notifications: off"},
+    "btn_country": {"uk": "🌍 Змінити країну", "en": "🌍 Change country"},
+    "btn_lang": {"uk": "🌐 English", "en": "🌐 Українська"},
+    "btn_refresh": {"uk": "🔄 Оновити", "en": "🔄 Refresh"},
+    "btn_about": {"uk": "ℹ️ Як рахується", "en": "ℹ️ How it works"},
+    "btn_back": {"uk": "« Назад", "en": "« Back"},
+    "about": {
+        "uk": (
+            "<b>Як рахується напруга</b>\n\n"
+            "Шкала 0–10 зводить шість блоків сигналів: рекомендації урядів своїм громадянам "
+            "і статус персоналу посольств, авіація і повітряний простір, внутрішні заходи "
+            "країни, сигнали з боку агресора, медіа й аналітика, ринки.\n\n"
+            "Важать причина (збройний конфлікт важить більше, ніж тероризм), кількість "
+            "незалежних джерел, синхронність держав і відхилення від звичного рівня країни. "
+            "Вирішальні події (виїзд персоналу посольств, закриття неба, мобілізація) "
+            "гарантують мінімальний бал.\n\n"
+            "🟢 0–2 базовий фон · 🟡 3–4 поодинокі зміни · 🟠 5–6 кілька блоків · "
+            "🔴 7–8 виїзд персоналу, обмеження неба · 🟥 9–10 критичний рівень\n\n"
+            "Статус війни показується окремо: шкала вимірює ескалацію, а не наявний конфлікт."
+        ),
+        "en": (
+            "<b>How tension is scored</b>\n\n"
+            "The 0–10 scale combines six signal blocks: governments' travel advice and embassy "
+            "staff posture, aviation and airspace, the country's own emergency measures, "
+            "signals from the aggressor side, media and analysis, markets.\n\n"
+            "What counts: the stated reason (armed conflict weighs more than terrorism), the "
+            "number of independent sources, several governments acting in sync, and deviation "
+            "from the country's usual level. Decisive events (embassy staff departure, airspace "
+            "closure, mobilisation) guarantee a minimum score.\n\n"
+            "🟢 0–2 baseline · 🟡 3–4 isolated changes · 🟠 5–6 several blocks · "
+            "🔴 7–8 staff departure, airspace limits · 🟥 9–10 critical\n\n"
+            "War status is shown separately: the scale measures escalation, not an existing war."
+        ),
+    },
+    "help": {
+        "uk": "/start — панель\n/help — довідка",
+        "en": "/start — dashboard\n/help — help",
+    },
+    "level_green": {"uk": "зелений", "en": "green"},
+    "level_yellow": {"uk": "жовтий", "en": "yellow"},
+    "level_orange": {"uk": "помаранчевий", "en": "orange"},
+    "level_red": {"uk": "червоний", "en": "red"},
+    "level_critical": {"uk": "критичний", "en": "critical"},
+    "war_none": {"uk": "збройного конфлікту немає", "en": "no armed conflict"},
+    "war_frozen": {
+        "uk": "заморожений конфлікт / окупація частини території",
+        "en": "frozen conflict / partial occupation",
+    },
+    "war_clashes": {"uk": "окремі збройні інциденти", "en": "sporadic armed clashes"},
+    "war_active": {"uk": "збройний конфлікт", "en": "armed conflict"},
+    "war_war": {"uk": "війна", "en": "war"},
+    "alert_change": {
+        "uk": "🔔 {flag} <b>{country}</b>: змінилась рекомендація ({source})",
+        "en": "🔔 {flag} <b>{country}</b>: travel advice changed ({source})",
+    },
+}
+
+
+def t(lang: str | None, key: str, **kwargs: object) -> str:
+    entry = TEXTS[key]
+    text = entry.get(lang or DEFAULT_LANG) or entry[DEFAULT_LANG]
+    return text.format(**kwargs) if kwargs else text
