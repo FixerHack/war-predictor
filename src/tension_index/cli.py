@@ -139,6 +139,19 @@ async def _run(args: argparse.Namespace) -> int:
     return 0 if report.ok else 2
 
 
+async def _export(args: argparse.Namespace) -> int:
+    from tension_index.export import build, write
+
+    settings = get_settings()
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        data = await build(db)
+    write(data, Path(args.out))
+    published = sum(1 for c in data["countries"].values() if c["score"] is not None)
+    print(f"exported {published}/{len(data['countries'])} published scores -> {args.out}")
+    return 0
+
+
 async def _digest() -> int:
     from tension_index.digest import send_digests
 
@@ -295,6 +308,9 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("classify", help="classify new changes and current advisories")
     sub.add_parser("digest", help="send the daily summary to users with the digest on")
 
+    p = sub.add_parser("export", help="write the public dashboard data (scores.json)")
+    p.add_argument("--out", default="_site/dashboard/scores.json")
+
     p = sub.add_parser("history", help="load archived advisories (Wayback) for an episode")
     p.add_argument("--episode", default="all", help="id from config/episodes.yaml or 'all'")
     p.add_argument("--db", default="data/history.sqlite3")
@@ -344,6 +360,7 @@ def main(argv: list[str] | None = None) -> None:
         "classify": lambda: _classify(),
         "run": lambda: _run(args),
         "digest": lambda: _digest(),
+        "export": lambda: _export(args),
         "history": lambda: _history(args),
         "backtest": lambda: _backtest(args),
     }

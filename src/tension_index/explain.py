@@ -28,6 +28,18 @@ KINDS = {
     "aviation:airspace_closed": ("повітряний простір закрито", "airspace closed"),
     "aviation:airspace_restricted": ("обмеження повітряного простору", "airspace restrictions"),
     "domestic:borders_closed": ("закриття кордонів", "border closures"),
+    "aviation:czib": ("бюлетень EASA щодо зони конфлікту", "EASA conflict zone bulletin"),
+    "aviation:traffic_drop": ("різке падіння авіатрафіку", "sharp drop in air traffic"),
+    "domestic:emergency": ("надзвичайні заходи в країні", "emergency measures in the country"),
+    "domestic:mobilisation": ("оголошено мобілізацію", "mobilisation declared"),
+    "aggressor:military_threat": ("військова загроза з боку агресора", "military threat from the aggressor side"),
+    "aggressor:hybrid_attack": ("гібридні атаки (дрони, саботаж, глушіння GPS)", "hybrid attacks (drones, sabotage, GPS jamming)"),
+    "aggressor:armed_attack": ("збройний напад", "armed attack"),
+    "aggressor:mfa_advisory": ("МЗС РФ/РБ радить своїм громадянам уникати країни", "RU/BY foreign ministry advises its citizens to avoid the country"),
+    "media:escalation_news": ("новини про ескалацію", "news about escalation"),
+    "media:gdelt_surge": ("сплеск уваги медіа до військової теми", "surge of military-related coverage"),
+    "markets:spread_jump": ("стрибок спреду облігацій", "bond spread jump"),
+    "markets:fx_drop": ("падіння курсу валюти", "currency drop"),
 }  # fmt: skip
 
 

@@ -10,6 +10,7 @@
 - 🧮 Алгоритм шкали: [docs/algorithm.md](docs/algorithm.md)
 - 🗂 Джерела даних і трекери війн: [docs/sources.md](docs/sources.md)
 - 📊 Прогрес: https://fixerhack.github.io/war-predictor/
+- 🗺 Публічна панель (карта, бал і причини по країнах): https://fixerhack.github.io/war-predictor/dashboard/
 
 ## Шкала
 
@@ -94,7 +95,7 @@ make lint                  # ruff
 ./scripts/run.sh bot       # бот (Ctrl+C для зупинки)
 make plan                  # перегенерувати PLAN.md після зміни roadmap.yaml
 make site                  # переглянути сторінку прогресу на http://localhost:8000
-make pages                 # опублікувати сторінку прогресу в гілку gh-pages
+make pages                 # опублікувати сторінку прогресу і панель (дані з data/tension.sqlite3) у gh-pages
 ```
 
 **Сторінка прогресу.** Є два способи публікації:

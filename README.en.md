@@ -10,6 +10,7 @@ An escalation-signal indicator for European countries on a 0–10 scale. The sys
 - 🧮 Scale algorithm: [docs/algorithm.md](docs/algorithm.md) (Ukrainian)
 - 🗂 Data sources and war trackers: [docs/sources.md](docs/sources.md) (Ukrainian)
 - 📊 Progress: https://fixerhack.github.io/war-predictor/
+- 🗺 Public dashboard (map, scores and reasons per country): https://fixerhack.github.io/war-predictor/dashboard/
 
 ## Scale
 
@@ -94,7 +95,7 @@ make lint                  # ruff
 ./scripts/run.sh bot       # bot (Ctrl+C to stop)
 make plan                  # regenerate PLAN.md after editing roadmap.yaml
 make site                  # preview the progress page at http://localhost:8000
-make pages                 # publish the progress page to the gh-pages branch
+make pages                 # publish the progress page and dashboard (data from data/tension.sqlite3) to gh-pages
 ```
 
 **Progress page.** There are two ways to publish it:
