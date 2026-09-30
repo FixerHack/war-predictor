@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.49
+  version: 0.2.50
   updated: 2026-09-30
 
 milestones:
@@ -38,7 +38,7 @@ stages:
       - {id: S0.7, status: done, days: 0.5, uk: "План + сторінка прогресу на GitHub Pages", en: "Plan + progress page on GitHub Pages"}
       - {id: S0.8, status: done, days: 0.3, uk: "README українською та англійською", en: "README in Ukrainian and English"}
       - {id: S0.9, status: done, days: 0.3, owner: human, uk: "MacBook: встановити uv і Claude Code, клонувати репозиторій, ./scripts/bootstrap.sh", en: "MacBook: install uv and Claude Code, clone the repo, ./scripts/bootstrap.sh"}
-      - {id: S0.10, status: todo, days: 0.2, owner: human, uk: "Anthropic Console: поповнення, ключ API, місячний ліміт витрат", en: "Anthropic Console: top-up, API key, monthly spend cap"}
+      - {id: S0.10, status: todo, days: 0.2, owner: human, uk: "OpenRouter: поповнення, ключ API (OPENROUTER_API_KEY у .env), ліміт витрат", en: "OpenRouter: top-up, API key (OPENROUTER_API_KEY in .env), spend limit"}
       - {id: S0.11, status: done, days: 0.2, owner: human, uk: "Створити бота в @BotFather, тестовий канал, заповнити .env", en: "Create bot via @BotFather, test channel, fill in .env"}
       - {id: S0.12, status: todo, days: 0.5, owner: human, uk: "Перший деплой на сервер: install_server.sh, перевірка healthcheck", en: "First server deploy: install_server.sh, verify healthcheck", note_uk: "Відкладено: спершу бот і система.", note_en: "Postponed: bot and system first."}
       - {id: S0.13, status: done, days: 0.2, owner: human, uk: "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root", en: "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root", note_uk: "Працює: fixerhack.github.io/war-predictor", note_en: "Live: fixerhack.github.io/war-predictor"}
@@ -213,6 +213,7 @@ stages:
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
+  - {date: 2026-09-30, uk: "Класифікація змін: Claude Haiku 4.5 через OpenRouter", en: "Change classification: Claude Haiku 4.5 via OpenRouter"}
   - {date: 2026-09-30, uk: "Заморські території європейських країн не впливають на статус війни; винятки фіксуються вручну в wikipedia_ignore", en: "Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore"}
   - {date: 2026-09-30, uk: "Деплой на сервер відкладено; пріоритет — бот і система на MacBook", en: "Server deploy postponed; priority is the bot and system on the MacBook"}
   - {date: 2026-09-27, uk: "Шкала 0–10 замість ймовірності: описує стан сигналів, а не прогнозує війну", en: "0–10 scale instead of a probability: describes signals, does not forecast war"}
@@ -232,6 +233,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.50
+    date: 2026-09-30
+    uk: ["Класифікатор через OpenRouter (Claude Haiku 4.5) як основний варіант; Anthropic API напряму лишається"]
+    en: ["Classifier via OpenRouter (Claude Haiku 4.5) as the main option; direct Anthropic API remains"]
   - version: 0.2.49
     date: 2026-09-30
     uk: ["США: країна визначається за назвою (теги у стрічці — FIPS, не ISO)", "Австралія: довший тайм-аут; Франція: нова адреса сторінки й очищення від меню", "Новини: прибрано NATO/ISW/ECFR (недоступні), додано Politico Europe і Kyiv Independent", "GDELT: повтор після 429; probe easa показує знайдені бюлетені"]

@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.49**, updated 2026-09-30.
+Version **0.2.50**, updated 2026-09-30.
 
 **Overall progress: 67%** · left ≈ 14.7 days · ✅ 45 · 🟡 19 · ⬜ 11 · ⛔ 3
 
@@ -25,7 +25,7 @@ Branch: `dev-bootstrap`
 - ✅ **S0.7** Plan + progress page on GitHub Pages
 - ✅ **S0.8** README in Ukrainian and English
 - ✅ **S0.9** MacBook: install uv and Claude Code, clone the repo, ./scripts/bootstrap.sh _(manual)_
-- ⬜ **S0.10** Anthropic Console: top-up, API key, monthly spend cap _(manual)_
+- ⬜ **S0.10** OpenRouter: top-up, API key (OPENROUTER_API_KEY in .env), spend limit _(manual)_
 - ✅ **S0.11** Create bot via @BotFather, test channel, fill in .env _(manual)_
 - ⬜ **S0.12** First server deploy: install_server.sh, verify healthcheck _(manual)_
   - Postponed: bot and system first.
@@ -228,6 +228,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-09-30: Change classification: Claude Haiku 4.5 via OpenRouter
 - 2026-09-30: Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore
 - 2026-09-30: Server deploy postponed; priority is the bot and system on the MacBook
 - 2026-09-27: 0–10 scale instead of a probability: describes signals, does not forecast war
@@ -249,6 +250,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.50** (2026-09-30)
+  - Classifier via OpenRouter (Claude Haiku 4.5) as the main option; direct Anthropic API remains
 - **0.2.49** (2026-09-30)
   - US: country matched by name (feed tags are FIPS, not ISO)
   - Australia: longer timeout; France: new page URL and menu stripping

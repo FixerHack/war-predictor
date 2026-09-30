@@ -111,8 +111,11 @@ async def collect_news(
             result.changed += cur.rowcount
     await db.commit()
 
-    if settings.anthropic_api_key:
-        await refine_with_claude(db, ClaudeClassifier(settings))
+    from tension_index.pipeline import make_classifier
+
+    claude = make_classifier(settings)
+    if claude is not None:
+        await refine_with_claude(db, claude)
     await db.execute("UPDATE news_items SET classified = 1 WHERE classified = 0")
     await derive_news_signals(db, now)
     await storage.finish(db, result, run_id)

@@ -75,7 +75,7 @@ async def test_claude_request_shape_and_merge(settings):
     assert result.method == "claude" and result.staff_posture == "authorized_departure"
     assert result.change_type == "level_raised"  # structured direction kept
     call = messages.calls[0]
-    assert call["model"] == settings.classifier_model
+    assert call["model"] == claude.model == "claude-opus-5-5"  # provider default
     assert call["output_config"]["format"]["type"] == "json_schema"
     assert call["system"][0]["cache_control"] == {"type": "ephemeral"}
     assert call["fallbacks"] == "default"
@@ -152,3 +152,80 @@ async def test_classify_pending_rules_only(settings):
         assert data["change_type"] == "level_raised" and data["reason"] == "armed_conflict"
         # Idempotent.
         assert (await classify_pending(db, settings, None))["changes"] == 0
+
+
+def openrouter_settings(settings):
+    settings.classifier_provider = "openrouter"
+    settings.openrouter_api_key = "sk-or-test"
+    return settings
+
+
+async def test_openrouter_request_and_parsing(settings):
+    import httpx
+
+    s = openrouter_settings(settings)
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["url"] = str(request.url)
+        seen["auth"] = request.headers["authorization"]
+        seen["body"] = json.loads(request.content)
+        content = "```json\n" + json.dumps(PAYLOAD) + "\n```"
+        return httpx.Response(
+            200, json={"choices": [{"finish_reason": "stop", "message": {"content": content}}]}
+        )
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        claude = ClaudeClassifier(s, client=client)
+        out = await claude.classify(publisher="us", country="PL", text="+x", level_before=None,
+                                    level_after=None, fallback=Classification())  # fmt: skip
+    assert claude.model == "anthropic/claude-haiku-4.5"
+    assert seen["url"] == "https://openrouter.ai/api/v1/chat/completions"
+    assert seen["auth"] == "Bearer sk-or-test"
+    body = seen["body"]
+    assert body["model"] == "anthropic/claude-haiku-4.5"
+    assert body["response_format"]["json_schema"]["strict"] is True
+    assert body["messages"][0]["content"][0]["cache_control"] == {"type": "ephemeral"}
+    assert out.method == "claude" and out.staff_posture == "authorized_departure"
+
+
+async def test_openrouter_errors_fall_back_to_rules(settings):
+    import httpx
+
+    s = openrouter_settings(settings)
+    transport = httpx.MockTransport(
+        lambda r: httpx.Response(402, json={"error": {"message": "credits"}})
+    )
+    async with httpx.AsyncClient(transport=transport) as client:
+        out = await ClaudeClassifier(s, client=client).classify(
+            publisher="us", country="PL", text="+x", level_before=None, level_after=None,
+            fallback=Classification(reason="crime"),
+        )  # fmt: skip
+    assert out.method == "rules" and out.reason == "crime" and "HTTP 402" in out.notes[0]
+
+
+async def test_openrouter_headlines(settings):
+    import httpx
+
+    from tension_index.classifier import classify_headlines
+
+    s = openrouter_settings(settings)
+    answer = {"items": [{"i": 0, "category": "domestic_emergency", "severity": 0.9},
+                        {"i": 1, "category": "none", "severity": 0}]}  # fmt: skip
+    transport = httpx.MockTransport(lambda r: httpx.Response(
+        200, json={"choices": [{"finish_reason": "stop", "message": {"content": json.dumps(answer)}}]}))  # fmt: skip
+    async with httpx.AsyncClient(transport=transport) as client:
+        labels = await classify_headlines(
+            ClaudeClassifier(s, client=client), ["Poland closes border", "Football"]
+        )
+    assert labels == {0: ("domestic_emergency", 0.9), 1: ("none", 0.0)}
+
+
+def test_make_classifier_needs_the_providers_key(settings):
+    from tension_index.pipeline import make_classifier
+
+    settings.classifier_provider = "openrouter"
+    settings.anthropic_api_key = "sk-ant"
+    assert make_classifier(settings) is None  # anthropic key alone is not enough
+    settings.openrouter_api_key = "sk-or"
+    assert make_classifier(settings).provider == "openrouter"
