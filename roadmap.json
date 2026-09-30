@@ -1,0 +1,1161 @@
+{
+  "project": {
+    "name_uk": "Індекс напруги: Європа",
+    "name_en": "Tension Index: Europe",
+    "repo": "FixerHack/war-predictor",
+    "version": "0.2.0",
+    "updated": "2026-09-30"
+  },
+  "milestones": [
+    {
+      "id": "M1",
+      "uk": "MVP: 14 днів автономного збору, бал 7+ для України до 24.02.2022 на історії, кожне сповіщення з поясненням",
+      "en": "MVP: 14 days of unattended collection, backtest scores Ukraine 7+ before 2022-02-24, every alert explained"
+    }
+  ],
+  "stages": [
+    {
+      "id": "S0",
+      "branch": "dev-bootstrap",
+      "uk": "Фундамент та інфраструктура",
+      "en": "Foundation & infrastructure",
+      "goal_uk": "Репозиторій, робоче середовище на MacBook і сервері, ключі, Telegram-бот.",
+      "goal_en": "Repository, working environment on the MacBook and server, keys, Telegram bot.",
+      "tasks": [
+        {
+          "id": "S0.1",
+          "status": "done",
+          "days": 0.2,
+          "uk": "Репозиторій, гілка main за замовчуванням, правила іменування гілок",
+          "en": "Repository, main as default branch, branch naming rules",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.2",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Python 3.12 + uv, структура пакета, CLI tension-index",
+          "en": "Python 3.12 + uv, package layout, tension-index CLI",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.3",
+          "status": "done",
+          "days": 0.5,
+          "uk": "SQLite-сховище з міграціями, повні версії текстів",
+          "en": "SQLite storage with migrations, full text versions",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.4",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Healthcheck (CLI, скрипт, таймер systemd, алерт у Telegram, dead-man ping)",
+          "en": "Healthcheck (CLI, script, systemd timer, Telegram alert, dead-man ping)",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.5",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Скрипти запуску, деплою і встановлення на сервер (systemd)",
+          "en": "Run, deploy and server install scripts (systemd)",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.6",
+          "status": "done",
+          "days": 0.3,
+          "uk": "CI: ruff + pytest через uv",
+          "en": "CI: ruff + pytest via uv",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.7",
+          "status": "done",
+          "days": 0.5,
+          "uk": "План + сторінка прогресу на GitHub Pages",
+          "en": "Plan + progress page on GitHub Pages",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.8",
+          "status": "done",
+          "days": 0.3,
+          "uk": "README українською та англійською",
+          "en": "README in Ukrainian and English",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.9",
+          "status": "todo",
+          "days": 0.3,
+          "owner": "human",
+          "uk": "MacBook: встановити uv і Claude Code, клонувати репозиторій, ./scripts/bootstrap.sh",
+          "en": "MacBook: install uv and Claude Code, clone the repo, ./scripts/bootstrap.sh"
+        },
+        {
+          "id": "S0.10",
+          "status": "todo",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Anthropic Console: поповнення, ключ API, місячний ліміт витрат",
+          "en": "Anthropic Console: top-up, API key, monthly spend cap"
+        },
+        {
+          "id": "S0.11",
+          "status": "todo",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Створити бота в @BotFather, тестовий канал, заповнити .env",
+          "en": "Create bot via @BotFather, test channel, fill in .env"
+        },
+        {
+          "id": "S0.12",
+          "status": "todo",
+          "days": 0.5,
+          "owner": "human",
+          "uk": "Перший деплой на сервер: install_server.sh, перевірка healthcheck",
+          "en": "First server deploy: install_server.sh, verify healthcheck"
+        },
+        {
+          "id": "S0.13",
+          "status": "todo",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Увімкнути GitHub Pages (Settings → Pages → Source: GitHub Actions)",
+          "en": "Enable GitHub Pages (Settings → Pages → Source: GitHub Actions)"
+        },
+        {
+          "id": "S0.14",
+          "status": "todo",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Захист гілки main (тільки через PR, CI зелений); видалити гілку claude/funny-planck-leoxip",
+          "en": "Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip"
+        }
+      ],
+      "stats": {
+        "percent": 67,
+        "days_total": 4.9,
+        "days_left": 1.6,
+        "counts": {
+          "done": 8,
+          "in_progress": 0,
+          "todo": 6,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 3.3,
+          "in_progress": 0,
+          "todo": 1.6,
+          "blocked": 0
+        },
+        "tasks": 14
+      }
+    },
+    {
+      "id": "S1",
+      "branch": "—",
+      "uk": "Вхідні рішення",
+      "en": "Input decisions",
+      "goal_uk": "Зафіксувати обсяг, формат і джерела.",
+      "goal_en": "Fix scope, format and sources.",
+      "tasks": [
+        {
+          "id": "S1.1",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Країни: ЄС-27, Велика Британія, Норвегія, Швейцарія, Ісландія, Молдова, Західні Балкани (38)",
+          "en": "Countries: EU-27, UK, Norway, Switzerland, Iceland, Moldova, Western Balkans (38)",
+          "note_uk": "Україну не включено: активна війна, шкала там постійно максимальна.",
+          "note_en": "Ukraine excluded: active war keeps the scale at maximum.",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.2",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Формат: публічний сервіс",
+          "en": "Format: public service",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.3",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Джерела рекомендацій: США, Велика Британія, Ізраїль, Канада, Австралія, Німеччина, Франція + МЗС РФ і Білорусі",
+          "en": "Advisory sources: US, UK, Israel, Canada, Australia, Germany, France + Russian and Belarusian MFA",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.4",
+          "status": "in_progress",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Затвердити перелік джерел (docs/sources.md)",
+          "en": "Approve the source list (docs/sources.md)",
+          "note_uk": "Каталог джерел із доступом і статусом перевірки готовий, потрібне затвердження.",
+          "note_en": "Source catalogue with access and verification status is ready, needs approval."
+        },
+        {
+          "id": "S1.5",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Розробка: власник проєкту + Claude Code; сервер власний",
+          "en": "Development: project owner + Claude Code; own server",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.6",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Бюджет: безкоштовний стек, платний лише Claude API (ліміт 10–20 $)",
+          "en": "Budget: free stack, only Claude API is paid (10–20 $ cap)",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.7",
+          "status": "todo",
+          "days": 0.3,
+          "owner": "human",
+          "uk": "Текст юридичного застереження (не прогноз, не порада)",
+          "en": "Legal disclaimer text (not a forecast, not advice)"
+        },
+        {
+          "id": "S1.8",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Алгоритм шкали 0–10 (docs/algorithm.md)",
+          "en": "0–10 scale algorithm (docs/algorithm.md)",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.9",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Ресьорч джерел і трекерів війн (docs/sources.md)",
+          "en": "Research of sources and war trackers (docs/sources.md)",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 80,
+        "days_total": 2.0,
+        "days_left": 0.4,
+        "counts": {
+          "done": 7,
+          "in_progress": 1,
+          "todo": 1,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 1.5,
+          "in_progress": 0.2,
+          "todo": 0.3,
+          "blocked": 0
+        },
+        "tasks": 9
+      }
+    },
+    {
+      "id": "S2",
+      "branch": "dev-collector",
+      "uk": "Збір офіційних рекомендацій",
+      "en": "Official advisory collection",
+      "goal_uk": "Регулярне отримання рекомендацій зі збереженням кожної версії тексту.",
+      "goal_en": "Regular collection of advisories, storing every text version.",
+      "tasks": [
+        {
+          "id": "S2.1",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Каркас джерел, збереження версій, виявлення змін (diff)",
+          "en": "Source framework, version storage, change detection (diff)",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.2",
+          "status": "in_progress",
+          "days": 0.5,
+          "uk": "Велика Британія (GOV.UK Content API)",
+          "en": "UK (GOV.UK Content API)",
+          "note_uk": "Реалізовано; потрібна перевірка на живих даних.",
+          "note_en": "Implemented; needs live verification.",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.3",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Німеччина (Auswärtiges Amt OpenData API)",
+          "en": "Germany (Auswärtiges Amt OpenData API)",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.4",
+          "status": "todo",
+          "days": 1,
+          "uk": "США (RSS TAsTWs + сторінки країн + Security Alerts посольств)",
+          "en": "US (TAsTWs RSS + country pages + embassy Security Alerts)",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.5",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Канада (open data JSON)",
+          "en": "Canada (open data JSON)",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.6",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Австралія (Smartraveller destinations-export)",
+          "en": "Australia (Smartraveller destinations-export)",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.7",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Франція (diplomatie.gouv.fr, парсинг)",
+          "en": "France (diplomatie.gouv.fr, scraping)",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.8",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Ізраїль (NSC travel warnings)",
+          "en": "Israel (NSC travel warnings)",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.9",
+          "status": "todo",
+          "days": 1,
+          "uk": "МЗС РФ і Білорусі: рекомендації своїм громадянам",
+          "en": "Russian and Belarusian MFA advisories to own citizens",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.10",
+          "status": "done",
+          "days": 0.2,
+          "uk": "Алерт у Telegram, якщо джерело зламалося",
+          "en": "Telegram alert when a source breaks",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.11",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Очищення тексту від дат оновлення і службових елементів",
+          "en": "Strip update dates and boilerplate before diffing",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 15,
+        "days_total": 6.2,
+        "days_left": 5.2,
+        "counts": {
+          "done": 2,
+          "in_progress": 1,
+          "todo": 8,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0.7,
+          "in_progress": 0.5,
+          "todo": 5.0,
+          "blocked": 0
+        },
+        "tasks": 11
+      }
+    },
+    {
+      "id": "S3",
+      "branch": "dev-aviation",
+      "uk": "Авіація і повітряний простір",
+      "en": "Aviation & airspace",
+      "goal_uk": "Офіційні попередження щодо неба і фактичне падіння трафіку.",
+      "goal_en": "Official airspace warnings and actual traffic drops.",
+      "tasks": [
+        {
+          "id": "S3.1",
+          "status": "todo",
+          "days": 1,
+          "uk": "EASA Conflict Zone Information Bulletins",
+          "en": "EASA Conflict Zone Information Bulletins",
+          "owner": "claude"
+        },
+        {
+          "id": "S3.2",
+          "status": "todo",
+          "days": 1.5,
+          "uk": "NOTAM: обмеження і закриття повітряного простору",
+          "en": "NOTAM: airspace restrictions and closures",
+          "owner": "claude"
+        },
+        {
+          "id": "S3.3",
+          "status": "todo",
+          "days": 1,
+          "uk": "OpenSky: падіння кількості рейсів за аеропортом",
+          "en": "OpenSky: drop in flights per airport",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 0,
+        "days_total": 3.5,
+        "days_left": 3.5,
+        "counts": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 3,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 3.5,
+          "blocked": 0
+        },
+        "tasks": 3
+      }
+    },
+    {
+      "id": "S4",
+      "branch": "dev-news",
+      "uk": "Новини, аналітика, внутрішні заходи",
+      "en": "News, analysis, domestic measures",
+      "goal_uk": "Незалежні підтвердження з медіа, аналітики, ринків і рішень самої країни.",
+      "goal_en": "Independent confirmation from media, analysis, markets and the country's own measures.",
+      "tasks": [
+        {
+          "id": "S4.1",
+          "status": "todo",
+          "days": 1,
+          "uk": "RSS рівнів 1–2, тільки заголовки й посилання",
+          "en": "Tier 1–2 RSS, headlines and links only",
+          "owner": "claude"
+        },
+        {
+          "id": "S4.2",
+          "status": "todo",
+          "days": 1,
+          "uk": "GDELT: обсяг і тональність по країні",
+          "en": "GDELT: volume and tone per country",
+          "owner": "claude"
+        },
+        {
+          "id": "S4.3",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "CrisisWatch: погіршення і Conflict Risk Alert",
+          "en": "CrisisWatch: deterioration and Conflict Risk Alerts",
+          "owner": "claude"
+        },
+        {
+          "id": "S4.4",
+          "status": "todo",
+          "days": 1,
+          "uk": "Внутрішні заходи країни: мобілізація, надзвичайні укази, кордони",
+          "en": "Domestic measures: mobilisation, emergency decrees, border closures",
+          "owner": "claude"
+        },
+        {
+          "id": "S4.5",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Ринки: облігації і курси через ECB Data Portal",
+          "en": "Markets: bonds and FX via ECB Data Portal",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 0,
+        "days_total": 4.0,
+        "days_left": 4.0,
+        "counts": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 5,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 4.0,
+          "blocked": 0
+        },
+        "tasks": 5
+      }
+    },
+    {
+      "id": "S5",
+      "branch": "dev-history",
+      "uk": "Історичний архів",
+      "en": "Historical archive",
+      "goal_uk": "Старі версії рекомендацій для перевірки шкали на відомих епізодах.",
+      "goal_en": "Past advisory versions to test the scale on known episodes.",
+      "tasks": [
+        {
+          "id": "S5.1",
+          "status": "todo",
+          "days": 1,
+          "uk": "Завантаження старих версій з Wayback Machine (CDX API)",
+          "en": "Download past versions from the Wayback Machine (CDX API)",
+          "owner": "claude"
+        },
+        {
+          "id": "S5.2",
+          "status": "todo",
+          "days": 1,
+          "uk": "Епізоди: Україна 2021–22, Вірменія/Азербайджан 2020, Ізраїль/Іран 2024–25",
+          "en": "Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 0,
+        "days_total": 2,
+        "days_left": 2.0,
+        "counts": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 2,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 2,
+          "blocked": 0
+        },
+        "tasks": 2
+      }
+    },
+    {
+      "id": "S6",
+      "branch": "dev-classifier",
+      "uk": "Класифікація змін (Claude API)",
+      "en": "Change classification (Claude API)",
+      "goal_uk": "Claude визначає причину і тип кожної зміни та перетворює її на сигнал.",
+      "goal_en": "Claude determines the reason and type of each change and turns it into a signal.",
+      "tasks": [
+        {
+          "id": "S6.1",
+          "status": "todo",
+          "days": 1,
+          "uk": "Промпт і JSON-схема: причина, тип зміни, персонал, кордони, цитата",
+          "en": "Prompt and JSON schema: reason, change type, staff, borders, quote",
+          "owner": "claude"
+        },
+        {
+          "id": "S6.2",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Виклик лише на змінених фрагментах, кешування промпту, ліміт витрат",
+          "en": "Call only on changed fragments, prompt caching, spend cap",
+          "owner": "claude"
+        },
+        {
+          "id": "S6.3",
+          "status": "todo",
+          "days": 1,
+          "uk": "Ручна перевірка на 50 прикладах",
+          "en": "Manual check on 50 examples",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 0,
+        "days_total": 2.5,
+        "days_left": 2.5,
+        "counts": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 3,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 2.5,
+          "blocked": 0
+        },
+        "tasks": 3
+      }
+    },
+    {
+      "id": "S7",
+      "branch": "dev-scoring",
+      "uk": "Розрахунок балу 0–10",
+      "en": "Scoring 0–10",
+      "goal_uk": "Зважена оцінка з модифікаторами, числа в config/weights.yaml.",
+      "goal_en": "Weighted score with modifiers, numbers in config/weights.yaml.",
+      "tasks": [
+        {
+          "id": "S7.1",
+          "status": "done",
+          "days": 1,
+          "uk": "Рушій балу: блоки А–Е, стелі, причини, згасання, верифікація, порогові події",
+          "en": "Scoring engine: blocks A–F, caps, reasons, decay, verification, floors",
+          "owner": "claude"
+        },
+        {
+          "id": "S7.2",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Норма країни і відхилення, синхронність держав, регіональна розбіжність",
+          "en": "Country baseline and deviation, cross-government synchrony, regional divergence",
+          "owner": "claude"
+        },
+        {
+          "id": "S7.3",
+          "status": "todo",
+          "days": 1,
+          "uk": "Таблиця сигналів і щоденний розрахунок балу для всіх країн",
+          "en": "Signals table and daily score computation for all countries",
+          "owner": "claude"
+        },
+        {
+          "id": "S7.4",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Пояснення балу у сповіщеннях і на панелі",
+          "en": "Score explanation in alerts and on the dashboard",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 50,
+        "days_total": 3.0,
+        "days_left": 1.5,
+        "counts": {
+          "done": 2,
+          "in_progress": 0,
+          "todo": 2,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 1.5,
+          "in_progress": 0,
+          "todo": 1.5,
+          "blocked": 0
+        },
+        "tasks": 4
+      }
+    },
+    {
+      "id": "S8",
+      "branch": "dev-backtest",
+      "uk": "Перевірка на історії",
+      "en": "Backtesting",
+      "goal_uk": "Шкала має спрацьовувати на відомих епізодах вчасно і без масових хибних тривог.",
+      "goal_en": "The scale must fire on known episodes in time and without mass false alarms.",
+      "tasks": [
+        {
+          "id": "S8.1",
+          "status": "todo",
+          "days": 1.5,
+          "uk": "Прогін шкали на історичних епізодах",
+          "en": "Replay the scale on historical episodes",
+          "owner": "claude"
+        },
+        {
+          "id": "S8.2",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Звіт про хибні тривоги і пропуски",
+          "en": "False alarm and miss report",
+          "owner": "claude"
+        },
+        {
+          "id": "S8.3",
+          "status": "todo",
+          "days": 1,
+          "uk": "Коригування ваг",
+          "en": "Weight tuning",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 0,
+        "days_total": 3.0,
+        "days_left": 3.0,
+        "counts": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 3,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 3.0,
+          "blocked": 0
+        },
+        "tasks": 3
+      }
+    },
+    {
+      "id": "S9",
+      "branch": "dev-tg-bot",
+      "uk": "Telegram-бот і сповіщення",
+      "en": "Telegram bot & alerts",
+      "goal_uk": "Бот з вибором мови й країни, панеллю і сповіщеннями з поясненням.",
+      "goal_en": "Bot with language and country choice, a dashboard and explained alerts.",
+      "tasks": [
+        {
+          "id": "S9.1",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Базовий бот на aiogram 3 і адмінські команди /status, /collect, /warcheck",
+          "en": "Base aiogram 3 bot and admin commands /status, /collect, /warcheck",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.2",
+          "status": "done",
+          "days": 1,
+          "uk": "Онбординг: мова (укр/англ) → країна → панель",
+          "en": "Onboarding: language (uk/en) → country → dashboard",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.3",
+          "status": "done",
+          "days": 1,
+          "uk": "Інлайн-панель: бал, статус війни, сусіди, зміни за 7 днів; перемикачі сповіщень, країни, мови",
+          "en": "Inline dashboard: score, war status, neighbours, 7-day changes; toggles for alerts, country, language",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.4",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Розсилка змін підписникам країни їхньою мовою",
+          "en": "Change alerts to a country's subscribers in their language",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.5",
+          "status": "todo",
+          "days": 1,
+          "uk": "Сповіщення при зміні балу на 1+ з поясненням і цитатою",
+          "en": "Alerts on score change of 1+ with explanation and quote",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.6",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Щоденний підсумок по регіону",
+          "en": "Daily regional digest",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.7",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Кілька країн на одного користувача",
+          "en": "Several countries per user",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 60,
+        "days_total": 5.0,
+        "days_left": 2.0,
+        "counts": {
+          "done": 4,
+          "in_progress": 0,
+          "todo": 3,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 3.0,
+          "in_progress": 0,
+          "todo": 2.0,
+          "blocked": 0
+        },
+        "tasks": 7
+      }
+    },
+    {
+      "id": "S10",
+      "branch": "dev-war-status",
+      "uk": "Статус війни",
+      "en": "War status",
+      "goal_uk": "Показувати, чи вже йде війна на території країни, окремо від шкали ескалації.",
+      "goal_en": "Show whether a war is already under way on the country's territory, separately from the escalation scale.",
+      "tasks": [
+        {
+          "id": "S10.1",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Довідник config/conflicts.yaml на основі RULAC (Молдова, Кіпр — окупація; сусідство з війною і агресором)",
+          "en": "Curated config/conflicts.yaml based on RULAC (Moldova, Cyprus — occupation; borders with war and aggressor)",
+          "owner": "claude"
+        },
+        {
+          "id": "S10.2",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Щоденна звірка з Wikipedia, розбіжності адміну (war-check)",
+          "en": "Daily check against Wikipedia, mismatches to admins (war-check)",
+          "owner": "claude"
+        },
+        {
+          "id": "S10.3",
+          "status": "todo",
+          "days": 0.5,
+          "owner": "human",
+          "uk": "Отримати токен UCDP API",
+          "en": "Obtain a UCDP API token"
+        },
+        {
+          "id": "S10.4",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "UCDP Candidate Events як друге автоматичне джерело",
+          "en": "UCDP Candidate Events as a second automatic source",
+          "owner": "claude"
+        },
+        {
+          "id": "S10.5",
+          "status": "todo",
+          "days": 0.3,
+          "uk": "Перевірити парсер Wikipedia на живій сторінці",
+          "en": "Verify the Wikipedia parser against the live page",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 43,
+        "days_total": 2.3,
+        "days_left": 1.3,
+        "counts": {
+          "done": 2,
+          "in_progress": 0,
+          "todo": 3,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 1.0,
+          "in_progress": 0,
+          "todo": 1.3,
+          "blocked": 0
+        },
+        "tasks": 5
+      }
+    },
+    {
+      "id": "S11",
+      "branch": "dev-dashboard",
+      "uk": "Публічна панель",
+      "en": "Public dashboard",
+      "goal_uk": "Карта країн і історія балу на безкоштовному хостингу.",
+      "goal_en": "Country map and score history on free hosting.",
+      "tasks": [
+        {
+          "id": "S11.1",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Експорт scores.json (публічне API тільки для читання)",
+          "en": "Export scores.json (read-only public API)",
+          "owner": "claude"
+        },
+        {
+          "id": "S11.2",
+          "status": "todo",
+          "days": 1,
+          "uk": "Карта Європи з кольорами рівнів",
+          "en": "Map of Europe coloured by level",
+          "owner": "claude"
+        },
+        {
+          "id": "S11.3",
+          "status": "todo",
+          "days": 1,
+          "uk": "Сторінка країни: історія балу і пояснення змін",
+          "en": "Country page: score history and change explanations",
+          "owner": "claude"
+        },
+        {
+          "id": "S11.4",
+          "status": "todo",
+          "days": 0.3,
+          "uk": "Юридичне застереження і методологія на сайті",
+          "en": "Disclaimer and methodology on the site",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 0,
+        "days_total": 2.8,
+        "days_left": 2.8,
+        "counts": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 4,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 2.8,
+          "blocked": 0
+        },
+        "tasks": 4
+      }
+    },
+    {
+      "id": "S12",
+      "branch": "dev-ops",
+      "uk": "Експлуатація",
+      "en": "Operations",
+      "goal_uk": "Система працює без ручного втручання і повідомляє про збої.",
+      "goal_en": "The system runs unattended and reports failures.",
+      "tasks": [
+        {
+          "id": "S12.1",
+          "status": "done",
+          "days": 0.2,
+          "uk": "Щоденний бекап SQLite з ротацією",
+          "en": "Daily SQLite backup with rotation",
+          "owner": "claude"
+        },
+        {
+          "id": "S12.2",
+          "status": "todo",
+          "days": 0.3,
+          "owner": "human",
+          "uk": "Dead-man switch на healthchecks.io (безкоштовно)",
+          "en": "Dead-man switch on healthchecks.io (free)"
+        },
+        {
+          "id": "S12.3",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "Автодеплой з main (GitHub Actions → SSH)",
+          "en": "Auto-deploy from main (GitHub Actions → SSH)",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 20,
+        "days_total": 1.0,
+        "days_left": 0.8,
+        "counts": {
+          "done": 1,
+          "in_progress": 0,
+          "todo": 2,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0.2,
+          "in_progress": 0,
+          "todo": 0.8,
+          "blocked": 0
+        },
+        "tasks": 3
+      }
+    },
+    {
+      "id": "S13",
+      "branch": "—",
+      "uk": "Критерії MVP",
+      "en": "MVP criteria",
+      "goal_uk": "Мінімальна робоча версія готова, коли виконано всі три умови.",
+      "goal_en": "The MVP is done when all three conditions hold.",
+      "tasks": [
+        {
+          "id": "S13.1",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "14 днів збору поспіль без ручного втручання",
+          "en": "14 consecutive days of collection without manual intervention",
+          "owner": "claude"
+        },
+        {
+          "id": "S13.2",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "На епізоді України бал досягає 7+ до 24.02.2022",
+          "en": "On the Ukraine episode the score reaches 7+ before 2022-02-24",
+          "owner": "claude"
+        },
+        {
+          "id": "S13.3",
+          "status": "todo",
+          "days": 0.3,
+          "uk": "Кожне сповіщення містить джерело, опис зміни і цитату",
+          "en": "Every alert contains the source, a description of the change and a quote",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 0,
+        "days_total": 1.3,
+        "days_left": 1.3,
+        "counts": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 3,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0,
+          "in_progress": 0,
+          "todo": 1.3,
+          "blocked": 0
+        },
+        "tasks": 3
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "date": "2026-09-27",
+      "uk": "Шкала 0–10 замість ймовірності: описує стан сигналів, а не прогнозує війну",
+      "en": "0–10 scale instead of a probability: describes signals, does not forecast war"
+    },
+    {
+      "date": "2026-09-27",
+      "uk": "Рекомендації посольств для країн ЄС і НАТО важать менше: союзники рідко заздалегідь піднімають рівень",
+      "en": "Advisories weigh less for EU/NATO members: allies rarely raise levels in advance"
+    },
+    {
+      "date": "2026-09-27",
+      "uk": "Порівняння з власною нормою країни, а не за абсолютним рівнем",
+      "en": "Compare against the country's own baseline, not absolute levels"
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Власний сервер (systemd) замість GitHub Actions за розкладом; Python 3.12 + uv, aiogram 3",
+      "en": "Own server (systemd) instead of scheduled GitHub Actions; Python 3.12 + uv, aiogram 3"
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Гілки: main за замовчуванням, робота в dev-<область>, fix-<що>, docs-<що>",
+      "en": "Branches: main by default, work in dev-<area>, fix-<what>, docs-<what>"
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Блоки поєднуються як незалежні підтвердження зі стелею внеску кожного блоку",
+      "en": "Blocks combine as independent confirmations, each with a contribution cap"
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Статус війни окремо від шкали; довідник ведеться вручну, автоматика лише пропонує зміни",
+      "en": "War status is separate from the scale; curated by hand, automation only proposes changes"
+    }
+  ],
+  "risks": [
+    {
+      "uk": "Блокування збору: сайти держав можуть блокувати запити з сервера",
+      "en": "Collection blocking: government sites may block requests from the server"
+    },
+    {
+      "uk": "Умови використання: Reuters і AP без відкритих RSS; ліцензія ACLED для публічного сервісу",
+      "en": "Terms of use: no open Reuters/AP RSS; ACLED licence for a public service"
+    },
+    {
+      "uk": "Публічна відповідальність: бал сприймуть як прогноз; потрібні застереження і методологія",
+      "en": "Public responsibility: the score will be read as a forecast; disclaimer and methodology needed"
+    },
+    {
+      "uk": "Неперевірені ваги: до етапу S8 це експертна гіпотеза",
+      "en": "Untested weights: an expert hypothesis until stage S8"
+    },
+    {
+      "uk": "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка",
+      "en": "Automatic war trackers list countries hit only by spillover; manual review needed"
+    }
+  ],
+  "changelog": [
+    {
+      "version": "0.2.0",
+      "date": "2026-09-30",
+      "uk": [
+        "Бот: мова → країна → інлайн-панель із перемикачами",
+        "Статус війни: довідник RULAC + звірка з Wikipedia",
+        "Алгоритм шкали і рушій балу з тестами",
+        "Каталог джерел",
+        "План об'єднано з попереднім дашбордом"
+      ],
+      "en": [
+        "Bot: language → country → inline dashboard with toggles",
+        "War status: RULAC-based list + Wikipedia check",
+        "Scale algorithm and scoring engine with tests",
+        "Source catalogue",
+        "Plan merged with the earlier dashboard"
+      ]
+    },
+    {
+      "version": "0.1.1",
+      "date": "2026-09-30",
+      "uk": [
+        "Каркас проєкту: uv, SQLite, збирач GOV.UK, бот, healthcheck, скрипти, CI, Pages"
+      ],
+      "en": [
+        "Project skeleton: uv, SQLite, GOV.UK collector, bot, healthcheck, scripts, CI, Pages"
+      ]
+    },
+    {
+      "version": "0.1.0",
+      "date": "2026-09-27",
+      "uk": [
+        "Створено дашборд проєкту",
+        "Зафіксовано вхідні рішення"
+      ],
+      "en": [
+        "Project dashboard created",
+        "Input decisions recorded"
+      ]
+    }
+  ],
+  "ideas": [
+    {
+      "uk": "Сигнал «тиші»: країна зникла з медіа при активних рекомендаціях",
+      "en": "\"Silence\" signal: country drops out of the media while advisories are active"
+    },
+    {
+      "uk": "Message Batches API для історичного архіву — вдвічі дешевше",
+      "en": "Message Batches API for the historical archive — half the price"
+    },
+    {
+      "uk": "Перехід на PostgreSQL, якщо з'явиться багато користувачів",
+      "en": "Move to PostgreSQL if user numbers grow"
+    }
+  ],
+  "stats": {
+    "percent": 27,
+    "days_total": 43.5,
+    "days_left": 31.9,
+    "counts": {
+      "done": 26,
+      "in_progress": 2,
+      "todo": 48,
+      "blocked": 0
+    },
+    "days_by_status": {
+      "done": 11.2,
+      "in_progress": 0.7,
+      "todo": 31.6,
+      "blocked": 0
+    },
+    "tasks": 76
+  },
+  "build": {
+    "built_at": "2026-09-30T11:16:57+00:00",
+    "commit": "662a666"
+  }
+}
