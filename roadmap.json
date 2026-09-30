@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.10",
+    "version": "0.2.44",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -308,58 +308,72 @@
         },
         {
           "id": "S2.3",
-          "status": "todo",
+          "status": "in_progress",
           "days": 0.5,
           "uk": "Німеччина (Auswärtiges Amt OpenData API)",
           "en": "Germany (Auswärtiges Amt OpenData API)",
+          "note_uk": "Реалізовано; перевірити на живих даних: tension-index probe",
+          "note_en": "Implemented; verify live: tension-index probe",
           "owner": "claude"
         },
         {
           "id": "S2.4",
-          "status": "todo",
+          "status": "in_progress",
           "days": 1,
           "uk": "США (RSS TAsTWs + сторінки країн + Security Alerts посольств)",
           "en": "US (TAsTWs RSS + country pages + embassy Security Alerts)",
+          "note_uk": "Реалізовано; перевірити на живих даних: tension-index probe",
+          "note_en": "Implemented; verify live: tension-index probe",
           "owner": "claude"
         },
         {
           "id": "S2.5",
-          "status": "todo",
+          "status": "in_progress",
           "days": 0.5,
           "uk": "Канада (open data JSON)",
           "en": "Canada (open data JSON)",
+          "note_uk": "Реалізовано; перевірити на живих даних: tension-index probe",
+          "note_en": "Implemented; verify live: tension-index probe",
           "owner": "claude"
         },
         {
           "id": "S2.6",
-          "status": "todo",
+          "status": "in_progress",
           "days": 0.5,
           "uk": "Австралія (Smartraveller destinations-export)",
           "en": "Australia (Smartraveller destinations-export)",
+          "note_uk": "Реалізовано; перевірити на живих даних: tension-index probe",
+          "note_en": "Implemented; verify live: tension-index probe",
           "owner": "claude"
         },
         {
           "id": "S2.7",
-          "status": "todo",
+          "status": "in_progress",
           "days": 0.5,
           "uk": "Франція (diplomatie.gouv.fr, парсинг)",
           "en": "France (diplomatie.gouv.fr, scraping)",
+          "note_uk": "Лише текст сторінки, рівень визначає класифікатор; перевірити probe fr",
+          "note_en": "Page text only, level set by the classifier; verify with probe fr",
           "owner": "claude"
         },
         {
           "id": "S2.8",
-          "status": "todo",
+          "status": "blocked",
           "days": 0.5,
           "uk": "Ізраїль (NSC travel warnings)",
           "en": "Israel (NSC travel warnings)",
+          "note_uk": "Сторінка NSC — JS-застосунок без відомого API; потрібен зразок відповіді. Для Європи вага низька.",
+          "note_en": "NSC page is a JS app with no known API; needs a sample response. Low weight for Europe.",
           "owner": "claude"
         },
         {
           "id": "S2.9",
-          "status": "todo",
+          "status": "in_progress",
           "days": 1,
           "uk": "МЗС РФ і Білорусі: рекомендації своїм громадянам",
           "en": "Russian and Belarusian MFA advisories to own citizens",
+          "note_uk": "Через GDELT: російськомовні публікації про поради МЗС РФ/РБ, 2+ видання = підтверджено.",
+          "note_en": "Via GDELT: Russian-language reports of RU/BY MFA advice, 2+ outlets = confirmed.",
           "owner": "claude"
         },
         {
@@ -372,7 +386,7 @@
         },
         {
           "id": "S2.11",
-          "status": "todo",
+          "status": "done",
           "days": 0.5,
           "uk": "Очищення тексту від дат оновлення і службових елементів",
           "en": "Strip update dates and boilerplate before diffing",
@@ -380,20 +394,20 @@
         }
       ],
       "stats": {
-        "percent": 19,
+        "percent": 60,
         "days_total": 6.2,
-        "days_left": 5.0,
+        "days_left": 2.5,
         "counts": {
-          "done": 3,
-          "in_progress": 0,
-          "todo": 8,
-          "blocked": 0
+          "done": 4,
+          "in_progress": 6,
+          "todo": 0,
+          "blocked": 1
         },
         "days_by_status": {
-          "done": 1.2,
-          "in_progress": 0,
-          "todo": 5.0,
-          "blocked": 0
+          "done": 1.7,
+          "in_progress": 4.0,
+          "todo": 0,
+          "blocked": 0.5
         },
         "tasks": 11
       }
@@ -408,44 +422,50 @@
       "tasks": [
         {
           "id": "S3.1",
-          "status": "todo",
+          "status": "in_progress",
           "days": 1,
           "uk": "EASA Conflict Zone Information Bulletins",
           "en": "EASA Conflict Zone Information Bulletins",
+          "note_uk": "Реалізовано (парсинг сторінки); перевірити: tension-index probe easa",
+          "note_en": "Implemented (page parsing); verify: tension-index probe easa",
           "owner": "claude"
         },
         {
           "id": "S3.2",
-          "status": "todo",
+          "status": "blocked",
           "days": 1.5,
           "uk": "NOTAM: обмеження і закриття повітряного простору",
           "en": "NOTAM: airspace restrictions and closures",
+          "note_uk": "Безкоштовного API NOTAM для Європи немає (EUROCONTROL EAD платний). Обмеження неба беремо з текстів рекомендацій і CZIB.",
+          "note_en": "No free European NOTAM API (EUROCONTROL EAD is paid). Airspace limits come from advisory texts and CZIBs.",
           "owner": "claude"
         },
         {
           "id": "S3.3",
-          "status": "todo",
+          "status": "in_progress",
           "days": 1,
           "uk": "OpenSky: падіння кількості рейсів за аеропортом",
           "en": "OpenSky: drop in flights per airport",
+          "note_uk": "Реалізовано через OpenSky (падіння трафіку); норма з’явиться після ~3 тижнів збору.",
+          "note_en": "Implemented via OpenSky (traffic drop); baseline needs ~3 weeks of samples.",
           "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 0,
+        "percent": 29,
         "days_total": 3.5,
-        "days_left": 3.5,
+        "days_left": 2.5,
         "counts": {
           "done": 0,
-          "in_progress": 0,
-          "todo": 3,
-          "blocked": 0
+          "in_progress": 2,
+          "todo": 0,
+          "blocked": 1
         },
         "days_by_status": {
           "done": 0,
-          "in_progress": 0,
-          "todo": 3.5,
-          "blocked": 0
+          "in_progress": 2,
+          "todo": 0,
+          "blocked": 1.5
         },
         "tasks": 3
       }
@@ -460,59 +480,69 @@
       "tasks": [
         {
           "id": "S4.1",
-          "status": "todo",
+          "status": "in_progress",
           "days": 1,
           "uk": "RSS рівнів 1–2, тільки заголовки й посилання",
           "en": "Tier 1–2 RSS, headlines and links only",
+          "note_uk": "Реалізовано: 13 стрічок у config/feeds.yaml, подія рахується лише з 2+ стрічок; перевірити URL: tension-index probe news",
+          "note_en": "Implemented: 13 feeds in config/feeds.yaml, an event counts only from 2+ feeds; check URLs: tension-index probe news",
           "owner": "claude"
         },
         {
           "id": "S4.2",
-          "status": "todo",
+          "status": "in_progress",
           "days": 1,
           "uk": "GDELT: обсяг і тональність по країні",
           "en": "GDELT: volume and tone per country",
+          "note_uk": "Реалізовано: сплеск військової тематики vs 60 днів (раз на добу); рахується лише з підтвердженням новинами.",
+          "note_en": "Implemented: surge of military coverage vs 60 days (daily); counts only when news confirm.",
           "owner": "claude"
         },
         {
           "id": "S4.3",
-          "status": "todo",
+          "status": "in_progress",
           "days": 0.5,
           "uk": "CrisisWatch: погіршення і Conflict Risk Alert",
           "en": "CrisisWatch: deterioration and Conflict Risk Alerts",
+          "note_uk": "Через RSS Crisis Group у стрічках новин.",
+          "note_en": "Via the Crisis Group RSS in the news feeds.",
           "owner": "claude"
         },
         {
           "id": "S4.4",
-          "status": "todo",
+          "status": "in_progress",
           "days": 1,
           "uk": "Внутрішні заходи країни: мобілізація, надзвичайні укази, кордони",
           "en": "Domestic measures: mobilisation, emergency decrees, border closures",
+          "note_uk": "З новин: надзвичайний стан, кордони, мобілізація (лише з 2+ стрічок).",
+          "note_en": "From news: emergency, borders, mobilisation (2+ feeds only).",
           "owner": "claude"
         },
         {
           "id": "S4.5",
-          "status": "todo",
+          "status": "in_progress",
           "days": 0.5,
           "uk": "Ринки: облігації і курси через ECB Data Portal",
           "en": "Markets: bonds and FX via ECB Data Portal",
+          "note_uk": "ЄЦБ: спред 10-річних облігацій до Німеччини і курс валюти (раз на добу).",
+          "note_en": "ECB: 10y spread over Germany and FX (daily).",
           "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 0,
+        "percent": 50,
         "days_total": 4.0,
-        "days_left": 4.0,
+        "days_left": 2.0,
         "counts": {
           "done": 0,
-          "in_progress": 0,
-          "todo": 5,
+          "in_progress": 5,
+          "todo": 0,
           "blocked": 0
         },
         "days_by_status": {
           "done": 0,
-          "in_progress": 0,
-          "todo": 4.0,
+          "in_progress": 4.0,
+          "todo": 0,
           "blocked": 0
         },
         "tasks": 5
@@ -528,35 +558,39 @@
       "tasks": [
         {
           "id": "S5.1",
-          "status": "todo",
+          "status": "done",
           "days": 1,
           "uk": "Завантаження старих версій з Wayback Machine (CDX API)",
           "en": "Download past versions from the Wayback Machine (CDX API)",
+          "note_uk": "tension-index history: знімки Wayback (щодня за 45 днів до події, раз на 5 днів раніше) в окрему базу data/history.sqlite3.",
+          "note_en": "tension-index history: Wayback captures (daily 45 days before the event, every 5 days earlier) into data/history.sqlite3.",
           "owner": "claude"
         },
         {
           "id": "S5.2",
-          "status": "todo",
+          "status": "in_progress",
           "days": 1,
           "uk": "Епізоди: Україна 2021–22, Вірменія/Азербайджан 2020, Ізраїль/Іран 2024–25",
           "en": "Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25",
+          "note_uk": "Епізоди в config/episodes.yaml (Україна 2022, Азербайджан 2020, Ізраїль 2024, контроль Франція 2016); завантаження потребує мережі, запустити локально.",
+          "note_en": "Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.",
           "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 0,
+        "percent": 75,
         "days_total": 2,
-        "days_left": 2.0,
+        "days_left": 0.5,
         "counts": {
-          "done": 0,
-          "in_progress": 0,
-          "todo": 2,
+          "done": 1,
+          "in_progress": 1,
+          "todo": 0,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 0,
-          "in_progress": 0,
-          "todo": 2,
+          "done": 1,
+          "in_progress": 1,
+          "todo": 0,
           "blocked": 0
         },
         "tasks": 2
@@ -572,7 +606,7 @@
       "tasks": [
         {
           "id": "S6.1",
-          "status": "todo",
+          "status": "done",
           "days": 1,
           "uk": "Промпт і JSON-схема: причина, тип зміни, персонал, кордони, цитата",
           "en": "Prompt and JSON schema: reason, change type, staff, borders, quote",
@@ -580,35 +614,39 @@
         },
         {
           "id": "S6.2",
-          "status": "todo",
+          "status": "done",
           "days": 0.5,
           "uk": "Виклик лише на змінених фрагментах, кешування промпту, ліміт витрат",
           "en": "Call only on changed fragments, prompt caching, spend cap",
+          "note_uk": "Лише змінені фрагменти, кеш системного промпту, ліміт викликів CLASSIFIER_MAX_CALLS; без ключа працюють правила.",
+          "note_en": "Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key.",
           "owner": "claude"
         },
         {
           "id": "S6.3",
           "status": "todo",
           "days": 1,
+          "owner": "human",
           "uk": "Ручна перевірка на 50 прикладах",
           "en": "Manual check on 50 examples",
-          "owner": "claude"
+          "note_uk": "Потрібен ключ API і реальні зміни; перевірити 50 класифікацій вручну.",
+          "note_en": "Needs an API key and real changes; review 50 classifications by hand."
         }
       ],
       "stats": {
-        "percent": 0,
+        "percent": 60,
         "days_total": 2.5,
-        "days_left": 2.5,
+        "days_left": 1.0,
         "counts": {
-          "done": 0,
+          "done": 2,
           "in_progress": 0,
-          "todo": 3,
+          "todo": 1,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 0,
+          "done": 1.5,
           "in_progress": 0,
-          "todo": 2.5,
+          "todo": 1,
           "blocked": 0
         },
         "tasks": 3
@@ -640,15 +678,17 @@
         },
         {
           "id": "S7.3",
-          "status": "todo",
+          "status": "done",
           "days": 1,
           "uk": "Таблиця сигналів і щоденний розрахунок балу для всіх країн",
           "en": "Signals table and daily score computation for all countries",
+          "note_uk": "tension-index run: збір → класифікація → сигнали → бал; бал без достатнього покриття не публікується (крім порогових подій).",
+          "note_en": "tension-index run: collect → classify → signals → score; no score without enough coverage (except threshold events).",
           "owner": "claude"
         },
         {
           "id": "S7.4",
-          "status": "todo",
+          "status": "done",
           "days": 0.5,
           "uk": "Пояснення балу у сповіщеннях і на панелі",
           "en": "Score explanation in alerts and on the dashboard",
@@ -656,19 +696,19 @@
         }
       ],
       "stats": {
-        "percent": 50,
+        "percent": 100,
         "days_total": 3.0,
-        "days_left": 1.5,
+        "days_left": 0.0,
         "counts": {
-          "done": 2,
+          "done": 4,
           "in_progress": 0,
-          "todo": 2,
+          "todo": 0,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 1.5,
+          "done": 3.0,
           "in_progress": 0,
-          "todo": 1.5,
+          "todo": 0,
           "blocked": 0
         },
         "tasks": 4
@@ -684,18 +724,22 @@
       "tasks": [
         {
           "id": "S8.1",
-          "status": "todo",
+          "status": "in_progress",
           "days": 1.5,
           "uk": "Прогін шкали на історичних епізодах",
           "en": "Replay the scale on historical episodes",
+          "note_uk": "tension-index backtest: день за днем, звіти в reports/backtest; перевірено на синтетичних даних, чекає реального архіву.",
+          "note_en": "tension-index backtest: day-by-day replay, reports in reports/backtest; tested on synthetic data, awaiting the real archive.",
           "owner": "claude"
         },
         {
           "id": "S8.2",
-          "status": "todo",
+          "status": "in_progress",
           "days": 0.5,
           "uk": "Звіт про хибні тривоги і пропуски",
           "en": "False alarm and miss report",
+          "note_uk": "Звіт: PASS/FAIL за очікуванням епізоду, перші дні досягнення 3/5/7/9, контрольний епізод на хибні тривоги.",
+          "note_en": "Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms.",
           "owner": "claude"
         },
         {
@@ -704,23 +748,25 @@
           "days": 1,
           "uk": "Коригування ваг",
           "en": "Weight tuning",
+          "note_uk": "Спостереження: надбавка surge_weight піднімає рішення однієї держави до 9+, а шкала вимагає кількох держав. Налаштувати на реальних даних.",
+          "note_en": "Observation: surge_weight lifts a single government decision to 9+, the scale wants several. Tune on real data.",
           "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 0,
+        "percent": 33,
         "days_total": 3.0,
-        "days_left": 3.0,
+        "days_left": 2.0,
         "counts": {
           "done": 0,
-          "in_progress": 0,
-          "todo": 3,
+          "in_progress": 2,
+          "todo": 1,
           "blocked": 0
         },
         "days_by_status": {
           "done": 0,
-          "in_progress": 0,
-          "todo": 3.0,
+          "in_progress": 2.0,
+          "todo": 1,
           "blocked": 0
         },
         "tasks": 3
@@ -768,43 +814,49 @@
         },
         {
           "id": "S9.5",
-          "status": "todo",
+          "status": "done",
           "days": 1,
           "uk": "Сповіщення при зміні балу на 1+ з поясненням і цитатою",
           "en": "Alerts on score change of 1+ with explanation and quote",
+          "note_uk": "Бал змінився на 1+ → підписникам приходить пояснення з джерелами й цитатами.",
+          "note_en": "Score moves by 1+ → subscribers get an explanation with sources and quotes.",
           "owner": "claude"
         },
         {
           "id": "S9.6",
-          "status": "todo",
+          "status": "done",
           "days": 0.5,
           "uk": "Щоденний підсумок по регіону",
           "en": "Daily regional digest",
+          "note_uk": "Щоденний дайджест (перемикач на панелі, таймер 06:37 UTC): бал, зміна за добу, зростання в регіоні.",
+          "note_en": "Daily digest (toggle on the dashboard, 06:37 UTC timer): score, 24 h change, regional rises.",
           "owner": "claude"
         },
         {
           "id": "S9.7",
-          "status": "todo",
+          "status": "done",
           "days": 0.5,
           "uk": "Кілька країн на одного користувача",
           "en": "Several countries per user",
+          "note_uk": "До 5 країн: список з позначками, перемикання картки кнопками.",
+          "note_en": "Up to 5 countries: ticked list, switch the detailed card by buttons.",
           "owner": "claude"
         }
       ],
       "stats": {
-        "percent": 60,
+        "percent": 100,
         "days_total": 5.0,
-        "days_left": 2.0,
+        "days_left": 0.0,
         "counts": {
-          "done": 4,
+          "done": 7,
           "in_progress": 0,
-          "todo": 3,
+          "todo": 0,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 3.0,
+          "done": 5.0,
           "in_progress": 0,
-          "todo": 2.0,
+          "todo": 0,
           "blocked": 0
         },
         "tasks": 7
@@ -890,51 +942,59 @@
       "tasks": [
         {
           "id": "S11.1",
-          "status": "todo",
+          "status": "done",
           "days": 0.5,
           "uk": "Експорт scores.json (публічне API тільки для читання)",
           "en": "Export scores.json (read-only public API)",
+          "note_uk": "tension-index export → dashboard/scores.json (бал, рівень, причини, статус війни, 90 днів історії).",
+          "note_en": "tension-index export → dashboard/scores.json (score, level, reasons, war status, 90-day history).",
           "owner": "claude"
         },
         {
           "id": "S11.2",
-          "status": "todo",
+          "status": "done",
           "days": 1,
           "uk": "Карта Європи з кольорами рівнів",
           "en": "Map of Europe coloured by level",
+          "note_uk": "Карта-сітка 38 країн, одновідтінкова шкала, перевірена на кольоросліпість, у світлій і темній темах.",
+          "note_en": "Tile map of 38 countries, single-hue scale validated for colour blindness, light and dark.",
           "owner": "claude"
         },
         {
           "id": "S11.3",
-          "status": "todo",
+          "status": "done",
           "days": 1,
           "uk": "Сторінка країни: історія балу і пояснення змін",
           "en": "Country page: score history and change explanations",
+          "note_uk": "Картка країни: бал, причини з цитатами, позначки, статус війни, графік 90 днів; таблиця всіх країн; посилання #PL.",
+          "note_en": "Country card: score, reasons with quotes, flags, war status, 90-day chart; table of all countries; #PL links.",
           "owner": "claude"
         },
         {
           "id": "S11.4",
-          "status": "todo",
+          "status": "in_progress",
           "days": 0.3,
+          "owner": "human",
           "uk": "Юридичне застереження і методологія на сайті",
           "en": "Disclaimer and methodology on the site",
-          "owner": "claude"
+          "note_uk": "Робочий текст застереження й методології на сторінці; остаточний текст затверджує власник (S1.7).",
+          "note_en": "Working disclaimer and methodology on the page; final wording approved by the owner (S1.7)."
         }
       ],
       "stats": {
-        "percent": 0,
+        "percent": 95,
         "days_total": 2.8,
-        "days_left": 2.8,
+        "days_left": 0.1,
         "counts": {
-          "done": 0,
-          "in_progress": 0,
-          "todo": 4,
+          "done": 3,
+          "in_progress": 1,
+          "todo": 0,
           "blocked": 0
         },
         "days_by_status": {
-          "done": 0,
-          "in_progress": 0,
-          "todo": 2.8,
+          "done": 2.5,
+          "in_progress": 0.3,
+          "todo": 0,
           "blocked": 0
         },
         "tasks": 4
@@ -1120,6 +1180,106 @@
   ],
   "changelog": [
     {
+      "version": "0.2.44",
+      "date": "2026-09-30",
+      "uk": [
+        "Публічна панель: карта Європи, картка країни з графіком, таблиця, методологія (/dashboard/)",
+        "Експорт scores.json"
+      ],
+      "en": [
+        "Public dashboard: map of Europe, country card with chart, table, methodology (/dashboard/)",
+        "scores.json export"
+      ]
+    },
+    {
+      "version": "0.2.40",
+      "date": "2026-09-30",
+      "uk": [
+        "Бот: до 5 країн на користувача, перемикання між ними, щоденний дайджест"
+      ],
+      "en": [
+        "Bot: up to 5 countries per user, switching between them, daily digest"
+      ]
+    },
+    {
+      "version": "0.2.38",
+      "date": "2026-09-30",
+      "uk": [
+        "Архів Wayback для історичних епізодів (tension-index history)",
+        "Бектест шкали з PASS/FAIL-звітами (tension-index backtest)"
+      ],
+      "en": [
+        "Wayback archive for historical episodes (tension-index history)",
+        "Scale backtest with PASS/FAIL reports (tension-index backtest)"
+      ]
+    },
+    {
+      "version": "0.2.33",
+      "date": "2026-09-30",
+      "uk": [
+        "Новини: 13 стрічок, категорії заголовків (правила + Claude), підтвердження двома стрічками",
+        "GDELT: сплески уваги медіа і поради МЗС РФ/РБ",
+        "Ринки ЄЦБ: спреди облігацій і курси валют",
+        "probe news / gdelt / ecb"
+      ],
+      "en": [
+        "News: 13 feeds, headline categories (rules + Claude), two-feed confirmation",
+        "GDELT: media surges and RU/BY MFA advice",
+        "ECB markets: bond spreads and FX",
+        "probe news / gdelt / ecb"
+      ]
+    },
+    {
+      "version": "0.2.27",
+      "date": "2026-09-30",
+      "uk": [
+        "Авіація: бюлетені EASA щодо зон конфлікту, падіння авіатрафіку (OpenSky) із захистом від збоїв даних"
+      ],
+      "en": [
+        "Aviation: EASA conflict zone bulletins, air traffic drops (OpenSky) with data-outage guard"
+      ]
+    },
+    {
+      "version": "0.2.24",
+      "date": "2026-09-30",
+      "uk": [
+        "Сигнали з рекомендацій, щоденний бал, пояснення",
+        "Команда run (повний цикл) і сповіщення про зміну балу",
+        "Бот показує бал і причини"
+      ],
+      "en": [
+        "Signals from advisories, daily score, explanations",
+        "run command (full cycle) and score-change alerts",
+        "Bot shows the score and reasons"
+      ]
+    },
+    {
+      "version": "0.2.21",
+      "date": "2026-09-30",
+      "uk": [
+        "Класифікатор змін: правила + Claude (строга JSON-схема, кешування, ліміт викликів)",
+        "Команда classify"
+      ],
+      "en": [
+        "Change classifier: rules + Claude (strict JSON schema, caching, call cap)",
+        "classify command"
+      ]
+    },
+    {
+      "version": "0.2.18",
+      "date": "2026-09-30",
+      "uk": [
+        "Джерела: Німеччина, США, Канада, Австралія, Франція",
+        "Очищення службових рядків (дати оновлення)",
+        "Команда probe для перевірки джерел"
+      ],
+      "en": [
+        "Sources: Germany, US, Canada, Australia, France",
+        "Boilerplate (update dates) stripped before diffing",
+        "probe command to inspect sources"
+      ]
+    },
+    {
       "version": "0.2.10",
       "date": "2026-09-30",
       "uk": [
@@ -1255,25 +1415,25 @@
     }
   ],
   "stats": {
-    "percent": 30,
+    "percent": 65,
     "days_total": 43.9,
-    "days_left": 30.9,
+    "days_left": 15.2,
     "counts": {
-      "done": 32,
-      "in_progress": 1,
-      "todo": 45,
-      "blocked": 0
+      "done": 44,
+      "in_progress": 18,
+      "todo": 14,
+      "blocked": 2
     },
     "days_by_status": {
-      "done": 12.9,
-      "in_progress": 0.2,
-      "todo": 30.8,
-      "blocked": 0
+      "done": 21.9,
+      "in_progress": 13.5,
+      "todo": 6.5,
+      "blocked": 2.0
     },
     "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T11:38:37+00:00",
-    "commit": "854b7d5"
+    "built_at": "2026-09-30T12:17:04+00:00",
+    "commit": "1a64d56"
   }
 }

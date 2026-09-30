@@ -120,14 +120,14 @@ const T = {
         next: "Наступний крок, етап", all_done: "Усі завдання виконано.", owner: "вручну",
         milestones: "Віхи", decisions: "Зафіксовані рішення", risks: "Ризики", changelog: "Журнал змін",
         ideas: "Ідеї", built: "Зібрано", plan: "План у репозиторії", branch: "гілка",
-        err: "Не вдалося завантажити roadmap.json", title: "хід проєкту" },
+        err: "Не вдалося завантажити roadmap.json", title: "хід проєкту", dashboard: "Публічна панель" },
   en: { version: "Version", updated: "updated", done_of: "Done", of: "of", tasks: "tasks",
         in_progress_n: "in progress", left: "≈ left", days: "days",
         done: "done", in_progress: "in progress", todo: "not started", blocked: "blocked",
         next: "Next step, stage", all_done: "All tasks are done.", owner: "manual",
         milestones: "Milestones", decisions: "Decisions", risks: "Risks", changelog: "Changelog",
         ideas: "Ideas", built: "Built", plan: "Plan in the repository", branch: "branch",
-        err: "Failed to load roadmap.json", title: "progress" },
+        err: "Failed to load roadmap.json", title: "progress", dashboard: "Public dashboard" },
 };
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -201,7 +201,8 @@ function render() {
   document.getElementById("foot").innerHTML =
     `${t.built}: ${esc(data.build.built_at.replace("T", " ").replace("+00:00", " UTC"))}` +
     (commit ? ` · <a href="https://github.com/${repo}/commit/${commit}">${commit}</a>` : "") +
-    ` · <a href="https://github.com/${repo}/blob/main/${lang === "uk" ? "PLAN.md" : "PLAN.en.md"}">${t.plan}</a>`;
+    ` · <a href="https://github.com/${repo}/blob/main/${lang === "uk" ? "PLAN.md" : "PLAN.en.md"}">${t.plan}</a>` +
+    ` · <a href="dashboard/">${t.dashboard}</a>`;
 }
 
 document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; store.set("lang", lang); render(); }));
