@@ -87,7 +87,12 @@ async def _war_check(args: argparse.Namespace) -> int:
     settings = get_settings()
     try:
         async with make_client(settings) as client:
-            detected = war_status.parse_wikipedia(await war_status.fetch_wikipedia(client))
+            html = await war_status.fetch_wikipedia(client)
+        if args.headings:
+            for h in war_status.headings(html):
+                print(f"{'  ' * (h.level - 2)}h{h.level} [{h.severity or '-'}] {h.text}")
+            return 0
+        detected = war_status.parse_wikipedia(html)
     except (httpx.HTTPError, KeyError, ValueError) as exc:
         print(f"war-check failed: {type(exc).__name__}: {exc}", file=sys.stderr)
         if args.notify:
@@ -141,6 +146,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("war-check", help="compare config/conflicts.yaml with Wikipedia")
     p.add_argument("--notify", action="store_true", help="alert Telegram on mismatches")
+    p.add_argument(
+        "--headings", action="store_true", help="print page headings and parsed severity, then exit"
+    )
 
     p = sub.add_parser("roadmap", help="render PLAN.md + progress site from roadmap.yaml")
     p.add_argument("--source", default="roadmap/roadmap.yaml")

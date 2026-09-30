@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.6
+  version: 0.2.7
   updated: 2026-09-30
 
 milestones:
@@ -40,7 +40,7 @@ stages:
       - {id: S0.9, status: done, days: 0.3, owner: human, uk: "MacBook: встановити uv і Claude Code, клонувати репозиторій, ./scripts/bootstrap.sh", en: "MacBook: install uv and Claude Code, clone the repo, ./scripts/bootstrap.sh"}
       - {id: S0.10, status: todo, days: 0.2, owner: human, uk: "Anthropic Console: поповнення, ключ API, місячний ліміт витрат", en: "Anthropic Console: top-up, API key, monthly spend cap"}
       - {id: S0.11, status: done, days: 0.2, owner: human, uk: "Створити бота в @BotFather, тестовий канал, заповнити .env", en: "Create bot via @BotFather, test channel, fill in .env"}
-      - {id: S0.12, status: todo, days: 0.5, owner: human, uk: "Перший деплой на сервер: install_server.sh, перевірка healthcheck", en: "First server deploy: install_server.sh, verify healthcheck"}
+      - {id: S0.12, status: todo, days: 0.5, owner: human, uk: "Перший деплой на сервер: install_server.sh, перевірка healthcheck", en: "First server deploy: install_server.sh, verify healthcheck", note_uk: "Відкладено: спершу бот і система.", note_en: "Postponed: bot and system first."}
       - {id: S0.13, status: done, days: 0.2, owner: human, uk: "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root", en: "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root", note_uk: "Працює: fixerhack.github.io/war-predictor", note_en: "Live: fixerhack.github.io/war-predictor"}
       - {id: S0.15, status: todo, days: 0.2, owner: human, uk: "Зняти блокування GitHub Actions: Settings → Billing and plans (рахунок / картка)", en: "Unlock GitHub Actions: Settings → Billing and plans (invoice / card)", note_uk: "CI не стартує: «account is locked due to a billing issue».", note_en: "CI does not start: \"account is locked due to a billing issue\"."}
       - {id: S0.16, status: done, days: 0.2, uk: "Публікація сторінки прогресу без Actions (make pages → гілка gh-pages)", en: "Publish the progress page without Actions (make pages → gh-pages branch)"}
@@ -176,7 +176,7 @@ stages:
       - {id: S10.2, status: done, days: 0.5, uk: "Щоденна звірка з Wikipedia, розбіжності адміну (war-check)", en: "Daily check against Wikipedia, mismatches to admins (war-check)"}
       - {id: S10.3, status: todo, days: 0.5, owner: human, uk: "Отримати токен UCDP API", en: "Obtain a UCDP API token"}
       - {id: S10.4, status: todo, days: 0.5, uk: "UCDP Candidate Events як друге автоматичне джерело", en: "UCDP Candidate Events as a second automatic source"}
-      - {id: S10.5, status: in_progress, days: 0.3, uk: "Перевірити парсер Wikipedia на живій сторінці", en: "Verify the Wikipedia parser against the live page", note_uk: "Запит працює; додано захист від зміни розмітки, потрібен повторний запуск war-check.", note_en: "Request works; layout-change guard added, re-run war-check to confirm."}
+      - {id: S10.5, status: in_progress, days: 0.3, uk: "Перевірити парсер Wikipedia на живій сторінці", en: "Verify the Wikipedia parser against the live page", note_uk: "Захист виявив, що розбір вікітексту не бачить розділів; парсер переведено на відрендерений HTML, потрібен запуск war-check --headings.", note_en: "Guard showed wikitext parsing found no sections; parser moved to rendered HTML, run war-check --headings to confirm."}
 
   - id: S11
     branch: dev-dashboard
@@ -213,6 +213,7 @@ stages:
       - {id: S13.3, status: todo, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote"}
 
 decisions:
+  - {date: 2026-09-30, uk: "Деплой на сервер відкладено; пріоритет — бот і система на MacBook", en: "Server deploy postponed; priority is the bot and system on the MacBook"}
   - {date: 2026-09-27, uk: "Шкала 0–10 замість ймовірності: описує стан сигналів, а не прогнозує війну", en: "0–10 scale instead of a probability: describes signals, does not forecast war"}
   - {date: 2026-09-27, uk: "Рекомендації посольств для країн ЄС і НАТО важать менше: союзники рідко заздалегідь піднімають рівень", en: "Advisories weigh less for EU/NATO members: allies rarely raise levels in advance"}
   - {date: 2026-09-27, uk: "Порівняння з власною нормою країни, а не за абсолютним рівнем", en: "Compare against the country's own baseline, not absolute levels"}
@@ -230,6 +231,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.7
+    date: 2026-09-30
+    uk: ["Парсер Wikipedia працює з відрендереним HTML і підзаголовками будь-якого рівня", "war-check --headings: діагностика структури сторінки"]
+    en: ["Wikipedia parser works on rendered HTML and headings of any level", "war-check --headings: page structure diagnostics"]
   - version: 0.2.6
     date: 2026-09-30
     uk: ["Перевірено на MacBook: bootstrap, бот (онбординг і панель), збір GOV.UK, healthcheck", "war-check: помилка, якщо розмітка Wikipedia змінилась; вивід розпізнаних країн"]

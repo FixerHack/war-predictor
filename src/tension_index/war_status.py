@@ -3,13 +3,15 @@
 Two layers:
 1. `config/conflicts.yaml` - curated, human-reviewed status (shown to users).
 2. Automatic check against Wikipedia's "List of ongoing armed conflicts" (updated daily by
-   editors, grouped by annual death toll). Mismatches are reported to admins for review,
+   editors, grouped by annual death toll), parsed from the rendered page because its tables
+   are transcluded templates. Mismatches are reported to admins for review,
    never applied automatically: the list also names countries hit only by spillover
    (e.g. a drone crash), which must not turn into "war" for a public product.
 """
 
 from __future__ import annotations
 
+import html as html_lib
 import re
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -74,65 +76,98 @@ def _names(code: str) -> list[str]:
     return _ALIASES.get(code, [COUNTRIES[code].name])
 
 
-def _section_severity(heading: str) -> str | None:
-    h = heading.lower().replace(",", "")
-    if h.startswith("10000") or "major war" in h:
-        return "war"
-    if h.startswith("1000") or "minor war" in h:
-        return "war"
-    if h.startswith("100") or h.startswith("conflicts"):
-        return "active"
-    if h.startswith("fewer") or h.startswith("1–99") or "skirmish" in h:
+def section_severity(heading: str) -> str | None:
+    """Map a death-toll heading to a severity. Order matters: "fewer than 100" contains "100"."""
+    h = heading.lower().replace(",", "").replace("\u2013", "-").replace("\u2014", "-")
+    if "fewer" in h or re.search(r"\b1-99\b", h) or "skirmish" in h or "clash" in h:
         return "clashes"
+    if "10000" in h or "major war" in h:
+        return "war"
+    if "1000" in h or "minor war" in h:
+        return "war"
+    if re.search(r"\b100\b", h) or h.startswith("conflicts"):
+        return "active"
     return None
 
 
-_HEADING = re.compile(r"^==\s*([^=].*?)\s*==\s*$", re.M)
+_HEADING = re.compile(r"<h([2-4])\b[^>]*>(.*?)</h\1>", re.S | re.I)
+_TAG = re.compile(r"<[^>]+>")
 
 
-def parse_wikipedia(wikitext: str) -> dict[str, str]:
+@dataclass(slots=True)
+class Heading:
+    level: int
+    text: str
+    severity: str | None  # own or inherited from the enclosing death-toll section
+
+
+def _sections(html: str) -> list[tuple[Heading, str]]:
+    """Split rendered HTML into (heading, body) pairs. Subheadings (e.g. regions) inside a
+    death-toll section inherit its severity until a heading of the same or higher level."""
+    matches = list(_HEADING.finditer(html))
+    out: list[tuple[Heading, str]] = []
+    current: str | None = None
+    current_level = 99
+    for i, m in enumerate(matches):
+        level = int(m.group(1))
+        text = " ".join(html_lib.unescape(_TAG.sub("", m.group(2))).split())
+        own = section_severity(text)
+        if own is not None:
+            current, current_level = own, level
+        elif level <= current_level:
+            current, current_level = None, 99
+        body_end = matches[i + 1].start() if i + 1 < len(matches) else len(html)
+        out.append((Heading(level, text, own or current), html[m.end() : body_end]))
+    return out
+
+
+def headings(html: str) -> list[Heading]:
+    """Diagnostics: every heading with the severity the parser assigns to it."""
+    return [h for h, _ in _sections(html)]
+
+
+def _mentions(body: str, name: str) -> bool:
+    # Rendered links: <a href="/wiki/Poland" title="Poland">
+    return bool(
+        re.search(rf'title="{re.escape(name)}"', body)
+        or re.search(rf'href="/wiki/{re.escape(name.replace(" ", "_"))}"', body)
+    )
+
+
+def parse_wikipedia(html: str) -> dict[str, str]:
     """Return {country_code: highest severity} for monitored countries named in the list.
 
-    Raises ValueError when no death-toll section is recognised: a changed page layout must
-    fail loudly instead of looking like "no conflicts in Europe".
+    Works on the rendered page (templates transcluded). Raises ValueError when no death-toll
+    section is recognised: a changed layout must fail loudly, not look like "no conflicts".
     """
     found: dict[str, str] = {}
-    recognised = 0
-    parts = _HEADING.split(wikitext)
-    # parts = [intro, heading1, body1, heading2, body2, ...]
-    for heading, body in zip(parts[1::2], parts[2::2], strict=False):
-        severity = _section_severity(heading)
-        if severity is None:
-            continue
-        recognised += 1
-        for code in COUNTRIES:
-            for name in _names(code):
-                # {{flag|Poland}}, {{flagicon|Poland}}, {{flagcountry|Poland}}, [[Poland]]
-                pattern = (
-                    rf"\{{\{{\s*flag\w*\s*\|\s*{re.escape(name)}\s*[|}}]|\[\[{re.escape(name)}[\]|]"
-                )
-                if re.search(pattern, body, re.I):
-                    if SEVERITY.index(severity) > SEVERITY.index(found.get(code, "none")):
-                        found[code] = severity
-                    break
-    if recognised == 0:
+    sections = [(h, body) for h, body in _sections(html) if h.severity]
+    if not sections:
         raise ValueError("no conflict sections recognised on the Wikipedia page; layout changed?")
+    for heading, body in sections:
+        for code in COUNTRIES:
+            if any(_mentions(body, name) for name in _names(code)):
+                severity = heading.severity
+                assert severity is not None
+                if SEVERITY.index(severity) > SEVERITY.index(found.get(code, "none")):
+                    found[code] = severity
     return found
 
 
 async def fetch_wikipedia(client: httpx.AsyncClient) -> str:
+    """Rendered HTML of the list (tables are transcluded templates, absent from raw wikitext)."""
     response = await client.get(
         WIKI_API,
         params={
             "action": "parse",
             "page": WIKI_PAGE,
-            "prop": "wikitext",
+            "prop": "text",
             "format": "json",
             "formatversion": "2",
         },
     )
     response.raise_for_status()
-    return response.json()["parse"]["wikitext"]
+    return response.json()["parse"]["text"]
 
 
 def mismatches(curated: dict[str, WarStatus], detected: dict[str, str]) -> list[str]:
