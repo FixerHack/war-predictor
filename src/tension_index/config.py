@@ -1,10 +1,11 @@
 """Application settings, loaded from environment variables and `.env`."""
 
+import sys
 from functools import lru_cache
 from pathlib import Path
 from typing import Annotated, Literal
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
@@ -35,6 +36,28 @@ class Settings(BaseSettings):
 
     log_level: str = "INFO"
 
+    @model_validator(mode="before")
+    @classmethod
+    def _model_in_provider(cls, data: object) -> object:
+        """Accept a model id put into CLASSIFIER_PROVIDER by mistake (e.g.
+        "anthropic/claude-haiku-4.5"): an OpenRouter-style id means provider openrouter."""
+        if not isinstance(data, dict):
+            return data
+        provider = str(data.get("classifier_provider") or "").strip()
+        if "/" in provider:
+            sys.stderr.write(
+                f"warning: CLASSIFIER_PROVIDER={provider!r} looks like a model id; using "
+                f"CLASSIFIER_PROVIDER=openrouter"
+                + ("" if data.get("classifier_model") else f" and CLASSIFIER_MODEL={provider}")
+                + ". Fix .env to silence this.\n"
+            )
+            data = {**data, "classifier_provider": "openrouter"}
+            if not data.get("classifier_model"):
+                data["classifier_model"] = provider
+        elif provider:
+            data = {**data, "classifier_provider": provider.lower()}
+        return data
+
     @field_validator("telegram_admin_ids", mode="before")
     @classmethod
     def _split_ids(cls, value: object) -> object:
@@ -48,3 +71,17 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+def settings_error_text(exc: Exception) -> str:
+    """One readable line per invalid .env setting (instead of a pydantic traceback)."""
+    from pydantic import ValidationError
+
+    if not isinstance(exc, ValidationError):
+        return str(exc)
+    lines = ["Invalid settings in .env (or environment):"]
+    for err in exc.errors():
+        name = ".".join(str(x) for x in err["loc"]).upper()
+        lines.append(f"  {name} = {err.get('input')!r}: {err['msg']}")
+    lines.append("See .env.example for the expected values.")
+    return "\n".join(lines)

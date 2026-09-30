@@ -360,7 +360,14 @@ def main(argv: list[str] | None = None) -> None:
     args = build_parser().parse_args(argv)
     if args.command == "roadmap":
         sys.exit(_roadmap(args))
-    setup_logging(get_settings().log_level)
+    try:
+        settings = get_settings()
+    except ValueError as exc:  # pydantic ValidationError is a ValueError
+        from tension_index.config import settings_error_text
+
+        print(settings_error_text(exc), file=sys.stderr)
+        sys.exit(2)
+    setup_logging(settings.log_level)
     handlers = {
         "init-db": lambda: _init_db(),
         "collect": lambda: _collect(args),
