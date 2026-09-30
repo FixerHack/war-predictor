@@ -166,3 +166,50 @@ async def test_fr_uses_main_content():
         adv = await FrSource(c).fetch(get_country("PL"))
     assert adv.text == "Pologne\nVigilance normale." and adv.level is None
     assert not FrSource(c).supports(get_country("FR"))
+
+
+def test_fr_alerts_text_drops_page_furniture():
+    from tension_index.sources.fr import alerts_text
+
+    page = """Voir le fil d’Ariane
+Accueil
+Pologne
+Conseils aux voyageurs
+Dernière mise à jour le : 16 septembre 2026
+Information toujours valable à la date du jour
+Imprimer
+Vous voyagez à l'étranger ?
+Pour recevoir des alertes, inscrivez-vous sur Fil d'Ariane.
+S'inscrire sur Fil d'Ariane
+Donnez-nous votre avis
+Aidez-nous à améliorer notre service en répondant à notre enquête.
+Répondre à l'enquête utilisateurs
+Fermer
+Pologne –Vigilance renforcée aux frontières
+Des contrôles sont en place."""
+    assert (
+        alerts_text(page)
+        == "Pologne –Vigilance renforcée aux frontières\nDes contrôles sont en place."
+    )
+
+
+async def test_us_does_not_confuse_fips_and_iso_codes():
+    feed = b"""<rss><channel>
+<item><title>Seychelles - Level 1: Exercise Normal Precautions</title><link>s</link>
+<description>x</description><category domain="Country-Tag">SE</category></item>
+<item><title>Sweden - Level 2: Exercise Increased Caution</title><link>w</link>
+<description>y</description><category domain="Country-Tag">SW</category></item>
+<item><title>Bosnia-Herzegovina - Level 2: Exercise Increased Caution</title><link>b</link>
+<description>z</description><category domain="Country-Tag">BK</category></item>
+<item><title>Iceland Travel Advisory</title><link>i</link>
+<description>Level 1</description><category domain="Country-Tag">IC</category></item>
+</channel></rss>"""
+    async with client({"https://travel.state.gov": feed}) as c:
+        src = UsSource(c)
+        await src.prepare()
+        se = await src.fetch(get_country("SE"))
+        ba = await src.fetch(get_country("BA"))
+        iceland = await src.fetch(get_country("IS"))  # no name match: FIPS "IC", not ISO "IS"
+    assert se.title.startswith("Sweden") and se.level == "2"
+    assert ba.title.startswith("Bosnia")
+    assert iceland.title == "Iceland Travel Advisory"

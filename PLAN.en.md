@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.48**, updated 2026-09-30.
+Version **0.2.49**, updated 2026-09-30.
 
 **Overall progress: 67%** · left ≈ 14.7 days · ✅ 45 · 🟡 19 · ⬜ 11 · ⛔ 3
 
@@ -249,6 +249,11 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.49** (2026-09-30)
+  - US: country matched by name (feed tags are FIPS, not ISO)
+  - Australia: longer timeout; France: new page URL and menu stripping
+  - News: dropped NATO/ISW/ECFR (unreachable), added Politico Europe and Kyiv Independent
+  - GDELT: retry after 429; probe easa shows parsed bulletins
 - **0.2.48** (2026-09-30)
   - GDELT: stop after 3 consecutive failures when the service is unreachable
 - **0.2.47** (2026-09-30)

@@ -59,6 +59,7 @@ def _items(payload: object) -> list[dict]:
 class AuSource(Source):
     name = "au"
     label = "🇦🇺 Smartraveller"
+    timeout = 120.0  # the export covers every destination and is slow to generate
 
     async def prepare(self) -> None:
         self.index: dict[str, dict] = {}

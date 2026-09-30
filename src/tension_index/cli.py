@@ -251,6 +251,15 @@ async def _probe(args: argparse.Namespace) -> int:
         async with make_client(get_settings()) as client:
             response = await client.get(PROBE_URLS[args.source])
             print(f"HTTP {response.status_code} {response.url} ({len(response.text)} bytes)")
+            if args.source == "easa" and response.is_success:
+                from tension_index.extra.aviation import _CZIB_ID, parse_czibs
+                from tension_index.sources.base import html_to_text, main_content
+
+                text = html_to_text(main_content(response.text))
+                ids = sorted({m.group(1) for m in _CZIB_ID.finditer(text)})
+                print(f"CZIB ids on the page: {len(ids)} {ids[:12]}")
+                print(f"active CZIBs for monitored countries: {parse_czibs(text) or 'none'}")
+                return 0 if ids else 2
             print(response.text[: args.bytes])
         return 0 if response.is_success else 2
     if args.source not in REGISTRY:

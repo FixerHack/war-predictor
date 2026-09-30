@@ -32,6 +32,7 @@ class Source(abc.ABC):
 
     name: str = ""
     label: str = ""
+    timeout: float | None = None  # seconds; None = the client default
 
     def __init__(self, client: httpx.AsyncClient) -> None:
         self.client = client
@@ -47,7 +48,8 @@ class Source(abc.ABC):
     async def fetch(self, country: Country) -> Advisory: ...
 
     async def get(self, url: str, **params: str) -> httpx.Response:
-        response = await self.client.get(url, params=params or None)
+        kwargs = {"timeout": self.timeout} if self.timeout else {}
+        response = await self.client.get(url, params=params or None, **kwargs)
         self.raw[str(response.url)] = response.text
         response.raise_for_status()
         return response

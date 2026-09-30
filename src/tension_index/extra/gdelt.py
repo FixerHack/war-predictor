@@ -53,6 +53,16 @@ def surge_strength(ratio: float) -> float:
     return min(1.0, 0.3 + (ratio - SURGE_RATIO) * 0.2)
 
 
+async def _get(client: httpx.AsyncClient, params: dict, pause: float) -> httpx.Response:
+    """GET with up to two retries on 429 (GDELT allows one request per 5 seconds)."""
+    for attempt in range(3):
+        response = await client.get(API, params=params)
+        if response.status_code != 429 or attempt == 2:
+            return response
+        await asyncio.sleep(pause * 2)
+    return response
+
+
 async def _recently_ran(db: aiosqlite.Connection, now: datetime) -> bool:
     last = await storage.last_success(db, "gdelt")
     return bool(last) and now - datetime.fromisoformat(last) < timedelta(hours=MIN_INTERVAL_HOURS)
@@ -82,10 +92,10 @@ async def collect_gdelt(
     run_id = await storage.start_run(db, "gdelt")
     for code, country in COUNTRIES.items():
         try:
-            response = await client.get(API, params={
+            response = await _get(client, {
                 "query": f'"{country.name}" {KEYWORDS}', "mode": "timelinevolraw",
                 "timespan": "3months", "format": "json",
-            })  # fmt: skip
+            }, pause)  # fmt: skip
             response.raise_for_status()
             counts = daily_counts(response.json())
         except (httpx.HTTPError, ValueError) as exc:
@@ -116,10 +126,10 @@ async def collect_gdelt(
         await asyncio.sleep(pause)
 
     try:
-        response = await client.get(API, params={
+        response = await _get(client, {
             "query": f"{MFA_QUERY} sourcelang:russian", "mode": "artlist",
             "maxrecords": "75", "timespan": "7days", "format": "json",
-        })  # fmt: skip
+        }, pause)  # fmt: skip
         response.raise_for_status()
         articles = response.json().get("articles") or []
         result.changed += await mfa_signals(db, articles, now)
