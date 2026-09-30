@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.48",
+    "version": "0.2.51",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -99,8 +99,8 @@
           "status": "todo",
           "days": 0.2,
           "owner": "human",
-          "uk": "Anthropic Console: поповнення, ключ API, місячний ліміт витрат",
-          "en": "Anthropic Console: top-up, API key, monthly spend cap"
+          "uk": "OpenRouter: поповнення, ключ API (OPENROUTER_API_KEY у .env), ліміт витрат",
+          "en": "OpenRouter: top-up, API key (OPENROUTER_API_KEY in .env), spend limit"
         },
         {
           "id": "S0.11",
@@ -1114,6 +1114,11 @@
   "decisions": [
     {
       "date": "2026-09-30",
+      "uk": "Класифікація змін: Claude Haiku 4.5 через OpenRouter",
+      "en": "Change classification: Claude Haiku 4.5 via OpenRouter"
+    },
+    {
+      "date": "2026-09-30",
       "uk": "Заморські території європейських країн не впливають на статус війни; винятки фіксуються вручну в wikipedia_ignore",
       "en": "Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore"
     },
@@ -1185,6 +1190,42 @@
     }
   ],
   "changelog": [
+    {
+      "version": "0.2.51",
+      "date": "2026-09-30",
+      "uk": [
+        "Зрозуміла помилка при неправильному .env; назва моделі в CLASSIFIER_PROVIDER розпізнається як OpenRouter"
+      ],
+      "en": [
+        "Readable error for a bad .env; a model id in CLASSIFIER_PROVIDER is read as OpenRouter"
+      ]
+    },
+    {
+      "version": "0.2.50",
+      "date": "2026-09-30",
+      "uk": [
+        "Класифікатор через OpenRouter (Claude Haiku 4.5) як основний варіант; Anthropic API напряму лишається"
+      ],
+      "en": [
+        "Classifier via OpenRouter (Claude Haiku 4.5) as the main option; direct Anthropic API remains"
+      ]
+    },
+    {
+      "version": "0.2.49",
+      "date": "2026-09-30",
+      "uk": [
+        "США: країна визначається за назвою (теги у стрічці — FIPS, не ISO)",
+        "Австралія: довший тайм-аут; Франція: нова адреса сторінки й очищення від меню",
+        "Новини: прибрано NATO/ISW/ECFR (недоступні), додано Politico Europe і Kyiv Independent",
+        "GDELT: повтор після 429; probe easa показує знайдені бюлетені"
+      ],
+      "en": [
+        "US: country matched by name (feed tags are FIPS, not ISO)",
+        "Australia: longer timeout; France: new page URL and menu stripping",
+        "News: dropped NATO/ISW/ECFR (unreachable), added Politico Europe and Kyiv Independent",
+        "GDELT: retry after 429; probe easa shows parsed bulletins"
+      ]
+    },
     {
       "version": "0.2.48",
       "date": "2026-09-30",
@@ -1461,7 +1502,7 @@
     "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T12:19:05+00:00",
-    "commit": "d5a7f1a"
+    "built_at": "2026-09-30T14:30:34+00:00",
+    "commit": "327c5bc"
   }
 }
