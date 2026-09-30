@@ -56,6 +56,9 @@ class Classification:
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
+QUOTE_MIN_WORDS = 4
+QUOTE_MIN_CHARS = 20
+
 # --- Rules ----------------------------------------------------------------------------------
 
 _STAFF_RULES = [  # most severe first
@@ -143,8 +146,15 @@ def classify_rules(text: str, *, level_change: tuple[float, float] | None = None
         (ln for ln in added.splitlines() if re.search(pattern, ln.lower())),
         next((ln for ln in added.splitlines() if ln.strip()), ""),
     )
-    result.quote = quote_line.strip()[:300]
+    result.quote = usable_quote(quote_line)
     return result
+
+
+def usable_quote(text: str) -> str:
+    """A quote worth showing to users: a sentence, not a page fragment like "3 pays"."""
+    text = " ".join(text.split())[:300]
+    words = re.findall(r"[^\W\d_]{2,}", text)
+    return text if len(words) >= QUOTE_MIN_WORDS and len(text) >= QUOTE_MIN_CHARS else ""
 
 
 # --- Claude ---------------------------------------------------------------------------------
@@ -351,7 +361,7 @@ class ClaudeClassifier:
             fallback.notes.append("claude: unparseable output, rules used")
             return fallback
         result.method = "claude"
-        result.quote = result.quote[:300]
+        result.quote = usable_quote(result.quote) or fallback.quote
         # Keep the deterministic level-change direction: it comes from structured data.
         if fallback.change_type in ("level_raised", "level_lowered"):
             result.change_type = fallback.change_type

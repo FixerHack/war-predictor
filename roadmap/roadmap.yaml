@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.59
+  version: 0.2.60
   updated: 2026-09-30
 
 milestones:
@@ -128,6 +128,7 @@ stages:
       - {id: S6.2, status: done, days: 0.5, uk: "Виклик лише на змінених фрагментах, кешування промпту, ліміт витрат", en: "Call only on changed fragments, prompt caching, spend cap", note_uk: "Лише змінені фрагменти, кеш системного промпту, ліміт викликів CLASSIFIER_MAX_CALLS; без ключа працюють правила.", note_en: "Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key."}
       - {id: S6.3, status: todo, days: 1, owner: human, uk: "Ручна перевірка на 50 прикладах", en: "Manual check on 50 examples", note_uk: "Потрібен ключ API і реальні зміни; перевірити 50 класифікацій вручну.", note_en: "Needs an API key and real changes; review 50 classifications by hand."}
 
+      - {id: S6.6, status: done, days: 0.1, uk: "Фільтр цитат: уривки сторінок («3 pays») не показуються", en: "Quote filter: page fragments (\"3 pays\") are not shown"}
   - id: S7
     branch: dev-scoring
     uk: Розрахунок балу 0–10
@@ -238,6 +239,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.60
+    date: 2026-09-30
+    uk: "Цитати коротші за 4 слова (уривки навігації) більше не показуються в поясненнях."
+    en: "Quotes shorter than 4 words (navigation fragments) are no longer shown in explanations."
   - version: 0.2.59
     date: 2026-09-30
     uk: "Карта пояснює бал кожної країни: короткий підсумок, заповненість шести блоків, рівні рекомендацій урядів і всі помічені сигнали з цитатами, плюс повна методика. Прибрано хибні сигнали падіння авіатрафіку для малих країн."

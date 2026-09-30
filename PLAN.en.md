@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.59**, updated 2026-09-30.
+Version **0.2.60**, updated 2026-09-30.
 
-**Overall progress: 67%** · left ≈ 14.9 days · ✅ 48 · 🟡 18 · ⬜ 11 · ⛔ 4
+**Overall progress: 67%** · left ≈ 14.9 days · ✅ 49 · 🟡 18 · ⬜ 11 · ⛔ 4
 
 ## Milestones
 
@@ -123,7 +123,7 @@ Branch: `dev-history`
 - 🟡 **S5.2** Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25
   - Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.
 
-## S6. Change classification (Claude API) — 60%
+## S6. Change classification (Claude API) — 62%
 
 _Claude determines the reason and type of each change and turns it into a signal._
 
@@ -134,6 +134,7 @@ Branch: `dev-classifier`
   - Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key.
 - ⬜ **S6.3** Manual check on 50 examples _(manual)_
   - Needs an API key and real changes; review 50 classifications by hand.
+- ✅ **S6.6** Quote filter: page fragments ("3 pays") are not shown
 
 ## S7. Scoring 0–10 — 100%
 
@@ -257,6 +258,94 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.60** (2026-09-30)
+  - Q
+  - u
+  - o
+  - t
+  - e
+  - s
+  -  
+  - s
+  - h
+  - o
+  - r
+  - t
+  - e
+  - r
+  -  
+  - t
+  - h
+  - a
+  - n
+  -  
+  - 4
+  -  
+  - w
+  - o
+  - r
+  - d
+  - s
+  -  
+  - (
+  - n
+  - a
+  - v
+  - i
+  - g
+  - a
+  - t
+  - i
+  - o
+  - n
+  -  
+  - f
+  - r
+  - a
+  - g
+  - m
+  - e
+  - n
+  - t
+  - s
+  - )
+  -  
+  - a
+  - r
+  - e
+  -  
+  - n
+  - o
+  -  
+  - l
+  - o
+  - n
+  - g
+  - e
+  - r
+  -  
+  - s
+  - h
+  - o
+  - w
+  - n
+  -  
+  - i
+  - n
+  -  
+  - e
+  - x
+  - p
+  - l
+  - a
+  - n
+  - a
+  - t
+  - i
+  - o
+  - n
+  - s
+  - .
 - **0.2.59** (2026-09-30)
   - T
   - h

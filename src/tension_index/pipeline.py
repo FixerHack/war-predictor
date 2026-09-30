@@ -16,7 +16,12 @@ from email.utils import parsedate_to_datetime
 import aiosqlite
 
 from tension_index import storage
-from tension_index.classifier import Classification, ClaudeClassifier, classify_rules
+from tension_index.classifier import (
+    Classification,
+    ClaudeClassifier,
+    classify_rules,
+    usable_quote,
+)
 from tension_index.config import Settings
 from tension_index.countries import COUNTRIES, peers
 from tension_index.scoring import (
@@ -226,7 +231,7 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             "observed_at": when,
             "reason": cls.reason,
             "state": True,
-            "note": cls.quote,
+            "note": usable_quote(cls.quote),
         }
         strength = advisory_strength(cfg, snap["source"], level)
         await storage.upsert_signal(
@@ -302,7 +307,7 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
                 observed_at=datetime.fromisoformat(row["detected_at"]),
                 reason=cls.reason,
                 state=False,
-                note=cls.summary_en or cls.quote,
+                note=cls.summary_en or usable_quote(cls.quote),
             )
             await storage.upsert_signal(db, event, f"change:{row['id']}")
             count += 1
