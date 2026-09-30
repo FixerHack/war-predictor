@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.18
+  version: 0.2.21
   updated: 2026-09-30
 
 milestones:
@@ -123,9 +123,9 @@ stages:
     goal_uk: "Claude визначає причину і тип кожної зміни та перетворює її на сигнал."
     goal_en: "Claude determines the reason and type of each change and turns it into a signal."
     tasks:
-      - {id: S6.1, status: todo, days: 1, uk: "Промпт і JSON-схема: причина, тип зміни, персонал, кордони, цитата", en: "Prompt and JSON schema: reason, change type, staff, borders, quote"}
-      - {id: S6.2, status: todo, days: 0.5, uk: "Виклик лише на змінених фрагментах, кешування промпту, ліміт витрат", en: "Call only on changed fragments, prompt caching, spend cap"}
-      - {id: S6.3, status: todo, days: 1, uk: "Ручна перевірка на 50 прикладах", en: "Manual check on 50 examples"}
+      - {id: S6.1, status: done, days: 1, uk: "Промпт і JSON-схема: причина, тип зміни, персонал, кордони, цитата", en: "Prompt and JSON schema: reason, change type, staff, borders, quote"}
+      - {id: S6.2, status: done, days: 0.5, uk: "Виклик лише на змінених фрагментах, кешування промпту, ліміт витрат", en: "Call only on changed fragments, prompt caching, spend cap", note_uk: "Лише змінені фрагменти, кеш системного промпту, ліміт викликів CLASSIFIER_MAX_CALLS; без ключа працюють правила.", note_en: "Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key."}
+      - {id: S6.3, status: todo, days: 1, owner: human, uk: "Ручна перевірка на 50 прикладах", en: "Manual check on 50 examples", note_uk: "Потрібен ключ API і реальні зміни; перевірити 50 класифікацій вручну.", note_en: "Needs an API key and real changes; review 50 classifications by hand."}
 
   - id: S7
     branch: dev-scoring
@@ -232,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.21
+    date: 2026-09-30
+    uk: ["Класифікатор змін: правила + Claude (строга JSON-схема, кешування, ліміт викликів)", "Команда classify"]
+    en: ["Change classifier: rules + Claude (strict JSON schema, caching, call cap)", "classify command"]
   - version: 0.2.18
     date: 2026-09-30
     uk: ["Джерела: Німеччина, США, Канада, Австралія, Франція", "Очищення службових рядків (дати оновлення)", "Команда probe для перевірки джерел"]

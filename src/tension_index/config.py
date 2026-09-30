@@ -16,6 +16,10 @@ class Settings(BaseSettings):
     telegram_admin_ids: Annotated[list[int], NoDecode] = Field(default_factory=list)
 
     anthropic_api_key: str = ""
+    # Classifier model; cheaper option: claude-haiku-4-5 (then set CLASSIFIER_EFFORT="")
+    classifier_model: str = "claude-opus-5-5"
+    classifier_effort: str = "low"
+    classifier_max_calls: int = 60  # per run; beyond it rules are used (spend guard)
 
     database_path: Path = Path("data/tension.sqlite3")
 
