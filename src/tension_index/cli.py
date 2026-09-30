@@ -92,6 +92,12 @@ async def _war_check(args: argparse.Namespace) -> int:
             for h in war_status.headings(html):
                 print(f"{'  ' * (h.level - 2)}h{h.level} [{h.severity or '-'}] {h.text}")
             return 0
+        if args.explain:
+            wanted = {c.upper() for c in args.explain}
+            for m in war_status.mentions(html):
+                if m.country in wanted:
+                    print(f"{m.country} [{m.severity}] {m.conflict or '?'} | column: {m.column}")
+            return 0
         detected = war_status.parse_wikipedia(html)
     except (httpx.HTTPError, KeyError, ValueError) as exc:
         print(f"war-check failed: {type(exc).__name__}: {exc}", file=sys.stderr)
@@ -148,6 +154,9 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--notify", action="store_true", help="alert Telegram on mismatches")
     p.add_argument(
         "--headings", action="store_true", help="print page headings and parsed severity, then exit"
+    )
+    p.add_argument(
+        "--explain", type=_csv, metavar="CODES", help="show where countries (e.g. FR,PL) are found"
     )
 
     p = sub.add_parser("roadmap", help="render PLAN.md + progress site from roadmap.yaml")

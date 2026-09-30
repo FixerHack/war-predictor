@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.7
+  version: 0.2.8
   updated: 2026-09-30
 
 milestones:
@@ -176,7 +176,7 @@ stages:
       - {id: S10.2, status: done, days: 0.5, uk: "Щоденна звірка з Wikipedia, розбіжності адміну (war-check)", en: "Daily check against Wikipedia, mismatches to admins (war-check)"}
       - {id: S10.3, status: todo, days: 0.5, owner: human, uk: "Отримати токен UCDP API", en: "Obtain a UCDP API token"}
       - {id: S10.4, status: todo, days: 0.5, uk: "UCDP Candidate Events як друге автоматичне джерело", en: "UCDP Candidate Events as a second automatic source"}
-      - {id: S10.5, status: in_progress, days: 0.3, uk: "Перевірити парсер Wikipedia на живій сторінці", en: "Verify the Wikipedia parser against the live page", note_uk: "Захист виявив, що розбір вікітексту не бачить розділів; парсер переведено на відрендерений HTML, потрібен запуск war-check --headings.", note_en: "Guard showed wikitext parsing found no sections; parser moved to rendered HTML, run war-check --headings to confirm."}
+      - {id: S10.5, status: in_progress, days: 0.3, uk: "Перевірити парсер Wikipedia на живій сторінці", en: "Verify the Wikipedia parser against the live page", note_uk: "Розділи розпізнаються на живій сторінці; враховується лише колонка Location, перевірити war-check --explain FR.", note_en: "Sections recognised on the live page; only the Location column counts, check war-check --explain FR."}
 
   - id: S11
     branch: dev-dashboard
@@ -231,6 +231,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.8
+    date: 2026-09-30
+    uk: ["Статус війни за Wikipedia: лише колонка Location (учасники конфліктів за кордоном не рахуються)", "war-check --explain: звідки взялася згадка країни"]
+    en: ["Wikipedia war status: Location column only (parties to conflicts abroad no longer count)", "war-check --explain: where a country mention comes from"]
   - version: 0.2.7
     date: 2026-09-30
     uk: ["Парсер Wikipedia працює з відрендереним HTML і підзаголовками будь-якого рівня", "war-check --headings: діагностика структури сторінки"]
