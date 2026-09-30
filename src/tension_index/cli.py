@@ -94,6 +94,8 @@ async def _war_check(args: argparse.Namespace) -> int:
             await send(settings, f"❌ war-check failed: {escape(str(exc))}")
         return 2
     diff = war_status.mismatches(war_status.load(), detected)
+    mentioned = ", ".join(f"{code}={sev}" for code, sev in sorted(detected.items())) or "none"
+    print(f"Monitored countries mentioned on Wikipedia: {mentioned}")
     print("\n".join(diff) or "No mismatches with Wikipedia")
     if diff and args.notify:
         await send(

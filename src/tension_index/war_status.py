@@ -91,14 +91,20 @@ _HEADING = re.compile(r"^==\s*([^=].*?)\s*==\s*$", re.M)
 
 
 def parse_wikipedia(wikitext: str) -> dict[str, str]:
-    """Return {country_code: highest severity} for monitored countries named in the list."""
+    """Return {country_code: highest severity} for monitored countries named in the list.
+
+    Raises ValueError when no death-toll section is recognised: a changed page layout must
+    fail loudly instead of looking like "no conflicts in Europe".
+    """
     found: dict[str, str] = {}
+    recognised = 0
     parts = _HEADING.split(wikitext)
     # parts = [intro, heading1, body1, heading2, body2, ...]
     for heading, body in zip(parts[1::2], parts[2::2], strict=False):
         severity = _section_severity(heading)
         if severity is None:
             continue
+        recognised += 1
         for code in COUNTRIES:
             for name in _names(code):
                 # {{flag|Poland}}, {{flagicon|Poland}}, {{flagcountry|Poland}}, [[Poland]]
@@ -109,6 +115,8 @@ def parse_wikipedia(wikitext: str) -> dict[str, str]:
                     if SEVERITY.index(severity) > SEVERITY.index(found.get(code, "none")):
                         found[code] = severity
                     break
+    if recognised == 0:
+        raise ValueError("no conflict sections recognised on the Wikipedia page; layout changed?")
     return found
 
 
