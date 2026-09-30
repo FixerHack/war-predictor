@@ -1,0 +1,8 @@
+[Unit]
+Description=Tension Index: SQLite backup
+
+[Service]
+Type=oneshot
+User=@APP_USER@
+WorkingDirectory=@APP_DIR@
+ExecStart=@APP_DIR@/scripts/backup.sh

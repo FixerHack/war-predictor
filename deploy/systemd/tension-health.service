@@ -1,0 +1,10 @@
+[Unit]
+Description=Tension Index: health check
+
+[Service]
+Type=oneshot
+User=@APP_USER@
+WorkingDirectory=@APP_DIR@
+ExecStart=@APP_DIR@/scripts/healthcheck.sh --notify
+# 1 = WARN (e.g. no run yet) should not mark the unit as failed
+SuccessExitStatus=1

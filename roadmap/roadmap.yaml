@@ -1,0 +1,161 @@
+# Single source of truth for the project plan.
+# `uv run tension-index roadmap` renders PLAN.md, PLAN.en.md and the GitHub Pages
+# progress site from this file. Edit here, never in the generated files.
+#
+# status: done | in_progress | todo | blocked
+# days:   rough effort estimate, used to weight progress
+# owner:  claude | dmytro (tasks only a human can do: accounts, secrets, server access)
+
+project:
+  name: Tension Index
+  repo: FixerHack/war-predictor
+  updated: 2026-09-30
+
+milestones:
+  - id: M1
+    uk: "MVP: 14 днів автономного збору, бал 7+ для України до 24.02.2022 на історії, кожне сповіщення з поясненням"
+    en: "MVP: 14 days of unattended collection, backtest scores Ukraine 7+ before 2022-02-24, every alert explained"
+
+stages:
+  - id: S0
+    branch: dev-bootstrap
+    uk: Фундамент та інфраструктура
+    en: Foundation & infrastructure
+    tasks:
+      - {id: S0.1, status: done, days: 0.2, uk: "Репозиторій, гілка main за замовчуванням, правила іменування гілок", en: "Repository, main as default branch, branch naming rules"}
+      - {id: S0.2, status: done, days: 0.5, uk: "Python 3.12 + uv, структура пакета, CLI tension-index", en: "Python 3.12 + uv, package layout, tension-index CLI"}
+      - {id: S0.3, status: done, days: 0.5, uk: "SQLite-сховище з міграціями, повні версії текстів", en: "SQLite storage with migrations, full text versions"}
+      - {id: S0.4, status: done, days: 0.5, uk: "Healthcheck (CLI, скрипт, таймер systemd, алерт у Telegram, dead-man ping)", en: "Healthcheck (CLI, script, systemd timer, Telegram alert, dead-man ping)"}
+      - {id: S0.5, status: done, days: 0.5, uk: "Скрипти запуску, деплою і встановлення на сервер (systemd)", en: "Run, deploy and server install scripts (systemd)"}
+      - {id: S0.6, status: done, days: 0.3, uk: "CI: ruff + pytest через uv", en: "CI: ruff + pytest via uv"}
+      - {id: S0.7, status: done, days: 0.5, uk: "План + сторінка прогресу на GitHub Pages", en: "Plan + progress page on GitHub Pages"}
+      - {id: S0.8, status: done, days: 0.3, uk: "README українською та англійською", en: "README in Ukrainian and English"}
+      - {id: S0.9, status: todo, days: 0.2, owner: dmytro, uk: "Увімкнути GitHub Pages (Settings → Pages → Source: GitHub Actions)", en: "Enable GitHub Pages (Settings → Pages → Source: GitHub Actions)"}
+      - {id: S0.10, status: todo, days: 0.2, owner: dmytro, uk: "Створити бота в @BotFather, тестовий канал, заповнити .env", en: "Create bot via @BotFather, test channel, fill in .env"}
+      - {id: S0.11, status: todo, days: 0.5, owner: dmytro, uk: "Перший деплой на сервер: install_server.sh, перевірка healthcheck", en: "First server deploy: install_server.sh, verify healthcheck"}
+      - {id: S0.12, status: todo, days: 0.2, owner: dmytro, uk: "Захист гілки main (Settings → Branches: тільки через PR, CI зелений)", en: "Protect main (Settings → Branches: PR only, CI green)"}
+
+  - id: S1
+    branch: "—"
+    uk: Вхідні рішення
+    en: Input decisions
+    tasks:
+      - {id: S1.1, status: done, days: 0.1, uk: "Країни: ЄС-27, Велика Британія, Норвегія, Швейцарія, Ісландія, Молдова, Західні Балкани (38)", en: "Countries: EU-27, UK, Norway, Switzerland, Iceland, Moldova, Western Balkans (38)"}
+      - {id: S1.2, status: done, days: 0.1, uk: "Формат: публічний сервіс", en: "Format: public service"}
+      - {id: S1.3, status: done, days: 0.1, uk: "Джерела рекомендацій: США, Велика Британія, Ізраїль, Канада, Австралія, Німеччина, Франція + МЗС РФ і Білорусі", en: "Advisory sources: US, UK, Israel, Canada, Australia, Germany, France + Russian and Belarusian MFA"}
+      - {id: S1.4, status: in_progress, days: 0.2, uk: "Затвердити перелік новинних джерел рівнів 1–2", en: "Approve tier 1–2 news source list"}
+      - {id: S1.5, status: done, days: 0.1, uk: "Розробка: Дмитро + Claude Code; сервер власний", en: "Development: Dmytro + Claude Code; own server"}
+      - {id: S1.6, status: done, days: 0.1, uk: "Бюджет: безкоштовний стек, платний лише Claude API (ліміт 10–20 $)", en: "Budget: free stack, only Claude API is paid (10–20 $ cap)"}
+      - {id: S1.7, status: todo, days: 0.3, owner: dmytro, uk: "Текст юридичного застереження (не прогноз, не порада)", en: "Legal disclaimer text (not a forecast, not advice)"}
+
+  - id: S2
+    branch: dev-collector
+    uk: Збір офіційних рекомендацій
+    en: Official advisory collection
+    tasks:
+      - {id: S2.1, status: done, days: 0.5, uk: "Каркас джерел, збереження версій, виявлення змін (diff)", en: "Source framework, version storage, change detection (diff)"}
+      - {id: S2.2, status: in_progress, days: 0.5, uk: "Велика Британія (GOV.UK Content API): реалізовано, потрібна перевірка на живих даних", en: "UK (GOV.UK Content API): implemented, needs live verification"}
+      - {id: S2.3, status: todo, days: 0.5, uk: "Німеччина (Auswärtiges Amt OpenData API)", en: "Germany (Auswärtiges Amt OpenData API)"}
+      - {id: S2.4, status: todo, days: 1, uk: "США (travel.state.gov: рівні + Security Alerts посольств)", en: "US (travel.state.gov levels + embassy Security Alerts)"}
+      - {id: S2.5, status: todo, days: 0.5, uk: "Канада (travel.gc.ca)", en: "Canada (travel.gc.ca)"}
+      - {id: S2.6, status: todo, days: 0.5, uk: "Австралія (Smartraveller)", en: "Australia (Smartraveller)"}
+      - {id: S2.7, status: todo, days: 0.5, uk: "Франція (diplomatie.gouv.fr, Conseils aux voyageurs)", en: "France (diplomatie.gouv.fr, Conseils aux voyageurs)"}
+      - {id: S2.8, status: todo, days: 0.5, uk: "Ізраїль (NSC travel warnings)", en: "Israel (NSC travel warnings)"}
+      - {id: S2.9, status: todo, days: 1, uk: "МЗС РФ і Білорусі: рекомендації своїм громадянам (сигнали агресора)", en: "Russian and Belarusian MFA advisories to own citizens (aggressor signals)"}
+      - {id: S2.10, status: done, days: 0.2, uk: "Алерт у Telegram, якщо джерело зламалося", en: "Telegram alert when a source breaks"}
+
+  - id: S3
+    branch: dev-aviation
+    uk: Авіація і повітряний простір
+    en: Aviation & airspace
+    tasks:
+      - {id: S3.1, status: todo, days: 1, uk: "EASA Conflict Zone Information Bulletins", en: "EASA Conflict Zone Information Bulletins"}
+      - {id: S3.2, status: todo, days: 1.5, uk: "NOTAM: обмеження і закриття повітряного простору", en: "NOTAM: airspace restrictions and closures"}
+      - {id: S3.3, status: todo, days: 1, uk: "Скасування рейсів авіакомпаніями (джерело визначити)", en: "Airline flight cancellations (source TBD)"}
+
+  - id: S4
+    branch: dev-news
+    uk: Новини, аналітика, внутрішні заходи
+    en: News, analysis, domestic measures
+    tasks:
+      - {id: S4.1, status: todo, days: 1, uk: "RSS рівнів 1–2 (BBC, NATO, EEAS, ERR, LSM, LRT, Yle, ISW, CrisisWatch, ECFR, RUSI), тільки заголовки й посилання", en: "Tier 1–2 RSS (BBC, NATO, EEAS, ERR, LSM, LRT, Yle, ISW, CrisisWatch, ECFR, RUSI), headlines and links only"}
+      - {id: S4.2, status: todo, days: 1, uk: "GDELT: обсяг і тональність по країні", en: "GDELT: volume and tone per country"}
+      - {id: S4.3, status: todo, days: 0.5, uk: "Рівні довіри джерел; рівні 3–4 без підтвердження не впливають на бал", en: "Source trust tiers; unconfirmed tier 3–4 items don't affect the score"}
+      - {id: S4.4, status: todo, days: 1, uk: "Внутрішні заходи країни: мобілізація, надзвичайні укази, кордони", en: "Domestic measures: mobilisation, emergency decrees, border closures"}
+      - {id: S4.5, status: todo, days: 0.5, uk: "Ринкові індикатори: CDS, спреди, курс валюти (безкоштовне джерело)", en: "Market indicators: CDS, spreads, FX (free source)"}
+
+  - id: S5
+    branch: dev-history
+    uk: Історичний архів
+    en: Historical archive
+    tasks:
+      - {id: S5.1, status: todo, days: 1, uk: "Завантаження старих версій рекомендацій з Wayback Machine (CDX API)", en: "Download past advisory versions from the Wayback Machine (CDX API)"}
+      - {id: S5.2, status: todo, days: 1, uk: "Епізоди: Україна 2021–22, Вірменія/Азербайджан 2020, Ізраїль/Іран 2024–25", en: "Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25"}
+
+  - id: S6
+    branch: dev-classifier
+    uk: Класифікація змін (Claude API)
+    en: Change classification (Claude API)
+    tasks:
+      - {id: S6.1, status: todo, days: 1, uk: "Промпт і JSON-схема: причина, тип зміни, персонал, кордони, цитата", en: "Prompt and JSON schema: reason, change type, staff, borders, quote"}
+      - {id: S6.2, status: todo, days: 0.5, uk: "Виклик лише на змінених фрагментах, кешування промпту, ліміт витрат", en: "Call only on changed fragments, prompt caching, spend cap"}
+      - {id: S6.3, status: todo, days: 1, uk: "Еталонний набір із 30–50 змін для перевірки якості", en: "Gold set of 30–50 changes to evaluate quality"}
+
+  - id: S7
+    branch: dev-scoring
+    uk: Розрахунок балу 0–10
+    en: Scoring 0–10
+    tasks:
+      - {id: S7.1, status: todo, days: 1, uk: "Блоки А–Е з вагами в config/weights.yaml", en: "Blocks A–F with weights in config/weights.yaml"}
+      - {id: S7.2, status: todo, days: 1, uk: "Норма країни за 6–12 місяців і відхилення від неї", en: "Per-country 6–12 month baseline and deviation"}
+      - {id: S7.3, status: todo, days: 1, uk: "Модифікатори: синхронність держав, регіональна розбіжність, згасання, верифікація", en: "Modifiers: cross-government synchrony, regional divergence, decay, verification"}
+      - {id: S7.4, status: todo, days: 0.5, uk: "Пояснення балу: які сигнали, скільки незалежних джерел", en: "Score explanation: which signals, how many independent sources"}
+
+  - id: S8
+    branch: dev-backtest
+    uk: Перевірка на історії
+    en: Backtesting
+    tasks:
+      - {id: S8.1, status: todo, days: 1.5, uk: "Відтворення шкали на історичних епізодах", en: "Replay the scale on historical episodes"}
+      - {id: S8.2, status: todo, days: 1, uk: "Коригування ваг, звіт про хибні тривоги і пропуски", en: "Weight tuning, false alarm and miss report"}
+
+  - id: S9
+    branch: dev-tg-bot
+    uk: Telegram-бот і сповіщення
+    en: Telegram bot & alerts
+    tasks:
+      - {id: S9.1, status: done, days: 0.5, uk: "Базовий бот на aiogram 3: /status, /changes, /help, адмінська /collect", en: "Base aiogram 3 bot: /status, /changes, /help, admin /collect"}
+      - {id: S9.2, status: todo, days: 1, uk: "Сповіщення при зміні балу на 1+ з поясненням і цитатою", en: "Alerts on score change of 1+ with explanation and quote"}
+      - {id: S9.3, status: todo, days: 0.5, uk: "/country XX: поточний бал, історія, причини", en: "/country XX: current score, history, reasons"}
+      - {id: S9.4, status: todo, days: 1, uk: "Підписки користувачів на країни, щотижневий дайджест", en: "User country subscriptions, weekly digest"}
+
+  - id: S10
+    branch: dev-dashboard
+    uk: Публічна панель
+    en: Public dashboard
+    tasks:
+      - {id: S10.1, status: todo, days: 0.5, uk: "Експорт scores.json (публічне API тільки для читання)", en: "Export scores.json (read-only public API)"}
+      - {id: S10.2, status: todo, days: 1.5, uk: "Карта Європи з рівнями і історія балу по країні", en: "Map of Europe with levels and per-country score history"}
+      - {id: S10.3, status: todo, days: 0.3, uk: "Застереження і методологія на сторінці", en: "Disclaimer and methodology on the page"}
+
+  - id: S11
+    branch: dev-ops
+    uk: Експлуатація
+    en: Operations
+    tasks:
+      - {id: S11.1, status: done, days: 0.2, uk: "Щоденний бекап SQLite з ротацією", en: "Daily SQLite backup with rotation"}
+      - {id: S11.2, status: todo, days: 0.3, owner: dmytro, uk: "Dead-man switch на healthchecks.io (безкоштовно)", en: "Dead-man switch on healthchecks.io (free)"}
+      - {id: S11.3, status: todo, days: 0.5, uk: "Автодеплой з main (GitHub Actions → SSH)", en: "Auto-deploy from main (GitHub Actions → SSH)"}
+      - {id: S11.4, status: todo, days: 0.5, uk: "14 днів безперервного збору без ручного втручання", en: "14 days of continuous collection without manual intervention"}
+
+ideas:
+  - uk: "Мультимовний бот (укр/англ) — публічний продукт для іноземців теж"
+    en: "Bilingual bot (uk/en) — the public product serves foreigners too"
+  - uk: "Сигнал «тиші»: країна зникла з медіа при активних рекомендаціях"
+    en: "\"Silence\" signal: country drops out of the media while advisories are active"
+  - uk: "Порівняння формулювань між державами: ті самі причини в тиждень = сильніший сигнал"
+    en: "Cross-government wording match: same reason within a week = stronger signal"
+  - uk: "Message Batches API для історичного архіву — вдвічі дешевше"
+    en: "Message Batches API for the historical archive — half the price"
+  - uk: "Перехід на PostgreSQL, якщо з'явиться багато користувачів панелі"
+    en: "Move to PostgreSQL if dashboard traffic grows"
