@@ -207,3 +207,19 @@ async def test_us_does_not_confuse_fips_and_iso_codes():
     assert se.title.startswith("Sweden") and se.level == "2"
     assert ba.title.startswith("Bosnia")
     assert iceland.title == "Iceland Travel Advisory"
+
+
+async def test_us_picks_the_same_item_whatever_the_order():
+    items = [
+        b"<item><title>Poland - Level 1: Exercise Normal Precautions</title><link>a</link><pubDate>Mon, 01 Sep 2026 00:00:00 GMT</pubDate><description>old</description></item>",
+        b"<item><title>Poland - Level 2: Exercise Increased Caution</title><link>b</link><pubDate>Tue, 29 Sep 2026 00:00:00 GMT</pubDate><description>new</description></item>",
+        b"<item><title>Poland - Security Alert</title><link>c</link><pubDate>Wed, 30 Sep 2026 00:00:00 GMT</pubDate><description>alert</description></item>",
+    ]
+    picked = set()
+    for order in (items, items[::-1]):
+        feed = b"<rss><channel>" + b"".join(order) + b"</channel></rss>"
+        async with client({"https://travel.state.gov": feed}) as c:
+            src = UsSource(c)
+            await src.prepare()
+            picked.add((await src.fetch(get_country("PL"))).text)
+    assert picked == {"new"}

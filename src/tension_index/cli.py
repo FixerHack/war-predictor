@@ -152,6 +152,28 @@ async def _export(args: argparse.Namespace) -> int:
     return 0
 
 
+async def _changes(args: argparse.Namespace) -> int:
+    """Recent advisory changes with their diff (to spot sources that change on every run)."""
+    settings = get_settings()
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        query = "SELECT id, source, country, detected_at, diff FROM changes"
+        params: list = []
+        if args.source:
+            query += " WHERE source = ?"
+            params.append(args.source)
+        query += " ORDER BY id DESC LIMIT ?"
+        params.append(args.last)
+        async with db.execute(query, params) as cur:
+            rows = await cur.fetchall()
+    for r in rows:
+        print(f"#{r['id']} {r['detected_at']} {r['source']} {r['country']}")
+        print("\n".join("    " + line for line in r["diff"].splitlines()[:12]))
+    if not rows:
+        print("no changes recorded")
+    return 0
+
+
 async def _digest() -> int:
     from tension_index.digest import send_digests
 
@@ -319,6 +341,10 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("classify", help="classify new changes and current advisories")
     sub.add_parser("digest", help="send the daily summary to users with the digest on")
 
+    p = sub.add_parser("changes", help="show recent advisory changes with their diff")
+    p.add_argument("--source", help="e.g. us")
+    p.add_argument("--last", type=int, default=10)
+
     p = sub.add_parser("export", help="write the public dashboard data (scores.json)")
     p.add_argument("--out", default="_site/dashboard/scores.json")
 
@@ -378,6 +404,7 @@ def main(argv: list[str] | None = None) -> None:
         "classify": lambda: _classify(),
         "run": lambda: _run(args),
         "digest": lambda: _digest(),
+        "changes": lambda: _changes(args),
         "export": lambda: _export(args),
         "history": lambda: _history(args),
         "backtest": lambda: _backtest(args),

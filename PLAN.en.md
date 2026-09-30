@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.53**, updated 2026-09-30.
+Version **0.2.54**, updated 2026-09-30.
 
 **Overall progress: 66%** · left ≈ 14.9 days · ✅ 45 · 🟡 18 · ⬜ 11 · ⛔ 4
 
@@ -251,6 +251,10 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.54** (2026-09-30)
+  - run: progress and time limits for aviation, news, GDELT, ECB
+  - US: deterministic item choice per country (fewer false changes)
+  - changes command: recent changes with diff
 - **0.2.53** (2026-09-30)
   - 2-minute limit per source: a hanging site no longer stalls the cycle
   - Australia disabled by default (DISABLED_SOURCES)
