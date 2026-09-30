@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.44**, updated 2026-09-30.
+Version **0.2.47**, updated 2026-09-30.
 
-**Overall progress: 65%** · left ≈ 15.2 days · ✅ 44 · 🟡 18 · ⬜ 14 · ⛔ 2
+**Overall progress: 67%** · left ≈ 14.7 days · ✅ 45 · 🟡 19 · ⬜ 11 · ⛔ 3
 
 ## Milestones
 
@@ -184,7 +184,8 @@ Branch: `dev-war-status`
 - ✅ **S10.1** Curated config/conflicts.yaml based on RULAC (Moldova, Cyprus — occupation; borders with war and aggressor)
 - ✅ **S10.2** Daily check against Wikipedia, mismatches to admins (war-check)
 - ⬜ **S10.3** Obtain a UCDP API token _(manual)_
-- ⬜ **S10.4** UCDP Candidate Events as a second automatic source
+- ⛔ **S10.4** UCDP Candidate Events as a second automatic source
+  - Waiting for the UCDP token (S10.3).
 - ✅ **S10.5** Verify the Wikipedia parser against the live page
   - Verified on the live page: sections, Location column; France (French Guiana) excluded by review.
 
@@ -203,7 +204,7 @@ Branch: `dev-dashboard`
 - 🟡 **S11.4** Disclaimer and methodology on the site _(manual)_
   - Working disclaimer and methodology on the page; final wording approved by the owner (S1.7).
 
-## S12. Operations — 20%
+## S12. Operations — 45%
 
 _The system runs unattended and reports failures._
 
@@ -211,9 +212,10 @@ Branch: `dev-ops`
 
 - ✅ **S12.1** Daily SQLite backup with rotation
 - ⬜ **S12.2** Dead-man switch on healthchecks.io (free) _(manual)_
-- ⬜ **S12.3** Auto-deploy from main (GitHub Actions → SSH)
+- 🟡 **S12.3** Auto-deploy from main (GitHub Actions → SSH)
+  - .github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set.
 
-## S13. MVP criteria — 0%
+## S13. MVP criteria — 23%
 
 _The MVP is done when all three conditions hold._
 
@@ -221,7 +223,8 @@ Branch: `—`
 
 - ⬜ **S13.1** 14 consecutive days of collection without manual intervention
 - ⬜ **S13.2** On the Ukraine episode the score reaches 7+ before 2022-02-24
-- ⬜ **S13.3** Every alert contains the source, a description of the change and a quote
+- ✅ **S13.3** Every alert contains the source, a description of the change and a quote
+  - Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes.
 
 ## Decisions
 
@@ -246,6 +249,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.47** (2026-09-30)
+  - Auto-deploy from main over SSH (once Actions are unlocked)
+  - Source implementation status in docs/sources.md
 - **0.2.44** (2026-09-30)
   - Public dashboard: map of Europe, country card with chart, table, methodology (/dashboard/)
   - scores.json export

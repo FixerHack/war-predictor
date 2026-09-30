@@ -1,0 +1,35 @@
+name: Deploy
+
+# Deploys main to the server over SSH (runs scripts/deploy.sh there).
+# Needs repository secrets: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY (private key),
+# optional DEPLOY_PATH (default ~/war-predictor). Without DEPLOY_HOST the job is skipped.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check configuration
+        id: cfg
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+        run: echo "enabled=$([ -n "$HOST" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+      - name: Deploy over SSH
+        if: steps.cfg.outputs.enabled == 'true'
+        env:
+          HOST: ${{ secrets.DEPLOY_HOST }}
+          USER: ${{ secrets.DEPLOY_USER }}
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          APP_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/deploy_key && chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+          ssh -i ~/.ssh/deploy_key "$USER@$HOST" "cd ${APP_PATH:-~/war-predictor} && ./scripts/deploy.sh main"
