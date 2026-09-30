@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.51**, updated 2026-09-30.
+Version **0.2.52**, updated 2026-09-30.
 
 **Overall progress: 67%** · left ≈ 14.7 days · ✅ 45 · 🟡 19 · ⬜ 11 · ⛔ 3
 
@@ -250,6 +250,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.52** (2026-09-30)
+  - Australia: country pages instead of the slow export (level after "Overall advice level")
+  - News: dropped Kyiv Independent (404)
 - **0.2.51** (2026-09-30)
   - Readable error for a bad .env; a model id in CLASSIFIER_PROVIDER is read as OpenRouter
 - **0.2.50** (2026-09-30)
