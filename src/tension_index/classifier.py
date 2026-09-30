@@ -299,3 +299,90 @@ class ClaudeClassifier:
         if fallback.change_type in ("level_raised", "level_lowered"):
             result.change_type = fallback.change_type
         return result
+
+
+# --- Headlines ------------------------------------------------------------------------------
+
+HEADLINE_CATEGORIES = (
+    "armed_attack", "mobilisation", "domestic_emergency", "aggressor_advisory",
+    "hybrid_attack", "military_threat", "escalation_news", "none",
+)  # fmt: skip
+HEADLINE_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "items": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "i": {"type": "integer"},
+                    "category": {"type": "string", "enum": list(HEADLINE_CATEGORIES)},
+                    "severity": {"type": "number"},
+                },
+                "required": ["i", "category", "severity"],
+                "additionalProperties": False,
+            },
+        }
+    },
+    "required": ["items"],
+    "additionalProperties": False,
+}
+HEADLINE_PROMPT = """You label news headlines about European countries for an indicator of \
+escalation signals. For each numbered headline return its category and a severity 0..1.
+
+Categories (about the country named in the headline):
+- armed_attack: a military attack actually happened on its territory (missile/drone strike, \
+troops crossing the border, shelling).
+- mobilisation: the country actually declared or ordered mobilisation (not debates or drills).
+- domestic_emergency: state of emergency, martial law, border closure, evacuation orders, \
+shelters prepared because of a threat, air-raid alerts.
+- aggressor_advisory: Russia's or Belarus's government advises its citizens to avoid or \
+leave the country, or reduces its embassy there.
+- hybrid_attack: sabotage, GPS jamming, airspace violations by drones/aircraft, attacks on \
+infrastructure or undersea cables attributed to a state.
+- military_threat: troop build-ups or exercises near its border, explicit threats of attack.
+- escalation_news: other reporting on rising military tension involving the country.
+- none: anything else (politics, economy, sport, routine defence procurement, history).
+
+Severity: 1 = confirmed, large-scale, official; 0.5 = partial or unconfirmed; 0.2 = minor.
+Label by what the headline states happened, not by alarming words."""
+
+
+async def classify_headlines(
+    claude: ClaudeClassifier, headlines: list[str]
+) -> dict[int, tuple[str, float]] | None:
+    """{index: (category, severity)} from Claude, or None (then rules are used)."""
+    if not headlines or not claude.available:
+        return None
+    import anthropic
+
+    numbered = "\n".join(f"{i}. {h}" for i, h in enumerate(headlines))
+    request = claude._request(numbered)
+    request["system"] = [
+        {"type": "text", "text": HEADLINE_PROMPT, "cache_control": {"type": "ephemeral"}}
+    ]
+    request["output_config"]["format"] = {"type": "json_schema", "schema": HEADLINE_SCHEMA}
+    request["max_tokens"] = 8192
+    extra = (
+        {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
+        if claude.settings.classifier_model in FALLBACK_MODELS
+        else {}
+    )
+    claude.calls += 1
+    try:
+        response = await claude.client.beta.messages.create(**request, **extra)
+    except (anthropic.APIConnectionError, anthropic.APIStatusError) as exc:
+        log.warning("Claude headline classification failed: %s", exc)
+        return None
+    if response.stop_reason == "refusal":
+        return None
+    text = next((b.text for b in response.content if b.type == "text"), "")
+    try:
+        items = json.loads(text)["items"]
+    except (ValueError, KeyError, TypeError):
+        return None
+    return {
+        int(x["i"]): (x["category"], max(0.0, min(1.0, float(x["severity"]))))
+        for x in items
+        if 0 <= int(x["i"]) < len(headlines) and x["category"] in HEADLINE_CATEGORIES
+    }

@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.27**, updated 2026-09-30.
+Version **0.2.33**, updated 2026-09-30.
 
-**Overall progress: 46%** · left ≈ 23.9 days · ✅ 38 · 🟡 8 · ⬜ 30 · ⛔ 2
+**Overall progress: 51%** · left ≈ 21.4 days · ✅ 38 · 🟡 14 · ⬜ 24 · ⛔ 2
 
 ## Milestones
 
@@ -54,7 +54,7 @@ Branch: `—`
 - ✅ **S1.8** 0–10 scale algorithm (docs/algorithm.md)
 - ✅ **S1.9** Research of sources and war trackers (docs/sources.md)
 
-## S2. Official advisory collection — 52%
+## S2. Official advisory collection — 60%
 
 _Regular collection of advisories, storing every text version._
 
@@ -75,8 +75,8 @@ Branch: `dev-collector`
   - Page text only, level set by the classifier; verify with probe fr
 - ⛔ **S2.8** Israel (NSC travel warnings)
   - NSC page is a JS app with no known API; needs a sample response. Low weight for Europe.
-- ⬜ **S2.9** Russian and Belarusian MFA advisories to own citizens
-  - Moved to S4: collected via news/GDELT (mid.ru blocks foreign requests).
+- 🟡 **S2.9** Russian and Belarusian MFA advisories to own citizens
+  - Via GDELT: Russian-language reports of RU/BY MFA advice, 2+ outlets = confirmed.
 - ✅ **S2.10** Telegram alert when a source breaks
 - ✅ **S2.11** Strip update dates and boilerplate before diffing
 
@@ -93,17 +93,22 @@ Branch: `dev-aviation`
 - 🟡 **S3.3** OpenSky: drop in flights per airport
   - Implemented via OpenSky (traffic drop); baseline needs ~3 weeks of samples.
 
-## S4. News, analysis, domestic measures — 0%
+## S4. News, analysis, domestic measures — 50%
 
 _Independent confirmation from media, analysis, markets and the country's own measures._
 
 Branch: `dev-news`
 
-- ⬜ **S4.1** Tier 1–2 RSS, headlines and links only
-- ⬜ **S4.2** GDELT: volume and tone per country
-- ⬜ **S4.3** CrisisWatch: deterioration and Conflict Risk Alerts
-- ⬜ **S4.4** Domestic measures: mobilisation, emergency decrees, border closures
-- ⬜ **S4.5** Markets: bonds and FX via ECB Data Portal
+- 🟡 **S4.1** Tier 1–2 RSS, headlines and links only
+  - Implemented: 13 feeds in config/feeds.yaml, an event counts only from 2+ feeds; check URLs: tension-index probe news
+- 🟡 **S4.2** GDELT: volume and tone per country
+  - Implemented: surge of military coverage vs 60 days (daily); counts only when news confirm.
+- 🟡 **S4.3** CrisisWatch: deterioration and Conflict Risk Alerts
+  - Via the Crisis Group RSS in the news feeds.
+- 🟡 **S4.4** Domestic measures: mobilisation, emergency decrees, border closures
+  - From news: emergency, borders, mobilisation (2+ feeds only).
+- 🟡 **S4.5** Markets: bonds and FX via ECB Data Portal
+  - ECB: 10y spread over Germany and FX (daily).
 
 ## S5. Historical archive — 0%
 
@@ -230,6 +235,11 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.33** (2026-09-30)
+  - News: 13 feeds, headline categories (rules + Claude), two-feed confirmation
+  - GDELT: media surges and RU/BY MFA advice
+  - ECB markets: bond spreads and FX
+  - probe news / gdelt / ecb
 - **0.2.27** (2026-09-30)
   - Aviation: EASA conflict zone bulletins, air traffic drops (OpenSky) with data-outage guard
 - **0.2.24** (2026-09-30)
