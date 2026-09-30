@@ -40,9 +40,20 @@ class WarStatus:
     source: str = ""
     borders_war: list[str] = field(default_factory=list)
     borders_aggressor: list[str] = field(default_factory=list)
+    # Reviewed Wikipedia entries that do not concern the country's European territory,
+    # e.g. France listed for French Guiana: [{conflict, reason_uk, reason_en}]
+    wikipedia_ignore: list[dict] = field(default_factory=list)
 
     def note(self, lang: str) -> str:
         return self.note_uk if lang == "uk" else self.note_en
+
+    def ignore_reason(self, conflict: str) -> str | None:
+        """English reason if `conflict` was reviewed and excluded for this country."""
+        wanted = conflict.strip().lower()
+        for entry in self.wikipedia_ignore:
+            if entry["conflict"].strip().lower() == wanted:
+                return entry.get("reason_en") or "ignored"
+        return None
 
 
 @lru_cache
@@ -300,10 +311,13 @@ def mentions(html: str) -> list[Mention]:
     return out
 
 
-def parse_wikipedia(html: str) -> dict[str, str]:
-    """Return {country_code: highest severity} from the Location columns (see `mentions`)."""
+def parse_wikipedia(html: str, curated: dict[str, WarStatus] | None = None) -> dict[str, str]:
+    """Return {country_code: highest severity} from the Location columns (see `mentions`),
+    skipping conflicts a human excluded via `wikipedia_ignore` in the curated file."""
     found: dict[str, str] = {}
     for m in mentions(html):
+        if curated and curated[m.country].ignore_reason(m.conflict):
+            continue
         if SEVERITY.index(m.severity) > SEVERITY.index(found.get(m.country, "none")):
             found[m.country] = m.severity
     return found
