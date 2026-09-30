@@ -157,7 +157,8 @@ def register_admin(router_: Router, settings: Settings) -> None:
     async def cmd_warcheck(message: Message) -> None:
         try:
             async with make_client(settings) as client:
-                detected = war_status.parse_wikipedia(await war_status.fetch_wikipedia(client))
+                html = await war_status.fetch_wikipedia(client)
+            detected = war_status.parse_wikipedia(html, war_status.load())
         except (httpx.HTTPError, KeyError, ValueError) as exc:
             await message.answer(f"❌ war-check failed: {escape(str(exc))}")
             return

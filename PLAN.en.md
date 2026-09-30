@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.9**, updated 2026-09-30.
+Version **0.2.10**, updated 2026-09-30.
 
-**Overall progress: 29%** · left ≈ 31.0 days · ✅ 31 · 🟡 2 · ⬜ 45 · ⛔ 0
+**Overall progress: 30%** · left ≈ 30.9 days · ✅ 32 · 🟡 1 · ⬜ 45 · ⛔ 0
 
 ## Milestones
 
@@ -149,7 +149,7 @@ Branch: `dev-tg-bot`
 - ⬜ **S9.6** Daily regional digest
 - ⬜ **S9.7** Several countries per user
 
-## S10. War status — 50%
+## S10. War status — 57%
 
 _Show whether a war is already under way on the country's territory, separately from the escalation scale._
 
@@ -159,8 +159,8 @@ Branch: `dev-war-status`
 - ✅ **S10.2** Daily check against Wikipedia, mismatches to admins (war-check)
 - ⬜ **S10.3** Obtain a UCDP API token _(manual)_
 - ⬜ **S10.4** UCDP Candidate Events as a second automatic source
-- 🟡 **S10.5** Verify the Wikipedia parser against the live page
-  - Sections recognised on the live page; only the Location column counts, check war-check --explain FR.
+- ✅ **S10.5** Verify the Wikipedia parser against the live page
+  - Verified on the live page: sections, Location column; France (French Guiana) excluded by review.
 
 ## S11. Public dashboard — 0%
 
@@ -195,6 +195,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-09-30: Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore
 - 2026-09-30: Server deploy postponed; priority is the bot and system on the MacBook
 - 2026-09-27: 0–10 scale instead of a probability: describes signals, does not forecast war
 - 2026-09-27: Advisories weigh less for EU/NATO members: allies rarely raise levels in advance
@@ -215,6 +216,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.10** (2026-09-30)
+  - War status: reviewed exclusions via wikipedia_ignore; France — Brazilian drug war (French Guiana)
+  - Wikipedia check verified on the live page
 - **0.2.9** (2026-09-30)
   - war-check --explain: correct conflict name and Location cell text
 - **0.2.8** (2026-09-30)

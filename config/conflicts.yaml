@@ -10,6 +10,8 @@
 #   war     - war (1,000+ deaths/yr)
 # borders_war: neighbours with a war on their territory (context line in the bot)
 # borders_aggressor: land borders with Russia / Belarus
+# wikipedia_ignore: Wikipedia conflicts reviewed as unrelated to the country's European
+#   territory (overseas regions, etc.). Exact conflict name as `war-check --explain` prints it.
 
 reviewed: 2026-09-30
 default: {status: none}
@@ -26,6 +28,12 @@ countries:
     note_uk: "Північ острова під контролем Туреччини з 1974 року (RULAC: окупація)"
     note_en: "Northern Cyprus under Turkish control since 1974 (RULAC: military occupation)"
     source: "RULAC (https://www.rulac.org), Cyprus: military occupation by Turkey"
+  FR:
+    status: none
+    wikipedia_ignore:
+      - conflict: "Brazilian drug war"
+        reason_uk: "Французька Гвіана (Південна Америка), не європейська територія"
+        reason_en: "French Guiana (South America), not European territory"
   PL: {status: none, borders_war: [UA], borders_aggressor: [BY, RU]}
   LT: {status: none, borders_aggressor: [BY, RU]}
   LV: {status: none, borders_aggressor: [BY, RU]}

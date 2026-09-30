@@ -145,3 +145,16 @@ async def test_fetch_wikipedia_requests_rendered_html():
 
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
         assert "Russo-Ukrainian" in await war_status.fetch_wikipedia(client)
+
+
+def test_reviewed_conflicts_are_ignored():
+    curated = war_status.load()
+    assert curated["FR"].ignore_reason("Brazilian drug war").startswith("French Guiana")
+    html = (
+        "<h3>Conflicts (100–999 deaths)</h3>"
+        '<table class="wikitable"><tr><th>Start of conflict</th><th>Conflict</th><th>Location</th></tr>'
+        f"<tr><td>1992</td><td>Brazilian drug war</td><td>{flag('Brazil')} {flag('France')} (French Guiana)</td></tr>"
+        f"<tr><td>2025</td><td>Something new</td><td>{flag('Latvia')}</td></tr></table>"
+    )
+    assert war_status.parse_wikipedia(html) == {"FR": "active", "LV": "active"}
+    assert war_status.parse_wikipedia(html, curated) == {"LV": "active"}

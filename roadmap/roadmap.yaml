@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.9
+  version: 0.2.10
   updated: 2026-09-30
 
 milestones:
@@ -176,7 +176,7 @@ stages:
       - {id: S10.2, status: done, days: 0.5, uk: "Щоденна звірка з Wikipedia, розбіжності адміну (war-check)", en: "Daily check against Wikipedia, mismatches to admins (war-check)"}
       - {id: S10.3, status: todo, days: 0.5, owner: human, uk: "Отримати токен UCDP API", en: "Obtain a UCDP API token"}
       - {id: S10.4, status: todo, days: 0.5, uk: "UCDP Candidate Events як друге автоматичне джерело", en: "UCDP Candidate Events as a second automatic source"}
-      - {id: S10.5, status: in_progress, days: 0.3, uk: "Перевірити парсер Wikipedia на живій сторінці", en: "Verify the Wikipedia parser against the live page", note_uk: "Розділи розпізнаються на живій сторінці; враховується лише колонка Location, перевірити war-check --explain FR.", note_en: "Sections recognised on the live page; only the Location column counts, check war-check --explain FR."}
+      - {id: S10.5, status: done, days: 0.3, uk: "Перевірити парсер Wikipedia на живій сторінці", en: "Verify the Wikipedia parser against the live page", note_uk: "Перевірено на живій сторінці: розділи, колонка Location; Франція (Французька Гвіана) виключена вручну.", note_en: "Verified on the live page: sections, Location column; France (French Guiana) excluded by review."}
 
   - id: S11
     branch: dev-dashboard
@@ -213,6 +213,7 @@ stages:
       - {id: S13.3, status: todo, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote"}
 
 decisions:
+  - {date: 2026-09-30, uk: "Заморські території європейських країн не впливають на статус війни; винятки фіксуються вручну в wikipedia_ignore", en: "Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore"}
   - {date: 2026-09-30, uk: "Деплой на сервер відкладено; пріоритет — бот і система на MacBook", en: "Server deploy postponed; priority is the bot and system on the MacBook"}
   - {date: 2026-09-27, uk: "Шкала 0–10 замість ймовірності: описує стан сигналів, а не прогнозує війну", en: "0–10 scale instead of a probability: describes signals, does not forecast war"}
   - {date: 2026-09-27, uk: "Рекомендації посольств для країн ЄС і НАТО важать менше: союзники рідко заздалегідь піднімають рівень", en: "Advisories weigh less for EU/NATO members: allies rarely raise levels in advance"}
@@ -231,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.10
+    date: 2026-09-30
+    uk: ["Статус війни: список ручних винятків wikipedia_ignore; Франція — Brazilian drug war (Французька Гвіана)", "Звірка з Wikipedia перевірена на живій сторінці"]
+    en: ["War status: reviewed exclusions via wikipedia_ignore; France — Brazilian drug war (French Guiana)", "Wikipedia check verified on the live page"]
   - version: 0.2.9
     date: 2026-09-30
     uk: ["war-check --explain: правильна назва конфлікту і текст клітинки Location"]

@@ -94,12 +94,15 @@ async def _war_check(args: argparse.Namespace) -> int:
             return 0
         if args.explain:
             wanted = {c.upper() for c in args.explain}
+            curated = war_status.load()
             for m in war_status.mentions(html):
                 if m.country in wanted:
-                    print(f"{m.country} [{m.severity}] {m.conflict or '?'}")
+                    reason = curated[m.country].ignore_reason(m.conflict)
+                    suffix = f"  (ignored: {reason})" if reason else ""
+                    print(f"{m.country} [{m.severity}] {m.conflict or '?'}{suffix}")
                     print(f"    {m.column}: {m.cell[:300]}")
             return 0
-        detected = war_status.parse_wikipedia(html)
+        detected = war_status.parse_wikipedia(html, war_status.load())
     except (httpx.HTTPError, KeyError, ValueError) as exc:
         print(f"war-check failed: {type(exc).__name__}: {exc}", file=sys.stderr)
         if args.notify:
