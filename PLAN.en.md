@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.60**, updated 2026-09-30.
+Version **0.2.61**, updated 2026-09-30.
 
-**Overall progress: 67%** · left ≈ 14.9 days · ✅ 49 · 🟡 18 · ⬜ 11 · ⛔ 4
+**Overall progress: 68%** · left ≈ 14.4 days · ✅ 49 · 🟡 19 · ⬜ 10 · ⛔ 4
 
 ## Milestones
 
@@ -150,7 +150,7 @@ Branch: `dev-scoring`
 - ✅ **S7.5** Guard against flapping sources (A → B → A) and the why command
   - Returning to a version seen within 7 days is not a change; such changes produce no score events. tension-index why LU lists blocks and active signals.
 
-## S8. Backtesting — 33%
+## S8. Backtesting — 50%
 
 _The scale must fire on known episodes in time and without mass false alarms._
 
@@ -160,8 +160,8 @@ Branch: `dev-backtest`
   - tension-index backtest: day-by-day replay, reports in reports/backtest; tested on synthetic data, awaiting the real archive.
 - 🟡 **S8.2** False alarm and miss report
   - Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms.
-- ⬜ **S8.3** Weight tuning
-  - Observation: surge_weight lifts a single government decision to 9+, the scale wants several. Tune on real data.
+- 🟡 **S8.3** Weight tuning
+  - First step done on reconstructed timelines: surge bonus capped at 0.10, synchrony counts only real tightening (no terrorism or rewording). France 2015: 7.3 → 4.5; one government ordering departure: 7.6 → 7.0; Ukraine 2022 unchanged (8.3 / 9.0). Next: run on the real archive.
 
 ## S9. Telegram bot & alerts — 100%
 
@@ -234,6 +234,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-09-30: Surge bonus at most 0.10 to R; synchrony counts only level raises, staff posture, consular/border/airspace measures with reason relevance ≥ 0.5.
 - 2026-09-30: Change classification: Claude Haiku 4.5 via OpenRouter
 - 2026-09-30: Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore
 - 2026-09-30: Server deploy postponed; priority is the bot and system on the MacBook
@@ -258,6 +259,134 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.61** (2026-09-30)
+  - S
+  - c
+  - a
+  - l
+  - e
+  -  
+  - t
+  - u
+  - n
+  - i
+  - n
+  - g
+  - :
+  -  
+  - c
+  - a
+  - p
+  - p
+  - e
+  - d
+  -  
+  - t
+  - h
+  - e
+  -  
+  - s
+  - u
+  - r
+  - g
+  - e
+  -  
+  - b
+  - o
+  - n
+  - u
+  - s
+  -  
+  - a
+  - n
+  - d
+  -  
+  - n
+  - a
+  - r
+  - r
+  - o
+  - w
+  - e
+  - d
+  -  
+  - g
+  - o
+  - v
+  - e
+  - r
+  - n
+  - m
+  - e
+  - n
+  - t
+  -  
+  - s
+  - y
+  - n
+  - c
+  - h
+  - r
+  - o
+  - n
+  - y
+  -  
+  - t
+  - o
+  -  
+  - r
+  - e
+  - a
+  - l
+  -  
+  - t
+  - i
+  - g
+  - h
+  - t
+  - e
+  - n
+  - i
+  - n
+  - g
+  - ;
+  -  
+  - t
+  - h
+  - e
+  -  
+  - F
+  - r
+  - a
+  - n
+  - c
+  - e
+  -  
+  - 2
+  - 0
+  - 1
+  - 5
+  -  
+  - f
+  - a
+  - l
+  - s
+  - e
+  -  
+  - a
+  - l
+  - a
+  - r
+  - m
+  -  
+  - i
+  - s
+  -  
+  - g
+  - o
+  - n
+  - e
+  - .
 - **0.2.60** (2026-09-30)
   - Q
   - u

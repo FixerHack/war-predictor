@@ -79,12 +79,16 @@ baseline:
   window_days: 180
   min_history_days: 30        # below this, no surge bonus (not enough history)
   surge_weight: 0.5           # R_adj = R + surge_weight * max(0, R - baseline_median)
+  surge_cap: 0.10             # the surge bonus never adds more than this to R
 
 # Cross-government synchrony: several governments tightening within a week.
 synchrony:
   window_days: 7
   min_governments: 3
   multiplier: 1.2
+  # Signals that are not tightening: the standing level and routine rewording.
+  ignore_kinds: ["advisory_level", "advisory_update:security_update"]
+  min_relevance: 0.5          # reason relevance needed (terrorism 0.2, crime 0.05 do not count)
 
 # Regional comparison (peer groups from countries.py). Flags only, no score change by default.
 regional:
