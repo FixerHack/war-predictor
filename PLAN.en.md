@@ -2,15 +2,15 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.1**, updated 2026-09-30.
+Version **0.2.2**, updated 2026-09-30.
 
-**Overall progress: 27%** · left ≈ 32.1 days · ✅ 27 · 🟡 2 · ⬜ 49 · ⛔ 0
+**Overall progress: 27%** · left ≈ 31.9 days · ✅ 28 · 🟡 2 · ⬜ 48 · ⛔ 0
 
 ## Milestones
 
 - **M1** — MVP: 14 days of unattended collection, backtest scores Ukraine 7+ before 2022-02-24, every alert explained
 
-## S0. Foundation & infrastructure — 66%
+## S0. Foundation & infrastructure — 70%
 
 _Repository, working environment on the MacBook and server, keys, Telegram bot._
 
@@ -28,8 +28,8 @@ Branch: `dev-bootstrap`
 - ⬜ **S0.10** Anthropic Console: top-up, API key, monthly spend cap _(manual)_
 - ⬜ **S0.11** Create bot via @BotFather, test channel, fill in .env _(manual)_
 - ⬜ **S0.12** First server deploy: install_server.sh, verify healthcheck _(manual)_
-- ⬜ **S0.13** Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root _(manual)_
-  - Site is already on the gh-pages branch (make pages) because Actions are locked.
+- ✅ **S0.13** Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root _(manual)_
+  - Live: fixerhack.github.io/war-predictor
 - ⬜ **S0.15** Unlock GitHub Actions: Settings → Billing and plans (invoice / card) _(manual)_
   - CI does not start: "account is locked due to a billing issue".
 - ✅ **S0.16** Publish the progress page without Actions (make pages → gh-pages branch)
@@ -212,6 +212,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.2** (2026-09-30)
+  - Progress page live from the gh-pages branch
+  - pages.yml now refreshes gh-pages instead of deploying directly
 - **0.2.1** (2026-09-30)
   - Publish the progress page without GitHub Actions: make pages → gh-pages branch
 - **0.2.0** (2026-09-30)

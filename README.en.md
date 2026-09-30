@@ -9,7 +9,7 @@ An escalation-signal indicator for European countries on a 0–10 scale. The sys
 - 📋 Plan: [PLAN.en.md](PLAN.en.md) (generated from [`roadmap/roadmap.yaml`](roadmap/roadmap.yaml))
 - 🧮 Scale algorithm: [docs/algorithm.md](docs/algorithm.md) (Ukrainian)
 - 🗂 Data sources and war trackers: [docs/sources.md](docs/sources.md) (Ukrainian)
-- 📊 Progress: the project's GitHub Pages (`https://fixerhack.github.io/war-predictor/` once Pages is enabled)
+- 📊 Progress: https://fixerhack.github.io/war-predictor/
 
 ## Scale
 
@@ -95,10 +95,10 @@ make pages                 # publish the progress page to the gh-pages branch
 ```
 
 **Progress page.** There are two ways to publish it:
-- automatically via GitHub Actions (`.github/workflows/pages.yml`, Settings → Pages → Source: GitHub Actions);
+- automatically via GitHub Actions (`.github/workflows/pages.yml` refreshes the `gh-pages` branch on every push to `main`);
 - without Actions: `make pages` builds the site and pushes it to the `gh-pages` branch (Settings → Pages → Source: Deploy from a branch → `gh-pages` / `root`).
 
-Pick one of the two.
+Pages is set to serve the `gh-pages` branch (Settings → Pages → Deploy from a branch).
 
 ## Server
 
