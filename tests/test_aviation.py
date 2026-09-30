@@ -96,3 +96,34 @@ async def test_europe_wide_collapse_is_treated_as_outage(settings):
 def test_drop_strength_range():
     assert aviation.drop_strength(0.5) == 0.3
     assert aviation.drop_strength(0.1) == 1.0
+
+
+async def test_traffic_drop_clears_when_traffic_recovers(settings):
+    when = datetime(2026, 9, 30, 12, tzinfo=UTC)
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        await _seed_history(db, when)
+        async with mock(lambda r: opensky_response(when, pl_count=4)) as c:
+            await aviation.collect_traffic(db, c, settings)
+        later = when + timedelta(minutes=10)
+        async with mock(lambda r: opensky_response(later, pl_count=38)) as c:
+            await aviation.collect_traffic(db, c, settings)
+        async with db.execute("SELECT COUNT(*) FROM signals WHERE active = 1") as cur:
+            assert (await cur.fetchone())[0] == 0
+
+
+async def test_no_traffic_signal_without_a_real_norm(settings):
+    """Runs from one afternoon are not a norm; tiny boxes are noise either way."""
+    when = datetime(2026, 9, 30, 12, tzinfo=UTC)
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        for minutes in (30, 60, 90):  # three runs earlier the same day
+            t = when - timedelta(minutes=minutes)
+            await db.execute(
+                "INSERT INTO traffic (country, observed_at, hour_of_week, aircraft) VALUES (?, ?, ?, ?)",
+                ("PL", t.isoformat(), aviation.hour_of_week(t), 40),
+            )
+        await db.commit()
+        assert await aviation.baseline(db, "PL", when) is None
+    assert not aviation.is_drop(3, 10)  # "3 vs usual 10": too few aircraft to judge
+    assert aviation.is_drop(4, 40) and not aviation.is_drop(25, 40)

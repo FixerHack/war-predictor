@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import math
 import re
 import statistics
 from datetime import UTC, datetime, timedelta
@@ -45,7 +46,8 @@ BOXES: dict[str, tuple[float, float, float, float]] = {
     "BA": (42.5, 45.3, 15.7, 19.6), "XK": (41.8, 43.3, 20.0, 21.8),
 }  # fmt: skip
 TOTAL = "EU"  # pseudo-country for the whole query, to detect data outages
-MIN_BASELINE = 5  # aircraft; smaller boxes are too noisy to judge
+MIN_BASELINE = 20  # aircraft; smaller boxes (LU, MT, ...) are too noisy to judge
+MIN_BASELINE_DAYS = 3  # same hour of the week on at least this many days (= weeks)
 DROP_RATIO = 0.5  # signal when traffic falls below half of the usual level
 BASELINE_DAYS = 28
 
@@ -142,17 +144,28 @@ def hour_of_week(when: datetime) -> int:
 
 
 async def baseline(db: aiosqlite.Connection, country: str, when: datetime) -> float | None:
-    """Median count at the same hour of the week (±1 h) over the last 4 weeks."""
+    """Median count at the same hour of the week (±1 h) over the last 4 weeks, or None
+    while there are samples from fewer than MIN_BASELINE_DAYS days."""
     how = hour_of_week(when)
     hours = [(how + d) % 168 for d in (-1, 0, 1)]
     since = (when - timedelta(days=BASELINE_DAYS)).isoformat()
     async with db.execute(
-        f"SELECT aircraft FROM traffic WHERE country = ? AND observed_at >= ? AND observed_at < ? "
+        f"SELECT aircraft, substr(observed_at, 1, 10) FROM traffic WHERE country = ? "
+        f"AND observed_at >= ? AND observed_at < ? "
         f"AND hour_of_week IN ({','.join('?' * len(hours))})",
         (country, since, when.isoformat(), *hours),
     ) as cur:
-        values = [r[0] for r in await cur.fetchall()]
-    return statistics.median(values) if len(values) >= 3 else None
+        rows = await cur.fetchall()
+    if len({r[1] for r in rows}) < MIN_BASELINE_DAYS:
+        return None  # a few runs on one afternoon are not a norm
+    return statistics.median(r[0] for r in rows)
+
+
+def is_drop(count: int, base: float | None) -> bool:
+    """Below half of the usual level and outside normal (Poisson) noise: 3 sigma."""
+    if base is None or base < MIN_BASELINE:
+        return False
+    return count < base * DROP_RATIO and count < base - 3 * math.sqrt(base)
 
 
 def drop_strength(ratio: float) -> float:
@@ -188,17 +201,22 @@ async def collect_traffic(
             )
         for code in BOXES:
             base = await baseline(db, code, now)
-            if base is None or base < MIN_BASELINE:
+            if not is_drop(counts[code], base):
+                # A drop holds only while traffic stays low: clear it once it recovers.
+                await db.execute(
+                    "UPDATE signals SET active = 0 WHERE publisher = 'opensky' AND country = ?",
+                    (code,),
+                )
                 continue
-            ratio = counts[code] / base
-            if ratio < DROP_RATIO:
-                signal = Signal(
-                    country=code, block="aviation", kind="aviation:traffic_drop",
-                    strength=drop_strength(ratio), publisher="opensky", observed_at=now,
-                    note=f"{counts[code]} aircraft vs usual {base:.0f} at this hour",
-                )  # fmt: skip
-                await storage.upsert_signal(db, signal, f"opensky:{code}:{now:%Y-%m-%dT%H}")
-                result.changed += 1
+            assert base is not None
+            signal = Signal(
+                country=code, block="aviation", kind="aviation:traffic_drop",
+                strength=drop_strength(counts[code] / base), publisher="opensky",
+                observed_at=now, state=True,
+                note=f"{counts[code]} aircraft vs usual {base:.0f} at this hour",
+            )  # fmt: skip
+            await storage.upsert_signal(db, signal, f"opensky:{code}")
+            result.changed += 1
         await db.commit()
     except (httpx.HTTPError, ValueError, KeyError, TypeError) as exc:
         await db.commit()  # keep the traffic sample for the baseline

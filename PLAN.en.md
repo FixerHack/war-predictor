@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.57**, updated 2026-09-30.
+Version **0.2.59**, updated 2026-09-30.
 
-**Overall progress: 66%** · left ≈ 14.9 days · ✅ 46 · 🟡 18 · ⬜ 11 · ⛔ 4
+**Overall progress: 67%** · left ≈ 14.9 days · ✅ 48 · 🟡 18 · ⬜ 11 · ⛔ 4
 
 ## Milestones
 
@@ -80,7 +80,7 @@ Branch: `dev-collector`
 - ✅ **S2.10** Telegram alert when a source breaks
 - ✅ **S2.11** Strip update dates and boilerplate before diffing
 
-## S3. Aviation & airspace — 29%
+## S3. Aviation & airspace — 33%
 
 _Official airspace warnings and actual traffic drops._
 
@@ -92,6 +92,8 @@ Branch: `dev-aviation`
   - No free European NOTAM API (EUROCONTROL EAD is paid). Airspace limits come from advisory texts and CZIBs.
 - 🟡 **S3.3** OpenSky: drop in flights per airport
   - Implemented via OpenSky (traffic drop); baseline needs ~3 weeks of samples.
+- ✅ **S3.6** Air traffic drop: norm only from 3+ weeks, 20-aircraft and 3σ thresholds, signal cleared on recovery
+  - The false LU signal ("3 aircraft vs usual 10") can no longer happen.
 
 ## S4. News, analysis, domestic measures — 50%
 
@@ -205,6 +207,7 @@ Branch: `dev-dashboard`
   - Country card: score, reasons with quotes, flags, war status, 90-day chart; table of all countries; #PL links.
 - 🟡 **S11.4** Disclaimer and methodology on the site _(manual)_
   - Working disclaimer and methodology on the page; final wording approved by the owner (S1.7).
+- ✅ **S11.5** Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method
 
 ## S12. Operations — 45%
 
@@ -254,6 +257,224 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.59** (2026-09-30)
+  - T
+  - h
+  - e
+  -  
+  - m
+  - a
+  - p
+  -  
+  - e
+  - x
+  - p
+  - l
+  - a
+  - i
+  - n
+  - s
+  -  
+  - e
+  - v
+  - e
+  - r
+  - y
+  -  
+  - c
+  - o
+  - u
+  - n
+  - t
+  - r
+  - y
+  - '
+  - s
+  -  
+  - s
+  - c
+  - o
+  - r
+  - e
+  - :
+  -  
+  - a
+  -  
+  - s
+  - h
+  - o
+  - r
+  - t
+  -  
+  - s
+  - u
+  - m
+  - m
+  - a
+  - r
+  - y
+  - ,
+  -  
+  - t
+  - h
+  - e
+  -  
+  - s
+  - i
+  - x
+  -  
+  - b
+  - l
+  - o
+  - c
+  - k
+  - s
+  - ,
+  -  
+  - g
+  - o
+  - v
+  - e
+  - r
+  - n
+  - m
+  - e
+  - n
+  - t
+  -  
+  - a
+  - d
+  - v
+  - i
+  - c
+  - e
+  -  
+  - l
+  - e
+  - v
+  - e
+  - l
+  - s
+  -  
+  - a
+  - n
+  - d
+  -  
+  - a
+  - l
+  - l
+  -  
+  - o
+  - b
+  - s
+  - e
+  - r
+  - v
+  - e
+  - d
+  -  
+  - s
+  - i
+  - g
+  - n
+  - a
+  - l
+  - s
+  -  
+  - w
+  - i
+  - t
+  - h
+  -  
+  - q
+  - u
+  - o
+  - t
+  - e
+  - s
+  - ,
+  -  
+  - p
+  - l
+  - u
+  - s
+  -  
+  - t
+  - h
+  - e
+  -  
+  - f
+  - u
+  - l
+  - l
+  -  
+  - m
+  - e
+  - t
+  - h
+  - o
+  - d
+  - .
+  -  
+  - F
+  - a
+  - l
+  - s
+  - e
+  -  
+  - a
+  - i
+  - r
+  - -
+  - t
+  - r
+  - a
+  - f
+  - f
+  - i
+  - c
+  - -
+  - d
+  - r
+  - o
+  - p
+  -  
+  - s
+  - i
+  - g
+  - n
+  - a
+  - l
+  - s
+  -  
+  - f
+  - o
+  - r
+  -  
+  - s
+  - m
+  - a
+  - l
+  - l
+  -  
+  - c
+  - o
+  - u
+  - n
+  - t
+  - r
+  - i
+  - e
+  - s
+  -  
+  - r
+  - e
+  - m
+  - o
+  - v
+  - e
+  - d
+  - .
 - **0.2.57** (2026-09-30)
   - S
   - o

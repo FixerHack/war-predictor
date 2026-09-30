@@ -10,13 +10,25 @@ import aiosqlite
 
 from tension_index import __version__, explain, war_status
 from tension_index.countries import COUNTRIES
+from tension_index.pipeline import active_signals
 
 HISTORY_DAYS = 90
+MAX_SIGNALS = 15
+
+
+def _labels(publisher: str, kind: str) -> dict:
+    return {
+        "publisher": {lang: explain.publisher_label(publisher, lang) for lang in ("uk", "en")},
+        "kind": {lang: explain.kind_label(kind, lang) for lang in ("uk", "en")},
+    }
 
 
 async def build(db: aiosqlite.Connection, now: datetime | None = None) -> dict:
     now = now or datetime.now(UTC)
     since = (now - timedelta(days=HISTORY_DAYS)).isoformat()
+    by_country: dict[str, list] = {}
+    for sig in await active_signals(db, now):
+        by_country.setdefault(sig.country, []).append(sig)
     countries = {}
     for code, c in COUNTRIES.items():
         async with db.execute(
@@ -46,6 +58,28 @@ async def build(db: aiosqlite.Connection, now: datetime | None = None) -> dict:
                 lang: explain.flag_lines(payload.get("flags", []), lang) for lang in ("uk", "en")
             },
             "war": {"status": war.status, "note": {"uk": war.note_uk, "en": war.note_en}},
+            # Full breakdown for the dashboard's detailed explanation.
+            "raw": payload.get("raw"),
+            "blocks": payload.get("blocks", {}),
+            "floors": payload.get("floors", []),
+            "flag_keys": payload.get("flags", []),
+            "contributors": [
+                {"block": c["block"], "value": round(c["value"], 3), "note": c.get("note") or ""}
+                | _labels(c["publisher"], c["kind"])
+                for c in payload.get("top", [])
+            ],
+            "signals": [
+                {
+                    "block": sig.block,
+                    "strength": round(sig.strength, 3),
+                    "state": sig.state,
+                    "observed_at": sig.observed_at.isoformat(timespec="minutes"),
+                    "reason": sig.reason,
+                    "note": sig.note,
+                }
+                | _labels(sig.publisher, sig.kind)
+                for sig in sorted(by_country.get(code, []), key=lambda s: -s.strength)[:MAX_SIGNALS]
+            ],
             "history": sorted(daily.items()),
         }
     return {"generated_at": now.isoformat(timespec="seconds"), "version": __version__,
