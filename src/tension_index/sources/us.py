@@ -45,7 +45,9 @@ def _rank(item: dict) -> tuple:
         when = parsedate_to_datetime(item["date"]).timestamp() if item["date"] else 0.0
     except (TypeError, ValueError):
         when = 0.0
-    return (bool(_LEVEL.search(item["title"])), when, item["link"])
+    # The feed can repeat an item with the same title, date and link but a different text;
+    # comparing the text last keeps the choice independent of the feed order.
+    return (bool(_LEVEL.search(item["title"])), when, item["link"], item["description"])
 
 
 class UsSource(Source):

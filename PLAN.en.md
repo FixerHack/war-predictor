@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.55**, updated 2026-09-30.
+Version **0.2.56**, updated 2026-09-30.
 
 **Overall progress: 66%** · left ≈ 14.9 days · ✅ 45 · 🟡 18 · ⬜ 11 · ⛔ 4
 
@@ -251,6 +251,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.56** (2026-09-30)
+  - GDELT is its own daily command and timer; run no longer waits for it
+  - US: duplicate items with different text no longer cause false changes
 - **0.2.55** (2026-09-30)
   - US: reissue notes are not counted as changes
 - **0.2.54** (2026-09-30)

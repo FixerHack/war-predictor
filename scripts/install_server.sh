@@ -33,7 +33,7 @@ for unit in deploy/systemd/*.service deploy/systemd/*.timer; do
 done
 sudo systemctl daemon-reload
 sudo systemctl enable --now tension-bot.service
-sudo systemctl enable --now tension-collect.timer tension-health.timer tension-backup.timer tension-warcheck.timer tension-digest.timer
+sudo systemctl enable --now tension-collect.timer tension-health.timer tension-backup.timer tension-warcheck.timer tension-digest.timer tension-gdelt.timer
 
 log "Status"
 systemctl list-timers 'tension-*' --no-pager || true

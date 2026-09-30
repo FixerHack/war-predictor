@@ -88,7 +88,8 @@ Then fill in `.env` (bot token, channel ID, your Telegram ID in `TELEGRAM_ADMIN_
 ```bash
 make test                  # tests
 make lint                  # ruff
-./scripts/run.sh run       # full cycle: collect → classify → score
+./scripts/run.sh run       # full cycle: collect → classify → score (~1 min)
+./scripts/run.sh gdelt     # daily GDELT collection on its own (a few minutes)
 ./scripts/run.sh collect --countries PL,EE   # collection only, a few countries
 ./scripts/run.sh probe us --country PL      # what a source really returns
 ./scripts/run.sh health    # system health
@@ -126,6 +127,7 @@ What runs:
 | `tension-backup.timer` | daily SQLite backup, last 14 kept |
 | `tension-warcheck.timer` | daily war status check against Wikipedia |
 | `tension-digest.timer` | daily digest to subscribers (06:37 UTC) |
+| `tension-gdelt.timer` | daily GDELT collection (04:43 UTC, a few minutes) |
 
 Update: `./scripts/deploy.sh` (branch `main`) or `./scripts/deploy.sh dev-tg-bot` to test a branch.
 Status: `./scripts/healthcheck.sh` (exit codes: 0 OK, 1 WARN, 2 FAIL); logs: `journalctl -u tension-bot -f`.
