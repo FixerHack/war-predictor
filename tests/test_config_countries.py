@@ -22,3 +22,32 @@ def test_country_set():
     assert get_country("UA").region == "backtest"
     with pytest.raises(KeyError):
         get_country("XX")
+
+
+def test_model_id_in_provider_is_understood(monkeypatch, capsys):
+    monkeypatch.setenv("CLASSIFIER_PROVIDER", "anthropic/claude-haiku-4.5")
+    s = Settings(_env_file=None)
+    assert (
+        s.classifier_provider == "openrouter" and s.classifier_model == "anthropic/claude-haiku-4.5"
+    )
+    assert "looks like a model id" in capsys.readouterr().err
+
+
+def test_provider_is_case_insensitive(monkeypatch):
+    monkeypatch.setenv("CLASSIFIER_PROVIDER", "OpenRouter")
+    assert Settings(_env_file=None).classifier_provider == "openrouter"
+
+
+def test_bad_setting_gives_a_readable_error(monkeypatch, capsys):
+    from tension_index import cli, config
+
+    monkeypatch.setenv("CLASSIFIER_PROVIDER", "gpt")
+    config.get_settings.cache_clear()
+    try:
+        with pytest.raises(SystemExit) as exit_info:
+            cli.main(["health"])
+    finally:
+        config.get_settings.cache_clear()
+    assert exit_info.value.code == 2
+    err = capsys.readouterr().err
+    assert "CLASSIFIER_PROVIDER = 'gpt'" in err and "Traceback" not in err

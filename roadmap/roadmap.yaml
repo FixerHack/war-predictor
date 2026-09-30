@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.50
+  version: 0.2.51
   updated: 2026-09-30
 
 milestones:
@@ -233,6 +233,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.51
+    date: 2026-09-30
+    uk: ["Зрозуміла помилка при неправильному .env; назва моделі в CLASSIFIER_PROVIDER розпізнається як OpenRouter"]
+    en: ["Readable error for a bad .env; a model id in CLASSIFIER_PROVIDER is read as OpenRouter"]
   - version: 0.2.50
     date: 2026-09-30
     uk: ["Класифікатор через OpenRouter (Claude Haiku 4.5) як основний варіант; Anthropic API напряму лишається"]
