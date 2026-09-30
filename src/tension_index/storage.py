@@ -218,6 +218,18 @@ async def latest_snapshot(db: aiosqlite.Connection, source: str, country: str) -
     return Snapshot(*row) if row else None
 
 
+async def seen_versions(
+    db: aiosqlite.Connection, source: str, country: str, since_iso: str
+) -> set[tuple[str, str | None]]:
+    """(content_hash, level) of the versions fetched since `since_iso`."""
+    async with db.execute(
+        "SELECT content_hash, level FROM snapshots WHERE source = ? AND country = ? "
+        "AND fetched_at >= ?",
+        (source, country, since_iso),
+    ) as cur:
+        return {(r[0], r[1]) for r in await cur.fetchall()}
+
+
 async def insert_snapshot(
     db: aiosqlite.Connection,
     *,

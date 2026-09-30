@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.56
+  version: 0.2.57
   updated: 2026-09-30
 
 milestones:
@@ -139,6 +139,7 @@ stages:
       - {id: S7.3, status: done, days: 1, uk: "Таблиця сигналів і щоденний розрахунок балу для всіх країн", en: "Signals table and daily score computation for all countries", note_uk: "tension-index run: збір → класифікація → сигнали → бал; бал без достатнього покриття не публікується (крім порогових подій).", note_en: "tension-index run: collect → classify → signals → score; no score without enough coverage (except threshold events)."}
       - {id: S7.4, status: done, days: 0.5, uk: "Пояснення балу у сповіщеннях і на панелі", en: "Score explanation in alerts and on the dashboard"}
 
+      - {id: S7.5, status: done, days: 0.5, uk: "Захист від «мерехтіння» джерел (A → B → A) і команда why", en: "Guard against flapping sources (A → B → A) and the why command", note_uk: "Повернення до версії, яку бачили за останні 7 днів, не вважається зміною; такі зміни не дають подій у балі. tension-index why LU показує блоки й активні сигнали.", note_en: "Returning to a version seen within 7 days is not a change; such changes produce no score events. tension-index why LU lists blocks and active signals."}
   - id: S8
     branch: dev-backtest
     uk: Перевірка на історії
@@ -225,6 +226,7 @@ decisions:
   - {date: 2026-09-30, uk: "Статус війни окремо від шкали; довідник ведеться вручну, автоматика лише пропонує зміни", en: "War status is separate from the scale; curated by hand, automation only proposes changes"}
 
 risks:
+  - {uk: "Справжнє повернення рекомендації до попередньої версії протягом 7 днів не буде окремою зміною (стан однаково оновлюється).", en: "A genuine revert of an advisory within 7 days is not reported as a change (the state still updates)."}
   - {uk: "Частина урядових сайтів блокує автоматичні запити (Австралія); джерело можна втратити без попередження", en: "Some government sites block automated requests (Australia); a source can be lost without notice"}
   - {uk: "GitHub Actions заблоковані через білінг акаунта: CI не перевіряє зміни, до розблокування перевірки лише локально (make check)", en: "GitHub Actions locked by an account billing issue: no CI until unlocked, checks run locally only (make check)"}
   - {uk: "Блокування збору: сайти держав можуть блокувати запити з сервера", en: "Collection blocking: government sites may block requests from the server"}
@@ -234,6 +236,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.57
+    date: 2026-09-30
+    uk: "Джерела, що перемикаються між двома версіями тексту (як стрічка США), більше не створюють змін і не піднімають бал; нова команда why пояснює бал країни."
+    en: "Sources that swing between two text versions (like the US feed) no longer create changes or lift the score; new why command explains a country's score."
   - version: 0.2.56
     date: 2026-09-30
     uk: ["GDELT — окрема щоденна команда і таймер; run більше не чекає на нього", "США: дублікати записів з різним текстом більше не дають хибних змін"]

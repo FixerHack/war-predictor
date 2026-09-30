@@ -70,6 +70,10 @@ borders_closed_strength: 0.7
 verification:
   max_unconfirmed_tier: 2
 
+# A source that swings between two texts (A -> B -> A) within this many days is
+# flapping (e.g. CDN nodes serving different versions): no change, no event.
+flap_window_days: 7
+
 # Surge bonus: how far above the country's own norm it is right now.
 baseline:
   window_days: 180

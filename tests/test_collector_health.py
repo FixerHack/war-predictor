@@ -137,3 +137,20 @@ def test_disabled_sources_setting(monkeypatch):
     assert Settings(_env_file=None).disabled_sources == ["au", "fr"]
     monkeypatch.setenv("DISABLED_SOURCES", "")
     assert Settings(_env_file=None).disabled_sources == []
+
+
+async def test_flapping_source_records_one_change(settings):
+    """A -> B -> A -> B within days: the first swing is recorded, the flapping is not."""
+    other = copy.deepcopy(PAYLOAD)
+    other["details"]["parts"][0]["body"] = "<p>Another version of the text.</p>"
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        await collect_source(db, make_source(PAYLOAD), ["PL"])
+        swings = [
+            (await collect_source(db, make_source(p), ["PL"])).changed
+            for p in (other, PAYLOAD, other, PAYLOAD)
+        ]
+        assert swings == [1, 0, 0, 0]
+        # The current version is still the latest snapshot.
+        latest = await storage.latest_snapshot(db, "gov_uk", "PL")
+        assert latest is not None and "Another version" not in latest.text

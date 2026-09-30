@@ -2,6 +2,7 @@
 from datetime import UTC, datetime
 
 from tension_index import storage
+from tension_index.classifier import classify_rules
 from tension_index.explain import explain, reasons
 from tension_index.notify import render_change, render_score
 from tension_index.pipeline import (
@@ -170,3 +171,39 @@ def test_score_alerts_threshold():
         return ScoreUpdate("PL", prev, ScoreResult("PL", new, "green", 0, {}))
 
     assert len(score_alerts([upd(None, 5), upd(2.0, 2.9), upd(2.0, 3.0), upd(6, None)])) == 1
+
+
+async def _change(db, prev, new, country="MD"):
+    cid = await storage.insert_change(
+        db, source="us", country=country, prev_snapshot=prev, new_snapshot=new, diff="d"
+    )
+    cls = classify_rules("x")
+    cls.change_type = "security_update"
+    await storage.save_classification(
+        db, ref_type="change", ref_id=cid, country=country, publisher="us", method="rules",
+        payload=cls.to_json(),
+    )  # fmt: skip
+    return cid
+
+
+async def test_flapping_changes_are_not_events(settings):
+    from datetime import timedelta
+
+    from tension_index.pipeline import flapping_changes
+
+    async with storage.connect(settings.database_path) as db:
+        a1 = await seed(db, text="Version A.")
+        b1 = await seed(db, text="Version B.")
+        a2 = await seed(db, text="Version A.")
+        flap_1, flap_2 = await _change(db, a1, b1), await _change(db, b1, a2)
+        # A real change elsewhere, never undone.
+        x1 = await seed(db, country="EE", text="Calm.")
+        x2 = await seed(db, country="EE", text="Staff ordered to leave.")
+        real = await _change(db, x1, x2, country="EE")
+        await db.commit()
+
+        assert await flapping_changes(db, timedelta(days=7)) == {flap_1, flap_2}
+        await derive_advisory_signals(db)
+        events = [s for s in await active_signals(db, datetime.now(UTC)) if not s.state]
+        assert [(s.country, s.kind) for s in events] == [("EE", "advisory_update:security_update")]
+        assert real not in await flapping_changes(db, timedelta(days=7))

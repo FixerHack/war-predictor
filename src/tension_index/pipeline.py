@@ -171,6 +171,38 @@ async def _is_baseline(db: aiosqlite.Connection, snap: aiosqlite.Row) -> bool:
         return await cur.fetchone() is None
 
 
+async def flapping_changes(db: aiosqlite.Connection, window: timedelta) -> set[int]:
+    """Changes to a version seen shortly before, or undone shortly after (A -> B -> A)."""
+    versions: dict[tuple[str, str], dict[int, tuple[datetime, tuple]]] = {}
+    async with db.execute(
+        "SELECT id, source, country, fetched_at, content_hash, level FROM snapshots ORDER BY id"
+    ) as cur:
+        for r in await cur.fetchall():
+            versions.setdefault((r["source"], r["country"]), {})[r["id"]] = (
+                datetime.fromisoformat(r["fetched_at"]),
+                (r["content_hash"], r["level"]),
+            )
+    flaps = set()
+    async with db.execute(
+        "SELECT id, source, country, prev_snapshot, new_snapshot FROM changes"
+    ) as cur:
+        for c in await cur.fetchall():
+            seq = versions.get((c["source"], c["country"]), {})
+            if c["prev_snapshot"] not in seq or c["new_snapshot"] not in seq:
+                continue
+            new_at, new_key = seq[c["new_snapshot"]]
+            _, old_key = seq[c["prev_snapshot"]]
+            for sid, (when, key) in seq.items():
+                near = abs(when - new_at) <= window
+                if near and (
+                    (sid < c["prev_snapshot"] and key == new_key)
+                    or (sid > c["new_snapshot"] and key == old_key)
+                ):
+                    flaps.add(c["id"])
+                    break
+    return flaps
+
+
 async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
     """Turn current advisories (+ their classification) into state signals and classified
     changes into event signals. Superseded advisory versions are deactivated."""
@@ -247,12 +279,17 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
     for sid in stale:
         await db.execute("UPDATE signals SET active = 0 WHERE id = ?", (sid,))
 
-    # One-off events from classified changes.
+    # One-off events from classified changes; flapping ones (A -> B -> A) are not events.
+    flaps = await flapping_changes(db, timedelta(days=cfg["flap_window_days"]))
+    for change_id in flaps:
+        await db.execute("UPDATE signals SET active = 0 WHERE ref = ?", (f"change:{change_id}",))
     async with db.execute(
         "SELECT c.id, c.country, c.source, c.detected_at, k.payload FROM changes c "
         "JOIN classifications k ON k.ref_type = 'change' AND k.ref_id = c.id"
     ) as cur:
         for row in await cur.fetchall():
+            if row["id"] in flaps:
+                continue
             cls = Classification.from_json(row["payload"])
             if cls.change_type not in ADVISORY_EVENT_TYPES:
                 continue
