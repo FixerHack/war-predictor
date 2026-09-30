@@ -202,7 +202,10 @@ def signals_at(snapshots, changes, moment: datetime, cfg: dict) -> list[Signal]:
                     **base,
                 )
             )
-        if cls.airspace in ("closed", "restricted") and relevance(cfg, cls.reason) >= 0.5:
+        if (
+            cls.airspace in ("closed", "restricted")
+            and relevance(cfg, cls.reason) >= cfg["airspace_min_relevance"]
+        ):
             out.append(Signal(block="aviation", kind=f"aviation:airspace_{cls.airspace}",
                               strength=1.0 if cls.airspace == "closed" else 0.6, **base))  # fmt: skip
     for ch in changes:

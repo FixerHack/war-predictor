@@ -33,15 +33,17 @@ reason_relevance:
 # Advisory level -> strength 0..1, per publishing government.
 advisory_levels:
   us: {"1": 0.0, "2": 0.2, "3": 0.55, "4": 0.85}
+  # "...to parts" / partial warnings mostly cover border or long-occupied areas (Crimea,
+  # Transnistria): they weigh clearly less than advice for the whole country.
   gov_uk:
     none: 0.0
-    avoid_all_but_essential_travel_to_parts: 0.4
+    avoid_all_but_essential_travel_to_parts: 0.3
     avoid_all_but_essential_travel_to_whole_country: 0.6
-    avoid_all_travel_to_parts: 0.7
+    avoid_all_travel_to_parts: 0.45
     avoid_all_travel_to_whole_country: 0.85
   ca: {"normal": 0.0, "high_caution": 0.2, "avoid_non_essential": 0.55, "avoid_all": 0.85}
   au: {"1": 0.0, "2": 0.2, "3": 0.55, "4": 0.85}
-  de: {"none": 0.0, "security_notice": 0.2, "partial_warning": 0.5, "travel_warning": 0.85}
+  de: {"none": 0.0, "security_notice": 0.2, "partial_warning": 0.35, "travel_warning": 0.85}
   fr: {"vert": 0.0, "jaune": 0.2, "orange": 0.55, "rouge": 0.85}
   il: {"1": 0.0, "2": 0.1, "3": 0.4, "4": 0.8}   # NSC levels for Europe mostly reflect antisemitism/terror
 
@@ -73,6 +75,10 @@ verification:
 # A source that swings between two texts (A -> B -> A) within this many days is
 # flapping (e.g. CDN nodes serving different versions): no change, no event.
 flap_window_days: 7
+
+# Airspace closures or restrictions stated in advisories count only for a security reason
+# (armed conflict 1.0, military threat 1.0, hybrid attack 0.7), not ash, weather or "unknown".
+airspace_min_relevance: 0.7
 
 # Surge bonus: how far above the country's own norm it is right now.
 baseline:
