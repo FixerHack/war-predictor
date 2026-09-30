@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.68",
+    "version": "0.2.69",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -774,8 +774,8 @@
           "days": 1.5,
           "uk": "Прогін шкали на історичних епізодах",
           "en": "Replay the scale on historical episodes",
-          "note_uk": "Архів Wayback, Україна-2022: правила — PASS, 7 з 24.01.2022 (за 31 день). З моделлю 7 з'являлось уже 09.10.2021 через «обмеження неба» (Крим з 2014 р.) — пороги неба тепер вимагають двох джерел; чекає повторного прогону.",
-          "note_en": "Wayback archive, Ukraine 2022: rules PASS, 7 from 24 Jan 2022 (31 days ahead). With the model 7 came as early as 9 Oct 2021 via \"airspace restricted\" (Crimea since 2014) — airspace floors now need two sources; awaiting a re-run.",
+          "note_uk": "Архів Wayback, Україна-2022: правила — 7 з 24.01.2022 (за 31 день), модель — 7 з 20.12.2021 (нарощування військ), 9 після вторгнення. Обидва PASS; контрольні епізоди ще не прогнані.",
+          "note_en": "Wayback archive, Ukraine 2022: rules — 7 from 24 Jan 2022 (31 days ahead), model — 7 from 20 Dec 2021 (troop build-up), 9 after the invasion. Both PASS; control episodes not run yet.",
           "owner": "claude"
         },
         {
@@ -1283,6 +1283,12 @@
   ],
   "changelog": [
     {
+      "version": "0.2.69",
+      "date": "2026-09-30",
+      "uk": "Сигнали з рекомендацій (небо, статус посольства, кордони) вимикаються, коли нова класифікація того самого тексту їх більше не підтверджує.",
+      "en": "Advisory-derived signals (airspace, embassy posture, borders) switch off when a new classification of the same text no longer supports them."
+    },
+    {
       "version": "0.2.68",
       "date": "2026-09-30",
       "uk": "Версії, що чергуються, більше не зберігаються й не класифікуються повторно (економія викликів моделі); регіональні попередження (Британія «to parts», Німеччина Teilreisewarnung) важать менше; закриття неба зараховується лише з безпекової причини.",
@@ -1722,7 +1728,7 @@
     "tasks": 85
   },
   "build": {
-    "built_at": "2026-09-30T17:32:18+00:00",
-    "commit": "6b96e9d"
+    "built_at": "2026-09-30T17:47:14+00:00",
+    "commit": "78dc137"
   }
 }
