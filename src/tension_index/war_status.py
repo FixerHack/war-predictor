@@ -242,6 +242,7 @@ class Mention:
     section: str
     conflict: str
     column: str  # header of the column the country was found in ("*" = whole table)
+    cell: str = ""  # text of that cell, for --explain
 
 
 def mentions(html: str) -> list[Mention]:
@@ -272,7 +273,12 @@ def mentions(html: str) -> list[Mention]:
                 else []
             )
             loc_cols = [i for i, h in enumerate(headers) if "location" in h]
-            name_col = next((i for i, h in enumerate(headers) if "conflict" in h), None)
+            # "Start of conflict" also contains "conflict": prefer a header without start/year.
+            conflict_cols = [i for i, h in enumerate(headers) if "conflict" in h]
+            name_col = next(
+                (i for i in conflict_cols if not re.search(r"start|year|began", headers[i])),
+                conflict_cols[0] if conflict_cols else None,
+            )
             for row in grid[(header_idx or 0) + (1 if header_idx is not None else 0) :]:
                 if not row:
                     continue
@@ -287,7 +293,9 @@ def mentions(html: str) -> list[Mention]:
                         cell = row[col] if col < len(row) else None
                         if cell and any(_mentions(cell.html, n) for n in _names(code)):
                             column = headers[col] if loc_cols else "*"
-                            out.append(Mention(code, severity, heading.text, conflict, column))
+                            out.append(
+                                Mention(code, severity, heading.text, conflict, column, cell.text)
+                            )
                             break
     return out
 
