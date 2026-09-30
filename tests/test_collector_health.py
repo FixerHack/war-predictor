@@ -86,3 +86,20 @@ async def test_prepare_failure_fails_the_run(settings):
         await storage.migrate(db)
         result = await collect_source(db, CaSource(httpx.AsyncClient(transport=transport)), ["PL"])
     assert not result.ok and result.failed == 1 and result.errors[0].startswith("prepare:")
+
+
+async def test_daily_collectors_may_be_a_day_old(settings):
+    from datetime import UTC, datetime, timedelta
+
+    old = (datetime.now(UTC) - timedelta(hours=20)).isoformat(timespec="seconds")
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        for source in ("gdelt", "gov_uk"):
+            await db.execute(
+                "INSERT INTO collect_runs (source, started_at, finished_at, ok) VALUES (?, ?, ?, 1)",
+                (source, old, old),
+            )
+        await db.commit()
+    checks = {c.name: c.status for c in (await run_checks(settings)).checks}
+    assert checks["collector.gdelt"] == Status.OK
+    assert checks["collector.gov_uk"] == Status.FAIL  # 3-hourly collector, 20 h is stale
