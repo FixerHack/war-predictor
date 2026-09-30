@@ -223,3 +223,26 @@ async def test_us_picks_the_same_item_whatever_the_order():
             await src.prepare()
             picked.add((await src.fetch(get_country("PL"))).text)
     assert picked == {"new"}
+
+
+async def test_us_duplicate_items_differing_only_in_text():
+    same = b"<title>Estonia - Level 1: Exercise Normal Precautions</title><link>e</link><pubDate>Mon, 01 Sep 2026 00:00:00 GMT</pubDate>"
+    a = (
+        b"<item>"
+        + same
+        + b"<description>Exercise normal precautions in Estonia. Long text.</description></item>"
+    )
+    b = (
+        b"<item>"
+        + same
+        + b"<description>Exercise normal precaution in Estonia.</description></item>"
+    )
+    texts = set()
+    for order in ((a, b), (b, a)):
+        async with client(
+            {"https://travel.state.gov": b"<rss><channel>" + b"".join(order) + b"</channel></rss>"}
+        ) as c:
+            src = UsSource(c)
+            await src.prepare()
+            texts.add((await src.fetch(get_country("EE"))).text)
+    assert len(texts) == 1

@@ -190,3 +190,25 @@ async def test_gdelt_gives_up_when_unreachable(settings):
         async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as c:
             result = await gdelt.collect_gdelt(db, c, settings, pause=0)
     assert not result.ok and len(calls) <= 4  # 3 countries + the MFA query
+
+
+async def test_run_cycle_skips_gdelt_unless_asked(monkeypatch, settings):
+    from tension_index import runner
+
+    called = []
+
+    async def fake(db, client, s):
+        called.append(1)
+        return runner.RunResult(source="gdelt", fetched=1)
+
+    async def no_collect(*a, **k):
+        return []
+
+    monkeypatch.setitem(runner.EXTRA_COLLECTORS, "gdelt", fake)
+    for name in [n for n in runner.EXTRA_COLLECTORS if n != "gdelt"]:
+        monkeypatch.delitem(runner.EXTRA_COLLECTORS, name)
+    monkeypatch.setattr(runner, "collect_all", no_collect)
+    await runner.run_cycle(settings)
+    assert called == []
+    await runner.run_cycle(settings, slow=True)
+    assert called == [1]

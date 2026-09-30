@@ -88,7 +88,8 @@ cd war-predictor
 ```bash
 make test                  # тести
 make lint                  # ruff
-./scripts/run.sh run       # повний цикл: збір → класифікація → бал
+./scripts/run.sh run       # повний цикл: збір → класифікація → бал (~1 хв)
+./scripts/run.sh gdelt     # щоденний збір GDELT окремо (кілька хвилин)
 ./scripts/run.sh collect --countries PL,EE   # лише збір для кількох країн
 ./scripts/run.sh probe us --country PL      # що насправді віддає джерело
 ./scripts/run.sh health    # стан системи
@@ -126,6 +127,7 @@ nano .env                     # заповнити
 | `tension-backup.timer` | щоденний бекап SQLite, зберігаються останні 14 |
 | `tension-warcheck.timer` | щоденна звірка статусу війни з Wikipedia |
 | `tension-digest.timer` | щоденний дайджест підписникам (06:37 UTC) |
+| `tension-gdelt.timer` | щоденний збір GDELT (04:43 UTC, кілька хвилин) |
 
 Оновлення: `./scripts/deploy.sh` (гілка `main`) або `./scripts/deploy.sh dev-tg-bot` для тесту гілки.
 Стан: `./scripts/healthcheck.sh` (коди виходу: 0 OK, 1 WARN, 2 FAIL), логи: `journalctl -u tension-bot -f`.

@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.55
+  version: 0.2.56
   updated: 2026-09-30
 
 milestones:
@@ -234,6 +234,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.56
+    date: 2026-09-30
+    uk: ["GDELT — окрема щоденна команда і таймер; run більше не чекає на нього", "США: дублікати записів з різним текстом більше не дають хибних змін"]
+    en: ["GDELT is its own daily command and timer; run no longer waits for it", "US: duplicate items with different text no longer cause false changes"]
   - version: 0.2.55
     date: 2026-09-30
     uk: ["США: службові примітки про перевидання не рахуються змінами"]

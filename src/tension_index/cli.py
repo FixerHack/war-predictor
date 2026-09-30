@@ -125,7 +125,7 @@ async def _war_check(args: argparse.Namespace) -> int:
 async def _run(args: argparse.Namespace) -> int:
     from tension_index.runner import run_cycle, score_alerts
 
-    report = await run_cycle(get_settings(), notify=args.notify)
+    report = await run_cycle(get_settings(), notify=args.notify, slow=args.all)
     for r in report.results:
         print(f"{r.source}: fetched={r.fetched} changed={r.changed} failed={r.failed} ok={r.ok}")
     print(f"classified: {report.classified}")
@@ -179,6 +179,15 @@ async def _digest() -> int:
 
     print(f"digests sent: {await send_digests(get_settings())}")
     return 0
+
+
+async def _gdelt() -> int:
+    from tension_index.runner import run_slow
+
+    results = await run_slow(get_settings())
+    for r in results:
+        print(f"{r.source}: fetched={r.fetched} changed={r.changed} failed={r.failed} ok={r.ok}")
+    return 0 if all(r.ok for r in results) else 2
 
 
 async def _classify() -> int:
@@ -360,6 +369,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = sub.add_parser("run", help="full cycle: collect, classify, score, notify")
     p.add_argument("--notify", action="store_true", help="send alerts to Telegram")
+    p.add_argument("--all", action="store_true", help="also run the slow daily GDELT collector")
+
+    sub.add_parser("gdelt", help="daily GDELT collection (media volume, RU/BY MFA advice)")
 
     p = sub.add_parser("probe", help="show a source's raw response and parsed result")
     p.add_argument("source")
@@ -403,6 +415,7 @@ def main(argv: list[str] | None = None) -> None:
         "probe": lambda: _probe(args),
         "classify": lambda: _classify(),
         "run": lambda: _run(args),
+        "gdelt": lambda: _gdelt(),
         "digest": lambda: _digest(),
         "changes": lambda: _changes(args),
         "export": lambda: _export(args),

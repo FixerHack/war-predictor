@@ -32,6 +32,8 @@ Collector = Callable[..., Awaitable[RunResult]]
 EXTRA_COLLECTORS: dict[str, Collector] = dict(extra.COLLECTORS)
 # Seconds per collector; GDELT asks for one request per 5 s (38 countries once a day).
 EXTRA_DEADLINES = {"gdelt": 420.0, "news": 180.0}
+# Slow daily collectors run from their own timer (`tension-index gdelt`), not every cycle.
+SLOW_COLLECTORS = {"gdelt"}
 
 
 @dataclass(slots=True)
@@ -56,7 +58,18 @@ def score_alerts(updates: list[ScoreUpdate], threshold: float = 1.0) -> list[Sco
     ]
 
 
-async def run_cycle(settings: Settings, notify: bool = False) -> CycleReport:
+async def run_slow(settings: Settings) -> list[RunResult]:
+    """The daily slow collectors (GDELT) on their own."""
+    results = []
+    async with make_client(settings) as client, storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        for name in SLOW_COLLECTORS:
+            log.info("collecting %s (daily, a few minutes)", name)
+            results.append(await EXTRA_COLLECTORS[name](db, client, settings))
+    return results
+
+
+async def run_cycle(settings: Settings, notify: bool = False, slow: bool = False) -> CycleReport:
     from tension_index.notify import broadcast, broadcast_change, render_score, send
     from tension_index.sources import REGISTRY
 
@@ -65,6 +78,8 @@ async def run_cycle(settings: Settings, notify: bool = False) -> CycleReport:
     async with make_client(settings) as client, storage.connect(settings.database_path) as db:
         await storage.migrate(db)
         for name, collect in EXTRA_COLLECTORS.items():
+            if name in SLOW_COLLECTORS and not slow:
+                continue
             log.info("collecting %s", name)
             try:
                 result = await asyncio.wait_for(

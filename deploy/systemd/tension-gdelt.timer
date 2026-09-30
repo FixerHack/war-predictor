@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily GDELT collection at 04:43 UTC (before the morning cycle)
+
+[Timer]
+OnCalendar=*-*-* 04:43:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

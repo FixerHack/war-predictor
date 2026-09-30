@@ -1,0 +1,11 @@
+[Unit]
+Description=Tension Index: daily GDELT collection (media volume, RU/BY MFA advice)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=@APP_USER@
+WorkingDirectory=@APP_DIR@
+ExecStart=@UV@ run --frozen --no-dev tension-index gdelt
+TimeoutStartSec=15min
