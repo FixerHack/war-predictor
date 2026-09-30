@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.33**, updated 2026-09-30.
+Version **0.2.38**, updated 2026-09-30.
 
-**Overall progress: 51%** · left ≈ 21.4 days · ✅ 38 · 🟡 14 · ⬜ 24 · ⛔ 2
+**Overall progress: 57%** · left ≈ 18.9 days · ✅ 39 · 🟡 17 · ⬜ 20 · ⛔ 2
 
 ## Milestones
 
@@ -110,14 +110,16 @@ Branch: `dev-news`
 - 🟡 **S4.5** Markets: bonds and FX via ECB Data Portal
   - ECB: 10y spread over Germany and FX (daily).
 
-## S5. Historical archive — 0%
+## S5. Historical archive — 75%
 
 _Past advisory versions to test the scale on known episodes._
 
 Branch: `dev-history`
 
-- ⬜ **S5.1** Download past versions from the Wayback Machine (CDX API)
-- ⬜ **S5.2** Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25
+- ✅ **S5.1** Download past versions from the Wayback Machine (CDX API)
+  - tension-index history: Wayback captures (daily 45 days before the event, every 5 days earlier) into data/history.sqlite3.
+- 🟡 **S5.2** Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25
+  - Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.
 
 ## S6. Change classification (Claude API) — 60%
 
@@ -143,15 +145,18 @@ Branch: `dev-scoring`
   - tension-index run: collect → classify → signals → score; no score without enough coverage (except threshold events).
 - ✅ **S7.4** Score explanation in alerts and on the dashboard
 
-## S8. Backtesting — 0%
+## S8. Backtesting — 33%
 
 _The scale must fire on known episodes in time and without mass false alarms._
 
 Branch: `dev-backtest`
 
-- ⬜ **S8.1** Replay the scale on historical episodes
-- ⬜ **S8.2** False alarm and miss report
+- 🟡 **S8.1** Replay the scale on historical episodes
+  - tension-index backtest: day-by-day replay, reports in reports/backtest; tested on synthetic data, awaiting the real archive.
+- 🟡 **S8.2** False alarm and miss report
+  - Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms.
 - ⬜ **S8.3** Weight tuning
+  - Observation: surge_weight lifts a single government decision to 9+, the scale wants several. Tune on real data.
 
 ## S9. Telegram bot & alerts — 80%
 
@@ -235,6 +240,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.38** (2026-09-30)
+  - Wayback archive for historical episodes (tension-index history)
+  - Scale backtest with PASS/FAIL reports (tension-index backtest)
 - **0.2.33** (2026-09-30)
   - News: 13 feeds, headline categories (rules + Claude), two-feed confirmation
   - GDELT: media surges and RU/BY MFA advice

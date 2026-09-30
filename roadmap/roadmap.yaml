@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.33
+  version: 0.2.38
   updated: 2026-09-30
 
 milestones:
@@ -113,8 +113,8 @@ stages:
     goal_uk: "Старі версії рекомендацій для перевірки шкали на відомих епізодах."
     goal_en: "Past advisory versions to test the scale on known episodes."
     tasks:
-      - {id: S5.1, status: todo, days: 1, uk: "Завантаження старих версій з Wayback Machine (CDX API)", en: "Download past versions from the Wayback Machine (CDX API)"}
-      - {id: S5.2, status: todo, days: 1, uk: "Епізоди: Україна 2021–22, Вірменія/Азербайджан 2020, Ізраїль/Іран 2024–25", en: "Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25"}
+      - {id: S5.1, status: done, days: 1, uk: "Завантаження старих версій з Wayback Machine (CDX API)", en: "Download past versions from the Wayback Machine (CDX API)", note_uk: "tension-index history: знімки Wayback (щодня за 45 днів до події, раз на 5 днів раніше) в окрему базу data/history.sqlite3.", note_en: "tension-index history: Wayback captures (daily 45 days before the event, every 5 days earlier) into data/history.sqlite3."}
+      - {id: S5.2, status: in_progress, days: 1, uk: "Епізоди: Україна 2021–22, Вірменія/Азербайджан 2020, Ізраїль/Іран 2024–25", en: "Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25", note_uk: "Епізоди в config/episodes.yaml (Україна 2022, Азербайджан 2020, Ізраїль 2024, контроль Франція 2016); завантаження потребує мережі, запустити локально.", note_en: "Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally."}
 
   - id: S6
     branch: dev-classifier
@@ -146,9 +146,9 @@ stages:
     goal_uk: "Шкала має спрацьовувати на відомих епізодах вчасно і без масових хибних тривог."
     goal_en: "The scale must fire on known episodes in time and without mass false alarms."
     tasks:
-      - {id: S8.1, status: todo, days: 1.5, uk: "Прогін шкали на історичних епізодах", en: "Replay the scale on historical episodes"}
-      - {id: S8.2, status: todo, days: 0.5, uk: "Звіт про хибні тривоги і пропуски", en: "False alarm and miss report"}
-      - {id: S8.3, status: todo, days: 1, uk: "Коригування ваг", en: "Weight tuning"}
+      - {id: S8.1, status: in_progress, days: 1.5, uk: "Прогін шкали на історичних епізодах", en: "Replay the scale on historical episodes", note_uk: "tension-index backtest: день за днем, звіти в reports/backtest; перевірено на синтетичних даних, чекає реального архіву.", note_en: "tension-index backtest: day-by-day replay, reports in reports/backtest; tested on synthetic data, awaiting the real archive."}
+      - {id: S8.2, status: in_progress, days: 0.5, uk: "Звіт про хибні тривоги і пропуски", en: "False alarm and miss report", note_uk: "Звіт: PASS/FAIL за очікуванням епізоду, перші дні досягнення 3/5/7/9, контрольний епізод на хибні тривоги.", note_en: "Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms."}
+      - {id: S8.3, status: todo, days: 1, uk: "Коригування ваг", en: "Weight tuning", note_uk: "Спостереження: надбавка surge_weight піднімає рішення однієї держави до 9+, а шкала вимагає кількох держав. Налаштувати на реальних даних.", note_en: "Observation: surge_weight lifts a single government decision to 9+, the scale wants several. Tune on real data."}
 
   - id: S9
     branch: dev-tg-bot
@@ -232,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.38
+    date: 2026-09-30
+    uk: ["Архів Wayback для історичних епізодів (tension-index history)", "Бектест шкали з PASS/FAIL-звітами (tension-index backtest)"]
+    en: ["Wayback archive for historical episodes (tension-index history)", "Scale backtest with PASS/FAIL reports (tension-index backtest)"]
   - version: 0.2.33
     date: 2026-09-30
     uk: ["Новини: 13 стрічок, категорії заголовків (правила + Claude), підтвердження двома стрічками", "GDELT: сплески уваги медіа і поради МЗС РФ/РБ", "Ринки ЄЦБ: спреди облігацій і курси валют", "probe news / gdelt / ecb"]

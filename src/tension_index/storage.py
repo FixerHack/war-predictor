@@ -217,12 +217,14 @@ async def insert_snapshot(
     title: str | None = None,
     level: str | None = None,
     source_updated: str | None = None,
+    fetched_at: str | None = None,  # set by the history loader (archive timestamp)
 ) -> int:
     cur = await db.execute(
         "INSERT INTO snapshots (source, country, fetched_at, source_updated, url, title, level, "
         "content_hash, text) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        (source, country, utcnow(), source_updated, url, title, level, content_hash(text), text),
-    )
+        (source, country, fetched_at or utcnow(), source_updated, url, title, level,
+         content_hash(text), text),
+    )  # fmt: skip
     return cur.lastrowid or 0
 
 
@@ -234,11 +236,12 @@ async def insert_change(
     prev_snapshot: int | None,
     new_snapshot: int,
     diff: str,
+    detected_at: str | None = None,
 ) -> int:
     cur = await db.execute(
         "INSERT INTO changes (source, country, detected_at, prev_snapshot, new_snapshot, diff) "
         "VALUES (?, ?, ?, ?, ?, ?)",
-        (source, country, utcnow(), prev_snapshot, new_snapshot, diff),
+        (source, country, detected_at or utcnow(), prev_snapshot, new_snapshot, diff),
     )
     return cur.lastrowid or 0
 

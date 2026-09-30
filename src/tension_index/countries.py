@@ -77,12 +77,26 @@ _RAW: list[tuple[str, str, str, str, bool, str]] = [
 
 COUNTRIES: dict[str, Country] = {c[0]: Country(*c) for c in _RAW}
 
+# Not monitored, only used to replay historical episodes (backtesting the scale).
+BACKTEST: dict[str, Country] = {
+    c[0]: Country(*c)
+    for c in [
+        ("UA", "Ukraine", "Україна", "backtest", False, "ukraine"),
+        ("AM", "Armenia", "Вірменія", "backtest", False, "armenia"),
+        ("AZ", "Azerbaijan", "Азербайджан", "backtest", False, "azerbaijan"),
+        ("IL", "Israel", "Ізраїль", "backtest", False, "israel"),
+        ("GE", "Georgia", "Грузія", "backtest", False, "georgia"),
+    ]
+}
+
 
 def get_country(code: str) -> Country:
-    try:
-        return COUNTRIES[code.upper()]
-    except KeyError as exc:
-        raise KeyError(f"Unknown or unmonitored country code: {code!r}") from exc
+    code = code.upper()
+    if code in COUNTRIES:
+        return COUNTRIES[code]
+    if code in BACKTEST:
+        return BACKTEST[code]
+    raise KeyError(f"Unknown or unmonitored country code: {code!r}")
 
 
 def peers(code: str) -> list[Country]:
