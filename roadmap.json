@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.51",
+    "version": "0.2.52",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -1191,6 +1191,18 @@
   ],
   "changelog": [
     {
+      "version": "0.2.52",
+      "date": "2026-09-30",
+      "uk": [
+        "Австралія: сторінки країн замість повільного експорту (рівень після «Overall advice level»)",
+        "Новини: прибрано Kyiv Independent (404)"
+      ],
+      "en": [
+        "Australia: country pages instead of the slow export (level after \"Overall advice level\")",
+        "News: dropped Kyiv Independent (404)"
+      ]
+    },
+    {
       "version": "0.2.51",
       "date": "2026-09-30",
       "uk": [
@@ -1502,7 +1514,7 @@
     "tasks": 78
   },
   "build": {
-    "built_at": "2026-09-30T14:30:34+00:00",
-    "commit": "327c5bc"
+    "built_at": "2026-09-30T14:37:37+00:00",
+    "commit": "fe7be10"
   }
 }
