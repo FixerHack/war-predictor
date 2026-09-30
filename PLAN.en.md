@@ -2,15 +2,15 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.0**, updated 2026-09-30.
+Version **0.2.1**, updated 2026-09-30.
 
-**Overall progress: 27%** · left ≈ 31.9 days · ✅ 26 · 🟡 2 · ⬜ 48 · ⛔ 0
+**Overall progress: 27%** · left ≈ 32.1 days · ✅ 27 · 🟡 2 · ⬜ 49 · ⛔ 0
 
 ## Milestones
 
 - **M1** — MVP: 14 days of unattended collection, backtest scores Ukraine 7+ before 2022-02-24, every alert explained
 
-## S0. Foundation & infrastructure — 67%
+## S0. Foundation & infrastructure — 66%
 
 _Repository, working environment on the MacBook and server, keys, Telegram bot._
 
@@ -28,7 +28,11 @@ Branch: `dev-bootstrap`
 - ⬜ **S0.10** Anthropic Console: top-up, API key, monthly spend cap _(manual)_
 - ⬜ **S0.11** Create bot via @BotFather, test channel, fill in .env _(manual)_
 - ⬜ **S0.12** First server deploy: install_server.sh, verify healthcheck _(manual)_
-- ⬜ **S0.13** Enable GitHub Pages (Settings → Pages → Source: GitHub Actions) _(manual)_
+- ⬜ **S0.13** Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root _(manual)_
+  - Site is already on the gh-pages branch (make pages) because Actions are locked.
+- ⬜ **S0.15** Unlock GitHub Actions: Settings → Billing and plans (invoice / card) _(manual)_
+  - CI does not start: "account is locked due to a billing issue".
+- ✅ **S0.16** Publish the progress page without Actions (make pages → gh-pages branch)
 - ⬜ **S0.14** Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip _(manual)_
 
 ## S1. Input decisions — 80%
@@ -199,6 +203,7 @@ Branch: `—`
 
 ## Risks
 
+- GitHub Actions locked by an account billing issue: no CI until unlocked, checks run locally only (make check)
 - Collection blocking: government sites may block requests from the server
 - Terms of use: no open Reuters/AP RSS; ACLED licence for a public service
 - Public responsibility: the score will be read as a forecast; disclaimer and methodology needed
@@ -207,6 +212,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.1** (2026-09-30)
+  - Publish the progress page without GitHub Actions: make pages → gh-pages branch
 - **0.2.0** (2026-09-30)
   - Bot: language → country → inline dashboard with toggles
   - War status: RULAC-based list + Wikipedia check

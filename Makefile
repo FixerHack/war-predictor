@@ -1,5 +1,5 @@
 # Shortcuts for local development (macOS / Linux). Everything goes through uv.
-.PHONY: setup lint fmt test check plan site bot collect health
+.PHONY: setup lint fmt test check plan site pages bot collect health
 
 setup:        ## install deps, create .env and DB, run tests
 	./scripts/bootstrap.sh
@@ -22,6 +22,9 @@ plan:         ## regenerate PLAN.md / PLAN.en.md and the site from roadmap/roadm
 
 site: plan    ## preview the progress page at http://localhost:8000
 	cd _site && uv run python -m http.server 8000
+
+pages:        ## publish the progress page to the gh-pages branch (no GitHub Actions needed)
+	./scripts/publish_pages.sh
 
 bot:
 	uv run tension-index bot

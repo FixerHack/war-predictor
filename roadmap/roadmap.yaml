@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.0
+  version: 0.2.1
   updated: 2026-09-30
 
 milestones:
@@ -41,7 +41,9 @@ stages:
       - {id: S0.10, status: todo, days: 0.2, owner: human, uk: "Anthropic Console: поповнення, ключ API, місячний ліміт витрат", en: "Anthropic Console: top-up, API key, monthly spend cap"}
       - {id: S0.11, status: todo, days: 0.2, owner: human, uk: "Створити бота в @BotFather, тестовий канал, заповнити .env", en: "Create bot via @BotFather, test channel, fill in .env"}
       - {id: S0.12, status: todo, days: 0.5, owner: human, uk: "Перший деплой на сервер: install_server.sh, перевірка healthcheck", en: "First server deploy: install_server.sh, verify healthcheck"}
-      - {id: S0.13, status: todo, days: 0.2, owner: human, uk: "Увімкнути GitHub Pages (Settings → Pages → Source: GitHub Actions)", en: "Enable GitHub Pages (Settings → Pages → Source: GitHub Actions)"}
+      - {id: S0.13, status: todo, days: 0.2, owner: human, uk: "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root", en: "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root", note_uk: "Сайт уже в гілці gh-pages (make pages), бо Actions заблоковані.", note_en: "Site is already on the gh-pages branch (make pages) because Actions are locked."}
+      - {id: S0.15, status: todo, days: 0.2, owner: human, uk: "Зняти блокування GitHub Actions: Settings → Billing and plans (рахунок / картка)", en: "Unlock GitHub Actions: Settings → Billing and plans (invoice / card)", note_uk: "CI не стартує: «account is locked due to a billing issue».", note_en: "CI does not start: \"account is locked due to a billing issue\"."}
+      - {id: S0.16, status: done, days: 0.2, uk: "Публікація сторінки прогресу без Actions (make pages → гілка gh-pages)", en: "Publish the progress page without Actions (make pages → gh-pages branch)"}
       - {id: S0.14, status: todo, days: 0.2, owner: human, uk: "Захист гілки main (тільки через PR, CI зелений); видалити гілку claude/funny-planck-leoxip", en: "Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip"}
 
   - id: S1
@@ -220,6 +222,7 @@ decisions:
   - {date: 2026-09-30, uk: "Статус війни окремо від шкали; довідник ведеться вручну, автоматика лише пропонує зміни", en: "War status is separate from the scale; curated by hand, automation only proposes changes"}
 
 risks:
+  - {uk: "GitHub Actions заблоковані через білінг акаунта: CI не перевіряє зміни, до розблокування перевірки лише локально (make check)", en: "GitHub Actions locked by an account billing issue: no CI until unlocked, checks run locally only (make check)"}
   - {uk: "Блокування збору: сайти держав можуть блокувати запити з сервера", en: "Collection blocking: government sites may block requests from the server"}
   - {uk: "Умови використання: Reuters і AP без відкритих RSS; ліцензія ACLED для публічного сервісу", en: "Terms of use: no open Reuters/AP RSS; ACLED licence for a public service"}
   - {uk: "Публічна відповідальність: бал сприймуть як прогноз; потрібні застереження і методологія", en: "Public responsibility: the score will be read as a forecast; disclaimer and methodology needed"}
@@ -227,6 +230,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.1
+    date: 2026-09-30
+    uk: ["Публікація сторінки прогресу без GitHub Actions: make pages → гілка gh-pages"]
+    en: ["Publish the progress page without GitHub Actions: make pages → gh-pages branch"]
   - version: 0.2.0
     date: 2026-09-30
     uk: ["Бот: мова → країна → інлайн-панель із перемикачами", "Статус війни: довідник RULAC + звірка з Wikipedia", "Алгоритм шкали і рушій балу з тестами", "Каталог джерел", "План об'єднано з попереднім дашбордом"]
