@@ -97,6 +97,7 @@ async def collect_markets(
                 country=code, block="markets", kind="markets:spread_jump",
                 strength=min(1.0, jump / 3), publisher="ecb", observed_at=now,
                 note=f"10y spread over Germany up {jump:.1f} pp vs its 12-month median",
+                note_uk=f"спред 10-річних облігацій до Німеччини вищий на {jump:.1f} п. п. за медіану 12 місяців",
             ))  # fmt: skip
         result.fetched += 1
     except (httpx.HTTPError, KeyError) as exc:
@@ -110,6 +111,7 @@ async def collect_markets(
                 country=code, block="markets", kind="markets:fx_drop",
                 strength=min(1.0, drop / 0.15), publisher="ecb", observed_at=now,
                 note=f"{CURRENCY[code]} down {drop:.0%} vs EUR against its 60-day median",
+                note_uk=f"{CURRENCY[code]} подешевшала до євро на {drop:.0%} від медіани 60 днів",
             ))  # fmt: skip
         result.fetched += 1
     except (httpx.HTTPError, KeyError) as exc:

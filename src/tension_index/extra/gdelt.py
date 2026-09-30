@@ -120,6 +120,7 @@ async def collect_gdelt(
                 country=code, block="media", kind="media:gdelt_surge", strength=surge_strength(ratio),
                 publisher="gdelt", observed_at=now, tier=3, confirmed=confirmed,
                 reason="military_threat", note=f"military-related coverage x{ratio:.1f} vs usual",
+                note_uk=f"публікацій на військову тему в {ratio:.1f} раза більше за звичне",
             )  # fmt: skip
             await storage.upsert_signal(db, signal, f"gdelt:{now:%Y-%m-%d}")
             result.changed += 1

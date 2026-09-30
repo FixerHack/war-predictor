@@ -72,8 +72,11 @@ def reasons(payload: dict, lang: str, limit: int = 3) -> list[str]:
     lines = []
     for c in payload.get("top", [])[:limit]:
         line = f"{publisher_label(c['publisher'], lang)}: {kind_label(c['kind'], lang)}"
+        note_uk = (c.get("note_uk") or "").strip()
         note = (c.get("note") or "").strip()
-        if note:
+        if lang == "uk" and note_uk:
+            line += f" — {note_uk[:160]}"  # a Ukrainian summary, not a verbatim quote
+        elif note:
             line += f" — «{note[:160]}»"
         lines.append(line)
     return lines

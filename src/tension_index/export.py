@@ -64,7 +64,12 @@ async def build(db: aiosqlite.Connection, now: datetime | None = None) -> dict:
             "floors": payload.get("floors", []),
             "flag_keys": payload.get("flags", []),
             "contributors": [
-                {"block": c["block"], "value": round(c["value"], 3), "note": c.get("note") or ""}
+                {
+                    "block": c["block"],
+                    "value": round(c["value"], 3),
+                    "note": c.get("note") or "",
+                    "note_uk": c.get("note_uk") or "",
+                }
                 | _labels(c["publisher"], c["kind"])
                 for c in payload.get("top", [])
             ],
@@ -76,6 +81,7 @@ async def build(db: aiosqlite.Connection, now: datetime | None = None) -> dict:
                     "observed_at": sig.observed_at.isoformat(timespec="minutes"),
                     "reason": sig.reason,
                     "note": sig.note,
+                    "note_uk": sig.note_uk,
                 }
                 | _labels(sig.publisher, sig.kind)
                 for sig in sorted(by_country.get(code, []), key=lambda s: -s.strength)[:MAX_SIGNALS]

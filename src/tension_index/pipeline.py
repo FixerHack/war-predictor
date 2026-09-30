@@ -232,6 +232,7 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             "reason": cls.reason,
             "state": True,
             "note": usable_quote(cls.quote),
+            "note_uk": cls.summary_uk if cls.method == "claude" else "",
         }
         strength = advisory_strength(cfg, snap["source"], level)
         await storage.upsert_signal(
@@ -308,6 +309,7 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
                 reason=cls.reason,
                 state=False,
                 note=cls.summary_en or usable_quote(cls.quote),
+                note_uk=cls.summary_uk,
             )
             await storage.upsert_signal(db, event, f"change:{row['id']}")
             count += 1
@@ -336,6 +338,7 @@ async def active_signals(
             reason=r["reason"],
             state=bool(r["state"]),
             note=r["note"],
+            note_uk=r["note_uk"],
         )
         for r in rows
     ]

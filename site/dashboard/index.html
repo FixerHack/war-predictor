@@ -334,7 +334,9 @@ function signalItem(s, gov) {
   const t = T[lang];
   const what = gov ? (s.strength >= 0.1 ? `${t.raised} (${t.strength} ${s.strength.toFixed(2)})` : t.normal)
     : `${s.kind[lang]} · ${s.state ? t.state : t.event} · ${t.strength} ${s.strength.toFixed(2)}`;
-  const note = s.note ? `<span class="q">«${esc(s.note.slice(0, 220))}»</span>` : "";
+  // Ukrainian summary when there is one (not a verbatim quote), else the original quote.
+  const note = lang === "uk" && s.note_uk ? `<span class="q">${esc(s.note_uk.slice(0, 220))}</span>`
+    : s.note ? `<span class="q">«${esc(s.note.slice(0, 220))}»</span>` : "";
   return `<li>${esc(s.publisher[lang])}: ${esc(what)} <span class="muted">${esc(fmtDate(s.observed_at))}</span>${note}</li>`;
 }
 

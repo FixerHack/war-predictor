@@ -207,3 +207,22 @@ async def test_flapping_changes_are_not_events(settings):
         events = [s for s in await active_signals(db, datetime.now(UTC)) if not s.state]
         assert [(s.country, s.kind) for s in events] == [("EE", "advisory_update:security_update")]
         assert real not in await flapping_changes(db, timedelta(days=7))
+
+
+async def test_claude_summary_becomes_ukrainian_note(settings):
+    async with storage.connect(settings.database_path) as db:
+        sid = await seed(db, text="Do not travel due to armed conflict.")
+        cls = classify_rules("Do not travel due to armed conflict.")
+        cls.method, cls.quote = "claude", "Do not travel due to armed conflict."
+        cls.summary_uk = "США радять не їхати через збройний конфлікт."
+        await storage.save_classification(
+            db, ref_type="snapshot", ref_id=sid, country="MD", publisher="us", method="claude",
+            payload=cls.to_json(),
+        )  # fmt: skip
+        await derive_advisory_signals(db)
+        [level] = [s for s in await active_signals(db, NOW) if s.kind == "advisory_level"]
+    assert level.note_uk == "США радять не їхати через збройний конфлікт."
+    payload = {"top": [{"publisher": "us", "kind": "advisory_level", "note": level.note,
+                        "note_uk": level.note_uk}]}  # fmt: skip
+    assert reasons(payload, "uk")[0].endswith("— США радять не їхати через збройний конфлікт.")
+    assert reasons(payload, "en")[0].endswith("«Do not travel due to armed conflict.»")
