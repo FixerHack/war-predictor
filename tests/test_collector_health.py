@@ -103,3 +103,37 @@ async def test_daily_collectors_may_be_a_day_old(settings):
     checks = {c.name: c.status for c in (await run_checks(settings)).checks}
     assert checks["collector.gdelt"] == Status.OK
     assert checks["collector.gov_uk"] == Status.FAIL  # 3-hourly collector, 20 h is stale
+
+
+async def test_source_deadline_stops_a_hanging_site(settings):
+    import asyncio
+
+    from tension_index.countries import get_country
+    from tension_index.sources.base import Advisory, Source
+
+    class Hanging(Source):
+        name = "hang"
+
+        def supports(self, country):
+            return True
+
+        async def fetch(self, country):
+            if country.code == "PL":
+                return Advisory(country="PL", url="u", text="ok")
+            await asyncio.sleep(30)
+
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        result = await collect_source(db, Hanging(None), ["PL", "EE", "LV"], deadline_seconds=0.2)
+    assert result.fetched == 1 and result.failed == 2
+    assert get_country("EE")  # sanity
+
+
+def test_disabled_sources_setting(monkeypatch):
+    from tension_index.config import Settings
+
+    assert Settings(_env_file=None).disabled_sources == ["au"]
+    monkeypatch.setenv("DISABLED_SOURCES", "au, fr")
+    assert Settings(_env_file=None).disabled_sources == ["au", "fr"]
+    monkeypatch.setenv("DISABLED_SOURCES", "")
+    assert Settings(_env_file=None).disabled_sources == []
