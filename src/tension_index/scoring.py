@@ -164,17 +164,26 @@ def compute_score(
     adjusted = raw
     if history and history_days >= base_cfg["min_history_days"]:
         deviation = raw - statistics.median(history)
-        adjusted += base_cfg["surge_weight"] * max(0.0, deviation)
+        # Capped: a surge sharpens the picture but must not replace decisive events (floors).
+        bonus = base_cfg["surge_weight"] * max(0.0, deviation)
+        adjusted += min(bonus, base_cfg["surge_cap"])
     else:
         flags.append("short_history")
 
     # Several governments tightening within a week.
     syn = cfg["synchrony"]
     recent = now - timedelta(days=syn["window_days"])
+    # Only real tightening counts: a raised level, staff posture, consular/border/airspace
+    # measures - for a relevant reason. Routine rewording and terrorism notes do not.
+    relevance = cfg["reason_relevance"]
     tightening = {
         s.publisher
         for s in usable
-        if s.block == "advisories" and s.observed_at >= recent and _effective(cfg, s, now) > 0
+        if s.block == "advisories"
+        and s.kind not in syn["ignore_kinds"]
+        and s.observed_at >= recent
+        and relevance.get(s.reason, relevance["unknown"]) >= syn["min_relevance"]
+        and _effective(cfg, s, now) > 0
     }
     if len(tightening) >= syn["min_governments"]:
         adjusted *= syn["multiplier"]

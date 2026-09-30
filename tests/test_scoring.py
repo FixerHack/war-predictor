@@ -97,14 +97,38 @@ def test_unconfirmed_low_tier_is_ignored():
     assert compute_score("LT", [rumour], NOW).score > 0
 
 
+def raised(publisher, reason="armed_conflict", kind="advisory_update:level_raised", days=2):
+    return Signal(
+        country="MD", block="advisories", kind=kind, strength=0.4, publisher=publisher,
+        observed_at=NOW - timedelta(days=days), reason=reason,
+    )  # fmt: skip
+
+
 def test_synchrony_flag():
-    signals = [
-        adv(publisher=p, level="3", observed_at=NOW - timedelta(days=2))
-        for p in ("us", "au", "gov_uk")
-    ]
-    signals[2].strength = CFG["advisory_levels"]["gov_uk"]["avoid_all_travel_to_parts"]
+    signals = [adv(publisher=p, level="3") for p in ("us", "au", "gov_uk")]
+    signals += [raised(p) for p in ("us", "au", "gov_uk")]
     result = compute_score("MD", signals, NOW)
     assert "synchrony:3" in result.flags
+
+
+def test_synchrony_ignores_standing_levels_rewording_and_terrorism():
+    """Levels seen recently, routine updates and terrorism notes are not governments
+    tightening together (France, November 2015, was a false alarm before this rule)."""
+    signals = [
+        adv(publisher=p, level="3", observed_at=NOW - timedelta(days=1))
+        for p in ("us", "au", "gov_uk")
+    ]
+    signals += [raised(p, kind="advisory_update:security_update") for p in ("us", "au")]
+    signals += [raised("gov_uk", reason="terrorism"), raised("ca", reason="terrorism")]
+    assert not any(f.startswith("synchrony") for f in compute_score("MD", signals, NOW).flags)
+
+
+def test_surge_bonus_is_capped():
+    """One government's ordered departure in a calm country stays at its floor (7), the
+    surge over a flat norm must not lift it to 9+."""
+    signals = [staff("us", "ordered_departure")]
+    result = compute_score("PL", signals, NOW, history=[0.0] * 180, history_days=180)
+    assert 7.0 <= result.score < 8.0
 
 
 def test_surge_above_own_norm_and_isolation():
