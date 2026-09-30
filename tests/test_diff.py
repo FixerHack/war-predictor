@@ -26,3 +26,9 @@ def test_boilerplate_dates_are_ignored_but_content_kept():
     assert "Updated: ordered departure" in normalize(
         "Updated: ordered departure\nStand: 29.09.2026"
     )
+
+
+def test_us_reissue_notes_are_boilerplate():
+    old = "There were no changes to the advisory level or risk indicators. Advisory summary was updated.\nAdvisory summary\nExercise normal precautions in Estonia."
+    new = "Reissued after periodic review with minor edits.\nAdvisory Summary\nExercise normal precautions in Estonia."
+    assert changed_fragment(old, new) == ""
