@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.44
+  version: 0.2.47
   updated: 2026-09-30
 
 milestones:
@@ -175,7 +175,7 @@ stages:
       - {id: S10.1, status: done, days: 0.5, uk: "Довідник config/conflicts.yaml на основі RULAC (Молдова, Кіпр — окупація; сусідство з війною і агресором)", en: "Curated config/conflicts.yaml based on RULAC (Moldova, Cyprus — occupation; borders with war and aggressor)"}
       - {id: S10.2, status: done, days: 0.5, uk: "Щоденна звірка з Wikipedia, розбіжності адміну (war-check)", en: "Daily check against Wikipedia, mismatches to admins (war-check)"}
       - {id: S10.3, status: todo, days: 0.5, owner: human, uk: "Отримати токен UCDP API", en: "Obtain a UCDP API token"}
-      - {id: S10.4, status: todo, days: 0.5, uk: "UCDP Candidate Events як друге автоматичне джерело", en: "UCDP Candidate Events as a second automatic source"}
+      - {id: S10.4, status: blocked, days: 0.5, uk: "UCDP Candidate Events як друге автоматичне джерело", en: "UCDP Candidate Events as a second automatic source", note_uk: "Чекає токена UCDP (S10.3).", note_en: "Waiting for the UCDP token (S10.3)."}
       - {id: S10.5, status: done, days: 0.3, uk: "Перевірити парсер Wikipedia на живій сторінці", en: "Verify the Wikipedia parser against the live page", note_uk: "Перевірено на живій сторінці: розділи, колонка Location; Франція (Французька Гвіана) виключена вручну.", note_en: "Verified on the live page: sections, Location column; France (French Guiana) excluded by review."}
 
   - id: S11
@@ -199,7 +199,7 @@ stages:
     tasks:
       - {id: S12.1, status: done, days: 0.2, uk: "Щоденний бекап SQLite з ротацією", en: "Daily SQLite backup with rotation"}
       - {id: S12.2, status: todo, days: 0.3, owner: human, uk: "Dead-man switch на healthchecks.io (безкоштовно)", en: "Dead-man switch on healthchecks.io (free)"}
-      - {id: S12.3, status: todo, days: 0.5, uk: "Автодеплой з main (GitHub Actions → SSH)", en: "Auto-deploy from main (GitHub Actions → SSH)"}
+      - {id: S12.3, status: in_progress, days: 0.5, uk: "Автодеплой з main (GitHub Actions → SSH)", en: "Auto-deploy from main (GitHub Actions → SSH)", note_uk: "Процес .github/workflows/deploy.yml готовий (SSH → scripts/deploy.sh); запрацює після розблокування Actions і секретів DEPLOY_*.", note_en: ".github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set."}
 
   - id: S13
     branch: "—"
@@ -210,7 +210,7 @@ stages:
     tasks:
       - {id: S13.1, status: todo, days: 0.5, uk: "14 днів збору поспіль без ручного втручання", en: "14 consecutive days of collection without manual intervention"}
       - {id: S13.2, status: todo, days: 0.5, uk: "На епізоді України бал досягає 7+ до 24.02.2022", en: "On the Ukraine episode the score reaches 7+ before 2022-02-24"}
-      - {id: S13.3, status: todo, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote"}
+      - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
   - {date: 2026-09-30, uk: "Заморські території європейських країн не впливають на статус війни; винятки фіксуються вручну в wikipedia_ignore", en: "Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore"}
@@ -232,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.47
+    date: 2026-09-30
+    uk: ["Автодеплой з main через SSH (після розблокування Actions)", "Стан реалізації джерел у docs/sources.md"]
+    en: ["Auto-deploy from main over SSH (once Actions are unlocked)", "Source implementation status in docs/sources.md"]
   - version: 0.2.44
     date: 2026-09-30
     uk: ["Публічна панель: карта Європи, картка країни з графіком, таблиця, методологія (/dashboard/)", "Експорт scores.json"]
