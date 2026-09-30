@@ -1,0 +1,9 @@
+[Unit]
+Description=Daily digest at 06:37 UTC (morning in Europe)
+
+[Timer]
+OnCalendar=*-*-* 06:37:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target

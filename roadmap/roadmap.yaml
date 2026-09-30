@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.38
+  version: 0.2.40
   updated: 2026-09-30
 
 milestones:
@@ -162,8 +162,8 @@ stages:
       - {id: S9.3, status: done, days: 1, uk: "Інлайн-панель: бал, статус війни, сусіди, зміни за 7 днів; перемикачі сповіщень, країни, мови", en: "Inline dashboard: score, war status, neighbours, 7-day changes; toggles for alerts, country, language"}
       - {id: S9.4, status: done, days: 0.5, uk: "Розсилка змін підписникам країни їхньою мовою", en: "Change alerts to a country's subscribers in their language"}
       - {id: S9.5, status: done, days: 1, uk: "Сповіщення при зміні балу на 1+ з поясненням і цитатою", en: "Alerts on score change of 1+ with explanation and quote", note_uk: "Бал змінився на 1+ → підписникам приходить пояснення з джерелами й цитатами.", note_en: "Score moves by 1+ → subscribers get an explanation with sources and quotes."}
-      - {id: S9.6, status: todo, days: 0.5, uk: "Щоденний підсумок по регіону", en: "Daily regional digest"}
-      - {id: S9.7, status: todo, days: 0.5, uk: "Кілька країн на одного користувача", en: "Several countries per user"}
+      - {id: S9.6, status: done, days: 0.5, uk: "Щоденний підсумок по регіону", en: "Daily regional digest", note_uk: "Щоденний дайджест (перемикач на панелі, таймер 06:37 UTC): бал, зміна за добу, зростання в регіоні.", note_en: "Daily digest (toggle on the dashboard, 06:37 UTC timer): score, 24 h change, regional rises."}
+      - {id: S9.7, status: done, days: 0.5, uk: "Кілька країн на одного користувача", en: "Several countries per user", note_uk: "До 5 країн: список з позначками, перемикання картки кнопками.", note_en: "Up to 5 countries: ticked list, switch the detailed card by buttons."}
 
   - id: S10
     branch: dev-war-status
@@ -232,6 +232,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.40
+    date: 2026-09-30
+    uk: ["Бот: до 5 країн на користувача, перемикання між ними, щоденний дайджест"]
+    en: ["Bot: up to 5 countries per user, switching between them, daily digest"]
   - version: 0.2.38
     date: 2026-09-30
     uk: ["Архів Wayback для історичних епізодів (tension-index history)", "Бектест шкали з PASS/FAIL-звітами (tension-index backtest)"]

@@ -139,6 +139,13 @@ async def _run(args: argparse.Namespace) -> int:
     return 0 if report.ok else 2
 
 
+async def _digest() -> int:
+    from tension_index.digest import send_digests
+
+    print(f"digests sent: {await send_digests(get_settings())}")
+    return 0
+
+
 async def _classify() -> int:
     from tension_index.pipeline import classify_pending, make_classifier
 
@@ -286,6 +293,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("bot", help="run the Telegram bot (long polling)")
 
     sub.add_parser("classify", help="classify new changes and current advisories")
+    sub.add_parser("digest", help="send the daily summary to users with the digest on")
 
     p = sub.add_parser("history", help="load archived advisories (Wayback) for an episode")
     p.add_argument("--episode", default="all", help="id from config/episodes.yaml or 'all'")
@@ -335,6 +343,7 @@ def main(argv: list[str] | None = None) -> None:
         "probe": lambda: _probe(args),
         "classify": lambda: _classify(),
         "run": lambda: _run(args),
+        "digest": lambda: _digest(),
         "history": lambda: _history(args),
         "backtest": lambda: _backtest(args),
     }

@@ -10,4 +10,8 @@ class CountryCb(CallbackData, prefix="cty"):
 
 
 class MenuCb(CallbackData, prefix="m"):
-    action: str  # notify | country | lang | refresh | about | home
+    action: str  # notify | digest | country | lang | refresh | about | home
+
+
+class ViewCb(CallbackData, prefix="v"):
+    code: str  # followed country to show in detail
