@@ -167,7 +167,9 @@ async def _classify() -> int:
         await storage.migrate(db)
         claude = make_classifier(settings)
         if claude is None:
-            print("ANTHROPIC_API_KEY not set: keyword rules only")
+            print("No API key for the classifier provider: keyword rules only")
+        else:
+            print(f"classifier: {claude.provider} / {claude.model}")
         stats = await classify_pending(db, settings, claude)
     print(
         f"classified changes={stats['changes']} snapshots={stats['snapshots']} "

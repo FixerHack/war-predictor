@@ -208,43 +208,119 @@ changed, for a notification to the public. Do not speculate or predict."""
 
 # Models that accept server-side refusal fallbacks (`fallbacks: "default"`).
 FALLBACK_MODELS = {"claude-opus-5-5", "claude-opus-5", "claude-fable-5-1", "claude-sonnet-5-5"}
+DEFAULT_MODELS = {"anthropic": "claude-opus-5-5", "openrouter": "anthropic/claude-haiku-4.5"}
+OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
 class ClaudeClassifier:
-    """Claude with strict JSON output. Falls back to rules on refusal, API errors or when
-    the per-run call cap is reached (keeps spend bounded)."""
+    """Claude with strict JSON output, directly (Anthropic API) or through OpenRouter.
+    Falls back to rules on refusal, API errors or when the per-run call cap is reached
+    (keeps spend bounded)."""
 
     def __init__(self, settings: Settings, client: object | None = None) -> None:
         self.settings = settings
+        self.provider = settings.classifier_provider
+        self.model = settings.classifier_model or DEFAULT_MODELS[self.provider]
         self.calls = 0
         if client is None:
-            import anthropic
+            if self.provider == "openrouter":
+                import httpx
 
-            client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+                client = httpx.AsyncClient(timeout=120)
+            else:
+                import anthropic
+
+                client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
         self.client = client
 
     @property
     def available(self) -> bool:
         return self.calls < self.settings.classifier_max_calls
 
-    def _request(self, user: str) -> dict:
-        return {
-            "model": self.settings.classifier_model,
-            "max_tokens": 2048,
-            "system": [
-                {"type": "text", "text": SYSTEM_PROMPT, "cache_control": {"type": "ephemeral"}}
+    async def _call(
+        self, system: str, user: str, schema: dict, max_tokens: int
+    ) -> tuple[str | None, str]:
+        """JSON text from the model, or (None, reason) so the caller can fall back."""
+        self.calls += 1
+        if self.provider == "openrouter":
+            return await self._call_openrouter(system, user, schema, max_tokens)
+        return await self._call_anthropic(system, user, schema, max_tokens)
+
+    async def _call_anthropic(
+        self, system: str, user: str, schema: dict, max_tokens: int
+    ) -> tuple[str | None, str]:
+        import anthropic
+
+        output_config: dict = {"format": {"type": "json_schema", "schema": schema}}
+        if self.settings.classifier_effort:  # not accepted by every model (e.g. Haiku 4.5)
+            output_config["effort"] = self.settings.classifier_effort
+        extra = (
+            {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
+            if self.model in FALLBACK_MODELS
+            else {}
+        )
+        try:
+            response = await self.client.beta.messages.create(
+                model=self.model,
+                max_tokens=max_tokens,
+                system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],
+                messages=[{"role": "user", "content": user}],
+                output_config=output_config,
+                **extra,
+            )
+        except (anthropic.APIConnectionError, anthropic.RateLimitError) as exc:
+            log.warning("Claude unavailable (%s); using rules", exc)
+            return None, f"{type(exc).__name__}"
+        except anthropic.APIStatusError as exc:
+            log.warning("Claude API error %s; using rules", exc.status_code)
+            return None, f"HTTP {exc.status_code}"
+        if response.stop_reason == "refusal":
+            return None, "refusal"
+        return next((b.text for b in response.content if b.type == "text"), ""), ""
+
+    async def _call_openrouter(
+        self, system: str, user: str, schema: dict, max_tokens: int
+    ) -> tuple[str | None, str]:
+        import httpx
+
+        body = {
+            "model": self.model,
+            "max_tokens": max_tokens,
+            "messages": [
+                # cache_control is passed through to Anthropic models by OpenRouter
+                {"role": "system", "content": [
+                    {"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}
+                ]},
+                {"role": "user", "content": user},
             ],
-            "messages": [{"role": "user", "content": user}],
-            "output_config": {
-                "format": {"type": "json_schema", "schema": SCHEMA},
-                # effort is not accepted by every model (e.g. Haiku 4.5): empty = omit
-                **(
-                    {"effort": self.settings.classifier_effort}
-                    if self.settings.classifier_effort
-                    else {}
-                ),
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {"name": "result", "strict": True, "schema": schema},
             },
+        }  # fmt: skip
+        headers = {
+            "Authorization": f"Bearer {self.settings.openrouter_api_key}",
+            "X-Title": "Tension Index",
+            "HTTP-Referer": "https://github.com/FixerHack/war-predictor",
         }
+        try:
+            response = await self.client.post(OPENROUTER_URL, json=body, headers=headers)
+        except httpx.HTTPError as exc:
+            log.warning("OpenRouter unavailable (%s); using rules", exc)
+            return None, type(exc).__name__
+        if response.status_code != 200:
+            log.warning("OpenRouter error %s: %s", response.status_code, response.text[:300])
+            return None, f"HTTP {response.status_code}"
+        try:
+            choice = response.json()["choices"][0]
+        except (ValueError, KeyError, IndexError):
+            return None, "unexpected response"
+        if choice.get("finish_reason") in ("content_filter", "refusal"):
+            return None, "refusal"
+        content = (choice.get("message") or {}).get("content") or ""
+        # Tolerate a fenced or prefixed answer: take the outermost JSON object.
+        start, end = content.find("{"), content.rfind("}")
+        return (content[start : end + 1] if start != -1 and end > start else content), ""
 
     async def classify(
         self,
@@ -259,34 +335,15 @@ class ClaudeClassifier:
         if not self.available:
             fallback.notes.append("claude: per-run cap reached, rules used")
             return fallback
-        import anthropic
-
         user = (
             f"Publisher: {publisher}\nCountry: {country}\n"
             f"Level before: {level_before or 'n/a'}\nLevel after: {level_after or 'n/a'}\n\n"
             f"<advisory>\n{text[:12000]}\n</advisory>"
         )
-        self.calls += 1
-        try:
-            extra = (
-                {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
-                if self.settings.classifier_model in FALLBACK_MODELS
-                else {}
-            )
-            response = await self.client.beta.messages.create(**self._request(user), **extra)
-        except (anthropic.APIConnectionError, anthropic.RateLimitError) as exc:
-            log.warning("Claude unavailable (%s); using rules", exc)
-            fallback.notes.append(f"claude: {type(exc).__name__}, rules used")
+        text_out, problem = await self._call(SYSTEM_PROMPT, user, SCHEMA, 2048)
+        if text_out is None:
+            fallback.notes.append(f"claude: {problem}, rules used")
             return fallback
-        except anthropic.APIStatusError as exc:
-            log.warning("Claude API error %s; using rules", exc.status_code)
-            fallback.notes.append(f"claude: HTTP {exc.status_code}, rules used")
-            return fallback
-
-        if response.stop_reason == "refusal":
-            fallback.notes.append("claude: refusal, rules used")
-            return fallback
-        text_out = next((b.text for b in response.content if b.type == "text"), "")
         try:
             data = json.loads(text_out)
             result = Classification(**{k: data[k] for k in SCHEMA["required"]})
@@ -354,29 +411,10 @@ async def classify_headlines(
     """{index: (category, severity)} from Claude, or None (then rules are used)."""
     if not headlines or not claude.available:
         return None
-    import anthropic
-
     numbered = "\n".join(f"{i}. {h}" for i, h in enumerate(headlines))
-    request = claude._request(numbered)
-    request["system"] = [
-        {"type": "text", "text": HEADLINE_PROMPT, "cache_control": {"type": "ephemeral"}}
-    ]
-    request["output_config"]["format"] = {"type": "json_schema", "schema": HEADLINE_SCHEMA}
-    request["max_tokens"] = 8192
-    extra = (
-        {"betas": ["server-side-fallback-2026-07-01"], "fallbacks": "default"}
-        if claude.settings.classifier_model in FALLBACK_MODELS
-        else {}
-    )
-    claude.calls += 1
-    try:
-        response = await claude.client.beta.messages.create(**request, **extra)
-    except (anthropic.APIConnectionError, anthropic.APIStatusError) as exc:
-        log.warning("Claude headline classification failed: %s", exc)
+    text, _ = await claude._call(HEADLINE_PROMPT, numbered, HEADLINE_SCHEMA, 8192)
+    if text is None:
         return None
-    if response.stop_reason == "refusal":
-        return None
-    text = next((b.text for b in response.content if b.type == "text"), "")
     try:
         items = json.loads(text)["items"]
     except (ValueError, KeyError, TypeError):

@@ -45,7 +45,7 @@
 
 ## Стек
 
-Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite (aiosqlite) · Claude API (з етапу S6) · systemd на власному сервері · GitHub Actions (CI і Pages).
+Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite (aiosqlite) · Claude Haiku 4.5 через OpenRouter (або напряму через Anthropic API) для класифікації змін · systemd на власному сервері · GitHub Actions (CI і Pages).
 
 ## Структура
 

@@ -41,7 +41,13 @@ async def _snapshot(db: aiosqlite.Connection, snapshot_id: int | None) -> aiosql
 
 
 def make_classifier(settings: Settings) -> ClaudeClassifier | None:
-    return ClaudeClassifier(settings) if settings.anthropic_api_key else None
+    """A Claude classifier when the chosen provider has a key; None = rules only."""
+    key = (
+        settings.openrouter_api_key
+        if settings.classifier_provider == "openrouter"
+        else settings.anthropic_api_key
+    )
+    return ClaudeClassifier(settings) if key else None
 
 
 async def classify_pending(
