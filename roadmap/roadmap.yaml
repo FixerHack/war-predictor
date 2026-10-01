@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.71
+  version: 0.2.72
   updated: 2026-09-30
 
 milestones:
@@ -247,6 +247,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.72
+    date: 2026-09-30
+    uk: "Заходи з невказаною безпековою причиною («непередбачувана ситуація») знову рахуються; відсікаються лише явно невійськові причини (COVID, попіл, погода, злочинність, тероризм)."
+    en: "Measures with an unspecified security reason (\"unpredictable situation\") count again; only clearly non-military reasons are excluded (COVID, ash, weather, crime, terrorism)."
   - version: 0.2.71
     date: 2026-09-30
     uk: "Окрема причина для заходів (статус посольства, небо, кордони): карантинні заходи COVID-19 у рекомендації про конфлікт більше не піднімають бал і не вмикають порогів; один уряд із «закритим небом» дає 0.7 блоку авіації, а не 1.0."
