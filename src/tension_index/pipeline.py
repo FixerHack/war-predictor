@@ -49,6 +49,14 @@ async def _snapshot(db: aiosqlite.Connection, snapshot_id: int | None) -> aiosql
 
 def make_classifier(settings: Settings) -> ClaudeClassifier | None:
     """A Claude classifier when the chosen provider has a key; None = rules only."""
+    if settings.classifier_provider == "claude_code":
+        import shutil
+
+        if shutil.which(settings.claude_code_bin) is None:
+            log.warning("CLASSIFIER_PROVIDER=claude_code but %r is not on PATH; rules used",
+                        settings.claude_code_bin)  # fmt: skip
+            return None
+        return ClaudeClassifier(settings)
     key = (
         settings.openrouter_api_key
         if settings.classifier_provider == "openrouter"

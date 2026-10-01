@@ -20,10 +20,12 @@ class Settings(BaseSettings):
     openrouter_api_key: str = ""
     # Classifier: "anthropic" (direct) or "openrouter". Empty model = provider default
     # (anthropic: claude-opus-5-5, openrouter: anthropic/claude-haiku-4.5).
-    classifier_provider: Literal["anthropic", "openrouter"] = "anthropic"
+    # claude_code: the local `claude` CLI (Claude Code, signed in with a Claude subscription)
+    classifier_provider: Literal["anthropic", "openrouter", "claude_code"] = "anthropic"
     classifier_model: str = ""
     classifier_effort: str = "low"  # Anthropic API only; empty for models without effort
     classifier_max_calls: int = 60  # per run; beyond it rules are used (spend guard)
+    claude_code_bin: str = "claude"  # path or name of the Claude Code CLI
 
     # Sources skipped by the regular cycle (comma-separated). Australia's site does not
     # answer automated requests (tested 2026-09-30); `probe au` still works.
@@ -59,7 +61,7 @@ class Settings(BaseSettings):
             if not data.get("classifier_model"):
                 data["classifier_model"] = provider
         elif provider:
-            data = {**data, "classifier_provider": provider.lower()}
+            data = {**data, "classifier_provider": provider.lower().replace("-", "_")}
         return data
 
     @field_validator("disabled_sources", mode="before")

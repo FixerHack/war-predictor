@@ -144,3 +144,21 @@ async def test_loading_twice_does_not_duplicate_and_old_duplicates_go(tmp_path):
             assert (await cur.fetchone())[0] == changes
         async with httpx.AsyncClient(transport=httpx.MockTransport(wayback)) as client:
             assert await load_episode(db, client, UA, pause=0, refresh=True) == first
+
+
+def test_reaction_test_verdict():
+    """A surprise attack: pass when the score reacts within the allowed days."""
+    from tension_index.backtest import Day, Report
+
+    ep = Episode("az", "AZ", date(2020, 9, 1), date(2020, 10, 15), date(2020, 9, 27), {},
+                 {"min_score": 3, "react_within_days": 3})  # fmt: skip
+
+    def report(day_of_rise: date) -> Report:
+        r = Report(ep)
+        r.days = [Day(date(2020, 9, 20), 1.0, "green", 0.1, [], []),
+                  Day(day_of_rise, 3.6, "yellow", 0.3, [], [])]  # fmt: skip
+        return r
+
+    assert report(date(2020, 9, 29)).verdict() == (
+        True, "reached 3 on 2020-09-29, 2 days after the event (reaction test)")  # fmt: skip
+    assert not report(date(2020, 10, 5)).verdict()[0]

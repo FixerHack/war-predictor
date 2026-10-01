@@ -45,7 +45,7 @@ Admin commands (`TELEGRAM_ADMIN_IDS`): `/status`, `/collect`, `/warcheck`.
 
 ## Stack
 
-Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite (aiosqlite) · Claude Haiku 4.5 via OpenRouter (or the Anthropic API directly) to classify changes · systemd on our own server · GitHub Actions (CI and Pages).
+Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite (aiosqlite) · Claude Haiku 4.5 via OpenRouter, the Anthropic API or the local Claude Code CLI (`CLASSIFIER_PROVIDER=claude_code`, on a Claude subscription) to classify changes · systemd on our own server · GitHub Actions (CI and Pages).
 
 ## Layout
 

@@ -308,3 +308,52 @@ async def test_pending_rules_results_go_to_the_model_later(settings):
         assert (await classify_pending(db, settings, model))["claude"] == 1
         row = await storage.get_classification(db, "snapshot", 1)
     assert row["method"] == "claude"
+
+
+def fake_claude_cli(tmp_path, body: str, code: int = 0):
+    """A stand-in for the `claude` binary: records its arguments and stdin, prints `body`."""
+    script = tmp_path / "claude"
+    script.write_text(
+        "#!/bin/sh\n"
+        f'printf "%s\\n" "$@" > "{tmp_path}/args"\n'
+        f'cat > "{tmp_path}/stdin"\n'
+        f"cat <<'JSON'\n{body}\nJSON\n"
+        f"exit {code}\n"
+    )
+    script.chmod(0o755)
+    return str(script)
+
+
+async def test_claude_code_provider_uses_the_local_cli(settings, tmp_path):
+    from tension_index.pipeline import make_classifier
+
+    answer = {"reason": "armed_conflict", "change_type": "staff_posture", "level": "",
+              "staff_posture": "ordered_departure", "airspace": "unknown", "borders_closed": False,
+              "measure_reason": "armed_conflict", "quote": "Staff ordered to leave.",
+              "summary_uk": "Персонал відкликано.", "summary_en": "Staff ordered out."}  # fmt: skip
+    body = json.dumps(
+        {"type": "result", "is_error": False, "result": "", "structured_output": answer}
+    )
+    s = settings.model_copy(update={"classifier_provider": "claude_code",
+                                    "claude_code_bin": fake_claude_cli(tmp_path, body)})  # fmt: skip
+    claude = make_classifier(s)
+    assert claude is not None and claude.model == "haiku"
+    out = await claude.classify(publisher="us", country="MD", text="Staff ordered to leave.",
+                                level_before=None, level_after="4", fallback=Classification())  # fmt: skip
+    assert out.method == "claude" and out.staff_posture == "ordered_departure"
+    args = (tmp_path / "args").read_text().splitlines()
+    assert args[:3] == ["-p", "--output-format", "json"]
+    assert args[args.index("--tools") + 1] == "" and "--no-session-persistence" in args
+    assert "Staff ordered to leave." in (tmp_path / "stdin").read_text()
+
+
+async def test_claude_code_not_logged_in_stops_the_run(settings, tmp_path):
+    body = json.dumps(
+        {"type": "result", "is_error": True, "result": "Not logged in · Please run /login"}
+    )
+    s = settings.model_copy(update={"classifier_provider": "claude_code",
+                                    "claude_code_bin": fake_claude_cli(tmp_path, body, code=1)})  # fmt: skip
+    claude = ClaudeClassifier(s)
+    out = await claude.classify(publisher="us", country="MD", text="x", level_before=None,
+                                level_after=None, fallback=Classification(reason="crime"))  # fmt: skip
+    assert out.method == "rules_pending" and not claude.available
