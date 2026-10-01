@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.74
+  version: 0.2.75
   updated: 2026-09-30
 
 milestones:
@@ -250,6 +250,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.75
+    date: 2026-09-30
+    uk: "Класифікатор через Claude Code пише прогрес кожного виклику; якщо CLI не відповідає 90 с, виклики зупиняються до кінця запуску."
+    en: "The Claude Code classifier logs every call; if the CLI does not answer in 90 s, calls stop for the rest of the run."
   - version: 0.2.74
     date: 2026-09-30
     uk: "Новий провайдер класифікатора — локальний Claude Code за підпискою; епізод Вірменія–Азербайджан-2020 перевіряє реакцію (бал 3+ протягом 3 днів після нападу), а не раннє попередження."
