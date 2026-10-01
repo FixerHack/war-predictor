@@ -88,6 +88,8 @@ aside h3 { font-size: 1rem; margin: 0 0 8px; }
 footer { margin-top: 32px; color: var(--ink-2); font-size: 0.8rem; }
 a { color: var(--focus); }
 @media (prefers-reduced-motion: no-preference) { .seg .fill { transition: width .4s ease; } }
+body.hide-done .tasks li.s-done { display: none; }
+@media (max-width: 600px) { .controls { flex-wrap: wrap; } }
 </style>
 </head>
 <body>
@@ -100,6 +102,7 @@ a { color: var(--focus); }
     <div class="controls">
       <button class="btn" data-lang="uk" type="button">УКР</button>
       <button class="btn" data-lang="en" type="button">ENG</button>
+      <button class="btn" id="doneBtn" type="button" aria-pressed="false"></button>
       <button class="btn" id="themeBtn" type="button" aria-label="Theme">◐</button>
     </div>
   </header>
@@ -120,14 +123,14 @@ const T = {
         next: "Наступний крок, етап", all_done: "Усі завдання виконано.", owner: "вручну",
         milestones: "Віхи", decisions: "Зафіксовані рішення", risks: "Ризики", changelog: "Журнал змін",
         ideas: "Ідеї", built: "Зібрано", plan: "План у репозиторії", branch: "гілка",
-        err: "Не вдалося завантажити roadmap.json", title: "хід проєкту", dashboard: "Публічна панель" },
+        hideDone: "Сховати виконані", older: "Старіші зміни", err: "Не вдалося завантажити roadmap.json", title: "хід проєкту", dashboard: "Публічна панель" },
   en: { version: "Version", updated: "updated", done_of: "Done", of: "of", tasks: "tasks",
         in_progress_n: "in progress", left: "≈ left", days: "days",
         done: "done", in_progress: "in progress", todo: "not started", blocked: "blocked",
         next: "Next step, stage", all_done: "All tasks are done.", owner: "manual",
         milestones: "Milestones", decisions: "Decisions", risks: "Risks", changelog: "Changelog",
         ideas: "Ideas", built: "Built", plan: "Plan in the repository", branch: "branch",
-        err: "Failed to load roadmap.json", title: "progress", dashboard: "Public dashboard" },
+        hideDone: "Hide done", older: "Older changes", err: "Failed to load roadmap.json", title: "progress", dashboard: "Public dashboard" },
 };
 const store = {
   get(k) { try { return localStorage.getItem(k); } catch { return null; } },
@@ -141,6 +144,9 @@ function render() {
   const t = T[lang];
   document.documentElement.lang = lang;
   document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+  const doneBtn = document.getElementById("doneBtn");
+  doneBtn.textContent = t.hideDone;
+  doneBtn.setAttribute("aria-pressed", document.body.classList.contains("hide-done"));
   if (!data) return;
   const p = data.project, s = data.stats, stages = data.stages;
   const name = p["name_" + lang];
@@ -194,7 +200,12 @@ function render() {
     sec(t.milestones, (data.milestones || []).map((m) => `<div class="item"><b>${esc(m.id)}</b> · ${esc(m[lang])}</div>`).join("")) +
     sec(t.decisions, (data.decisions || []).map((d) => `<div class="item">${esc(d[lang])}<span class="d">${esc(d.date)}</span></div>`).join("")) +
     sec(t.risks, (data.risks || []).map((r) => `<div class="item">${esc(r[lang])}</div>`).join("")) +
-    sec(t.changelog, `<div class="log">${(data.changelog || []).map((c) => `<div><span class="v">${esc(c.version)}</span> <span class="meta">${esc(c.date)}</span><ul>${c[lang].map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`).join("")}</div>`) +
+    sec(t.changelog, (() => {
+      const item = (c) => `<div><span class="v">${esc(c.version)}</span> <span class="meta">${esc(c.date)}</span><ul>${[].concat(c[lang] || []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+      const log = data.changelog || [];
+      return `<div class="log">${log.slice(0, 15).map(item).join("")}</div>` +
+        (log.length > 15 ? `<details><summary>${esc(t.older)} (${log.length - 15})</summary><div class="log">${log.slice(15).map(item).join("")}</div></details>` : "");
+    })()) +
     sec(t.ideas, (data.ideas || []).map((i) => `<div class="item">${esc(i[lang])}</div>`).join(""));
 
   const repo = esc(p.repo), commit = esc(data.build.commit);
@@ -208,6 +219,13 @@ function render() {
 document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; store.set("lang", lang); render(); }));
 const savedTheme = store.get("theme");
 if (savedTheme === "light" || savedTheme === "dark") document.documentElement.dataset.theme = savedTheme;
+// Long task lists: on phones finished tasks are hidden by default (remembered per viewer).
+const savedDone = store.get("hideDone");
+document.body.classList.toggle("hide-done", savedDone ? savedDone === "1" : matchMedia("(max-width: 600px)").matches);
+document.getElementById("doneBtn").addEventListener("click", () => {
+  const on = !document.body.classList.contains("hide-done");
+  document.body.classList.toggle("hide-done", on); store.set("hideDone", on ? "1" : "0"); render();
+});
 document.getElementById("themeBtn").addEventListener("click", () => {
   const cur = document.documentElement.dataset.theme;
   const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
