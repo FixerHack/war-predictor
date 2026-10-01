@@ -97,11 +97,36 @@ TEXTS: dict[str, dict[str, str]] = {
         "uk": "/start — панель\n/help — довідка",
         "en": "/start — dashboard\n/help — help",
     },
-    "level_green": {"uk": "зелений", "en": "green"},
-    "level_yellow": {"uk": "жовтий", "en": "yellow"},
-    "level_orange": {"uk": "помаранчевий", "en": "orange"},
-    "level_red": {"uk": "червоний", "en": "red"},
+    # Neutral names, the same as on the map (colours are for the map only).
+    "level_green": {"uk": "низький", "en": "low"},
+    "level_yellow": {"uk": "помірний", "en": "moderate"},
+    "level_orange": {"uk": "підвищений", "en": "elevated"},
+    "level_red": {"uk": "високий", "en": "high"},
     "level_critical": {"uk": "критичний", "en": "critical"},
+    "mean_green": {
+        "uk": "Фон звичайний: ознак ескалації в джерелах немає.",
+        "en": "Usual background: no signs of escalation in the sources.",
+    },
+    "mean_yellow": {
+        "uk": "Поодинокі зміни, які варто відстежувати; загальної картини поки немає.",
+        "en": "Isolated changes worth watching; no pattern yet.",
+    },
+    "mean_orange": {
+        "uk": "Кілька незалежних сигналів одночасно або один сильний у ключовому блоці.",
+        "en": "Several independent signals at once, or one strong signal in a key block.",
+    },
+    "mean_red": {
+        "uk": "Сильні сигнали: виїзд персоналу посольств, закриття неба або узгоджене посилення "
+        "рекомендацій кількома урядами.",
+        "en": "Strong signals: embassy staff departure, airspace closure or several governments "
+        "tightening their advice together.",
+    },
+    "mean_critical": {
+        "uk": "Вирішальні події: наказ кількох урядів про виїзд персоналу, мобілізація, закрите небо.",
+        "en": "Decisive events: ordered staff departure by several governments, mobilisation, "
+        "closed airspace.",
+    },
+    "btn_map": {"uk": "🗺 Детальніше на карті", "en": "🗺 Details on the map"},
     "war_none": {"uk": "збройного конфлікту немає", "en": "no armed conflict"},
     "war_frozen": {
         "uk": "заморожений конфлікт / окупація частини території",

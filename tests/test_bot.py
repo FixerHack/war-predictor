@@ -63,7 +63,7 @@ def test_dashboard_indicators():
             updated="2026-09-30T10:00:00+00:00",
         )
     )
-    assert "🟠 <b>6.2</b> / 10 · orange" in text
+    assert "🟠 <b>6.2</b> / 10 · elevated" in text
     assert "▰▰▰▰▰▰▱▱▱▱" in text
     assert "frozen conflict" in text and "Transnistria" in text
     assert "Notifications: off" in text
