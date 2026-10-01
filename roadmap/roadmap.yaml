@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.73
+  version: 0.2.74
   updated: 2026-09-30
 
 milestones:
@@ -129,6 +129,7 @@ stages:
       - {id: S6.1, status: done, days: 1, uk: "Промпт і JSON-схема: причина, тип зміни, персонал, кордони, цитата", en: "Prompt and JSON schema: reason, change type, staff, borders, quote"}
       - {id: S6.2, status: done, days: 0.5, uk: "Виклик лише на змінених фрагментах, кешування промпту, ліміт витрат", en: "Call only on changed fragments, prompt caching, spend cap", note_uk: "Лише змінені фрагменти, кеш системного промпту, ліміт викликів CLASSIFIER_MAX_CALLS; без ключа працюють правила.", note_en: "Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key."}
       - {id: S6.3, status: todo, days: 1, owner: human, uk: "Ручна перевірка на 50 прикладах", en: "Manual check on 50 examples", note_uk: "Потрібен ключ API і реальні зміни; перевірити 50 класифікацій вручну.", note_en: "Needs an API key and real changes; review 50 classifications by hand."}
+      - {id: S6.7, status: done, days: 0.3, uk: "Класифікатор через локальний Claude Code (claude -p, без API-ключа)", en: "Classifier through the local Claude Code CLI (claude -p, no API key)", note_uk: "CLASSIFIER_PROVIDER=claude_code: виклик claude -p зі схемою JSON, без інструментів і без збереження сесій; використовує ліміти підписки. На сервері потрібен claude setup-token.", note_en: "CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed."}
 
       - {id: S6.6, status: done, days: 0.1, uk: "Фільтр цитат: уривки сторінок («3 pays») не показуються", en: "Quote filter: page fragments (\"3 pays\") are not shown"}
   - id: S7
@@ -220,6 +221,7 @@ stages:
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
+  - {date: 2026-09-30, uk: "Раптові напади (Вірменія–Азербайджан-2020) перевіряються на реакцію протягом 3 днів: рекомендації урядів не змінювались до початку боїв.", en: "Surprise attacks (Armenia–Azerbaijan 2020) are tested for a reaction within 3 days: government advice did not change before the fighting began."}
   - {date: 2026-09-30, uk: "Заходи з рекомендацій і пороги рахуються лише з безпекової причини заходу (релевантність ≥ 0.7 для заходів, ≥ 0.5 для порогів).", en: "Advisory measures and floors count only for a security reason for the measure (relevance ≥ 0.7 for measures, ≥ 0.5 for floors)."}
   - {date: 2026-09-30, uk: "Регіональні попередження: Британія «avoid all travel to parts» 0.45, «all but essential to parts» 0.3, Німеччина Teilreisewarnung 0.35 — вони здебільшого стосуються давно окупованих чи прикордонних районів.", en: "Regional warnings: UK \"avoid all travel to parts\" 0.45, \"all but essential to parts\" 0.3, German partial warning 0.35 — they mostly cover long-occupied or border areas."}
   - {date: 2026-09-30, uk: "Пороги неба (8 / 6) — лише за двох незалежних джерел, як і поріг наказу про виїзд персоналу.", en: "Airspace floors (8 / 6) only with two independent sources, like the ordered-departure floor."}
@@ -248,6 +250,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.74
+    date: 2026-09-30
+    uk: "Новий провайдер класифікатора — локальний Claude Code за підпискою; епізод Вірменія–Азербайджан-2020 перевіряє реакцію (бал 3+ протягом 3 днів після нападу), а не раннє попередження."
+    en: "New classifier provider — the local Claude Code CLI on a subscription; the Armenia–Azerbaijan 2020 episode tests the reaction (score 3+ within 3 days of the attack), not an early warning."
   - version: 0.2.73
     date: 2026-09-30
     uk: "Класифікатор зупиняється після першої відмови через ключ чи кредити (401/402/403) і не шле сотні запитів; тексти, класифіковані правилами під час недоступності моделі, модель перекласифікує пізніше. Правила беруть причину заходу з речення, де він згаданий."

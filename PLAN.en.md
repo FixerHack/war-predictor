@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.73**, updated 2026-09-30.
+Version **0.2.74**, updated 2026-09-30.
 
-**Overall progress: 68%** · left ≈ 14.6 days · ✅ 51 · 🟡 20 · ⬜ 10 · ⛔ 4
+**Overall progress: 68%** · left ≈ 14.6 days · ✅ 52 · 🟡 20 · ⬜ 10 · ⛔ 4
 
 ## Milestones
 
@@ -126,7 +126,7 @@ Branch: `dev-history`
   - Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.
 - ✅ **S5.5** Wayback archive: long timeouts, retries on 429/5xx, progress in logs
 
-## S6. Change classification (Claude API) — 62%
+## S6. Change classification (Claude API) — 66%
 
 _Claude determines the reason and type of each change and turns it into a signal._
 
@@ -137,6 +137,8 @@ Branch: `dev-classifier`
   - Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key.
 - ⬜ **S6.3** Manual check on 50 examples _(manual)_
   - Needs an API key and real changes; review 50 classifications by hand.
+- ✅ **S6.7** Classifier through the local Claude Code CLI (claude -p, no API key)
+  - CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed.
 - ✅ **S6.6** Quote filter: page fragments ("3 pays") are not shown
 
 ## S7. Scoring 0–10 — 100%
@@ -239,6 +241,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-09-30: Surprise attacks (Armenia–Azerbaijan 2020) are tested for a reaction within 3 days: government advice did not change before the fighting began.
 - 2026-09-30: Advisory measures and floors count only for a security reason for the measure (relevance ≥ 0.7 for measures, ≥ 0.5 for floors).
 - 2026-09-30: Regional warnings: UK "avoid all travel to parts" 0.45, "all but essential to parts" 0.3, German partial warning 0.35 — they mostly cover long-occupied or border areas.
 - 2026-09-30: Airspace floors (8 / 6) only with two independent sources, like the ordered-departure floor.
@@ -269,6 +272,194 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.74** (2026-09-30)
+  - N
+  - e
+  - w
+  -  
+  - c
+  - l
+  - a
+  - s
+  - s
+  - i
+  - f
+  - i
+  - e
+  - r
+  -  
+  - p
+  - r
+  - o
+  - v
+  - i
+  - d
+  - e
+  - r
+  -  
+  - —
+  -  
+  - t
+  - h
+  - e
+  -  
+  - l
+  - o
+  - c
+  - a
+  - l
+  -  
+  - C
+  - l
+  - a
+  - u
+  - d
+  - e
+  -  
+  - C
+  - o
+  - d
+  - e
+  -  
+  - C
+  - L
+  - I
+  -  
+  - o
+  - n
+  -  
+  - a
+  -  
+  - s
+  - u
+  - b
+  - s
+  - c
+  - r
+  - i
+  - p
+  - t
+  - i
+  - o
+  - n
+  - ;
+  -  
+  - t
+  - h
+  - e
+  -  
+  - A
+  - r
+  - m
+  - e
+  - n
+  - i
+  - a
+  - –
+  - A
+  - z
+  - e
+  - r
+  - b
+  - a
+  - i
+  - j
+  - a
+  - n
+  -  
+  - 2
+  - 0
+  - 2
+  - 0
+  -  
+  - e
+  - p
+  - i
+  - s
+  - o
+  - d
+  - e
+  -  
+  - t
+  - e
+  - s
+  - t
+  - s
+  -  
+  - t
+  - h
+  - e
+  -  
+  - r
+  - e
+  - a
+  - c
+  - t
+  - i
+  - o
+  - n
+  -  
+  - (
+  - s
+  - c
+  - o
+  - r
+  - e
+  -  
+  - 3
+  - +
+  -  
+  - w
+  - i
+  - t
+  - h
+  - i
+  - n
+  -  
+  - 3
+  -  
+  - d
+  - a
+  - y
+  - s
+  -  
+  - o
+  - f
+  -  
+  - t
+  - h
+  - e
+  -  
+  - a
+  - t
+  - t
+  - a
+  - c
+  - k
+  - )
+  - ,
+  -  
+  - n
+  - o
+  - t
+  -  
+  - a
+  - n
+  -  
+  - e
+  - a
+  - r
+  - l
+  - y
+  -  
+  - w
+  - a
+  - r
+  - n
+  - i
+  - n
+  - g
+  - .
 - **0.2.73** (2026-09-30)
   - T
   - h

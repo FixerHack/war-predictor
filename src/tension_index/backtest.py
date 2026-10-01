@@ -57,6 +57,14 @@ class Report:
             return ok, f"max {self.max_score:.1f} (limit {exp['max_score']})"
         first = self.first_reaching(exp.get("min_score", 7))
         event = self.episode.event
+        if "react_within_days" in exp and event is not None:
+            # A surprise attack: advisories cannot warn ahead, but must react quickly.
+            if first is None:
+                return False, f"never reached {exp['min_score']} (reaction test)"
+            late = (first - event).days
+            ok = late <= exp["react_within_days"]
+            when = f"{late} days after" if late >= 0 else f"{-late} days before"
+            return ok, f"reached {exp['min_score']} on {first}, {when} the event (reaction test)"
         if first is None or event is None:
             return False, f"never reached {exp.get('min_score', 7)}"
         lead = (event - first).days

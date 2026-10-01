@@ -263,7 +263,12 @@ changed, for a notification to the public. Do not speculate or predict."""
 
 # Models that accept server-side refusal fallbacks (`fallbacks: "default"`).
 FALLBACK_MODELS = {"claude-opus-5-5", "claude-opus-5", "claude-fable-5-1", "claude-sonnet-5-5"}
-DEFAULT_MODELS = {"anthropic": "claude-opus-5-5", "openrouter": "anthropic/claude-haiku-4.5"}
+DEFAULT_MODELS = {
+    "anthropic": "claude-opus-5-5",
+    "openrouter": "anthropic/claude-haiku-4.5",
+    "claude_code": "haiku",  # an alias the Claude Code CLI resolves
+}
+CLAUDE_CODE_TIMEOUT = 180  # seconds per call (the CLI starts a short session each time)
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
@@ -278,7 +283,7 @@ class ClaudeClassifier:
         self.model = settings.classifier_model or DEFAULT_MODELS[self.provider]
         self.calls = 0
         self.stopped = ""  # set on an account error (no credits, bad key): no more calls this run
-        if client is None:
+        if client is None and self.provider != "claude_code":
             if self.provider == "openrouter":
                 import httpx
 
@@ -311,7 +316,75 @@ class ClaudeClassifier:
         self.calls += 1
         if self.provider == "openrouter":
             return await self._call_openrouter(system, user, schema, max_tokens)
+        if self.provider == "claude_code":
+            return await self._call_claude_code(system, user, schema)
         return await self._call_anthropic(system, user, schema, max_tokens)
+
+    async def _call_claude_code(
+        self, system: str, user: str, schema: dict
+    ) -> tuple[str | None, str]:
+        """One non-interactive `claude -p` call: no tools, no saved session, JSON validated
+        against the schema. Runs in a temporary directory so no CLAUDE.md is picked up."""
+        import asyncio
+        import tempfile
+
+        args = [
+            self.settings.claude_code_bin, "-p",
+            "--output-format", "json",
+            "--json-schema", json.dumps(schema),
+            "--system-prompt", system,
+            "--model", self.model,
+            "--tools", "",
+            "--disallowedTools", "mcp__*",
+            "--no-session-persistence",
+        ]  # fmt: skip
+        try:
+            with tempfile.TemporaryDirectory() as cwd:
+                proc = await asyncio.create_subprocess_exec(
+                    *args, cwd=cwd, stdin=asyncio.subprocess.PIPE,
+                    stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
+                )  # fmt: skip
+                out, err = await asyncio.wait_for(
+                    proc.communicate(user.encode()), CLAUDE_CODE_TIMEOUT
+                )
+        except (OSError, TimeoutError) as exc:
+            log.warning("claude CLI unavailable (%s); using rules", type(exc).__name__)
+            return None, type(exc).__name__
+        return self._claude_code_result(proc.returncode, out, err)
+
+    def _claude_code_result(
+        self, code: int | None, out: bytes, err: bytes
+    ) -> tuple[str | None, str]:
+        try:
+            data = json.loads(out.decode("utf-8", "replace") or "{}")
+        except ValueError:
+            data = {}
+        text = str(data.get("result") or err.decode("utf-8", "replace") or "")
+        if code != 0 or data.get("is_error"):
+            low = text.lower()
+            if any(
+                w in low
+                for w in (
+                    "not logged in",
+                    "log in",
+                    "login",
+                    "usage limit",
+                    "limit reached",
+                    "credit",
+                )
+            ):
+                self.stopped = "claude CLI: " + text[:80]
+                log.error(
+                    "classifier stopped for this run (claude CLI): %s - rules used", text[:200]
+                )
+            else:
+                log.warning("claude CLI error (exit %s): %s", code, text[:200])
+            return None, f"claude CLI exit {code}"
+        structured = data.get("structured_output")
+        if isinstance(structured, dict):
+            return json.dumps(structured), ""
+        start, end = text.find("{"), text.rfind("}")
+        return (text[start : end + 1] if start != -1 and end > start else text), ""
 
     async def _call_anthropic(
         self, system: str, user: str, schema: dict, max_tokens: int

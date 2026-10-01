@@ -19,7 +19,9 @@ episodes:
     from: 2020-06-01
     to: 2020-10-15
     event: 2020-09-27
-    expect: {min_score: 5, before_event_days: 0}
+    # Surprise offensive: governments changed their advice only after the fighting began, so
+    # this episode tests the reaction (score 3+ within 3 days), not an early warning.
+    expect: {min_score: 3, react_within_days: 3}
     urls:
       us: https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/azerbaijan-travel-advisory.html
       gov_uk: https://www.gov.uk/foreign-travel-advice/azerbaijan
