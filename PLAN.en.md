@@ -2,15 +2,15 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.94**, updated 2026-09-30.
+Version **0.2.95**, updated 2026-10-01.
 
-**Overall progress: 76%** · left ≈ 11.7 days · ✅ 62 · 🟡 14 · ⬜ 9 · ⛔ 4
+**Overall progress: 77%** · left ≈ 11.2 days · ✅ 63 · 🟡 14 · ⬜ 8 · ⛔ 4
 
 ## Milestones
 
 - **M1** — MVP: 14 days of unattended collection, backtest scores Ukraine 7+ before 2022-02-24, every alert explained
 
-## S0. Foundation & infrastructure — 83%
+## S0. Foundation & infrastructure — 92%
 
 _Repository, working environment on the MacBook and server, keys, Telegram bot._
 
@@ -28,8 +28,8 @@ Branch: `dev-bootstrap`
 - ✅ **S0.10** OpenRouter: top-up, API key (OPENROUTER_API_KEY in .env), spend limit _(manual)_
   - Instead of OpenRouter the classifier runs through the local Claude Code CLI on a subscription (CLASSIFIER_PROVIDER=claude_code).
 - ✅ **S0.11** Create bot via @BotFather, test channel, fill in .env _(manual)_
-- ⬜ **S0.12** First server deploy: install_server.sh, verify healthcheck _(manual)_
-  - Script ready: scripts/install_server.sh installs the bot, timers, Claude Code and the gateway; a person runs it on the server.
+- ✅ **S0.12** First server deploy: install_server.sh, verify healthcheck _(manual)_
+  - Deployed 2026-10-01 following docs/deploy-agent.md: claude-gateway in ~/claude-gateway and the bot with timers in ~/war-predictor, separate services started on boot; the bot uses its own gateway token.
 - ✅ **S0.13** Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root _(manual)_
   - Live: fixerhack.github.io/war-predictor
 - ⬜ **S0.15** Unlock GitHub Actions: Settings → Billing and plans (invoice / card) _(manual)_
@@ -282,6 +282,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.95** (2026-10-01)
+  - First server deploy: claude-gateway and war-predictor run as separate systemd services started on boot; the first run classified changes through the gateway and published 38/38 scores.
 - **0.2.94** (2026-10-01)
   - The gateway and war-predictor are deployed separately: the gateway has its own installer (gateway/scripts/install.sh), directory, .env and service; install_server.sh installs only the bot and timers, which connect to the gateway with a token.
   - The deployment agent instructions now describe two separate installations.

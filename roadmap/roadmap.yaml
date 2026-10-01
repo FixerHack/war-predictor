@@ -13,8 +13,8 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.94
-  updated: 2026-09-30
+  version: 0.2.95
+  updated: 2026-10-01
 
 milestones:
   - id: M1
@@ -40,7 +40,7 @@ stages:
       - {id: S0.9, status: done, days: 0.3, owner: human, uk: "MacBook: встановити uv і Claude Code, клонувати репозиторій, ./scripts/bootstrap.sh", en: "MacBook: install uv and Claude Code, clone the repo, ./scripts/bootstrap.sh"}
       - {id: S0.10, status: done, days: 0.2, owner: human, uk: "OpenRouter: поповнення, ключ API (OPENROUTER_API_KEY у .env), ліміт витрат", en: "OpenRouter: top-up, API key (OPENROUTER_API_KEY in .env), spend limit", note_uk: "Замість OpenRouter класифікатор працює через локальний Claude Code за підпискою (CLASSIFIER_PROVIDER=claude_code).", note_en: "Instead of OpenRouter the classifier runs through the local Claude Code CLI on a subscription (CLASSIFIER_PROVIDER=claude_code)."}
       - {id: S0.11, status: done, days: 0.2, owner: human, uk: "Створити бота в @BotFather, тестовий канал, заповнити .env", en: "Create bot via @BotFather, test channel, fill in .env"}
-      - {id: S0.12, status: todo, days: 0.5, owner: human, uk: "Перший деплой на сервер: install_server.sh, перевірка healthcheck", en: "First server deploy: install_server.sh, verify healthcheck", note_uk: "Скрипт готовий: scripts/install_server.sh ставить бота, таймери, Claude Code і шлюз; запускає людина на сервері.", note_en: "Script ready: scripts/install_server.sh installs the bot, timers, Claude Code and the gateway; a person runs it on the server."}
+      - {id: S0.12, status: done, days: 0.5, owner: human, uk: "Перший деплой на сервер: install_server.sh, перевірка healthcheck", en: "First server deploy: install_server.sh, verify healthcheck", note_uk: "Розгорнуто 2026-10-01 за docs/deploy-agent.md: claude-gateway у ~/claude-gateway і бот із таймерами у ~/war-predictor, окремі сервіси з автозапуском; бот звертається до шлюзу власним токеном.", note_en: "Deployed 2026-10-01 following docs/deploy-agent.md: claude-gateway in ~/claude-gateway and the bot with timers in ~/war-predictor, separate services started on boot; the bot uses its own gateway token."}
       - {id: S0.13, status: done, days: 0.2, owner: human, uk: "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root", en: "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root", note_uk: "Працює: fixerhack.github.io/war-predictor", note_en: "Live: fixerhack.github.io/war-predictor"}
       - {id: S0.15, status: todo, days: 0.2, owner: human, uk: "Зняти блокування GitHub Actions: Settings → Billing and plans (рахунок / картка)", en: "Unlock GitHub Actions: Settings → Billing and plans (invoice / card)", note_uk: "CI не стартує: «account is locked due to a billing issue».", note_en: "CI does not start: \"account is locked due to a billing issue\"."}
       - {id: S0.16, status: done, days: 0.2, uk: "Публікація сторінки прогресу без Actions (make pages → гілка gh-pages)", en: "Publish the progress page without Actions (make pages → gh-pages branch)"}
@@ -256,6 +256,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.95
+    date: 2026-10-01
+    uk: ["Перший деплой на сервер: claude-gateway і war-predictor працюють як окремі systemd-сервіси з автозапуском; перший прогін класифікував зміни через шлюз і опублікував 38/38 балів."]
+    en: ["First server deploy: claude-gateway and war-predictor run as separate systemd services started on boot; the first run classified changes through the gateway and published 38/38 scores."]
   - version: 0.2.94
     date: 2026-10-01
     uk: ["Шлюз і war-predictor розгортаються окремо: у шлюзу власний інсталятор (gateway/scripts/install.sh), тека, .env і сервіс; install_server.sh ставить лише бота й таймери, а до шлюзу бот підключається токеном.", "Інструкцію для агента-розгортальника переписано під дві окремі установки."]
