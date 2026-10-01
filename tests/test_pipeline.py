@@ -235,7 +235,11 @@ async def test_volcanic_ash_airspace_closure_is_not_a_security_signal(settings):
             db, source="fr", country="IT", level=None, text="Etna ash closed a sector."
         )
         # ... and a restriction re-read as ash is switched off again (Italy stayed at 5.0).
-        for reason, expected in (("natural_disaster", 0), ("armed_conflict", 1), ("unknown", 0)):
+        for reason, expected in (
+            ("natural_disaster", 0),
+            ("armed_conflict", 1),
+            ("natural_disaster", 0),
+        ):
             cls = classify_rules("x")
             cls.airspace, cls.reason, cls.method = "restricted", reason, "claude"
             await storage.save_classification(
@@ -262,3 +266,20 @@ def test_covid_measures_in_a_conflict_advisory_are_not_security_signals():
             "state": True, "note": ""}  # fmt: skip
     kinds = [s.kind for s in advisory_state_signals(load_config(), cls, "none", base)]
     assert kinds == ["advisory_level"]
+
+
+def test_staff_departure_for_an_unspecified_security_reason_counts():
+    """Israel, October 2023: "due to the unpredictable security situation" -> unknown."""
+    from tension_index.pipeline import advisory_state_signals
+    from tension_index.scoring import load_config
+
+    cls = classify_rules("x")
+    cls.staff_posture, cls.reason, cls.measure_reason = (
+        "authorized_departure",
+        "terrorism",
+        "unknown",
+    )
+    base = {"country": "IL", "publisher": "us", "observed_at": NOW, "reason": cls.reason,
+            "state": True, "note": ""}  # fmt: skip
+    kinds = [s.kind for s in advisory_state_signals(load_config(), cls, "3", base)]
+    assert "staff_posture:authorized_departure" in kinds
