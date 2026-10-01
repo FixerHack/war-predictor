@@ -380,3 +380,27 @@ async def test_model_calls_run_in_parallel(settings, tmp_path):
     results = await classify_with_model(ClaudeClassifier(s), jobs)
     assert [r.method for r in results] == ["claude"] * 4
     assert time.monotonic() - started < 3.5  # 4 calls of 1 s each, side by side
+
+
+async def test_gateway_provider(settings):
+    import httpx
+
+    answer = {"reason": "military_threat", "change_type": "none", "level": "",
+              "staff_posture": "unknown", "airspace": "unknown", "borders_closed": False,
+              "measure_reason": "unknown", "quote": "", "summary_uk": "", "summary_en": ""}  # fmt: skip
+    seen = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen["url"], seen["auth"] = str(request.url), request.headers["authorization"]
+        seen["body"] = json.loads(request.content)
+        return httpx.Response(200, json={"text": "", "structured": answer})
+
+    s = settings.model_copy(update={"classifier_provider": "gateway", "gateway_url": "http://gw:8787/",
+                                    "gateway_token": "tok"})  # fmt: skip
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        claude = ClaudeClassifier(s, client=client)
+        out = await claude.classify(publisher="us", country="PL", text="x", level_before=None,
+                                    level_after=None, fallback=Classification())  # fmt: skip
+    assert out.method == "claude" and out.reason == "military_threat"
+    assert seen["url"] == "http://gw:8787/v1/complete" and seen["auth"] == "Bearer tok"
+    assert seen["body"]["model"] == "haiku" and "json_schema" in seen["body"]

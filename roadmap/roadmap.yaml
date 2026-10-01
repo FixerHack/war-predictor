@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.88
+  version: 0.2.90
   updated: 2026-09-30
 
 milestones:
@@ -130,6 +130,7 @@ stages:
       - {id: S6.2, status: done, days: 0.5, uk: "Виклик лише на змінених фрагментах, кешування промпту, ліміт витрат", en: "Call only on changed fragments, prompt caching, spend cap", note_uk: "Лише змінені фрагменти, кеш системного промпту, ліміт викликів CLASSIFIER_MAX_CALLS; без ключа працюють правила.", note_en: "Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key."}
       - {id: S6.3, status: todo, days: 1, owner: human, uk: "Ручна перевірка на 50 прикладах", en: "Manual check on 50 examples", note_uk: "Потрібен ключ API і реальні зміни; перевірити 50 класифікацій вручну.", note_en: "Needs an API key and real changes; review 50 classifications by hand."}
       - {id: S6.7, status: done, days: 0.3, uk: "Класифікатор через локальний Claude Code (claude -p, без API-ключа)", en: "Classifier through the local Claude Code CLI (claude -p, no API key)", note_uk: "CLASSIFIER_PROVIDER=claude_code: виклик claude -p зі схемою JSON, без інструментів і без збереження сесій; використовує ліміти підписки. На сервері потрібен claude setup-token.", note_en: "CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed."}
+      - {id: S6.8, status: done, days: 1, uk: "Окремий інструмент claude-gateway: HTTP API (власний, сумісні з OpenAI й Anthropic) і MCP поверх Claude Code", en: "Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code", note_uk: "gateway/: токен обов'язковий, без інструментів і сесій, ліміт паралельних викликів, systemd-сервіс; tension-index може класифікувати через нього (CLASSIFIER_PROVIDER=gateway).", note_en: "gateway/: token required, no tools or sessions, parallel call limit, systemd service; tension-index can classify through it (CLASSIFIER_PROVIDER=gateway)."}
 
       - {id: S6.6, status: done, days: 0.1, uk: "Фільтр цитат: уривки сторінок («3 pays») не показуються", en: "Quote filter: page fragments (\"3 pays\") are not shown"}
   - id: S7
@@ -210,6 +211,7 @@ stages:
       - {id: S12.2, status: todo, days: 0.3, owner: human, uk: "Dead-man switch на healthchecks.io (безкоштовно)", en: "Dead-man switch on healthchecks.io (free)"}
       - {id: S12.3, status: in_progress, days: 0.5, uk: "Автодеплой з main (GitHub Actions → SSH)", en: "Auto-deploy from main (GitHub Actions → SSH)", note_uk: "Процес .github/workflows/deploy.yml готовий (SSH → scripts/deploy.sh); запрацює після розблокування Actions і секретів DEPLOY_*.", note_en: ".github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set."}
 
+      - {id: S12.5, status: todo, owner: human, days: 0.3, uk: "Сервер: встановити Claude Code, claude setup-token, запустити claude-gateway (systemd) за HTTPS-проксі", en: "Server: install Claude Code, claude setup-token, run claude-gateway (systemd) behind an HTTPS proxy"}
   - id: S13
     branch: "—"
     uk: Критерії MVP
@@ -241,6 +243,7 @@ decisions:
   - {date: 2026-09-30, uk: "Статус війни окремо від шкали; довідник ведеться вручну, автоматика лише пропонує зміни", en: "War status is separate from the scale; curated by hand, automation only proposes changes"}
 
 risks:
+  - {uk: "Шлюз використовує підписку Claude того, хто залогінений: його не можна відкривати стороннім людям; для чужих програм потрібен ключ API.", en: "The gateway uses the signed-in person's Claude subscription: it must not be opened to other people; other people's programs need an API key."}
   - {uk: "Без кредитів OpenRouter класифікація йде лише правилами: причини й статус посольств визначаються грубіше, бал менш точний.", en: "Without OpenRouter credits classification falls back to rules only: reasons and embassy posture are cruder, the score less precise."}
   - {uk: "Справжнє повернення рекомендації до попередньої версії протягом 7 днів не буде окремою зміною (стан однаково оновлюється).", en: "A genuine revert of an advisory within 7 days is not reported as a change (the state still updates)."}
   - {uk: "Частина урядових сайтів блокує автоматичні запити (Австралія); джерело можна втратити без попередження", en: "Some government sites block automated requests (Australia); a source can be lost without notice"}
@@ -252,6 +255,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.90
+    date: 2026-10-01
+    uk: ["Новий окремий інструмент claude-gateway: будь-яка програма може звертатися до Claude Code на сервері через HTTP (власний формат, OpenAI- чи Anthropic-сумісний) або MCP.", "Класифікатор tension-index може працювати через шлюз (CLASSIFIER_PROVIDER=gateway)."]
+    en: ["New separate tool claude-gateway: any program can call Claude Code on the server over HTTP (own format, OpenAI- or Anthropic-compatible) or MCP.", "The tension-index classifier can run through the gateway (CLASSIFIER_PROVIDER=gateway)."]
   - version: 0.2.88
     date: 2026-10-01
     uk: ["Карта показує Україну (війна), Росію (агресор) і Білорусь (територію використано для нападу) — для контексту, без балу.", "Телефонна версія: карта без горизонтальної прокрутки, панель країни прокручується до видимої області, таблиця клікабельна; на сторінці плану можна сховати виконані завдання, журнал змін згорнуто після 15 записів.", "Виправлено: записи журналу змін одним рядком ламали PLAN.md і сторінку плану."]

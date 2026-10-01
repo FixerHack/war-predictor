@@ -21,7 +21,8 @@ class Settings(BaseSettings):
     # Classifier: "anthropic" (direct) or "openrouter". Empty model = provider default
     # (anthropic: claude-opus-5-5, openrouter: anthropic/claude-haiku-4.5).
     # claude_code: the local `claude` CLI (Claude Code, signed in with a Claude subscription)
-    classifier_provider: Literal["anthropic", "openrouter", "claude_code"] = "anthropic"
+    # gateway: a claude-gateway service (gateway/ in this repo) at GATEWAY_URL
+    classifier_provider: Literal["anthropic", "openrouter", "claude_code", "gateway"] = "anthropic"
     classifier_model: str = ""
     classifier_effort: str = "low"  # Anthropic API only; empty for models without effort
     classifier_max_calls: int = 60  # per run; beyond it rules are used (spend guard)
@@ -29,6 +30,8 @@ class Settings(BaseSettings):
     # Public map; the bot links each country to <url>#<code>
     dashboard_url: str = "https://fixerhack.github.io/war-predictor/dashboard/"
     classifier_concurrency: int = 4  # model calls in parallel
+    gateway_url: str = ""  # e.g. http://127.0.0.1:8787
+    gateway_token: str = ""
 
     # Sources skipped by the regular cycle (comma-separated). Australia's site does not
     # answer automated requests (tested 2026-09-30); `probe au` still works.

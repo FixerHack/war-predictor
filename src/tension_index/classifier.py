@@ -267,6 +267,7 @@ DEFAULT_MODELS = {
     "anthropic": "claude-opus-5-5",
     "openrouter": "anthropic/claude-haiku-4.5",
     "claude_code": "haiku",  # an alias the Claude Code CLI resolves
+    "gateway": "haiku",
 }
 CLAUDE_CODE_TIMEOUT = 90  # seconds per call (the CLI starts a short session each time)
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -285,7 +286,7 @@ class ClaudeClassifier:
         self.stopped = ""  # set on an account error (no credits, bad key): no more calls this run
         self._slots: object | None = None  # asyncio.Semaphore, created in the running loop
         if client is None and self.provider != "claude_code":
-            if self.provider == "openrouter":
+            if self.provider in ("openrouter", "gateway"):
                 import httpx
 
                 client = httpx.AsyncClient(timeout=120)
@@ -319,7 +320,39 @@ class ClaudeClassifier:
             return await self._call_openrouter(system, user, schema, max_tokens)
         if self.provider == "claude_code":
             return await self._call_claude_code(system, user, schema)
+        if self.provider == "gateway":
+            return await self._call_gateway(system, user, schema)
         return await self._call_anthropic(system, user, schema, max_tokens)
+
+    async def _call_gateway(self, system: str, user: str, schema: dict) -> tuple[str | None, str]:
+        """claude-gateway's /v1/complete: the same request as claude_code, over HTTP."""
+        import httpx
+
+        url = self.settings.gateway_url.rstrip("/") + "/v1/complete"
+        body = {"prompt": user, "system": system, "model": self.model, "json_schema": schema}
+        headers = {"Authorization": f"Bearer {self.settings.gateway_token}"}
+        try:
+            response = await self.client.post(url, json=body, headers=headers, timeout=180)
+        except httpx.HTTPError as exc:
+            log.warning("gateway unavailable (%s); using rules", type(exc).__name__)
+            return None, type(exc).__name__
+        if response.status_code != 200:
+            if response.status_code in (
+                401,
+                403,
+                429,
+                503,
+            ):  # token, usage limit, CLI not signed in
+                self.stopped = f"gateway HTTP {response.status_code}"
+                log.error("classifier stopped for this run (gateway %s): %s - rules used",
+                          response.status_code, response.text[:200])  # fmt: skip
+            else:
+                log.warning("gateway error %s: %s", response.status_code, response.text[:200])
+            return None, f"HTTP {response.status_code}"
+        data = response.json()
+        if isinstance(data.get("structured"), dict):
+            return json.dumps(data["structured"]), ""
+        return data.get("text") or "", ""
 
     async def _call_claude_code(
         self, system: str, user: str, schema: dict

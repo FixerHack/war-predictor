@@ -135,6 +135,10 @@ nano .env                     # заповнити
 
 Для зовнішнього моніторингу вкажіть `HEALTH_PING_URL` (наприклад, безкоштовний [healthchecks.io](https://healthchecks.io)): якщо сервер перестане надсилати пінги, прийде лист.
 
+## Шлюз Claude Code
+
+[`gateway/`](gateway/README.md) — окремий інструмент: HTTP API (власний, сумісні з OpenAI й Anthropic) і MCP-сервер поверх Claude Code. Через нього будь-яка програма на сервері може звертатися до Claude готовими запитами, а `tension-index` — класифікувати зміни (`CLASSIFIER_PROVIDER=gateway`).
+
 ## Гілки і процес
 
 - `main` — гілка за замовчуванням, завжди робоча. Зміни тільки через Pull Request із зеленим CI.

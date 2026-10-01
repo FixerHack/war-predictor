@@ -50,6 +50,11 @@ async def _snapshot(db: aiosqlite.Connection, snapshot_id: int | None) -> aiosql
 
 def make_classifier(settings: Settings) -> ClaudeClassifier | None:
     """A Claude classifier when the chosen provider has a key; None = rules only."""
+    if settings.classifier_provider == "gateway":
+        if not settings.gateway_url:
+            log.warning("CLASSIFIER_PROVIDER=gateway but GATEWAY_URL is empty; rules used")
+            return None
+        return ClaudeClassifier(settings)
     if settings.classifier_provider == "claude_code":
         import shutil
 

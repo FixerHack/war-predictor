@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.88**, updated 2026-09-30.
+Version **0.2.90**, updated 2026-09-30.
 
-**Overall progress: 76%** · left ≈ 11.4 days · ✅ 61 · 🟡 14 · ⬜ 8 · ⛔ 4
+**Overall progress: 76%** · left ≈ 11.7 days · ✅ 62 · 🟡 14 · ⬜ 9 · ⛔ 4
 
 ## Milestones
 
@@ -127,7 +127,7 @@ Branch: `dev-history`
   - Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.
 - ✅ **S5.5** Wayback archive: long timeouts, retries on 429/5xx, progress in logs
 
-## S6. Change classification (Claude API) — 66%
+## S6. Change classification (Claude API) — 74%
 
 _Claude determines the reason and type of each change and turns it into a signal._
 
@@ -140,6 +140,8 @@ Branch: `dev-classifier`
   - Needs an API key and real changes; review 50 classifications by hand.
 - ✅ **S6.7** Classifier through the local Claude Code CLI (claude -p, no API key)
   - CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed.
+- ✅ **S6.8** Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code
+  - gateway/: token required, no tools or sessions, parallel call limit, systemd service; tension-index can classify through it (CLASSIFIER_PROVIDER=gateway).
 - ✅ **S6.6** Quote filter: page fragments ("3 pays") are not shown
 
 ## S7. Scoring 0–10 — 100%
@@ -219,7 +221,7 @@ Branch: `dev-dashboard`
   - Neighbours are not scored, only hatched for context; data in the context section of conflicts.yaml (needs human review).
 - ✅ **S11.5** Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method
 
-## S12. Operations — 45%
+## S12. Operations — 35%
 
 _The system runs unattended and reports failures._
 
@@ -229,6 +231,7 @@ Branch: `dev-ops`
 - ⬜ **S12.2** Dead-man switch on healthchecks.io (free) _(manual)_
 - 🟡 **S12.3** Auto-deploy from main (GitHub Actions → SSH)
   - .github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set.
+- ⬜ **S12.5** Server: install Claude Code, claude setup-token, run claude-gateway (systemd) behind an HTTPS proxy _(manual)_
 
 ## S13. MVP criteria — 62%
 
@@ -264,6 +267,7 @@ Branch: `—`
 
 ## Risks
 
+- The gateway uses the signed-in person's Claude subscription: it must not be opened to other people; other people's programs need an API key.
 - Without OpenRouter credits classification falls back to rules only: reasons and embassy posture are cruder, the score less precise.
 - A genuine revert of an advisory within 7 days is not reported as a change (the state still updates).
 - Some government sites block automated requests (Australia); a source can be lost without notice
@@ -276,6 +280,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.90** (2026-10-01)
+  - New separate tool claude-gateway: any program can call Claude Code on the server over HTTP (own format, OpenAI- or Anthropic-compatible) or MCP.
+  - The tension-index classifier can run through the gateway (CLASSIFIER_PROVIDER=gateway).
 - **0.2.88** (2026-10-01)
   - The map shows Ukraine (war), Russia (aggressor) and Belarus (territory used for the attack) for context, without a score.
   - Phone layout: no horizontal scroll on the map, the country panel scrolls into view, the table is clickable; the plan page can hide finished tasks and folds the changelog after 15 entries.
