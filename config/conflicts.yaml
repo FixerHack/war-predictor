@@ -43,3 +43,26 @@ countries:
   SK: {status: none, borders_war: [UA]}
   HU: {status: none, borders_war: [UA]}
   RO: {status: none, borders_war: [UA]}
+
+# Neighbours outside the monitored set, shown on the public map for context only (no score).
+# role: at_war (war on its territory) | aggressor (wages the war) | aggressor_ally (territory
+# used for the attack). Added 2026-10-01 at the user's request; review like the rest.
+context:
+  UA:
+    status: war
+    role: at_war
+    note_uk: "Повномасштабна війна після вторгнення Росії 24.02.2022"
+    note_en: "Full-scale war since Russia's invasion on 24 Feb 2022"
+    source: "RULAC (https://www.rulac.org): international armed conflict, Russia v. Ukraine"
+  RU:
+    status: war
+    role: aggressor
+    note_uk: "Веде війну проти України з 2014 року, повномасштабну — з 24.02.2022"
+    note_en: "Waging war against Ukraine since 2014, full-scale since 24 Feb 2022"
+    source: "RULAC (https://www.rulac.org): international armed conflict, Russia v. Ukraine"
+  BY:
+    status: none
+    role: aggressor_ally
+    note_uk: "Територію використано для вторгнення в Україну у 2022 році"
+    note_en: "Territory used for the invasion of Ukraine in 2022"
+    source: "UN General Assembly resolution ES-11/1 (2 March 2022)"

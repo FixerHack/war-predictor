@@ -20,6 +20,11 @@ LABELS = {
 TEMPLATE = Path(__file__).resolve().parents[2] / "site" / "index.html"
 
 
+def _items(value: object) -> list[str]:
+    """A changelog side is a list of lines; a single string is one line (not characters)."""
+    return [value] if isinstance(value, str) else list(value or [])
+
+
 def load(path: Path) -> dict:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     seen: set[str] = set()
@@ -33,6 +38,9 @@ def load(path: Path) -> dict:
             task.setdefault("owner", "claude")
             if task["owner"] not in ("claude", "human"):
                 raise ValueError(f"{task['id']}: owner must be claude or human")
+    for entry in data.get("changelog") or []:  # one string = one line, not its characters
+        for lang in ("uk", "en"):
+            entry[lang] = _items(entry.get(lang))
     return data
 
 
@@ -143,7 +151,7 @@ def render_markdown(data: dict, lang: str) -> str:
         lines += ["", f"## {t['changelog']}", ""]
         for entry in data["changelog"]:
             lines.append(f"- **{entry['version']}** ({entry['date']})")
-            lines += [f"  - {change}" for change in entry[lang]]
+            lines += [f"  - {change}" for change in _items(entry[lang])]
     if data.get("ideas"):
         lines += ["", f"## {t['ideas']}", ""]
         lines += [f"- {idea[lang]}" for idea in data["ideas"]]

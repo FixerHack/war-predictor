@@ -88,8 +88,18 @@ async def build(db: aiosqlite.Connection, now: datetime | None = None) -> dict:
             ],
             "history": sorted(daily.items()),
         }
+    names = {"UA": ("Україна", "Ukraine"), "RU": ("Росія", "Russia"), "BY": ("Білорусь", "Belarus")}
+    context = {
+        code: {
+            "name": {"uk": names.get(code, (code, code))[0], "en": names.get(code, (code, code))[1]},
+            "flag": "".join(chr(0x1F1E6 + ord(ch) - ord("A")) for ch in code),
+            "status": e["status"], "role": e["role"],
+            "note": {"uk": e.get("note_uk", ""), "en": e.get("note_en", "")},
+        }
+        for code, e in war_status.context().items()
+    }  # fmt: skip
     return {"generated_at": now.isoformat(timespec="seconds"), "version": __version__,
-            "countries": countries}  # fmt: skip
+            "countries": countries, "context": context}  # fmt: skip
 
 
 def write(data: dict, out: Path) -> dict:

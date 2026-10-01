@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.87
+  version: 0.2.88
   updated: 2026-09-30
 
 milestones:
@@ -196,6 +196,7 @@ stages:
       - {id: S11.3, status: done, days: 1, uk: "Сторінка країни: історія балу і пояснення змін", en: "Country page: score history and change explanations", note_uk: "Картка країни: бал, причини з цитатами, позначки, статус війни, графік 90 днів; таблиця всіх країн; посилання #PL.", note_en: "Country card: score, reasons with quotes, flags, war status, 90-day chart; table of all countries; #PL links."}
       - {id: S11.4, status: in_progress, days: 0.3, owner: human, uk: "Юридичне застереження і методологія на сайті", en: "Disclaimer and methodology on the site", note_uk: "Робочий текст застереження й методології на сторінці; остаточний текст затверджує власник (S1.7).", note_en: "Working disclaimer and methodology on the page; final wording approved by the owner (S1.7)."}
       - {id: S11.6, status: done, days: 0.3, uk: "Пояснення українською: короткий виклад від класифікатора замість англійської цитати (карта, бот, сповіщення)", en: "Ukrainian explanations: the classifier's summary instead of the English quote (map, bot, alerts)", note_uk: "Цитати англійською лишаються для ENG і там, де українського викладу ще немає (новини, класифікація правилами).", note_en: "English quotes remain for ENG and where no Ukrainian summary exists yet (news, rule-based classification)."}
+      - {id: S11.7, status: done, days: 0.5, uk: "Карта: сусіди у війні (Україна, Росія, Білорусь) для контексту; телефонна версія карти й сторінки плану", en: "Map: neighbours at war (Ukraine, Russia, Belarus) for context; phone layout for the map and the plan page", note_uk: "Сусіди не оцінюються шкалою, лише показані штрихуванням; дані в розділі context файлу conflicts.yaml (потребує перегляду людиною).", note_en: "Neighbours are not scored, only hatched for context; data in the context section of conflicts.yaml (needs human review)."}
 
       - {id: S11.5, status: done, days: 0.5, uk: "Розгорнуте пояснення на карті (укр/англ): підсумок, блоки, що кажуть уряди, що помічено, повна методика", en: "Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method"}
   - id: S12
@@ -221,6 +222,7 @@ stages:
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
+  - {date: 2026-10-01, uk: "Сусіди у війні показуються на карті лише як контекст (штрихування, без балу); перелік — розділ context у config/conflicts.yaml.", en: "Neighbours at war are shown on the map as context only (hatched, no score); the list is the context section of config/conflicts.yaml."}
   - {date: 2026-09-30, uk: "Раптові напади (Вірменія–Азербайджан-2020) перевіряються на реакцію протягом 3 днів: рекомендації урядів не змінювались до початку боїв.", en: "Surprise attacks (Armenia–Azerbaijan 2020) are tested for a reaction within 3 days: government advice did not change before the fighting began."}
   - {date: 2026-09-30, uk: "Заходи з рекомендацій і пороги рахуються лише з безпекової причини заходу (релевантність ≥ 0.7 для заходів, ≥ 0.5 для порогів).", en: "Advisory measures and floors count only for a security reason for the measure (relevance ≥ 0.7 for measures, ≥ 0.5 for floors)."}
   - {date: 2026-09-30, uk: "Регіональні попередження: Британія «avoid all travel to parts» 0.45, «all but essential to parts» 0.3, Німеччина Teilreisewarnung 0.35 — вони здебільшого стосуються давно окупованих чи прикордонних районів.", en: "Regional warnings: UK \"avoid all travel to parts\" 0.45, \"all but essential to parts\" 0.3, German partial warning 0.35 — they mostly cover long-occupied or border areas."}
@@ -250,98 +252,102 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.88
+    date: 2026-10-01
+    uk: ["Карта показує Україну (війна), Росію (агресор) і Білорусь (територію використано для нападу) — для контексту, без балу.", "Телефонна версія: карта без горизонтальної прокрутки, панель країни прокручується до видимої області, таблиця клікабельна; на сторінці плану можна сховати виконані завдання, журнал змін згорнуто після 15 записів.", "Виправлено: записи журналу змін одним рядком ламали PLAN.md і сторінку плану."]
+    en: ["The map shows Ukraine (war), Russia (aggressor) and Belarus (territory used for the attack) for context, without a score.", "Phone layout: no horizontal scroll on the map, the country panel scrolls into view, the table is clickable; the plan page can hide finished tasks and folds the changelog after 15 entries.", "Fixed: changelog entries written as one string broke PLAN.md and the plan page."]
   - version: 0.2.87
     date: 2026-09-30
-    uk: "Дашборд бота: значення рівня одним реченням, позначки й порогові події, три причини, кнопка «Детальніше на карті»; рівні названо нейтрально, як на карті (низький…критичний)."
-    en: "Bot dashboard: the level meaning in one sentence, flags and threshold events, three reasons, a \"Details on the map\" button; levels have neutral names, as on the map (low…critical)."
+    uk: ["Дашборд бота: значення рівня одним реченням, позначки й порогові події, три причини, кнопка «Детальніше на карті»; рівні названо нейтрально, як на карті (низький…критичний)."]
+    en: ["Bot dashboard: the level meaning in one sentence, flags and threshold events, three reasons, a \"Details on the map\" button; levels have neutral names, as on the map (low…critical)."]
   - version: 0.2.86
     date: 2026-09-30
-    uk: "Держдеп: дві розкладки однієї рекомендації (розриви рядків, блок «If you decide to travel», службові примітки) зводяться до одного тексту — мерехтіння зникає без хвилі змін при оновленні."
-    en: "State Department: two layouts of one advisory (line breaks, the \"If you decide to travel\" block, update notes) reduce to one text — the flapping stops without a wave of changes on upgrade."
+    uk: ["Держдеп: дві розкладки однієї рекомендації (розриви рядків, блок «If you decide to travel», службові примітки) зводяться до одного тексту — мерехтіння зникає без хвилі змін при оновленні."]
+    en: ["State Department: two layouts of one advisory (line breaks, the \"If you decide to travel\" block, update notes) reduce to one text — the flapping stops without a wave of changes on upgrade."]
   - version: 0.2.80
     date: 2026-09-30
-    uk: "Етап бектесту завершено: усі чотири історичні епізоди проходять із класифікацією моделлю."
-    en: "Backtest stage finished: all four historical episodes pass with model classification."
+    uk: ["Етап бектесту завершено: усі чотири історичні епізоди проходять із класифікацією моделлю."]
+    en: ["Backtest stage finished: all four historical episodes pass with model classification."]
   - version: 0.2.77
     date: 2026-09-30
-    uk: "Лог Claude Code показує номер кожного виклику, а не лічильник на момент завершення."
-    en: "The Claude Code log shows each call's own number, not the counter at completion."
+    uk: ["Лог Claude Code показує номер кожного виклику, а не лічильник на момент завершення."]
+    en: ["The Claude Code log shows each call's own number, not the counter at completion."]
   - version: 0.2.76
     date: 2026-09-30
-    uk: "Класифікатор робить до 4 викликів моделі паралельно (CLASSIFIER_CONCURRENCY), а через Claude Code — без розширеного обдумування; класифікація має стати в кілька разів швидшою."
-    en: "The classifier makes up to 4 model calls in parallel (CLASSIFIER_CONCURRENCY), and via Claude Code without extended thinking; classification should be several times faster."
+    uk: ["Класифікатор робить до 4 викликів моделі паралельно (CLASSIFIER_CONCURRENCY), а через Claude Code — без розширеного обдумування; класифікація має стати в кілька разів швидшою."]
+    en: ["The classifier makes up to 4 model calls in parallel (CLASSIFIER_CONCURRENCY), and via Claude Code without extended thinking; classification should be several times faster."]
   - version: 0.2.75
     date: 2026-09-30
-    uk: "Класифікатор через Claude Code пише прогрес кожного виклику; якщо CLI не відповідає 90 с, виклики зупиняються до кінця запуску."
-    en: "The Claude Code classifier logs every call; if the CLI does not answer in 90 s, calls stop for the rest of the run."
+    uk: ["Класифікатор через Claude Code пише прогрес кожного виклику; якщо CLI не відповідає 90 с, виклики зупиняються до кінця запуску."]
+    en: ["The Claude Code classifier logs every call; if the CLI does not answer in 90 s, calls stop for the rest of the run."]
   - version: 0.2.74
     date: 2026-09-30
-    uk: "Новий провайдер класифікатора — локальний Claude Code за підпискою; епізод Вірменія–Азербайджан-2020 перевіряє реакцію (бал 3+ протягом 3 днів після нападу), а не раннє попередження."
-    en: "New classifier provider — the local Claude Code CLI on a subscription; the Armenia–Azerbaijan 2020 episode tests the reaction (score 3+ within 3 days of the attack), not an early warning."
+    uk: ["Новий провайдер класифікатора — локальний Claude Code за підпискою; епізод Вірменія–Азербайджан-2020 перевіряє реакцію (бал 3+ протягом 3 днів після нападу), а не раннє попередження."]
+    en: ["New classifier provider — the local Claude Code CLI on a subscription; the Armenia–Azerbaijan 2020 episode tests the reaction (score 3+ within 3 days of the attack), not an early warning."]
   - version: 0.2.73
     date: 2026-09-30
-    uk: "Класифікатор зупиняється після першої відмови через ключ чи кредити (401/402/403) і не шле сотні запитів; тексти, класифіковані правилами під час недоступності моделі, модель перекласифікує пізніше. Правила беруть причину заходу з речення, де він згаданий."
-    en: "The classifier stops after the first key or credit refusal (401/402/403) instead of sending hundreds of requests; texts classified by rules while the model was unavailable are re-classified by the model later. Rules take a measure's reason from the sentence that states it."
+    uk: ["Класифікатор зупиняється після першої відмови через ключ чи кредити (401/402/403) і не шле сотні запитів; тексти, класифіковані правилами під час недоступності моделі, модель перекласифікує пізніше. Правила беруть причину заходу з речення, де він згаданий."]
+    en: ["The classifier stops after the first key or credit refusal (401/402/403) instead of sending hundreds of requests; texts classified by rules while the model was unavailable are re-classified by the model later. Rules take a measure's reason from the sentence that states it."]
   - version: 0.2.72
     date: 2026-09-30
-    uk: "Заходи з невказаною безпековою причиною («непередбачувана ситуація») знову рахуються; відсікаються лише явно невійськові причини (COVID, попіл, погода, злочинність, тероризм)."
-    en: "Measures with an unspecified security reason (\"unpredictable situation\") count again; only clearly non-military reasons are excluded (COVID, ash, weather, crime, terrorism)."
+    uk: ["Заходи з невказаною безпековою причиною («непередбачувана ситуація») знову рахуються; відсікаються лише явно невійськові причини (COVID, попіл, погода, злочинність, тероризм)."]
+    en: ["Measures with an unspecified security reason (\"unpredictable situation\") count again; only clearly non-military reasons are excluded (COVID, ash, weather, crime, terrorism)."]
   - version: 0.2.71
     date: 2026-09-30
-    uk: "Окрема причина для заходів (статус посольства, небо, кордони): карантинні заходи COVID-19 у рекомендації про конфлікт більше не піднімають бал і не вмикають порогів; один уряд із «закритим небом» дає 0.7 блоку авіації, а не 1.0."
-    en: "A separate reason for measures (embassy posture, airspace, borders): COVID-19 measures in a conflict advisory no longer raise the score or trigger floors; one government's \"airspace closed\" gives the aviation block 0.7, not 1.0."
+    uk: ["Окрема причина для заходів (статус посольства, небо, кордони): карантинні заходи COVID-19 у рекомендації про конфлікт більше не піднімають бал і не вмикають порогів; один уряд із «закритим небом» дає 0.7 блоку авіації, а не 1.0."]
+    en: ["A separate reason for measures (embassy posture, airspace, borders): COVID-19 measures in a conflict advisory no longer raise the score or trigger floors; one government's \"airspace closed\" gives the aviation block 0.7, not 1.0."]
   - version: 0.2.70
     date: 2026-09-30
-    uk: "Повторне завантаження архіву пропускає вже завантажене (--refresh — завантажити заново), а дублікати зі старих баз прибираються автоматично."
-    en: "Loading the archive again skips what is already loaded (--refresh reloads), and duplicates in older databases are removed automatically."
+    uk: ["Повторне завантаження архіву пропускає вже завантажене (--refresh — завантажити заново), а дублікати зі старих баз прибираються автоматично."]
+    en: ["Loading the archive again skips what is already loaded (--refresh reloads), and duplicates in older databases are removed automatically."]
   - version: 0.2.69
     date: 2026-09-30
-    uk: "Сигнали з рекомендацій (небо, статус посольства, кордони) вимикаються, коли нова класифікація того самого тексту їх більше не підтверджує."
-    en: "Advisory-derived signals (airspace, embassy posture, borders) switch off when a new classification of the same text no longer supports them."
+    uk: ["Сигнали з рекомендацій (небо, статус посольства, кордони) вимикаються, коли нова класифікація того самого тексту їх більше не підтверджує."]
+    en: ["Advisory-derived signals (airspace, embassy posture, borders) switch off when a new classification of the same text no longer supports them."]
   - version: 0.2.68
     date: 2026-09-30
-    uk: "Версії, що чергуються, більше не зберігаються й не класифікуються повторно (економія викликів моделі); регіональні попередження (Британія «to parts», Німеччина Teilreisewarnung) важать менше; закриття неба зараховується лише з безпекової причини."
-    en: "Alternating versions are no longer stored or re-classified (saves model calls); regional warnings (UK \"to parts\", German partial warning) weigh less; airspace closures count only for a security reason."
+    uk: ["Версії, що чергуються, більше не зберігаються й не класифікуються повторно (економія викликів моделі); регіональні попередження (Британія «to parts», Німеччина Teilreisewarnung) важать менше; закриття неба зараховується лише з безпекової причини."]
+    en: ["Alternating versions are no longer stored or re-classified (saves model calls); regional warnings (UK \"to parts\", German partial warning) weigh less; airspace closures count only for a security reason."]
   - version: 0.2.67
     date: 2026-09-30
-    uk: "Держдеп: резервне джерело після зникнення RSS; закриття неба через вулканічний попіл чи погоду більше не рахується сигналом безпеки; модель визначає причину за загальним рівнем країни, а не за окремими регіонами."
-    en: "State Department: fallback source after the RSS feed disappeared; airspace closures for volcanic ash or weather no longer count as security signals; the model takes the reason for the country's overall level, not for single regions."
+    uk: ["Держдеп: резервне джерело після зникнення RSS; закриття неба через вулканічний попіл чи погоду більше не рахується сигналом безпеки; модель визначає причину за загальним рівнем країни, а не за окремими регіонами."]
+    en: ["State Department: fallback source after the RSS feed disappeared; airspace closures for volcanic ash or weather no longer count as security signals; the model takes the reason for the country's overall level, not for single regions."]
   - version: 0.2.66
     date: 2026-09-30
-    uk: "Класифікації правилами перераховуються ще раз після звуження правил для неба."
-    en: "Rule-based classifications are redone once more after narrowing the airspace rules."
+    uk: ["Класифікації правилами перераховуються ще раз після звуження правил для неба."]
+    en: ["Rule-based classifications are redone once more after narrowing the airspace rules."]
   - version: 0.2.65
     date: 2026-09-30
-    uk: "Пороги для закритого чи обмеженого неба тепер вимагають двох незалежних джерел; правила й модель не вважають обмеженням неба рутинні NOTAM, правила для дронів і давні регіональні заборони."
-    en: "Airspace closed/restricted floors now need two independent sources; rules and the model no longer treat routine NOTAMs, drone rules or long-standing regional bans as airspace restrictions."
+    uk: ["Пороги для закритого чи обмеженого неба тепер вимагають двох незалежних джерел; правила й модель не вважають обмеженням неба рутинні NOTAM, правила для дронів і давні регіональні заборони."]
+    en: ["Airspace closed/restricted floors now need two independent sources; rules and the model no longer treat routine NOTAMs, drone rules or long-standing regional bans as airspace restrictions."]
   - version: 0.2.64
     date: 2026-09-30
-    uk: "Виправлено правила класифікації: повні сторінки з маркерами списку чи телефонами більше не сприймаються як diff; нові формулювання статусу посольств (відкликання, переїзд, призупинення); шум «Still valid» і голих дат прибрано. Правилові класифікації буде перераховано."
-    en: "Fixed rule classification: full pages with bullets or phone numbers are no longer read as diffs; new embassy posture wordings (withdrawal, relocation, suspension); \"Still valid\" and bare-date noise removed. Rule-based classifications are redone."
+    uk: ["Виправлено правила класифікації: повні сторінки з маркерами списку чи телефонами більше не сприймаються як diff; нові формулювання статусу посольств (відкликання, переїзд, призупинення); шум «Still valid» і голих дат прибрано. Правилові класифікації буде перераховано."]
+    en: ["Fixed rule classification: full pages with bullets or phone numbers are no longer read as diffs; new embassy posture wordings (withdrawal, relocation, suspension); \"Still valid\" and bare-date noise removed. Rule-based classifications are redone."]
   - version: 0.2.63
     date: 2026-09-30
-    uk: "Завантаження архіву Wayback більше не обривається на повільних відповідях: таймаут 120 с і до 3 повторів."
-    en: "Wayback archive loading no longer fails on slow answers: 120 s timeout and up to 3 retries."
+    uk: ["Завантаження архіву Wayback більше не обривається на повільних відповідях: таймаут 120 с і до 3 повторів."]
+    en: ["Wayback archive loading no longer fails on slow answers: 120 s timeout and up to 3 retries."]
   - version: 0.2.62
     date: 2026-09-30
-    uk: "Українською мовою пояснення тепер показують короткий виклад українською замість англійської цитати; шаблонні примітки (авіатрафік, медіа, ринки) перекладено."
-    en: "In Ukrainian, explanations now show a Ukrainian summary instead of the English quote; templated notes (air traffic, media, markets) are translated."
+    uk: ["Українською мовою пояснення тепер показують короткий виклад українською замість англійської цитати; шаблонні примітки (авіатрафік, медіа, ринки) перекладено."]
+    en: ["In Ukrainian, explanations now show a Ukrainian summary instead of the English quote; templated notes (air traffic, media, markets) are translated."]
   - version: 0.2.61
     date: 2026-09-30
-    uk: "Налаштування шкали: обмежено надбавку за сплеск і звужено синхронність урядів до справжнього посилення рекомендацій; хибна тривога для Франції-2015 зникла."
-    en: "Scale tuning: capped the surge bonus and narrowed government synchrony to real tightening; the France 2015 false alarm is gone."
+    uk: ["Налаштування шкали: обмежено надбавку за сплеск і звужено синхронність урядів до справжнього посилення рекомендацій; хибна тривога для Франції-2015 зникла."]
+    en: ["Scale tuning: capped the surge bonus and narrowed government synchrony to real tightening; the France 2015 false alarm is gone."]
   - version: 0.2.60
     date: 2026-09-30
-    uk: "Цитати коротші за 4 слова (уривки навігації) більше не показуються в поясненнях."
-    en: "Quotes shorter than 4 words (navigation fragments) are no longer shown in explanations."
+    uk: ["Цитати коротші за 4 слова (уривки навігації) більше не показуються в поясненнях."]
+    en: ["Quotes shorter than 4 words (navigation fragments) are no longer shown in explanations."]
   - version: 0.2.59
     date: 2026-09-30
-    uk: "Карта пояснює бал кожної країни: короткий підсумок, заповненість шести блоків, рівні рекомендацій урядів і всі помічені сигнали з цитатами, плюс повна методика. Прибрано хибні сигнали падіння авіатрафіку для малих країн."
-    en: "The map explains every country's score: a short summary, the six blocks, government advice levels and all observed signals with quotes, plus the full method. False air-traffic-drop signals for small countries removed."
+    uk: ["Карта пояснює бал кожної країни: короткий підсумок, заповненість шести блоків, рівні рекомендацій урядів і всі помічені сигнали з цитатами, плюс повна методика. Прибрано хибні сигнали падіння авіатрафіку для малих країн."]
+    en: ["The map explains every country's score: a short summary, the six blocks, government advice levels and all observed signals with quotes, plus the full method. False air-traffic-drop signals for small countries removed."]
   - version: 0.2.57
     date: 2026-09-30
-    uk: "Джерела, що перемикаються між двома версіями тексту (як стрічка США), більше не створюють змін і не піднімають бал; нова команда why пояснює бал країни."
-    en: "Sources that swing between two text versions (like the US feed) no longer create changes or lift the score; new why command explains a country's score."
+    uk: ["Джерела, що перемикаються між двома версіями тексту (як стрічка США), більше не створюють змін і не піднімають бал; нова команда why пояснює бал країни."]
+    en: ["Sources that swing between two text versions (like the US feed) no longer create changes or lift the score; new why command explains a country's score."]
   - version: 0.2.56
     date: 2026-09-30
     uk: ["GDELT — окрема щоденна команда і таймер; run більше не чекає на нього", "США: дублікати записів з різним текстом більше не дають хибних змін"]

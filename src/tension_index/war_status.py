@@ -73,6 +73,21 @@ def get(code: str) -> WarStatus:
     return load()[code]
 
 
+ROLES = ("at_war", "aggressor", "aggressor_ally")
+
+
+@lru_cache
+def context(path: Path = CONFIG_PATH) -> dict[str, dict]:
+    """Neighbours outside the monitored set (map context only): code -> status, role, notes."""
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    result = {}
+    for code, entry in (data.get("context") or {}).items():
+        if entry.get("status") not in SEVERITY or entry.get("role") not in ROLES:
+            raise ValueError(f"context {code}: bad status/role {entry}")
+        result[code] = dict(entry)
+    return result
+
+
 # --- Automatic check: Wikipedia -------------------------------------------------------------
 
 # Aliases as they appear in Wikipedia flag templates / links.
