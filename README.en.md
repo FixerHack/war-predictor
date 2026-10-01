@@ -114,9 +114,16 @@ Requirements: Debian/Ubuntu with systemd, a user with `sudo`.
 git clone https://github.com/FixerHack/war-predictor.git ~/war-predictor
 cd ~/war-predictor
 ./scripts/install_server.sh   # first run creates .env and stops
-nano .env                     # fill it in
-./scripts/install_server.sh   # installs and starts the systemd units
+nano .env                     # fill in TELEGRAM_*
+./scripts/install_server.sh   # installs Claude Code, the gateway and the systemd units
 ```
+
+On the server, classification goes through the Claude Code gateway (`claude-gateway.service`, `127.0.0.1:8787` only). The script generates the gateway token and writes it to both `.env` files. To sign Claude Code on the server into your subscription:
+1. on your own computer run `claude setup-token`;
+2. put the token into `gateway/.env` as `CLAUDE_CODE_OAUTH_TOKEN=...`;
+3. run `./scripts/install_server.sh` again.
+
+Until then the bot classifies with rules only.
 
 What runs:
 
@@ -128,6 +135,7 @@ What runs:
 | `tension-backup.timer` | daily SQLite backup, last 14 kept |
 | `tension-warcheck.timer` | daily war status check against Wikipedia |
 | `tension-digest.timer` | daily digest to subscribers (06:37 UTC) |
+| `claude-gateway.service` | Claude Code gateway for classification (and your other programs) |
 | `tension-gdelt.timer` | daily GDELT collection (04:43 UTC, a few minutes) |
 
 Update: `./scripts/deploy.sh` (branch `main`) or `./scripts/deploy.sh dev-tg-bot` to test a branch.

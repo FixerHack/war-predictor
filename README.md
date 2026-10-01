@@ -114,9 +114,16 @@ Pages налаштовано на гілку `gh-pages` (Settings → Pages → 
 git clone https://github.com/FixerHack/war-predictor.git ~/war-predictor
 cd ~/war-predictor
 ./scripts/install_server.sh   # 1-й запуск створить .env і зупиниться
-nano .env                     # заповнити
-./scripts/install_server.sh   # встановить і запустить systemd-юніти
+nano .env                     # заповнити TELEGRAM_*
+./scripts/install_server.sh   # встановить Claude Code, шлюз і systemd-юніти
 ```
+
+Класифікація на сервері йде через шлюз Claude Code (`claude-gateway.service`, лише `127.0.0.1:8787`). Токен шлюзу скрипт генерує сам і прописує в обидва `.env`. Щоб Claude Code на сервері увійшов у вашу підписку:
+1. на своєму комп'ютері виконайте `claude setup-token`;
+2. вставте токен у `gateway/.env` як `CLAUDE_CODE_OAUTH_TOKEN=...`;
+3. запустіть `./scripts/install_server.sh` ще раз.
+
+Доки цього не зроблено, бот класифікує лише правилами.
 
 Що запускається:
 
@@ -129,6 +136,7 @@ nano .env                     # заповнити
 | `tension-warcheck.timer` | щоденна звірка статусу війни з Wikipedia |
 | `tension-digest.timer` | щоденний дайджест підписникам (06:37 UTC) |
 | `tension-gdelt.timer` | щоденний збір GDELT (04:43 UTC, кілька хвилин) |
+| `claude-gateway.service` | шлюз Claude Code для класифікації (і для інших ваших програм) |
 
 Оновлення: `./scripts/deploy.sh` (гілка `main`) або `./scripts/deploy.sh dev-tg-bot` для тесту гілки.
 Стан: `./scripts/healthcheck.sh` (коди виходу: 0 OK, 1 WARN, 2 FAIL), логи: `journalctl -u tension-bot -f`.

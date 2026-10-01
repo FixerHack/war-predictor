@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.91**, updated 2026-09-30.
+Version **0.2.92**, updated 2026-09-30.
 
 **Overall progress: 76%** · left ≈ 11.7 days · ✅ 62 · 🟡 14 · ⬜ 9 · ⛔ 4
 
@@ -29,7 +29,7 @@ Branch: `dev-bootstrap`
   - Instead of OpenRouter the classifier runs through the local Claude Code CLI on a subscription (CLASSIFIER_PROVIDER=claude_code).
 - ✅ **S0.11** Create bot via @BotFather, test channel, fill in .env _(manual)_
 - ⬜ **S0.12** First server deploy: install_server.sh, verify healthcheck _(manual)_
-  - Postponed: bot and system first.
+  - Script ready: scripts/install_server.sh installs the bot, timers, Claude Code and the gateway; a person runs it on the server.
 - ✅ **S0.13** Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root _(manual)_
   - Live: fixerhack.github.io/war-predictor
 - ⬜ **S0.15** Unlock GitHub Actions: Settings → Billing and plans (invoice / card) _(manual)_
@@ -280,6 +280,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.92** (2026-10-01)
+  - install_server.sh also installs Claude Code and claude-gateway, generates the gateway token and sets the bot to classify through it.
 - **0.2.91** (2026-10-01)
   - claude-gateway is a standalone project with its own uv.lock (not part of the bot's dependencies).
 - **0.2.90** (2026-10-01)
