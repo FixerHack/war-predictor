@@ -1022,7 +1022,7 @@ wheels = [
 
 [[package]]
 name = "tension-index"
-version = "0.2.77"
+version = "0.2.80"
 source = { editable = "." }
 dependencies = [
     { name = "aiogram" },

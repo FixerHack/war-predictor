@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.77**, updated 2026-09-30.
+Version **0.2.80**, updated 2026-09-30.
 
-**Overall progress: 68%** · left ≈ 14.6 days · ✅ 52 · 🟡 20 · ⬜ 10 · ⛔ 4
+**Overall progress: 72%** · left ≈ 13.1 days · ✅ 55 · 🟡 17 · ⬜ 10 · ⛔ 4
 
 ## Milestones
 
@@ -155,18 +155,17 @@ Branch: `dev-scoring`
 - ✅ **S7.5** Guard against flapping sources (A → B → A) and the why command
   - Returning to a version seen within 7 days is not a change; such changes produce no score events. tension-index why LU lists blocks and active signals.
 
-## S8. Backtesting — 50%
+## S8. Backtesting — 100%
 
 _The scale must fire on known episodes in time and without mass false alarms._
 
 Branch: `dev-backtest`
 
-- 🟡 **S8.1** Replay the scale on historical episodes
-  - 4 episodes run. France 2016 (control): max 3.0 — PASS. Israel 2024: PASS (war already ongoing). Armenia–Azerbaijan 2020: FAIL, 5 never reached (0 US versions archived). Ukraine was loaded over itself — duplicates removed, loading is now repeatable.
-- 🟡 **S8.2** False alarm and miss report
-  - Report: PASS/FAIL against the episode expectation, first days at 3/5/7/9, control episode for false alarms.
-- 🟡 **S8.3** Weight tuning
-  - First step done on reconstructed timelines: surge bonus capped at 0.10, synchrony counts only real tightening (no terrorism or rewording). France 2015: 7.3 → 4.5; one government ordering departure: 7.6 → 7.0; Ukraine 2022 unchanged (8.3 / 9.0). Next: run on the real archive.
+- ✅ **S8.1** Replay the scale on historical episodes
+  - Wayback archive, Claude Haiku 4.5 classification via Claude Code: Ukraine 2022 — 7 from 20 Dec 2021 (66 days ahead); Armenia–Azerbaijan 2020 — reaction 3+ on day 2 (surprise attack); Israel 2024 — 7 from the window start (US staff departure); France 2016 (control) — max 3.0. All PASS.
+- ✅ **S8.2** False alarm and miss report
+- ✅ **S8.3** Weight tuning
+  - Capped surge bonus, narrowed synchrony, separate measure reason, two-source airspace floors, lower weight for regional warnings. Revisit after 30+ days of live history.
 
 ## S9. Telegram bot & alerts — 100%
 
@@ -272,6 +271,92 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.80** (2026-09-30)
+  - B
+  - a
+  - c
+  - k
+  - t
+  - e
+  - s
+  - t
+  -  
+  - s
+  - t
+  - a
+  - g
+  - e
+  -  
+  - f
+  - i
+  - n
+  - i
+  - s
+  - h
+  - e
+  - d
+  - :
+  -  
+  - a
+  - l
+  - l
+  -  
+  - f
+  - o
+  - u
+  - r
+  -  
+  - h
+  - i
+  - s
+  - t
+  - o
+  - r
+  - i
+  - c
+  - a
+  - l
+  -  
+  - e
+  - p
+  - i
+  - s
+  - o
+  - d
+  - e
+  - s
+  -  
+  - p
+  - a
+  - s
+  - s
+  -  
+  - w
+  - i
+  - t
+  - h
+  -  
+  - m
+  - o
+  - d
+  - e
+  - l
+  -  
+  - c
+  - l
+  - a
+  - s
+  - s
+  - i
+  - f
+  - i
+  - c
+  - a
+  - t
+  - i
+  - o
+  - n
+  - .
 - **0.2.77** (2026-09-30)
   - T
   - h
