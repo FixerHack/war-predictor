@@ -33,7 +33,7 @@ Claude Code must be installed and signed in (`claude auth status`). On a server 
 1. run `claude setup-token` on a machine where you are signed in;
 2. put the printed token into `CLAUDE_CODE_OAUTH_TOKEN` in `.env`.
 
-systemd service: [`deploy/claude-gateway.service`](deploy/claude-gateway.service).
+systemd service: [`deploy/claude-gateway.service`](deploy/claude-gateway.service); on the server `scripts/install_server.sh` from the repository root installs it.
 
 ## Requests
 

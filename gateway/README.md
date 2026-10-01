@@ -33,7 +33,7 @@ uv run claude-gateway serve            # http://127.0.0.1:8787
 1. на машині, де ви вже увійшли, запустіть `claude setup-token`;
 2. отриманий токен покладіть у `CLAUDE_CODE_OAUTH_TOKEN` у `.env`.
 
-Сервіс systemd: [`deploy/claude-gateway.service`](deploy/claude-gateway.service).
+Сервіс systemd: [`deploy/claude-gateway.service`](deploy/claude-gateway.service); на сервері його ставить `scripts/install_server.sh` з кореня репозиторію.
 
 ## Запити
 
