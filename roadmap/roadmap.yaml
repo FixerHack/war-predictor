@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.93
+  version: 0.2.94
   updated: 2026-09-30
 
 milestones:
@@ -211,7 +211,7 @@ stages:
       - {id: S12.2, status: todo, days: 0.3, owner: human, uk: "Dead-man switch на healthchecks.io (безкоштовно)", en: "Dead-man switch on healthchecks.io (free)"}
       - {id: S12.3, status: in_progress, days: 0.5, uk: "Автодеплой з main (GitHub Actions → SSH)", en: "Auto-deploy from main (GitHub Actions → SSH)", note_uk: "Процес .github/workflows/deploy.yml готовий (SSH → scripts/deploy.sh); запрацює після розблокування Actions і секретів DEPLOY_*.", note_en: ".github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set."}
 
-      - {id: S12.5, status: todo, owner: human, days: 0.3, uk: "Сервер: встановити Claude Code, claude setup-token, запустити claude-gateway (systemd) за HTTPS-проксі", en: "Server: install Claude Code, claude setup-token, run claude-gateway (systemd) behind an HTTPS proxy"}
+      - {id: S12.5, status: todo, owner: human, days: 0.3, uk: "Сервер: встановити Claude Code, claude setup-token, запустити claude-gateway (systemd) за HTTPS-проксі", en: "Server: install Claude Code, claude setup-token, run claude-gateway (systemd) behind an HTTPS proxy", note_uk: "Шлюз розгортається окремо від бота: ~/claude-gateway, gateway/scripts/install.sh; бот підключається токеном. Покроково — docs/deploy-agent.md.", note_en: "The gateway is deployed separately from the bot: ~/claude-gateway, gateway/scripts/install.sh; the bot connects with a token. Step by step: docs/deploy-agent.md."}
   - id: S13
     branch: "—"
     uk: Критерії MVP
@@ -224,6 +224,7 @@ stages:
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
+  - {date: 2026-10-01, uk: "claude-gateway — окремий сервіс зі своєю текою, .env, юнітом і оновленням; програми (зокрема war-predictor) підключаються до нього кожна своїм токеном.", en: "claude-gateway is a separate service with its own directory, .env, unit and updates; programs (including war-predictor) connect to it, each with its own token."}
   - {date: 2026-10-01, uk: "Сусіди у війні показуються на карті лише як контекст (штрихування, без балу); перелік — розділ context у config/conflicts.yaml.", en: "Neighbours at war are shown on the map as context only (hatched, no score); the list is the context section of config/conflicts.yaml."}
   - {date: 2026-09-30, uk: "Раптові напади (Вірменія–Азербайджан-2020) перевіряються на реакцію протягом 3 днів: рекомендації урядів не змінювались до початку боїв.", en: "Surprise attacks (Armenia–Azerbaijan 2020) are tested for a reaction within 3 days: government advice did not change before the fighting began."}
   - {date: 2026-09-30, uk: "Заходи з рекомендацій і пороги рахуються лише з безпекової причини заходу (релевантність ≥ 0.7 для заходів, ≥ 0.5 для порогів).", en: "Advisory measures and floors count only for a security reason for the measure (relevance ≥ 0.7 for measures, ≥ 0.5 for floors)."}
@@ -255,6 +256,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.94
+    date: 2026-10-01
+    uk: ["Шлюз і war-predictor розгортаються окремо: у шлюзу власний інсталятор (gateway/scripts/install.sh), тека, .env і сервіс; install_server.sh ставить лише бота й таймери, а до шлюзу бот підключається токеном.", "Інструкцію для агента-розгортальника переписано під дві окремі установки."]
+    en: ["The gateway and war-predictor are deployed separately: the gateway has its own installer (gateway/scripts/install.sh), directory, .env and service; install_server.sh installs only the bot and timers, which connect to the gateway with a token.", "The deployment agent instructions now describe two separate installations."]
   - version: 0.2.93
     date: 2026-10-01
     uk: ["docs/deploy-agent.md — покрокова інструкція для агента (Claude Code), який розгортає сервер по SSH."]

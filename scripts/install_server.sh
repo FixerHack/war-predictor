@@ -3,8 +3,9 @@
 # own the app, from inside the cloned repo:
 #   git clone https://github.com/FixerHack/war-predictor.git ~/war-predictor
 #   cd ~/war-predictor && ./scripts/install_server.sh
-# Needs sudo for installing systemd units. Installs: uv, the bot and its timers, Claude Code and
-# claude-gateway (the bot classifies through the gateway, see gateway/README.md).
+# Needs sudo for installing systemd units. Installs uv, the bot and its timers. The bot classifies
+# through claude-gateway, a separate service installed on its own (gateway/scripts/install.sh,
+# see docs/deploy-agent.md): put its URL and a token into .env (GATEWAY_URL, GATEWAY_TOKEN).
 source "$(dirname "$0")/_common.sh"
 
 # set_env FILE KEY VALUE - replace KEY=... or append it
@@ -40,34 +41,11 @@ if [[ ! -f .env ]]; then
 fi
 [[ -n "$(get_env .env TELEGRAM_BOT_TOKEN)" ]] || die "TELEGRAM_BOT_TOKEN is empty in .env"
 
-# --- Claude Code and claude-gateway ---------------------------------------------------------
-if ! command -v claude >/dev/null 2>&1; then
-  log "Installing Claude Code"
-  curl -fsSL https://claude.ai/install.sh | bash
-fi
-CLAUDE_BIN="$(command -v claude || true)"
-[[ -n "$CLAUDE_BIN" ]] || die "claude not found after install; see https://code.claude.com/docs/en/setup"
-
-log "Installing claude-gateway"
-(cd gateway && uv sync --frozen --no-dev)
-if [[ ! -f gateway/.env ]]; then
-  cp gateway/.env.example gateway/.env
-  chmod 600 gateway/.env
-fi
-if [[ -z "$(get_env gateway/.env GATEWAY_TOKENS)" ]]; then
-  set_env gateway/.env GATEWAY_TOKENS "$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
-fi
-set_env gateway/.env GATEWAY_CLAUDE_BIN "$CLAUDE_BIN"
-GATEWAY_SECRET="$(get_env gateway/.env GATEWAY_TOKENS | cut -d, -f1)"
-# The bot talks to the gateway with the same token.
+# --- Connection to claude-gateway (a separate service) ---------------------------------------
 [[ -n "$(get_env .env GATEWAY_URL)" ]] || set_env .env GATEWAY_URL http://127.0.0.1:8787
-set_env .env GATEWAY_TOKEN "$GATEWAY_SECRET"
-
-CLAUDE_READY=0
-if [[ -n "$(get_env gateway/.env CLAUDE_CODE_OAUTH_TOKEN)" ]]; then
-  CLAUDE_READY=1
-elif "$CLAUDE_BIN" auth status >/dev/null 2>&1; then
-  CLAUDE_READY=1
+if [[ "$(get_env .env CLASSIFIER_PROVIDER)" == "gateway" && -z "$(get_env .env GATEWAY_TOKEN)" ]]; then
+  log "GATEWAY_TOKEN is empty: until it is set (a token from the gateway's GATEWAY_TOKENS)"
+  log "the bot classifies with keyword rules only."
 fi
 
 # --- systemd --------------------------------------------------------------------------------
@@ -80,33 +58,22 @@ render() {
     -e "s|@HOME@|$HOME|g" "$1" | sudo tee "/etc/systemd/system/$(basename "$1")" >/dev/null
 }
 log "Installing systemd units for user $APP_USER in $ROOT_DIR"
-for unit in deploy/systemd/*.service deploy/systemd/*.timer gateway/deploy/claude-gateway.service; do
+for unit in deploy/systemd/*.service deploy/systemd/*.timer; do
   render "$unit"
 done
 sudo systemctl daemon-reload
 
-if [[ "$CLAUDE_READY" == 1 ]]; then
-  sudo systemctl enable --now claude-gateway.service
-  sudo systemctl restart claude-gateway.service
-else
-  log "Claude Code is not signed in yet. On your own computer run:  claude setup-token"
-  log "then put the printed token into $ROOT_DIR/gateway/.env as CLAUDE_CODE_OAUTH_TOKEN=... and re-run."
-  log "Until then the bot classifies with keyword rules only."
-fi
 sudo systemctl enable --now tension-bot.service
 sudo systemctl restart tension-bot.service
 sudo systemctl enable --now tension-collect.timer tension-health.timer tension-backup.timer \
   tension-warcheck.timer tension-digest.timer tension-gdelt.timer
 
 log "Status"
-systemctl --no-pager --lines=0 status tension-bot.service claude-gateway.service || true
+systemctl --no-pager --lines=0 status tension-bot.service || true
 systemctl list-timers 'tension-*' --no-pager || true
-if [[ "$CLAUDE_READY" == 1 ]]; then
-  sleep 2
-  if curl -fsS -m 5 http://127.0.0.1:8787/health >/dev/null; then
-    log "claude-gateway is up on 127.0.0.1:8787"
-  else
-    log "claude-gateway did not answer: journalctl -u claude-gateway -n 50"
-  fi
+if [[ -n "$(get_env .env GATEWAY_TOKEN)" ]]; then
+  curl -fsS -m 5 "$(get_env .env GATEWAY_URL)/health" >/dev/null \
+    && log "claude-gateway answers at $(get_env .env GATEWAY_URL)" \
+    || log "claude-gateway does not answer at $(get_env .env GATEWAY_URL): is it installed and running?"
 fi
 ./scripts/healthcheck.sh || true
