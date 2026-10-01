@@ -268,7 +268,7 @@ DEFAULT_MODELS = {
     "openrouter": "anthropic/claude-haiku-4.5",
     "claude_code": "haiku",  # an alias the Claude Code CLI resolves
 }
-CLAUDE_CODE_TIMEOUT = 180  # seconds per call (the CLI starts a short session each time)
+CLAUDE_CODE_TIMEOUT = 90  # seconds per call (the CLI starts a short session each time)
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
@@ -327,7 +327,9 @@ class ClaudeClassifier:
         against the schema. Runs in a temporary directory so no CLAUDE.md is picked up."""
         import asyncio
         import tempfile
+        import time
 
+        started = time.monotonic()
         args = [
             self.settings.claude_code_bin, "-p",
             "--output-format", "json",
@@ -347,10 +349,19 @@ class ClaudeClassifier:
                 out, err = await asyncio.wait_for(
                     proc.communicate(user.encode()), CLAUDE_CODE_TIMEOUT
                 )
-        except (OSError, TimeoutError) as exc:
+        except TimeoutError:
+            proc.kill()
+            self.stopped = f"claude CLI did not answer in {CLAUDE_CODE_TIMEOUT} s"
+            log.error("classifier stopped for this run: %s - rules used", self.stopped)
+            return None, "timeout"
+        except OSError as exc:
             log.warning("claude CLI unavailable (%s); using rules", type(exc).__name__)
             return None, type(exc).__name__
-        return self._claude_code_result(proc.returncode, out, err)
+        result = self._claude_code_result(proc.returncode, out, err)
+        log.info("claude CLI call %d/%d: %s in %.0f s", self.calls,
+                 self.settings.classifier_max_calls, "ok" if result[0] else result[1],
+                 time.monotonic() - started)  # fmt: skip
+        return result
 
     def _claude_code_result(
         self, code: int | None, out: bytes, err: bytes
