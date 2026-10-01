@@ -3,7 +3,7 @@
     "name_uk": "Індекс напруги: Європа",
     "name_en": "Tension Index: Europe",
     "repo": "FixerHack/war-predictor",
-    "version": "0.2.69",
+    "version": "0.2.72",
     "updated": "2026-09-30"
   },
   "milestones": [
@@ -774,8 +774,8 @@
           "days": 1.5,
           "uk": "Прогін шкали на історичних епізодах",
           "en": "Replay the scale on historical episodes",
-          "note_uk": "Архів Wayback, Україна-2022: правила — 7 з 24.01.2022 (за 31 день), модель — 7 з 20.12.2021 (нарощування військ), 9 після вторгнення. Обидва PASS; контрольні епізоди ще не прогнані.",
-          "note_en": "Wayback archive, Ukraine 2022: rules — 7 from 24 Jan 2022 (31 days ahead), model — 7 from 20 Dec 2021 (troop build-up), 9 after the invasion. Both PASS; control episodes not run yet.",
+          "note_uk": "Прогнано 4 епізоди. Франція-2016 (контроль): максимум 3.0 — PASS. Ізраїль-2024: PASS (війна вже йшла). Вірменія–Азербайджан-2020: FAIL, 5 не досягнуто (США в архіві 0 версій). Україна повторно завантажилась поверх себе — дублікати прибрано, завантаження тепер повторюване.",
+          "note_en": "4 episodes run. France 2016 (control): max 3.0 — PASS. Israel 2024: PASS (war already ongoing). Armenia–Azerbaijan 2020: FAIL, 5 never reached (0 US versions archived). Ukraine was loaded over itself — duplicates removed, loading is now repeatable.",
           "owner": "claude"
         },
         {
@@ -1178,6 +1178,11 @@
   "decisions": [
     {
       "date": "2026-09-30",
+      "uk": "Заходи з рекомендацій і пороги рахуються лише з безпекової причини заходу (релевантність ≥ 0.7 для заходів, ≥ 0.5 для порогів).",
+      "en": "Advisory measures and floors count only for a security reason for the measure (relevance ≥ 0.7 for measures, ≥ 0.5 for floors)."
+    },
+    {
+      "date": "2026-09-30",
       "uk": "Регіональні попередження: Британія «avoid all travel to parts» 0.45, «all but essential to parts» 0.3, Німеччина Teilreisewarnung 0.35 — вони здебільшого стосуються давно окупованих чи прикордонних районів.",
       "en": "Regional warnings: UK \"avoid all travel to parts\" 0.45, \"all but essential to parts\" 0.3, German partial warning 0.35 — they mostly cover long-occupied or border areas."
     },
@@ -1282,6 +1287,24 @@
     }
   ],
   "changelog": [
+    {
+      "version": "0.2.72",
+      "date": "2026-09-30",
+      "uk": "Заходи з невказаною безпековою причиною («непередбачувана ситуація») знову рахуються; відсікаються лише явно невійськові причини (COVID, попіл, погода, злочинність, тероризм).",
+      "en": "Measures with an unspecified security reason (\"unpredictable situation\") count again; only clearly non-military reasons are excluded (COVID, ash, weather, crime, terrorism)."
+    },
+    {
+      "version": "0.2.71",
+      "date": "2026-09-30",
+      "uk": "Окрема причина для заходів (статус посольства, небо, кордони): карантинні заходи COVID-19 у рекомендації про конфлікт більше не піднімають бал і не вмикають порогів; один уряд із «закритим небом» дає 0.7 блоку авіації, а не 1.0.",
+      "en": "A separate reason for measures (embassy posture, airspace, borders): COVID-19 measures in a conflict advisory no longer raise the score or trigger floors; one government's \"airspace closed\" gives the aviation block 0.7, not 1.0."
+    },
+    {
+      "version": "0.2.70",
+      "date": "2026-09-30",
+      "uk": "Повторне завантаження архіву пропускає вже завантажене (--refresh — завантажити заново), а дублікати зі старих баз прибираються автоматично.",
+      "en": "Loading the archive again skips what is already loaded (--refresh reloads), and duplicates in older databases are removed automatically."
+    },
     {
       "version": "0.2.69",
       "date": "2026-09-30",
@@ -1728,7 +1751,7 @@
     "tasks": 85
   },
   "build": {
-    "built_at": "2026-09-30T17:47:14+00:00",
-    "commit": "78dc137"
+    "built_at": "2026-10-01T07:21:24+00:00",
+    "commit": "2b89ffc"
   }
 }
