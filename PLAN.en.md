@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.93**, updated 2026-09-30.
+Version **0.2.94**, updated 2026-09-30.
 
 **Overall progress: 76%** · left ≈ 11.7 days · ✅ 62 · 🟡 14 · ⬜ 9 · ⛔ 4
 
@@ -232,6 +232,7 @@ Branch: `dev-ops`
 - 🟡 **S12.3** Auto-deploy from main (GitHub Actions → SSH)
   - .github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set.
 - ⬜ **S12.5** Server: install Claude Code, claude setup-token, run claude-gateway (systemd) behind an HTTPS proxy _(manual)_
+  - The gateway is deployed separately from the bot: ~/claude-gateway, gateway/scripts/install.sh; the bot connects with a token. Step by step: docs/deploy-agent.md.
 
 ## S13. MVP criteria — 62%
 
@@ -247,6 +248,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-10-01: claude-gateway is a separate service with its own directory, .env, unit and updates; programs (including war-predictor) connect to it, each with its own token.
 - 2026-10-01: Neighbours at war are shown on the map as context only (hatched, no score); the list is the context section of config/conflicts.yaml.
 - 2026-09-30: Surprise attacks (Armenia–Azerbaijan 2020) are tested for a reaction within 3 days: government advice did not change before the fighting began.
 - 2026-09-30: Advisory measures and floors count only for a security reason for the measure (relevance ≥ 0.7 for measures, ≥ 0.5 for floors).
@@ -280,6 +282,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.94** (2026-10-01)
+  - The gateway and war-predictor are deployed separately: the gateway has its own installer (gateway/scripts/install.sh), directory, .env and service; install_server.sh installs only the bot and timers, which connect to the gateway with a token.
+  - The deployment agent instructions now describe two separate installations.
 - **0.2.93** (2026-10-01)
   - docs/deploy-agent.md — step-by-step instructions for an agent (Claude Code) deploying the server over SSH.
 - **0.2.92** (2026-10-01)

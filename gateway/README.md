@@ -33,7 +33,13 @@ uv run claude-gateway serve            # http://127.0.0.1:8787
 1. на машині, де ви вже увійшли, запустіть `claude setup-token`;
 2. отриманий токен покладіть у `CLAUDE_CODE_OAUTH_TOKEN` у `.env`.
 
-Сервіс systemd: [`deploy/claude-gateway.service`](deploy/claude-gateway.service); на сервері його ставить `scripts/install_server.sh` з кореня репозиторію.
+Сервіс systemd: [`deploy/claude-gateway.service`](deploy/claude-gateway.service); на сервері його ставить [`scripts/install.sh`](scripts/install.sh) — окремо від будь-яких програм-клієнтів, у власній теці:
+
+```bash
+git clone --filter=blob:none --sparse https://github.com/FixerHack/war-predictor.git ~/claude-gateway
+cd ~/claude-gateway && git sparse-checkout set gateway && cd gateway
+./scripts/install.sh   # uv, Claude Code, .env з токеном, сервіс systemd
+```
 
 ## Запити
 

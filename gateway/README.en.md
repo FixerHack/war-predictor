@@ -33,7 +33,13 @@ Claude Code must be installed and signed in (`claude auth status`). On a server 
 1. run `claude setup-token` on a machine where you are signed in;
 2. put the printed token into `CLAUDE_CODE_OAUTH_TOKEN` in `.env`.
 
-systemd service: [`deploy/claude-gateway.service`](deploy/claude-gateway.service); on the server `scripts/install_server.sh` from the repository root installs it.
+systemd service: [`deploy/claude-gateway.service`](deploy/claude-gateway.service); on the server [`scripts/install.sh`](scripts/install.sh) installs it — separately from any client programs, in its own directory:
+
+```bash
+git clone --filter=blob:none --sparse https://github.com/FixerHack/war-predictor.git ~/claude-gateway
+cd ~/claude-gateway && git sparse-checkout set gateway && cd gateway
+./scripts/install.sh   # uv, Claude Code, .env with a token, systemd service
+```
 
 ## Requests
 

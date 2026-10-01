@@ -1,4 +1,4 @@
-# Installed by scripts/install_server.sh (placeholders are filled in there).
+# Installed by scripts/install.sh (placeholders are filled in there).
 [Unit]
 Description=claude-gateway: HTTP API and MCP on top of Claude Code
 After=network-online.target
@@ -7,8 +7,8 @@ Wants=network-online.target
 [Service]
 Type=simple
 User=@APP_USER@
-WorkingDirectory=@APP_DIR@/gateway
-EnvironmentFile=@APP_DIR@/gateway/.env
+WorkingDirectory=@GW_DIR@
+EnvironmentFile=@GW_DIR@/.env
 Environment=PATH=@HOME@/.local/bin:/usr/local/bin:/usr/bin:/bin
 ExecStart=@UV@ run --frozen --no-dev claude-gateway serve
 Restart=on-failure
