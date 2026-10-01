@@ -1,5 +1,5 @@
 # Shortcuts for local development (macOS / Linux). Everything goes through uv.
-.PHONY: setup lint fmt test check plan site pages bot collect health
+.PHONY: setup lint fmt test gateway-test check plan site pages bot collect health
 
 setup:        ## install deps, create .env and DB, run tests
 	./scripts/bootstrap.sh
@@ -15,7 +15,10 @@ fmt:
 test:
 	uv run pytest -q
 
-check: lint test plan
+check: lint test gateway-test plan
+
+gateway-test: ## tests of the separate claude-gateway tool (gateway/)
+	cd gateway && uv run --frozen pytest -q
 
 plan:         ## regenerate PLAN.md / PLAN.en.md and the site from roadmap/roadmap.yaml
 	uv run tension-index roadmap --out _site

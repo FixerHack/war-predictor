@@ -1,0 +1,21 @@
+# /etc/systemd/system/claude-gateway.service
+[Unit]
+Description=claude-gateway: HTTP API and MCP on top of Claude Code
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=tension
+WorkingDirectory=/opt/war-predictor/gateway
+EnvironmentFile=/opt/war-predictor/gateway/.env
+ExecStart=/usr/local/bin/uv run --frozen claude-gateway serve
+Restart=on-failure
+RestartSec=5
+# The gateway only needs its own directory, a temp dir and ~/.claude (CLI login state).
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/opt/war-predictor/gateway /home/tension/.claude /home/tension/.claude.json
+
+[Install]
+WantedBy=multi-user.target

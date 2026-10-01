@@ -135,6 +135,10 @@ Status: `./scripts/healthcheck.sh` (exit codes: 0 OK, 1 WARN, 2 FAIL); logs: `jo
 
 For external monitoring set `HEALTH_PING_URL` (e.g. free [healthchecks.io](https://healthchecks.io)): if the server stops pinging, you get an email.
 
+## Claude Code gateway
+
+[`gateway/`](gateway/README.en.md) is a separate tool: an HTTP API (its own, OpenAI- and Anthropic-compatible) and an MCP server on top of Claude Code. Any program on the server can call Claude through it with ready-made requests, and `tension-index` can classify changes through it (`CLASSIFIER_PROVIDER=gateway`).
+
 ## Branches and workflow
 
 - `main` is the default branch and always works. Changes land only via Pull Request with green CI.
