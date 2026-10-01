@@ -196,12 +196,20 @@ async def test_openrouter_errors_fall_back_to_rules(settings):
     transport = httpx.MockTransport(
         lambda r: httpx.Response(402, json={"error": {"message": "credits"}})
     )
+    calls = []
+    transport = httpx.MockTransport(
+        lambda r: calls.append(1) or httpx.Response(402, json={"error": {"message": "credits"}})
+    )
     async with httpx.AsyncClient(transport=transport) as client:
-        out = await ClaudeClassifier(s, client=client).classify(
-            publisher="us", country="PL", text="+x", level_before=None, level_after=None,
-            fallback=Classification(reason="crime"),
-        )  # fmt: skip
-    assert out.method == "rules" and out.reason == "crime" and "HTTP 402" in out.notes[0]
+        claude = ClaudeClassifier(s, client=client)
+        for _ in range(3):  # no credits: one request, then rules for the rest of the run
+            out = await claude.classify(
+                publisher="us", country="PL", text="+x", level_before=None, level_after=None,
+                fallback=Classification(reason="crime"),
+            )  # fmt: skip
+    assert len(calls) == 1 and not claude.available
+    # Kept as a pending rules result, so the model gets the text on a later run.
+    assert out.method == "rules_pending" and out.reason == "crime" and "HTTP 402" in out.notes[0]
 
 
 async def test_openrouter_headlines(settings):
@@ -274,3 +282,29 @@ def test_routine_flight_notes_are_not_airspace_restrictions():
         assert classify_rules(text).airspace == "unknown", text
     assert classify_rules("Moldova has closed parts of its airspace.").airspace == "restricted"
     assert classify_rules("The airspace is closed to civil flights.").airspace == "closed"
+
+
+async def test_pending_rules_results_go_to_the_model_later(settings):
+    """Texts classified by rules while the model was out of credits are retried."""
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        await storage.insert_snapshot(
+            db, source="us", country="MD", url="u", text="Reconsider travel.", level="3"
+        )
+        await db.commit()
+        pending = classify_rules("Reconsider travel.")
+        pending.method = "rules_pending"
+        await storage.save_classification(
+            db, ref_type="snapshot", ref_id=1, country="MD", publisher="us",
+            method=pending.method, payload=pending.to_json(),
+        )  # fmt: skip
+
+        async def classify(**kw):
+            return Classification(reason="armed_conflict", method="claude")
+
+        out_of_credits = SimpleNamespace(available=False, classify=classify)
+        assert (await classify_pending(db, settings, out_of_credits))["snapshots"] == 0
+        model = SimpleNamespace(available=True, classify=classify)
+        assert (await classify_pending(db, settings, model))["claude"] == 1
+        row = await storage.get_classification(db, "snapshot", 1)
+    assert row["method"] == "claude"

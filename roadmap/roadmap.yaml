@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.72
+  version: 0.2.73
   updated: 2026-09-30
 
 milestones:
@@ -237,6 +237,7 @@ decisions:
   - {date: 2026-09-30, uk: "Статус війни окремо від шкали; довідник ведеться вручну, автоматика лише пропонує зміни", en: "War status is separate from the scale; curated by hand, automation only proposes changes"}
 
 risks:
+  - {uk: "Без кредитів OpenRouter класифікація йде лише правилами: причини й статус посольств визначаються грубіше, бал менш точний.", en: "Without OpenRouter credits classification falls back to rules only: reasons and embassy posture are cruder, the score less precise."}
   - {uk: "Справжнє повернення рекомендації до попередньої версії протягом 7 днів не буде окремою зміною (стан однаково оновлюється).", en: "A genuine revert of an advisory within 7 days is not reported as a change (the state still updates)."}
   - {uk: "Частина урядових сайтів блокує автоматичні запити (Австралія); джерело можна втратити без попередження", en: "Some government sites block automated requests (Australia); a source can be lost without notice"}
   - {uk: "GitHub Actions заблоковані через білінг акаунта: CI не перевіряє зміни, до розблокування перевірки лише локально (make check)", en: "GitHub Actions locked by an account billing issue: no CI until unlocked, checks run locally only (make check)"}
@@ -247,6 +248,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.73
+    date: 2026-09-30
+    uk: "Класифікатор зупиняється після першої відмови через ключ чи кредити (401/402/403) і не шле сотні запитів; тексти, класифіковані правилами під час недоступності моделі, модель перекласифікує пізніше. Правила беруть причину заходу з речення, де він згаданий."
+    en: "The classifier stops after the first key or credit refusal (401/402/403) instead of sending hundreds of requests; texts classified by rules while the model was unavailable are re-classified by the model later. Rules take a measure's reason from the sentence that states it."
   - version: 0.2.72
     date: 2026-09-30
     uk: "Заходи з невказаною безпековою причиною («непередбачувана ситуація») знову рахуються; відсікаються лише явно невійськові причини (COVID, попіл, погода, злочинність, тероризм)."
