@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.95
+  version: 0.2.96
   updated: 2026-10-01
 
 milestones:
@@ -44,6 +44,7 @@ stages:
       - {id: S0.13, status: done, days: 0.2, owner: human, uk: "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root", en: "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root", note_uk: "Працює: fixerhack.github.io/war-predictor", note_en: "Live: fixerhack.github.io/war-predictor"}
       - {id: S0.15, status: todo, days: 0.2, owner: human, uk: "Зняти блокування GitHub Actions: Settings → Billing and plans (рахунок / картка)", en: "Unlock GitHub Actions: Settings → Billing and plans (invoice / card)", note_uk: "CI не стартує: «account is locked due to a billing issue».", note_en: "CI does not start: \"account is locked due to a billing issue\"."}
       - {id: S0.16, status: done, days: 0.2, uk: "Публікація сторінки прогресу без Actions (make pages → гілка gh-pages)", en: "Publish the progress page without Actions (make pages → gh-pages branch)"}
+      - {id: S0.17, status: done, days: 0.1, uk: "Інсталятор шлюзу чекає на запуск сервісу до 30 с замість фіксованих 2 с", en: "Gateway installer waits up to 30 s for the service to start instead of a fixed 2 s"}
       - {id: S0.14, status: todo, days: 0.2, owner: human, uk: "Захист гілки main (тільки через PR, CI зелений); видалити гілку claude/funny-planck-leoxip", en: "Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip"}
 
   - id: S1
@@ -256,6 +257,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.96
+    date: 2026-10-01
+    uk: ["gateway/scripts/install.sh більше не звітує про помилку під час повторного встановлення: перевірка /health чекає до 30 с, поки шлюз стартує."]
+    en: ["gateway/scripts/install.sh no longer reports a false failure on re-install: the /health check waits up to 30 s for the gateway to start."]
   - version: 0.2.95
     date: 2026-10-01
     uk: ["Перший деплой на сервер: claude-gateway і war-predictor працюють як окремі systemd-сервіси з автозапуском; перший прогін класифікував зміни через шлюз і опублікував 38/38 балів."]

@@ -61,9 +61,13 @@ fi
 
 sudo systemctl enable --now claude-gateway.service
 sudo systemctl restart claude-gateway.service
-sleep 2
-if curl -fsS -m 5 "http://127.0.0.1:$(get_env .env GATEWAY_PORT | grep . || echo 8787)/health" >/dev/null; then
-  log "claude-gateway is up. Clients use the URL http://127.0.0.1:8787 and a token from GATEWAY_TOKENS."
-else
-  die "claude-gateway did not answer: journalctl -u claude-gateway -n 50"
-fi
+# Startup takes a few seconds; poll /health for up to 30 s.
+HEALTH_URL="http://127.0.0.1:$(get_env .env GATEWAY_PORT | grep . || echo 8787)/health"
+for _ in $(seq 30); do
+  if curl -fsS -m 2 "$HEALTH_URL" >/dev/null 2>&1; then
+    log "claude-gateway is up. Clients use the URL http://127.0.0.1:8787 and a token from GATEWAY_TOKENS."
+    exit 0
+  fi
+  sleep 1
+done
+die "claude-gateway did not answer: journalctl -u claude-gateway -n 50"

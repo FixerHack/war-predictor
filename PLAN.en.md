@@ -2,15 +2,15 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.95**, updated 2026-10-01.
+Version **0.2.96**, updated 2026-10-01.
 
-**Overall progress: 77%** · left ≈ 11.2 days · ✅ 63 · 🟡 14 · ⬜ 8 · ⛔ 4
+**Overall progress: 77%** · left ≈ 11.2 days · ✅ 64 · 🟡 14 · ⬜ 8 · ⛔ 4
 
 ## Milestones
 
 - **M1** — MVP: 14 days of unattended collection, backtest scores Ukraine 7+ before 2022-02-24, every alert explained
 
-## S0. Foundation & infrastructure — 92%
+## S0. Foundation & infrastructure — 93%
 
 _Repository, working environment on the MacBook and server, keys, Telegram bot._
 
@@ -35,6 +35,7 @@ Branch: `dev-bootstrap`
 - ⬜ **S0.15** Unlock GitHub Actions: Settings → Billing and plans (invoice / card) _(manual)_
   - CI does not start: "account is locked due to a billing issue".
 - ✅ **S0.16** Publish the progress page without Actions (make pages → gh-pages branch)
+- ✅ **S0.17** Gateway installer waits up to 30 s for the service to start instead of a fixed 2 s
 - ⬜ **S0.14** Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip _(manual)_
 
 ## S1. Input decisions — 80%
@@ -282,6 +283,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.96** (2026-10-01)
+  - gateway/scripts/install.sh no longer reports a false failure on re-install: the /health check waits up to 30 s for the gateway to start.
 - **0.2.95** (2026-10-01)
   - First server deploy: claude-gateway and war-predictor run as separate systemd services started on boot; the first run classified changes through the gateway and published 38/38 scores.
 - **0.2.94** (2026-10-01)
