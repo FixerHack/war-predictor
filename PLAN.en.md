@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.85**, updated 2026-09-30.
+Version **0.2.86**, updated 2026-09-30.
 
 **Overall progress: 75%** · left ≈ 11.4 days · ✅ 60 · 🟡 14 · ⬜ 8 · ⛔ 4
 
@@ -67,7 +67,7 @@ Branch: `dev-collector`
 - ✅ **S2.3** Germany (Auswärtiges Amt OpenData API)
   - Verified on live data 30 Sep–1 Oct 2026.
 - ✅ **S2.4** US (TAsTWs RSS + country pages + embassy Security Alerts)
-  - Verified on live data; alternating RSS versions are filtered out.
+  - Verified on live data. The feed serves two layouts of the same advice — both reduce to one canonical text.
 - ✅ **S2.5** Canada (open data JSON)
   - Verified on live data 30 Sep–1 Oct 2026.
 - ⛔ **S2.6** Australia (Smartraveller destinations-export)
@@ -273,6 +273,195 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.86** (2026-09-30)
+  - S
+  - t
+  - a
+  - t
+  - e
+  -  
+  - D
+  - e
+  - p
+  - a
+  - r
+  - t
+  - m
+  - e
+  - n
+  - t
+  - :
+  -  
+  - t
+  - w
+  - o
+  -  
+  - l
+  - a
+  - y
+  - o
+  - u
+  - t
+  - s
+  -  
+  - o
+  - f
+  -  
+  - o
+  - n
+  - e
+  -  
+  - a
+  - d
+  - v
+  - i
+  - s
+  - o
+  - r
+  - y
+  -  
+  - (
+  - l
+  - i
+  - n
+  - e
+  -  
+  - b
+  - r
+  - e
+  - a
+  - k
+  - s
+  - ,
+  -  
+  - t
+  - h
+  - e
+  -  
+  - "
+  - I
+  - f
+  -  
+  - y
+  - o
+  - u
+  -  
+  - d
+  - e
+  - c
+  - i
+  - d
+  - e
+  -  
+  - t
+  - o
+  -  
+  - t
+  - r
+  - a
+  - v
+  - e
+  - l
+  - "
+  -  
+  - b
+  - l
+  - o
+  - c
+  - k
+  - ,
+  -  
+  - u
+  - p
+  - d
+  - a
+  - t
+  - e
+  -  
+  - n
+  - o
+  - t
+  - e
+  - s
+  - )
+  -  
+  - r
+  - e
+  - d
+  - u
+  - c
+  - e
+  -  
+  - t
+  - o
+  -  
+  - o
+  - n
+  - e
+  -  
+  - t
+  - e
+  - x
+  - t
+  -  
+  - —
+  -  
+  - t
+  - h
+  - e
+  -  
+  - f
+  - l
+  - a
+  - p
+  - p
+  - i
+  - n
+  - g
+  -  
+  - s
+  - t
+  - o
+  - p
+  - s
+  -  
+  - w
+  - i
+  - t
+  - h
+  - o
+  - u
+  - t
+  -  
+  - a
+  -  
+  - w
+  - a
+  - v
+  - e
+  -  
+  - o
+  - f
+  -  
+  - c
+  - h
+  - a
+  - n
+  - g
+  - e
+  - s
+  -  
+  - o
+  - n
+  -  
+  - u
+  - p
+  - g
+  - r
+  - a
+  - d
+  - e
+  - .
 - **0.2.80** (2026-09-30)
   - B
   - a

@@ -38,6 +38,11 @@ class Source(abc.ABC):
         self.client = client
         self.raw: dict[str, str] = {}  # url -> last response body, for `probe`
 
+    def canonical(self, text: str) -> str:
+        """The publisher's text reduced to its substance (after `normalize`). Override when a
+        source serves the same advice in several layouts; must be idempotent."""
+        return text
+
     async def prepare(self) -> None:  # noqa: B027 - optional hook
         """Load a shared index once per run (sources publishing all countries in one file)."""
 

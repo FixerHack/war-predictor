@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.85
+  version: 0.2.86
   updated: 2026-09-30
 
 milestones:
@@ -73,7 +73,7 @@ stages:
       - {id: S2.1, status: done, days: 0.5, uk: "Каркас джерел, збереження версій, виявлення змін (diff)", en: "Source framework, version storage, change detection (diff)"}
       - {id: S2.2, status: done, days: 0.5, uk: "Велика Британія (GOV.UK Content API)", en: "UK (GOV.UK Content API)", note_uk: "Перевірено на живих даних (PL, EE, MD).", note_en: "Verified on live data (PL, EE, MD)."}
       - {id: S2.3, status: done, days: 0.5, uk: "Німеччина (Auswärtiges Amt OpenData API)", en: "Germany (Auswärtiges Amt OpenData API)", note_uk: "Перевірено на живих даних 30.09–01.10.2026.", note_en: "Verified on live data 30 Sep–1 Oct 2026."}
-      - {id: S2.4, status: done, days: 1, uk: "США (RSS TAsTWs + сторінки країн + Security Alerts посольств)", en: "US (TAsTWs RSS + country pages + embassy Security Alerts)", note_uk: "Перевірено на живих даних; мерехтіння версій RSS відфільтровано.", note_en: "Verified on live data; alternating RSS versions are filtered out."}
+      - {id: S2.4, status: done, days: 1, uk: "США (RSS TAsTWs + сторінки країн + Security Alerts посольств)", en: "US (TAsTWs RSS + country pages + embassy Security Alerts)", note_uk: "Перевірено на живих даних. Стрічка віддає дві розкладки тих самих порад — обидві зводяться до одного канонічного тексту.", note_en: "Verified on live data. The feed serves two layouts of the same advice — both reduce to one canonical text."}
       - {id: S2.5, status: done, days: 0.5, uk: "Канада (open data JSON)", en: "Canada (open data JSON)", note_uk: "Перевірено на живих даних 30.09–01.10.2026.", note_en: "Verified on live data 30 Sep–1 Oct 2026."}
       - {id: S2.6, status: blocked, days: 0.5, uk: "Австралія (Smartraveller destinations-export)", en: "Australia (Smartraveller destinations-export)", note_uk: "Сайт Smartraveller не відповідає на автоматичні запити (експорт і сторінки, перевірено 30.09.2026); вимкнено через DISABLED_SOURCES=au.", note_en: "Smartraveller does not answer automated requests (export and pages, tested 2026-09-30); disabled via DISABLED_SOURCES=au."}
       - {id: S2.7, status: in_progress, days: 0.5, uk: "Франція (diplomatie.gouv.fr, парсинг)", en: "France (diplomatie.gouv.fr, scraping)", note_uk: "Лише текст сторінки, рівень визначає класифікатор; перевірити probe fr", note_en: "Page text only, level set by the classifier; verify with probe fr"}
@@ -250,6 +250,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.86
+    date: 2026-09-30
+    uk: "Держдеп: дві розкладки однієї рекомендації (розриви рядків, блок «If you decide to travel», службові примітки) зводяться до одного тексту — мерехтіння зникає без хвилі змін при оновленні."
+    en: "State Department: two layouts of one advisory (line breaks, the \"If you decide to travel\" block, update notes) reduce to one text — the flapping stops without a wave of changes on upgrade."
   - version: 0.2.80
     date: 2026-09-30
     uk: "Етап бектесту завершено: усі чотири історичні епізоди проходять із класифікацією моделлю."
