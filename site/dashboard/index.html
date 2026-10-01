@@ -14,6 +14,7 @@
   --l0: #e0a080; --l1: #d67a55; --l2: #c2553a; --l3: #9c3527; --l4: #6f2019;
   --on0: #1b2129; --on1: #1b2129; --on2: #ffffff; --on3: #ffffff; --on4: #ffffff;
   --chart: #1b2129; --band: rgba(156, 53, 39, 0.07);
+  --hatch: rgba(111, 32, 25, 0.38); --hatch-2: rgba(74, 84, 98, 0.30);
   color-scheme: light dark;
 }
 @media (prefers-color-scheme: dark) {
@@ -24,6 +25,7 @@
     --l0: #7d3a2a; --l1: #a44a32; --l2: #c9643f; --l3: #e38a62; --l4: #f5b597;
     --on0: #ffffff; --on1: #ffffff; --on2: #121412; --on3: #121412; --on4: #121412;
     --chart: #e8eae6; --band: rgba(227, 138, 98, 0.08);
+    --hatch: rgba(245, 181, 151, 0.42); --hatch-2: rgba(170, 177, 185, 0.32);
   }
 }
 :root[data-theme="dark"] {
@@ -32,6 +34,7 @@
   --l0: #7d3a2a; --l1: #a44a32; --l2: #c9643f; --l3: #e38a62; --l4: #f5b597;
   --on0: #ffffff; --on1: #ffffff; --on2: #121412; --on3: #121412; --on4: #121412;
   --chart: #e8eae6; --band: rgba(227, 138, 98, 0.08);
+  --hatch: rgba(245, 181, 151, 0.42); --hatch-2: rgba(170, 177, 185, 0.32);
 }
 *, *::before, *::after { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink);
@@ -95,6 +98,37 @@ section.method dd { margin: 2px 0 0; }
 section.method ul { padding-left: 20px; }
 section.method h2 { font-size: 1.1rem; color: var(--ink); }
 footer { margin-top: 28px; font-size: 0.8rem; color: var(--ink-3); }
+/* Neighbours at war: context only, never scored - hatched, not a level colour */
+.tile.ctx { background: var(--surface) repeating-linear-gradient(135deg, transparent 0 5px, var(--hatch) 5px 8px);
+  color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--hatch); }
+.tile.ctx.ally { background: var(--surface) repeating-linear-gradient(135deg, transparent 0 5px, var(--hatch-2) 5px 8px);
+  box-shadow: inset 0 0 0 1.5px var(--hatch-2); }
+.tile.ctx[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
+.tile.span { aspect-ratio: auto; }
+.sw.hatch { background: repeating-linear-gradient(135deg, transparent 0 3px, var(--hatch) 3px 5px); box-shadow: inset 0 0 0 1px var(--hatch); }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--band); }
+td button.link { all: unset; cursor: pointer; }
+td button.link:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* Phones */
+@media (max-width: 600px) {
+  .wrap { padding: 14px 12px 40px; }
+  header { gap: 8px; }
+  .controls .btn { padding: 6px 10px; }
+  .notice { margin: 12px 0; font-size: 0.86rem; padding: 10px 12px; }
+  .legend { gap: 6px 10px; font-size: 0.78rem; }
+  .map { gap: 3px; }
+  .tile { border-radius: 4px; padding: 1px; }
+  .tile .c { font-size: 0.66rem; }
+  .tile .v { font-size: 0.58rem; }
+  .tile.ctx .v { font-size: 0.5rem; max-width: 100%; overflow: hidden; overflow-wrap: anywhere; text-align: center; }
+  .panel { padding: 14px 12px; }
+  .big .n { font-size: 2.2rem; }
+  .blocks { grid-template-columns: minmax(0, 7.6em) minmax(0, 1fr) 2.6em; font-size: 0.82rem; }
+  table { font-size: 0.84rem; }
+  th, td { padding: 7px 4px; }
+  section.method { font-size: 0.9rem; }
+}
 a { color: var(--focus); }
 </style>
 </head>
@@ -135,6 +169,8 @@ const GRID = { // approximate geography, 9 columns
   MT:[3,6], BA:[5,6], ME:[6,6], XK:[7,6],
   AL:[6,7], MK:[7,7], GR:[7,8], CY:[8,8],
 };
+// Neighbours shown for context: [col, row, colSpan, rowSpan]
+const CTX_GRID = { RU: [8, 0, 1, 3], BY: [7, 2, 1, 1], UA: [6, 3, 2, 1] };
 const LEVELS = ["green", "yellow", "orange", "red", "critical"];
 const WAR = { none: "", frozen: "🧊", clashes: "🟠", active: "🔴", war: "🟥" };
 const T = {
@@ -148,6 +184,10 @@ const T = {
         table: "Таблиця всіх країн", country: "Країна", score: "Бал", level: "Рівень",
         methodTitle: "Як рахується", method: "Шість блоків сигналів (рекомендації урядів і статус посольств, авіація, внутрішні заходи, сигнали агресора, медіа, ринки) поєднуються як незалежні підтвердження. Важать причина, кількість незалежних джерел, синхронність держав і відхилення від звичного рівня країни. Вирішальні події (виїзд персоналу посольств, закриття неба, мобілізація) гарантують мінімальний бал. Ваги — стартова гіпотеза, їх перевіряють на історичних епізодах.",
         algo: "Алгоритм", sources: "Джерела", progress: "Хід проєкту", empty: "Даних ще немає: панель заповниться після першого розрахунку.", tt: "бал",
+        ctxLegend: "війна поруч (не оцінюється)",
+        ctxRole: { at_war: "на території йде війна", aggressor: "веде війну (агресор)", aggressor_ally: "територію використано для нападу" },
+        ctxShort: { at_war: "війна", aggressor: "агресор", aggressor_ally: "—" },
+        ctxNote: "Не оцінюється шкалою: індекс охоплює 38 європейських країн і показує сигнали ескалації там, де війни ще немає. Сусіди тут — для контексту.",
         summaryT: "Пояснення", blocksT: "Блоки сигналів", govT: "Що кажуть уряди", seenT: "Що помічено", noSignals: "Інших тривожних сигналів немає.",
         state: "триває", event: "подія", strength: "сила", normal: "звичайний рівень", raised: "підвищений рівень",
         outOf: "з 10", levelWord: "рівень сигналів",
@@ -189,6 +229,10 @@ const T = {
         table: "Table of all countries", country: "Country", score: "Score", level: "Level",
         methodTitle: "How it is scored", method: "Six signal blocks (government advice and embassy posture, aviation, domestic measures, aggressor signals, media, markets) combine as independent confirmations. What counts: the stated reason, the number of independent sources, governments acting in sync, and deviation from the country's usual level. Decisive events (embassy staff departure, airspace closure, mobilisation) guarantee a minimum score. Weights are a starting hypothesis, tested on historical episodes.",
         algo: "Algorithm", sources: "Sources", progress: "Project progress", empty: "No data yet: the dashboard fills in after the first scoring run.", tt: "score",
+        ctxLegend: "war next door (not scored)",
+        ctxRole: { at_war: "war on its territory", aggressor: "waging the war (aggressor)", aggressor_ally: "territory used for the attack" },
+        ctxShort: { at_war: "war", aggressor: "aggr.", aggressor_ally: "—" },
+        ctxNote: "Not scored: the index covers 38 European countries and shows escalation signals where there is no war yet. Neighbours are shown for context.",
         summaryT: "Explanation", blocksT: "Signal blocks", govT: "What governments say", seenT: "What was observed", noSignals: "No other warning signals.",
         state: "ongoing", event: "event", strength: "strength", normal: "usual level", raised: "raised level",
         outOf: "out of 10", levelWord: "signal level",
@@ -237,7 +281,8 @@ function renderLegend() {
   const t = T[lang];
   document.getElementById("legend").innerHTML = LEVELS.map((l, i) =>
     `<span><span class="sw" style="background:var(--l${i})"></span>${esc(t.levels[l])}</span>`).join("") +
-    `<span><span class="sw" style="background:var(--empty)"></span>⏳ ${esc(t.nodata)}</span>`;
+    `<span><span class="sw" style="background:var(--empty)"></span>⏳ ${esc(t.nodata)}</span>` +
+    `<span><span class="sw hatch"></span>⚔ ${esc(t.ctxLegend)}</span>`;
 }
 
 function renderMap() {
@@ -253,8 +298,17 @@ function renderMap() {
       title="${esc(label)}" aria-label="${esc(label)}"
       style="grid-column:${col + 1};grid-row:${row + 1};background:${fill(c)};color:${ink(c)}">
       <span class="c">${code}</span><span class="v">${esc(val)}${war ? " " + war : ""}</span></button>`;
+  }).join("") + Object.entries(CTX_GRID).map(([code, [col, row, cs, rs]]) => {
+    const c = data?.context?.[code];
+    if (!c) return "";
+    const label = `${c.name[lang]}: ${T[lang].ctxRole[c.role]}`;
+    const icon = c.role === "aggressor_ally" ? "" : "⚔ ";
+    return `<button class="tile ctx${c.role === "aggressor_ally" ? " ally" : ""}${cs > 1 || rs > 1 ? " span" : ""}" type="button"
+      data-code="${code}" aria-pressed="${code === selected}" title="${esc(label)}" aria-label="${esc(label)}"
+      style="grid-column:${col + 1} / span ${cs};grid-row:${row + 1} / span ${rs}">
+      <span class="c">${code}</span><span class="v">${icon}${esc(T[lang].ctxShort[c.role])}</span></button>`;
   }).join("");
-  map.querySelectorAll(".tile").forEach((b) => b.onclick = () => select(b.dataset.code));
+  map.querySelectorAll(".tile").forEach((b) => b.onclick = () => select(b.dataset.code, true));
 }
 
 function chart(history) {
@@ -353,6 +407,13 @@ function signalsView(c) {
 function renderPanel() {
   const t = T[lang], panel = document.getElementById("panel");
   if (!data) { panel.innerHTML = `<p>${esc(t.empty)}</p>`; return; }
+  const ctx = selected && data.context?.[selected];
+  if (ctx) {
+    panel.innerHTML = `<h2>${ctx.flag} ${esc(ctx.name[lang])}</h2>` +
+      `<div class="big"><span class="n" aria-hidden="true">⚔</span><span class="lv">${esc(t.ctxRole[ctx.role])}</span></div>` +
+      (ctx.note[lang] ? `<p>${esc(ctx.note[lang])}</p>` : "") + `<p class="muted">${esc(t.ctxNote)}</p>`;
+    return;
+  }
   const code = selected && data.countries[selected] ? selected
     : Object.entries(data.countries).sort((a, b) => (b[1].score ?? -1) - (a[1].score ?? -1))[0][0];
   const c = data.countries[code];
@@ -386,9 +447,10 @@ function renderTable() {
   if (!data) { document.getElementById("table").innerHTML = ""; return; }
   const rows = Object.entries(data.countries).sort((a, b) => (b[1].score ?? -1) - (a[1].score ?? -1) || a[1].name[lang].localeCompare(b[1].name[lang]));
   document.getElementById("table").innerHTML = `<table><thead><tr><th>${esc(t.country)}</th><th class="num">${esc(t.score)}</th><th>${esc(t.level)}</th><th>${esc(t.war)}</th></tr></thead><tbody>` +
-    rows.map(([code, c]) => `<tr><td>${c.flag} ${esc(c.name[lang])}</td><td class="num">${c.score != null ? c.score.toFixed(1) : "—"}</td>` +
+    rows.map(([code, c]) => `<tr data-code="${code}"><td><button class="link" type="button">${c.flag} ${esc(c.name[lang])}</button></td><td class="num">${c.score != null ? c.score.toFixed(1) : "—"}</td>` +
       `<td>${c.score != null ? esc(t.lvl[c.level]) : "⏳"}</td><td>${WAR[c.war.status] || "🟢"} ${esc(t.warS[c.war.status])}</td></tr>`).join("") +
     `</tbody></table>`;
+  document.querySelectorAll("#table tbody tr").forEach((tr) => tr.onclick = () => select(tr.dataset.code, true));
 }
 
 function render() {
@@ -405,10 +467,14 @@ function render() {
   renderLegend(); renderMap(); renderPanel(); renderTable();
 }
 
-function select(code) {
+function select(code, byUser = false) {
   selected = code;
   history.replaceState(null, "", `#${code}`);
   renderMap(); renderPanel();
+  // On one-column layouts the panel is below the map: bring it into view.
+  if (byUser && matchMedia("(max-width: 860px)").matches) {
+    document.getElementById("panel").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 }
 
 document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; store.set("lang", lang); render(); }));

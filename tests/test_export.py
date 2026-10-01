@@ -47,3 +47,12 @@ def test_every_signal_kind_has_a_label():
         "markets:fx_drop",
     }
     assert kinds <= set(KINDS)
+
+
+async def test_export_has_context_neighbours(settings):
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        data = await build(db)
+    ua = data["context"]["UA"]
+    assert ua["status"] == "war" and ua["role"] == "at_war" and ua["name"]["uk"] == "Україна"
+    assert data["context"]["BY"]["role"] == "aggressor_ally" and "UA" not in data["countries"]

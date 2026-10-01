@@ -43,3 +43,20 @@ def test_package_version_matches_roadmap():
     from tension_index import __version__
 
     assert str(load(ROOT / "roadmap" / "roadmap.yaml")["project"]["version"]) == __version__
+
+
+def test_changelog_lines_are_lists(tmp_path):
+    """A changelog side written as one string is one line (PLAN.md once listed its letters)."""
+    from pathlib import Path
+
+    import yaml
+
+    raw = yaml.safe_load(Path("roadmap/roadmap.yaml").read_text(encoding="utf-8"))
+    assert all(isinstance(e[lang], list) for e in raw["changelog"] for lang in ("uk", "en"))
+    data = load(Path("roadmap/roadmap.yaml"))
+    data["changelog"][0]["uk"] = "Один рядок"
+    src = tmp_path / "roadmap.yaml"
+    src.write_text(yaml.safe_dump(data, allow_unicode=True), encoding="utf-8")
+    plan = build(src, tmp_path / "site", plan_dir=tmp_path)
+    assert plan["changelog"][0]["uk"] == ["Один рядок"]
+    assert "  - Один рядок" in (tmp_path / "PLAN.md").read_text(encoding="utf-8")
