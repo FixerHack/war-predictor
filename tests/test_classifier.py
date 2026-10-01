@@ -357,3 +357,26 @@ async def test_claude_code_not_logged_in_stops_the_run(settings, tmp_path):
     out = await claude.classify(publisher="us", country="MD", text="x", level_before=None,
                                 level_after=None, fallback=Classification(reason="crime"))  # fmt: skip
     assert out.method == "rules_pending" and not claude.available
+
+
+async def test_model_calls_run_in_parallel(settings, tmp_path):
+    import time
+
+    from tension_index.pipeline import classify_with_model
+
+    answer = {"reason": "unknown", "change_type": "none", "level": "", "staff_posture": "unknown",
+              "airspace": "unknown", "borders_closed": False, "measure_reason": "unknown",
+              "quote": "", "summary_uk": "", "summary_en": ""}  # fmt: skip
+    body = json.dumps({"is_error": False, "result": "", "structured_output": answer})
+    script = fake_claude_cli(tmp_path, body)
+    slow = tmp_path / "slow"
+    slow.write_text(f'#!/bin/sh\nsleep 1\nexec {script} "$@"\n')
+    slow.chmod(0o755)
+    s = settings.model_copy(update={"classifier_provider": "claude_code", "claude_code_bin": str(slow),
+                                    "classifier_concurrency": 4})  # fmt: skip
+    jobs = [({"publisher": "us", "country": "PL", "text": "x", "level_before": None,
+              "level_after": None}, Classification()) for _ in range(4)]  # fmt: skip
+    started = time.monotonic()
+    results = await classify_with_model(ClaudeClassifier(s), jobs)
+    assert [r.method for r in results] == ["claude"] * 4
+    assert time.monotonic() - started < 3.5  # 4 calls of 1 s each, side by side

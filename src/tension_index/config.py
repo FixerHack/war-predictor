@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     classifier_effort: str = "low"  # Anthropic API only; empty for models without effort
     classifier_max_calls: int = 60  # per run; beyond it rules are used (spend guard)
     claude_code_bin: str = "claude"  # path or name of the Claude Code CLI
+    classifier_concurrency: int = 4  # model calls in parallel
 
     # Sources skipped by the regular cycle (comma-separated). Australia's site does not
     # answer automated requests (tested 2026-09-30); `probe au` still works.

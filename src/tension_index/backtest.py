@@ -17,7 +17,7 @@ import aiosqlite
 from tension_index import storage
 from tension_index.classifier import Classification, ClaudeClassifier, classify_rules
 from tension_index.history import Episode
-from tension_index.pipeline import advisory_state_signals
+from tension_index.pipeline import advisory_state_signals, classify_with_model
 from tension_index.scoring import (
     Signal,
     advisory_strength,
@@ -121,44 +121,46 @@ async def _cached(
 async def classify_history(db: aiosqlite.Connection, claude: ClaudeClassifier | None) -> int:
     """Classify every archived version and change (cached in the history DB)."""
     cfg = load_config()
-    done = 0
     async with db.execute("SELECT * FROM snapshots ORDER BY id") as cur:
-        snapshots = await cur.fetchall()
-    for snap in snapshots:
-        if await _cached(db, "snapshot", snap["id"], claude):
-            continue
-        result = classify_rules(snap["text"])
-        if claude is not None and advisory_strength(cfg, snap["source"], snap["level"]) > 0:
-            result = await claude.classify(publisher=snap["source"], country=snap["country"],
-                                           text=snap["text"], level_before=None,
-                                           level_after=snap["level"], fallback=result)  # fmt: skip
+        snapshots = [
+            s for s in await cur.fetchall() if not await _cached(db, "snapshot", s["id"], claude)
+        ]
+    snap_jobs = [
+        ({"publisher": s["source"], "country": s["country"], "text": s["text"],
+          "level_before": None, "level_after": s["level"]}
+         if advisory_strength(cfg, s["source"], s["level"]) > 0 else None,
+         classify_rules(s["text"]))
+        for s in snapshots
+    ]  # fmt: skip
+    for snap, result in zip(snapshots, await classify_with_model(claude, snap_jobs), strict=True):
         await storage.save_classification(db, ref_type="snapshot", ref_id=snap["id"],
-                                           country=snap["country"], publisher=snap["source"],
-                                           method=result.method, payload=result.to_json())  # fmt: skip
-        done += 1
+                                          country=snap["country"], publisher=snap["source"],
+                                          method=result.method, payload=result.to_json())  # fmt: skip
     async with db.execute(
         "SELECT c.*, p.level AS before, n.level AS after FROM changes c "
         "JOIN snapshots n ON n.id = c.new_snapshot "
         "LEFT JOIN snapshots p ON p.id = c.prev_snapshot ORDER BY c.id"
     ) as cur:
-        changes = await cur.fetchall()  # fmt: skip
+        changes = [
+            c for c in await cur.fetchall() if not await _cached(db, "change", c["id"], claude)
+        ]
+    change_jobs = []
     for ch in changes:
-        if await _cached(db, "change", ch["id"], claude):
-            continue
         levels = (advisory_strength(cfg, ch["source"], ch["before"]),
                   advisory_strength(cfg, ch["source"], ch["after"]))  # fmt: skip
-        result = classify_rules(
+        rules = classify_rules(
             ch["diff"], level_change=levels if ch["before"] != ch["after"] else None
         )
-        if claude is not None and result.change_type != "editorial":
-            result = await claude.classify(publisher=ch["source"], country=ch["country"],
-                                           text=ch["diff"], level_before=ch["before"],
-                                           level_after=ch["after"], fallback=result)  # fmt: skip
+        kwargs = None
+        if rules.change_type != "editorial":
+            kwargs = {"publisher": ch["source"], "country": ch["country"], "text": ch["diff"],
+                      "level_before": ch["before"], "level_after": ch["after"]}  # fmt: skip
+        change_jobs.append((kwargs, rules))
+    for ch, result in zip(changes, await classify_with_model(claude, change_jobs), strict=True):
         await storage.save_classification(db, ref_type="change", ref_id=ch["id"],
                                           country=ch["country"], publisher=ch["source"],
                                           method=result.method, payload=result.to_json())  # fmt: skip
-        done += 1
-    return done
+    return len(snapshots) + len(changes)
 
 
 async def _load(db: aiosqlite.Connection, country: str):

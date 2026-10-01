@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.75
+  version: 0.2.76
   updated: 2026-09-30
 
 milestones:
@@ -250,6 +250,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.76
+    date: 2026-09-30
+    uk: "Класифікатор робить до 4 викликів моделі паралельно (CLASSIFIER_CONCURRENCY), а через Claude Code — без розширеного обдумування; класифікація має стати в кілька разів швидшою."
+    en: "The classifier makes up to 4 model calls in parallel (CLASSIFIER_CONCURRENCY), and via Claude Code without extended thinking; classification should be several times faster."
   - version: 0.2.75
     date: 2026-09-30
     uk: "Класифікатор через Claude Code пише прогрес кожного виклику; якщо CLI не відповідає 90 с, виклики зупиняються до кінця запуску."
