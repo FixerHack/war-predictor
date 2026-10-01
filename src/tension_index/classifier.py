@@ -283,6 +283,7 @@ class ClaudeClassifier:
         self.model = settings.classifier_model or DEFAULT_MODELS[self.provider]
         self.calls = 0
         self.stopped = ""  # set on an account error (no credits, bad key): no more calls this run
+        self._slots: object | None = None  # asyncio.Semaphore, created in the running loop
         if client is None and self.provider != "claude_code":
             if self.provider == "openrouter":
                 import httpx
@@ -341,9 +342,13 @@ class ClaudeClassifier:
             "--no-session-persistence",
         ]  # fmt: skip
         try:
+            import os
+
+            # Classification needs no extended thinking: it only slows each call down.
+            env = {**os.environ, "MAX_THINKING_TOKENS": "0"}
             with tempfile.TemporaryDirectory() as cwd:
                 proc = await asyncio.create_subprocess_exec(
-                    *args, cwd=cwd, stdin=asyncio.subprocess.PIPE,
+                    *args, cwd=cwd, env=env, stdin=asyncio.subprocess.PIPE,
                     stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE,
                 )  # fmt: skip
                 out, err = await asyncio.wait_for(
@@ -476,6 +481,26 @@ class ClaudeClassifier:
         return (content[start : end + 1] if start != -1 and end > start else content), ""
 
     async def classify(
+        self,
+        *,
+        publisher: str,
+        country: str,
+        text: str,
+        level_before: str | None,
+        level_after: str | None,
+        fallback: Classification,
+    ) -> Classification:
+        import asyncio
+
+        if self._slots is None:
+            self._slots = asyncio.Semaphore(max(1, self.settings.classifier_concurrency))
+        async with self._slots:  # type: ignore[attr-defined]
+            return await self._classify(
+                publisher=publisher, country=country, text=text, level_before=level_before,
+                level_after=level_after, fallback=fallback,
+            )  # fmt: skip
+
+    async def _classify(
         self,
         *,
         publisher: str,

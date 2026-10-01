@@ -6,6 +6,7 @@ run separately (CLI) or together (`tension-index run`).
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import statistics
@@ -65,6 +66,20 @@ def make_classifier(settings: Settings) -> ClaudeClassifier | None:
     return ClaudeClassifier(settings) if key else None
 
 
+async def classify_with_model(
+    claude: ClaudeClassifier | None, jobs: list[tuple[dict | None, Classification]]
+) -> list[Classification]:
+    """Rules results, refined by the model where a job asks for it - several calls at once
+    (the classifier limits how many run in parallel)."""
+
+    async def one(kwargs: dict | None, rules: Classification) -> Classification:
+        if claude is None or kwargs is None:
+            return rules
+        return await claude.classify(**kwargs, fallback=rules)
+
+    return list(await asyncio.gather(*(one(k, r) for k, r in jobs)))
+
+
 async def classify_pending(
     db: aiosqlite.Connection, settings: Settings, claude: ClaudeClassifier | None
 ) -> dict[str, int]:
@@ -72,7 +87,10 @@ async def classify_pending(
     cfg = load_config()
     stats = {"changes": 0, "snapshots": 0, "claude": 0}
 
+    change_jobs, change_rows = [], []
     for row in await storage.unclassified_changes(db, limit=500):
+        if claude is not None and not claude.available and row["method"] == PENDING:
+            continue  # still waiting for the model; keep the earlier rules result
         new = await _snapshot(db, row["new_snapshot"])
         async with db.execute(
             "SELECT prev_snapshot FROM changes WHERE id = ?", (row["id"],)
@@ -85,18 +103,16 @@ async def classify_pending(
             advisory_strength(cfg, row["source"], before),
             advisory_strength(cfg, row["source"], after),
         )
-        result = classify_rules(row["diff"], level_change=change if before != after else None)
-        if claude is not None and not claude.available and row["method"] == PENDING:
-            continue  # still waiting for the model; keep the earlier rules result
-        if claude is not None and result.change_type != "editorial":
-            result = await claude.classify(
-                publisher=row["source"],
-                country=row["country"],
-                text=row["diff"],
-                level_before=before,
-                level_after=after,
-                fallback=result,
-            )
+        rules = classify_rules(row["diff"], level_change=change if before != after else None)
+        kwargs = None
+        if rules.change_type != "editorial":
+            kwargs = {"publisher": row["source"], "country": row["country"], "text": row["diff"],
+                      "level_before": before, "level_after": after}  # fmt: skip
+        change_jobs.append((kwargs, rules))
+        change_rows.append(row)
+    for row, result in zip(
+        change_rows, await classify_with_model(claude, change_jobs), strict=True
+    ):
         await storage.save_classification(
             db,
             ref_type="change",
@@ -110,22 +126,20 @@ async def classify_pending(
         stats["claude"] += result.method == "claude"
 
     # The current version of each advisory: its reason decides how much its level counts.
+    snap_jobs, snaps = [], []
     for snap in await storage.latest_snapshots(db):
         done = await storage.get_classification(db, "snapshot", snap["id"])
         if done and not (done["method"] == PENDING and claude is not None and claude.available):
             continue
         strength = advisory_strength(cfg, snap["source"], snap["level"])
         needs_text_level = snap["source"] in TEXT_LEVEL_PUBLISHERS
-        result = classify_rules(snap["text"])
-        if claude is not None and (strength > 0 or needs_text_level):
-            result = await claude.classify(
-                publisher=snap["source"],
-                country=snap["country"],
-                text=snap["text"],
-                level_before=None,
-                level_after=snap["level"],
-                fallback=result,
-            )
+        kwargs = None
+        if strength > 0 or needs_text_level:
+            kwargs = {"publisher": snap["source"], "country": snap["country"],
+                      "text": snap["text"], "level_before": None, "level_after": snap["level"]}  # fmt: skip
+        snap_jobs.append((kwargs, classify_rules(snap["text"])))
+        snaps.append(snap)
+    for snap, result in zip(snaps, await classify_with_model(claude, snap_jobs), strict=True):
         await storage.save_classification(
             db,
             ref_type="snapshot",
