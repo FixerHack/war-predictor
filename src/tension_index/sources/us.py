@@ -130,9 +130,44 @@ def parse_feed(content: bytes) -> list[dict]:
     return items
 
 
+# Notes about the update itself, present in one copy of the feed and not in the other (the level
+# is compared separately, from the title).
+_UPDATE_NOTE = re.compile(
+    r"^(there (was|were) no changes? to the advisory level|the advisory level (was )?"
+    r"(increased|decreased|raised|lowered)|the .{0,60} risk indicators? (was|were) (added|removed)|"
+    r"advisory summary was updated|.{0,40}risk indicator.{0,40} (was|were) (added|removed))",
+    re.I,
+)
+_LEVEL1_LINE = re.compile(r"^exercise normal precautions? in [^.]{2,60}\.?$", re.I)
+_GUIDANCE = re.compile(r"^review our travel guidance for ", re.I)
+_TIPS = re.compile(r"^if you decide to travel to ", re.I)
+
+
+def canonical_text(text: str) -> str:
+    """The State Department feed serves two layouts of the same advisory (line breaks inside
+    sentences, a generic "If you decide to travel" checklist, update notes, "Travel Guidance"
+    vs "travel guidance"). Keep one sentence per line, without those parts."""
+    joined = " ".join(line.strip() for line in text.splitlines() if line.strip())
+    sentences = re.split(r"(?<=[.!?])\s+(?=[A-Z0-9\"“(])", joined)
+    out = []
+    for sentence in sentences:
+        sentence = sentence.strip()
+        if _TIPS.match(sentence):
+            break  # generic checklist (STEP, insurance, ...) until the end
+        if not sentence or _UPDATE_NOTE.match(sentence) or _LEVEL1_LINE.match(sentence):
+            continue
+        if _GUIDANCE.match(sentence):
+            continue
+        out.append(sentence)
+    return "\n".join(out)
+
+
 class UsSource(Source):
     name = "us"
     label = "🇺🇸 State Department"
+
+    def canonical(self, text: str) -> str:
+        return canonical_text(text)
 
     async def prepare(self) -> None:
         problems = []

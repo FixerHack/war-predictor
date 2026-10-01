@@ -4,6 +4,7 @@
 import httpx
 import pytest
 
+from tension_index import storage
 from tension_index.countries import get_country
 from tension_index.sources import REGISTRY, SourceFormatError
 from tension_index.sources.au import AuSource, level_from_text
@@ -275,3 +276,70 @@ async def test_us_api_as_xml_and_all_feeds_down():
     async with client({}) as c:
         with pytest.raises(SourceFormatError, match="no usable feed"):
             await UsSource(c).prepare()
+
+
+# Two copies of the same advisories from the State Department feed (September 2026).
+US_LAYOUTS = {
+    "MT": (
+        "Exercise normal precaution\nin Malta.\nMalta is generally a safe destination for travelers.\n"
+        "Review our Travel Guidance for Malta to learn how to prepare for a safe trip.",
+        "Malta is generally a safe destination for travelers.\n"
+        "Review our Travel Guidance for Malta to learn how to prepare for a safe trip.\n"
+        "If you decide to travel to Malta:\nEnroll in the Smart Traveler Enrollment Program (STEP).\n"
+        "Review the Country Security Report for Malta.",
+    ),
+    "LT": (
+        "Exercise normal precaution\nin Lithuania.\nLithuania is generally a safe destination for travelers.\n"
+        "Review our Travel Guidance for Lithuania to learn how to prepare for a safe trip.",
+        "Exercise normal precautions in Lithuania.\nLithuania is generally a safe destination for travelers.\n"
+        "Review our travel guidance for Lithuania to learn how to prepare for a safe trip.\n"
+        "If you decide to travel to Lithuania:\nBe aware of your surroundings.",
+    ),
+    "RS": (
+        "Exercise increased caution\nin Serbia due to crime.\n"
+        "Crime can occur anywhere in Serbia. Police may take longer to respond.",
+        "Exercise increased caution in Serbia due to crime.\n"
+        "Crime can occur anywhere in Serbia. Police may take longer to respond.\n"
+        "If you decide to travel to Serbia:\nUse caution when walking or driving at night.",
+    ),
+    "BE": (
+        "Exercise increased caution\nin Belgium due to crime, terrorism, and unrest.\nTerrorism\n"
+        "There is risk of terrorist violence in Belgium.\nVisit the country reports on terrorism.",
+        "There was no change to the advisory level. The “crime” and “unrest” risk "
+        "indicators were added. Advisory summary was updated.\n"
+        "Exercise increased caution in Belgium due to crime, terrorism, and unrest.\nTerrorism\n"
+        "There is risk of terrorist violence in Belgium. Visit the country reports on terrorism.",
+    ),
+}  # fmt: skip
+
+
+def test_us_layouts_of_the_same_advisory_are_one_text():
+    from tension_index.diff import normalize
+    from tension_index.sources.us import canonical_text
+
+    for code, (a, b) in US_LAYOUTS.items():
+        ca, cb = canonical_text(normalize(a)), canonical_text(normalize(b))
+        assert ca == cb, code
+        assert canonical_text(ca) == ca  # idempotent
+    serbia = canonical_text(US_LAYOUTS["RS"][0])
+    assert serbia.splitlines()[0] == "Exercise increased caution in Serbia due to crime."
+    # A real change still shows.
+    assert canonical_text("Do not travel to Serbia due to armed conflict.") != serbia
+
+
+async def test_switching_to_canonical_text_records_no_changes(settings):
+    """Stored (old-layout) texts compared with the canonical form: no wave of changes."""
+    from tension_index.collector import collect_source
+
+    feed = b"""<?xml version="1.0"?><rss><channel>
+<item><title>Malta - Level 1: Exercise Normal Precautions</title><link>m</link>
+<description>Malta is generally a safe destination for travelers.
+If you decide to travel to Malta: Enroll in STEP.</description></item></channel></rss>"""
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        await storage.insert_snapshot(db, source="us", country="MT", url="m", level="1",
+                                      text=US_LAYOUTS["MT"][0])  # fmt: skip
+        await db.commit()
+        async with client({"https://travel.state.gov": feed}) as c:
+            result = await collect_source(db, UsSource(c), ["MT"])
+    assert result.changed == 0

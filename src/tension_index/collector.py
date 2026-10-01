@@ -95,11 +95,12 @@ async def collect_source(
             continue
         _, advisory = outcome
         result.fetched += 1
-        text = normalize(advisory.text)
+        text = source.canonical(normalize(advisory.text))
         previous = await storage.latest_snapshot(db, source.name, country.code)
         # Compare against the previous text re-normalised with today's rules, so a new
         # boilerplate filter doesn't register as a change everywhere.
-        if previous and normalize(previous.text) == text and previous.level == advisory.level:
+        previous_text = source.canonical(normalize(previous.text)) if previous else ""
+        if previous and previous_text == text and previous.level == advisory.level:
             continue
         if previous is not None and (storage.content_hash(text), advisory.level) in (
             await storage.seen_versions(db, source.name, country.code, flap_since)
@@ -120,7 +121,7 @@ async def collect_source(
         )
         if previous is None:
             continue  # first sighting is the baseline, not a change
-        diff = changed_fragment(previous.text, text)
+        diff = changed_fragment(previous_text, text)
         if previous.level != advisory.level:
             diff = f"LEVEL: {previous.level} -> {advisory.level}\n{diff}"
         change_id = await storage.insert_change(
