@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.80
+  version: 0.2.85
   updated: 2026-09-30
 
 milestones:
@@ -38,7 +38,7 @@ stages:
       - {id: S0.7, status: done, days: 0.5, uk: "План + сторінка прогресу на GitHub Pages", en: "Plan + progress page on GitHub Pages"}
       - {id: S0.8, status: done, days: 0.3, uk: "README українською та англійською", en: "README in Ukrainian and English"}
       - {id: S0.9, status: done, days: 0.3, owner: human, uk: "MacBook: встановити uv і Claude Code, клонувати репозиторій, ./scripts/bootstrap.sh", en: "MacBook: install uv and Claude Code, clone the repo, ./scripts/bootstrap.sh"}
-      - {id: S0.10, status: todo, days: 0.2, owner: human, uk: "OpenRouter: поповнення, ключ API (OPENROUTER_API_KEY у .env), ліміт витрат", en: "OpenRouter: top-up, API key (OPENROUTER_API_KEY in .env), spend limit"}
+      - {id: S0.10, status: done, days: 0.2, owner: human, uk: "OpenRouter: поповнення, ключ API (OPENROUTER_API_KEY у .env), ліміт витрат", en: "OpenRouter: top-up, API key (OPENROUTER_API_KEY in .env), spend limit", note_uk: "Замість OpenRouter класифікатор працює через локальний Claude Code за підпискою (CLASSIFIER_PROVIDER=claude_code).", note_en: "Instead of OpenRouter the classifier runs through the local Claude Code CLI on a subscription (CLASSIFIER_PROVIDER=claude_code)."}
       - {id: S0.11, status: done, days: 0.2, owner: human, uk: "Створити бота в @BotFather, тестовий канал, заповнити .env", en: "Create bot via @BotFather, test channel, fill in .env"}
       - {id: S0.12, status: todo, days: 0.5, owner: human, uk: "Перший деплой на сервер: install_server.sh, перевірка healthcheck", en: "First server deploy: install_server.sh, verify healthcheck", note_uk: "Відкладено: спершу бот і система.", note_en: "Postponed: bot and system first."}
       - {id: S0.13, status: done, days: 0.2, owner: human, uk: "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root", en: "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root", note_uk: "Працює: fixerhack.github.io/war-predictor", note_en: "Live: fixerhack.github.io/war-predictor"}
@@ -72,9 +72,9 @@ stages:
     tasks:
       - {id: S2.1, status: done, days: 0.5, uk: "Каркас джерел, збереження версій, виявлення змін (diff)", en: "Source framework, version storage, change detection (diff)"}
       - {id: S2.2, status: done, days: 0.5, uk: "Велика Британія (GOV.UK Content API)", en: "UK (GOV.UK Content API)", note_uk: "Перевірено на живих даних (PL, EE, MD).", note_en: "Verified on live data (PL, EE, MD)."}
-      - {id: S2.3, status: in_progress, days: 0.5, uk: "Німеччина (Auswärtiges Amt OpenData API)", en: "Germany (Auswärtiges Amt OpenData API)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
-      - {id: S2.4, status: in_progress, days: 1, uk: "США (RSS TAsTWs + сторінки країн + Security Alerts посольств)", en: "US (TAsTWs RSS + country pages + embassy Security Alerts)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
-      - {id: S2.5, status: in_progress, days: 0.5, uk: "Канада (open data JSON)", en: "Canada (open data JSON)", note_uk: "Реалізовано; перевірити на живих даних: tension-index probe", note_en: "Implemented; verify live: tension-index probe"}
+      - {id: S2.3, status: done, days: 0.5, uk: "Німеччина (Auswärtiges Amt OpenData API)", en: "Germany (Auswärtiges Amt OpenData API)", note_uk: "Перевірено на живих даних 30.09–01.10.2026.", note_en: "Verified on live data 30 Sep–1 Oct 2026."}
+      - {id: S2.4, status: done, days: 1, uk: "США (RSS TAsTWs + сторінки країн + Security Alerts посольств)", en: "US (TAsTWs RSS + country pages + embassy Security Alerts)", note_uk: "Перевірено на живих даних; мерехтіння версій RSS відфільтровано.", note_en: "Verified on live data; alternating RSS versions are filtered out."}
+      - {id: S2.5, status: done, days: 0.5, uk: "Канада (open data JSON)", en: "Canada (open data JSON)", note_uk: "Перевірено на живих даних 30.09–01.10.2026.", note_en: "Verified on live data 30 Sep–1 Oct 2026."}
       - {id: S2.6, status: blocked, days: 0.5, uk: "Австралія (Smartraveller destinations-export)", en: "Australia (Smartraveller destinations-export)", note_uk: "Сайт Smartraveller не відповідає на автоматичні запити (експорт і сторінки, перевірено 30.09.2026); вимкнено через DISABLED_SOURCES=au.", note_en: "Smartraveller does not answer automated requests (export and pages, tested 2026-09-30); disabled via DISABLED_SOURCES=au."}
       - {id: S2.7, status: in_progress, days: 0.5, uk: "Франція (diplomatie.gouv.fr, парсинг)", en: "France (diplomatie.gouv.fr, scraping)", note_uk: "Лише текст сторінки, рівень визначає класифікатор; перевірити probe fr", note_en: "Page text only, level set by the classifier; verify with probe fr"}
       - {id: S2.8, status: blocked, days: 0.5, uk: "Ізраїль (NSC travel warnings)", en: "Israel (NSC travel warnings)", note_uk: "Сторінка NSC — JS-застосунок без відомого API; потрібен зразок відповіді. Для Європи вага низька.", note_en: "NSC page is a JS app with no known API; needs a sample response. Low weight for Europe."}
@@ -217,7 +217,7 @@ stages:
     goal_en: "The MVP is done when all three conditions hold."
     tasks:
       - {id: S13.1, status: todo, days: 0.5, uk: "14 днів збору поспіль без ручного втручання", en: "14 consecutive days of collection without manual intervention"}
-      - {id: S13.2, status: todo, days: 0.5, uk: "На епізоді України бал досягає 7+ до 24.02.2022", en: "On the Ukraine episode the score reaches 7+ before 2022-02-24"}
+      - {id: S13.2, status: done, days: 0.5, uk: "На епізоді України бал досягає 7+ до 24.02.2022", en: "On the Ukraine episode the score reaches 7+ before 2022-02-24", note_uk: "Бектест на архіві Wayback: 7 з 20.12.2021, за 66 днів до 24.02.2022.", note_en: "Wayback archive backtest: 7 from 20 Dec 2021, 66 days before 24 Feb 2022."}
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:

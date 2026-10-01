@@ -2,15 +2,15 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.80**, updated 2026-09-30.
+Version **0.2.85**, updated 2026-09-30.
 
-**Overall progress: 72%** · left ≈ 13.1 days · ✅ 55 · 🟡 17 · ⬜ 10 · ⛔ 4
+**Overall progress: 75%** · left ≈ 11.4 days · ✅ 60 · 🟡 14 · ⬜ 8 · ⛔ 4
 
 ## Milestones
 
 - **M1** — MVP: 14 days of unattended collection, backtest scores Ukraine 7+ before 2022-02-24, every alert explained
 
-## S0. Foundation & infrastructure — 79%
+## S0. Foundation & infrastructure — 83%
 
 _Repository, working environment on the MacBook and server, keys, Telegram bot._
 
@@ -25,7 +25,8 @@ Branch: `dev-bootstrap`
 - ✅ **S0.7** Plan + progress page on GitHub Pages
 - ✅ **S0.8** README in Ukrainian and English
 - ✅ **S0.9** MacBook: install uv and Claude Code, clone the repo, ./scripts/bootstrap.sh _(manual)_
-- ⬜ **S0.10** OpenRouter: top-up, API key (OPENROUTER_API_KEY in .env), spend limit _(manual)_
+- ✅ **S0.10** OpenRouter: top-up, API key (OPENROUTER_API_KEY in .env), spend limit _(manual)_
+  - Instead of OpenRouter the classifier runs through the local Claude Code CLI on a subscription (CLASSIFIER_PROVIDER=claude_code).
 - ✅ **S0.11** Create bot via @BotFather, test channel, fill in .env _(manual)_
 - ⬜ **S0.12** First server deploy: install_server.sh, verify healthcheck _(manual)_
   - Postponed: bot and system first.
@@ -54,7 +55,7 @@ Branch: `—`
 - ✅ **S1.8** 0–10 scale algorithm (docs/algorithm.md)
 - ✅ **S1.9** Research of sources and war trackers (docs/sources.md)
 
-## S2. Official advisory collection — 55%
+## S2. Official advisory collection — 71%
 
 _Regular collection of advisories, storing every text version._
 
@@ -63,12 +64,12 @@ Branch: `dev-collector`
 - ✅ **S2.1** Source framework, version storage, change detection (diff)
 - ✅ **S2.2** UK (GOV.UK Content API)
   - Verified on live data (PL, EE, MD).
-- 🟡 **S2.3** Germany (Auswärtiges Amt OpenData API)
-  - Implemented; verify live: tension-index probe
-- 🟡 **S2.4** US (TAsTWs RSS + country pages + embassy Security Alerts)
-  - Implemented; verify live: tension-index probe
-- 🟡 **S2.5** Canada (open data JSON)
-  - Implemented; verify live: tension-index probe
+- ✅ **S2.3** Germany (Auswärtiges Amt OpenData API)
+  - Verified on live data 30 Sep–1 Oct 2026.
+- ✅ **S2.4** US (TAsTWs RSS + country pages + embassy Security Alerts)
+  - Verified on live data; alternating RSS versions are filtered out.
+- ✅ **S2.5** Canada (open data JSON)
+  - Verified on live data 30 Sep–1 Oct 2026.
 - ⛔ **S2.6** Australia (Smartraveller destinations-export)
   - Smartraveller does not answer automated requests (export and pages, tested 2026-09-30); disabled via DISABLED_SOURCES=au.
 - 🟡 **S2.7** France (diplomatie.gouv.fr, scraping)
@@ -227,14 +228,15 @@ Branch: `dev-ops`
 - 🟡 **S12.3** Auto-deploy from main (GitHub Actions → SSH)
   - .github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set.
 
-## S13. MVP criteria — 23%
+## S13. MVP criteria — 62%
 
 _The MVP is done when all three conditions hold._
 
 Branch: `—`
 
 - ⬜ **S13.1** 14 consecutive days of collection without manual intervention
-- ⬜ **S13.2** On the Ukraine episode the score reaches 7+ before 2022-02-24
+- ✅ **S13.2** On the Ukraine episode the score reaches 7+ before 2022-02-24
+  - Wayback archive backtest: 7 from 20 Dec 2021, 66 days before 24 Feb 2022.
 - ✅ **S13.3** Every alert contains the source, a description of the change and a quote
   - Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes.
 
