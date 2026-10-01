@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.72**, updated 2026-09-30.
+Version **0.2.73**, updated 2026-09-30.
 
 **Overall progress: 68%** · left ≈ 14.6 days · ✅ 51 · 🟡 20 · ⬜ 10 · ⛔ 4
 
@@ -257,6 +257,7 @@ Branch: `—`
 
 ## Risks
 
+- Without OpenRouter credits classification falls back to rules only: reasons and embassy posture are cruder, the score less precise.
 - A genuine revert of an advisory within 7 days is not reported as a change (the state still updates).
 - Some government sites block automated requests (Australia); a source can be lost without notice
 - GitHub Actions locked by an account billing issue: no CI until unlocked, checks run locally only (make check)
@@ -268,6 +269,280 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.73** (2026-09-30)
+  - T
+  - h
+  - e
+  -  
+  - c
+  - l
+  - a
+  - s
+  - s
+  - i
+  - f
+  - i
+  - e
+  - r
+  -  
+  - s
+  - t
+  - o
+  - p
+  - s
+  -  
+  - a
+  - f
+  - t
+  - e
+  - r
+  -  
+  - t
+  - h
+  - e
+  -  
+  - f
+  - i
+  - r
+  - s
+  - t
+  -  
+  - k
+  - e
+  - y
+  -  
+  - o
+  - r
+  -  
+  - c
+  - r
+  - e
+  - d
+  - i
+  - t
+  -  
+  - r
+  - e
+  - f
+  - u
+  - s
+  - a
+  - l
+  -  
+  - (
+  - 4
+  - 0
+  - 1
+  - /
+  - 4
+  - 0
+  - 2
+  - /
+  - 4
+  - 0
+  - 3
+  - )
+  -  
+  - i
+  - n
+  - s
+  - t
+  - e
+  - a
+  - d
+  -  
+  - o
+  - f
+  -  
+  - s
+  - e
+  - n
+  - d
+  - i
+  - n
+  - g
+  -  
+  - h
+  - u
+  - n
+  - d
+  - r
+  - e
+  - d
+  - s
+  -  
+  - o
+  - f
+  -  
+  - r
+  - e
+  - q
+  - u
+  - e
+  - s
+  - t
+  - s
+  - ;
+  -  
+  - t
+  - e
+  - x
+  - t
+  - s
+  -  
+  - c
+  - l
+  - a
+  - s
+  - s
+  - i
+  - f
+  - i
+  - e
+  - d
+  -  
+  - b
+  - y
+  -  
+  - r
+  - u
+  - l
+  - e
+  - s
+  -  
+  - w
+  - h
+  - i
+  - l
+  - e
+  -  
+  - t
+  - h
+  - e
+  -  
+  - m
+  - o
+  - d
+  - e
+  - l
+  -  
+  - w
+  - a
+  - s
+  -  
+  - u
+  - n
+  - a
+  - v
+  - a
+  - i
+  - l
+  - a
+  - b
+  - l
+  - e
+  -  
+  - a
+  - r
+  - e
+  -  
+  - r
+  - e
+  - -
+  - c
+  - l
+  - a
+  - s
+  - s
+  - i
+  - f
+  - i
+  - e
+  - d
+  -  
+  - b
+  - y
+  -  
+  - t
+  - h
+  - e
+  -  
+  - m
+  - o
+  - d
+  - e
+  - l
+  -  
+  - l
+  - a
+  - t
+  - e
+  - r
+  - .
+  -  
+  - R
+  - u
+  - l
+  - e
+  - s
+  -  
+  - t
+  - a
+  - k
+  - e
+  -  
+  - a
+  -  
+  - m
+  - e
+  - a
+  - s
+  - u
+  - r
+  - e
+  - '
+  - s
+  -  
+  - r
+  - e
+  - a
+  - s
+  - o
+  - n
+  -  
+  - f
+  - r
+  - o
+  - m
+  -  
+  - t
+  - h
+  - e
+  -  
+  - s
+  - e
+  - n
+  - t
+  - e
+  - n
+  - c
+  - e
+  -  
+  - t
+  - h
+  - a
+  - t
+  -  
+  - s
+  - t
+  - a
+  - t
+  - e
+  - s
+  -  
+  - i
+  - t
+  - .
 - **0.2.72** (2026-09-30)
   - M
   - e

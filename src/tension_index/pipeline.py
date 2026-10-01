@@ -17,6 +17,7 @@ import aiosqlite
 
 from tension_index import storage
 from tension_index.classifier import (
+    PENDING,
     Classification,
     ClaudeClassifier,
     classify_rules,
@@ -77,6 +78,8 @@ async def classify_pending(
             advisory_strength(cfg, row["source"], after),
         )
         result = classify_rules(row["diff"], level_change=change if before != after else None)
+        if claude is not None and not claude.available and row["method"] == PENDING:
+            continue  # still waiting for the model; keep the earlier rules result
         if claude is not None and result.change_type != "editorial":
             result = await claude.classify(
                 publisher=row["source"],
@@ -100,7 +103,8 @@ async def classify_pending(
 
     # The current version of each advisory: its reason decides how much its level counts.
     for snap in await storage.latest_snapshots(db):
-        if await storage.get_classification(db, "snapshot", snap["id"]):
+        done = await storage.get_classification(db, "snapshot", snap["id"])
+        if done and not (done["method"] == PENDING and claude is not None and claude.available):
             continue
         strength = advisory_strength(cfg, snap["source"], snap["level"])
         needs_text_level = snap["source"] in TEXT_LEVEL_PUBLISHERS
@@ -217,7 +221,13 @@ def advisory_state_signals(
     publisher = base["publisher"]
     out = [Signal(block="advisories", kind="advisory_level",
                   strength=advisory_strength(cfg, publisher, level), **base)]  # fmt: skip
-    measure = {**base, "reason": cls.measure_reason or cls.reason}
+    # A measure whose own sentence names no reason takes the advice's reason when that one is
+    # stronger ("ordered departure" in a war advisory), else stays unknown (Israel 2023:
+    # "unpredictable security situation" in an advisory worded around terrorism).
+    reason = cls.measure_reason or cls.reason  # "" = not stated separately
+    if reason == "unknown" and relevance(cfg, cls.reason) > relevance(cfg, "unknown"):
+        reason = cls.reason
+    measure = {**base, "reason": reason}
     if relevance(cfg, measure["reason"]) < cfg["measure_min_relevance"]:
         return out
     posture = cfg["staff_posture"].get(cls.staff_posture, 0.0)

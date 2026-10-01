@@ -503,9 +503,9 @@ async def get_classification(
 
 async def unclassified_changes(db: aiosqlite.Connection, limit: int = 100) -> list[aiosqlite.Row]:
     async with db.execute(
-        "SELECT c.id, c.source, c.country, c.diff, c.new_snapshot FROM changes c "
+        "SELECT c.id, c.source, c.country, c.diff, c.new_snapshot, k.method FROM changes c "
         "LEFT JOIN classifications k ON k.ref_type = 'change' AND k.ref_id = c.id "
-        "WHERE k.id IS NULL ORDER BY c.id LIMIT ?",
+        "WHERE k.id IS NULL OR k.method = 'rules_pending' ORDER BY c.id LIMIT ?",
         (limit,),
     ) as cur:
         return list(await cur.fetchall())

@@ -62,6 +62,10 @@ class Classification:
 QUOTE_MIN_WORDS = 4
 QUOTE_MIN_CHARS = 20
 
+# Rules result kept while the model was unavailable (cap, credits, outage): retried later.
+PENDING = "rules_pending"
+
+
 # --- Rules ----------------------------------------------------------------------------------
 
 _FAMILY = r" of (eligible )?(family members|dependents|dependants)"
@@ -119,12 +123,16 @@ _PANDEMIC = re.compile(r"covid|coronavirus|pandemic|quarantine|sanitary|epidemi"
 
 
 def _measure_reason(text: str) -> str:
-    """health when the sentence stating a measure (posture, airspace, borders) is about COVID."""
+    """The reason stated in the sentence of a measure (posture, airspace, borders): health for
+    COVID, else the reason words of that sentence, else unknown ("" when no measure)."""
     patterns = [p for _, p in _STAFF_RULES] + [p for _, p in _AIRSPACE_RULES] + [_BORDERS.pattern]
     for sentence in re.split(r"(?<=[.!?])\s+|\n", text):
         low = sentence.lower()
-        if any(re.search(p, low) for p in patterns) and _PANDEMIC.search(sentence):
+        if not any(re.search(p, low) for p in patterns):
+            continue
+        if _PANDEMIC.search(sentence):
             return "health"
+        return next((r for r, p in _REASON_RULES.items() if re.search(p, low)), "unknown")
     return ""
 
 
@@ -269,6 +277,7 @@ class ClaudeClassifier:
         self.provider = settings.classifier_provider
         self.model = settings.classifier_model or DEFAULT_MODELS[self.provider]
         self.calls = 0
+        self.stopped = ""  # set on an account error (no credits, bad key): no more calls this run
         if client is None:
             if self.provider == "openrouter":
                 import httpx
@@ -282,7 +291,18 @@ class ClaudeClassifier:
 
     @property
     def available(self) -> bool:
-        return self.calls < self.settings.classifier_max_calls
+        return not self.stopped and self.calls < self.settings.classifier_max_calls
+
+    def _account_error(self, status: int, detail: str) -> bool:
+        """401/402/403: the key or the credits are the problem - retrying is pointless."""
+        if status not in (401, 402, 403):
+            return False
+        self.stopped = f"HTTP {status}"
+        log.error(
+            "classifier stopped for this run (%s %s): %s - rules used, the model will "
+            "re-classify these texts on a later run", self.provider, status, detail[:200],
+        )  # fmt: skip
+        return True
 
     async def _call(
         self, system: str, user: str, schema: dict, max_tokens: int
@@ -319,7 +339,8 @@ class ClaudeClassifier:
             log.warning("Claude unavailable (%s); using rules", exc)
             return None, f"{type(exc).__name__}"
         except anthropic.APIStatusError as exc:
-            log.warning("Claude API error %s; using rules", exc.status_code)
+            if not self._account_error(exc.status_code, str(exc)):
+                log.warning("Claude API error %s; using rules", exc.status_code)
             return None, f"HTTP {exc.status_code}"
         if response.stop_reason == "refusal":
             return None, "refusal"
@@ -356,7 +377,8 @@ class ClaudeClassifier:
             log.warning("OpenRouter unavailable (%s); using rules", exc)
             return None, type(exc).__name__
         if response.status_code != 200:
-            log.warning("OpenRouter error %s: %s", response.status_code, response.text[:300])
+            if not self._account_error(response.status_code, response.text):
+                log.warning("OpenRouter error %s: %s", response.status_code, response.text[:300])
             return None, f"HTTP {response.status_code}"
         try:
             choice = response.json()["choices"][0]
@@ -380,7 +402,8 @@ class ClaudeClassifier:
         fallback: Classification,
     ) -> Classification:
         if not self.available:
-            fallback.notes.append("claude: per-run cap reached, rules used")
+            fallback.notes.append(f"claude: {self.stopped or 'per-run cap reached'}, rules used")
+            fallback.method = PENDING  # the model gets it on a later run
             return fallback
         user = (
             f"Publisher: {publisher}\nCountry: {country}\n"
@@ -390,6 +413,8 @@ class ClaudeClassifier:
         text_out, problem = await self._call(SYSTEM_PROMPT, user, SCHEMA, 2048)
         if text_out is None:
             fallback.notes.append(f"claude: {problem}, rules used")
+            if problem != "refusal":
+                fallback.method = PENDING
             return fallback
         try:
             data = json.loads(text_out)
