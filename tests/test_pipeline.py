@@ -149,7 +149,7 @@ def test_explain_and_alert_rendering():
     assert "3 держав(и) посилили позицію" in text and "порогова подія" in text
     assert reasons(payload, "en")[0].startswith("🇺🇸 US State Dept: authorized departure")
     msg = render_score("MD", 5.2, payload)("uk")
-    assert "5.2 → <b>7.4</b> (червоний)" in msg and "Молдова" in msg and "не прогноз" in msg
+    assert "5.2 → <b>7.4</b> (високий)" in msg and "Молдова" in msg and "не прогноз" in msg
 
 
 def test_change_alert_prefers_summary():

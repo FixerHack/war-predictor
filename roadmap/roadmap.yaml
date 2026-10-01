@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.86
+  version: 0.2.87
   updated: 2026-09-30
 
 milestones:
@@ -250,6 +250,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.87
+    date: 2026-09-30
+    uk: "Дашборд бота: значення рівня одним реченням, позначки й порогові події, три причини, кнопка «Детальніше на карті»; рівні названо нейтрально, як на карті (низький…критичний)."
+    en: "Bot dashboard: the level meaning in one sentence, flags and threshold events, three reasons, a \"Details on the map\" button; levels have neutral names, as on the map (low…critical)."
   - version: 0.2.86
     date: 2026-09-30
     uk: "Держдеп: дві розкладки однієї рекомендації (розриви рядків, блок «If you decide to travel», службові примітки) зводяться до одного тексту — мерехтіння зникає без хвилі змін при оновленні."

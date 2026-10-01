@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from html import escape
+from functools import partial
+from html import escape as _escape
 
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
@@ -12,6 +13,9 @@ from tension_index.countries import COUNTRIES, get_country
 from tension_index.i18n import t
 from tension_index.storage import MAX_FOLLOWED
 from tension_index.war_status import ICONS, WarStatus
+
+# Telegram HTML needs only <, > and & escaped; quotes stay readable (Придністров'я).
+escape = partial(_escape, quote=False)
 
 LEVEL_ICONS = {"green": "🟢", "yellow": "🟡", "orange": "🟠", "red": "🔴", "critical": "🟥"}
 # Neighbours outside the monitored set, for the "borders" line.
@@ -35,6 +39,8 @@ class DashboardData:
     changes_7d: int
     updated: str | None
     reasons: list[str] = field(default_factory=list)  # from explain.reasons()
+    notes: list[str] = field(default_factory=list)  # flags and threshold events, explained
+    map_url: str = ""  # the country on the public map
     digest: bool = False
     # other followed countries: (code, score or None, level or None, war status)
     others: list[tuple[str, float | None, str | None, str]] = field(default_factory=list)
@@ -107,9 +113,11 @@ def dashboard_screen(d: DashboardData) -> Screen:
             f"{t(lang, 'level_' + d.level)}"
         )
         lines.append(bar(d.score))
+        lines.append(f"<i>{t(lang, 'mean_' + d.level)}</i>")
         if d.reasons:
             lines.append(f"<b>{t(lang, 'why')}:</b>")
             lines += [f"• {escape(r)}" for r in d.reasons]
+        lines += [f"ℹ️ {escape(n)}" for n in d.notes]
 
     war = d.war
     lines.append(f"{t(lang, 'war_status')}: {ICONS[war.status]} {t(lang, 'war_' + war.status)}")
@@ -167,6 +175,7 @@ def dashboard_screen(d: DashboardData) -> Screen:
                 ),
             ],
         ]
+        + ([[InlineKeyboardButton(text=t(lang, "btn_map"), url=d.map_url)]] if d.map_url else [])
         + [
             [
                 InlineKeyboardButton(

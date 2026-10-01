@@ -23,7 +23,7 @@ from tension_index import explain, storage, war_status
 from tension_index.bot import views
 from tension_index.bot.callbacks import CountryCb, LangCb, MenuCb, ViewCb
 from tension_index.collector import collect_all, make_client
-from tension_index.config import Settings
+from tension_index.config import Settings, get_settings
 from tension_index.countries import COUNTRIES
 from tension_index.health import run_checks
 from tension_index.i18n import LANGS, t
@@ -46,6 +46,12 @@ async def build_dashboard(db: aiosqlite.Connection, user: storage.User) -> views
         row = await _score(db, code)
         others.append((code, row["score"] if row else None, row["level"] if row else None,
                        war_status.get(code).status))  # fmt: skip
+    payload = json.loads(score_row["payload"]) if score_row else {}
+    published = bool(score_row) and score_row["score"] is not None
+    notes = explain.flag_lines(payload.get("flags", []), user.lang) if published else []
+    if published and payload.get("floors"):
+        notes.append(t(user.lang, "floor_hit"))
+    settings = get_settings()
     data = views.DashboardData(
         lang=user.lang,
         country=user.country,
@@ -55,9 +61,11 @@ async def build_dashboard(db: aiosqlite.Connection, user: storage.User) -> views
         war=war_status.get(user.country),
         changes_7d=await storage.changes_since(db, user.country, since),
         updated=score_row["computed_at"] if score_row else None,
-        reasons=explain.reasons(json.loads(score_row["payload"]), user.lang, limit=2)
-        if score_row and score_row["score"] is not None
-        else [],
+        reasons=explain.reasons(payload, user.lang, limit=3) if published else [],
+        notes=notes,
+        map_url=f"{settings.dashboard_url.rstrip('/')}/#{user.country}"
+        if settings.dashboard_url
+        else "",
         digest=user.digest,
         others=others,
     )
