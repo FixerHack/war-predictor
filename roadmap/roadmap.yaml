@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.90
+  version: 0.2.91
   updated: 2026-09-30
 
 milestones:
@@ -255,6 +255,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.91
+    date: 2026-10-01
+    uk: ["claude-gateway — самостійний проєкт із власним uv.lock (не входить у залежності бота)."]
+    en: ["claude-gateway is a standalone project with its own uv.lock (not part of the bot's dependencies)."]
   - version: 0.2.90
     date: 2026-10-01
     uk: ["Новий окремий інструмент claude-gateway: будь-яка програма може звертатися до Claude Code на сервері через HTTP (власний формат, OpenAI- чи Anthropic-сумісний) або MCP.", "Класифікатор tension-index може працювати через шлюз (CLASSIFIER_PROVIDER=gateway)."]

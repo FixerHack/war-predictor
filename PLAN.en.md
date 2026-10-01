@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.90**, updated 2026-09-30.
+Version **0.2.91**, updated 2026-09-30.
 
 **Overall progress: 76%** · left ≈ 11.7 days · ✅ 62 · 🟡 14 · ⬜ 9 · ⛔ 4
 
@@ -280,6 +280,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.91** (2026-10-01)
+  - claude-gateway is a standalone project with its own uv.lock (not part of the bot's dependencies).
 - **0.2.90** (2026-10-01)
   - New separate tool claude-gateway: any program can call Claude Code on the server over HTTP (own format, OpenAI- or Anthropic-compatible) or MCP.
   - The tension-index classifier can run through the gateway (CLASSIFIER_PROVIDER=gateway).
