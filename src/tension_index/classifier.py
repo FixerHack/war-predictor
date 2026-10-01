@@ -330,7 +330,7 @@ class ClaudeClassifier:
         import tempfile
         import time
 
-        started = time.monotonic()
+        started, number = time.monotonic(), self.calls  # this call's number (counted in _call)
         args = [
             self.settings.claude_code_bin, "-p",
             "--output-format", "json",
@@ -363,7 +363,7 @@ class ClaudeClassifier:
             log.warning("claude CLI unavailable (%s); using rules", type(exc).__name__)
             return None, type(exc).__name__
         result = self._claude_code_result(proc.returncode, out, err)
-        log.info("claude CLI call %d/%d: %s in %.0f s", self.calls,
+        log.info("claude CLI call %d/%d: %s in %.0f s", number,
                  self.settings.classifier_max_calls, "ok" if result[0] else result[1],
                  time.monotonic() - started)  # fmt: skip
         return result

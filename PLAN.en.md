@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.76**, updated 2026-09-30.
+Version **0.2.77**, updated 2026-09-30.
 
 **Overall progress: 68%** · left ≈ 14.6 days · ✅ 52 · 🟡 20 · ⬜ 10 · ⛔ 4
 
@@ -272,6 +272,87 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.77** (2026-09-30)
+  - T
+  - h
+  - e
+  -  
+  - C
+  - l
+  - a
+  - u
+  - d
+  - e
+  -  
+  - C
+  - o
+  - d
+  - e
+  -  
+  - l
+  - o
+  - g
+  -  
+  - s
+  - h
+  - o
+  - w
+  - s
+  -  
+  - e
+  - a
+  - c
+  - h
+  -  
+  - c
+  - a
+  - l
+  - l
+  - '
+  - s
+  -  
+  - o
+  - w
+  - n
+  -  
+  - n
+  - u
+  - m
+  - b
+  - e
+  - r
+  - ,
+  -  
+  - n
+  - o
+  - t
+  -  
+  - t
+  - h
+  - e
+  -  
+  - c
+  - o
+  - u
+  - n
+  - t
+  - e
+  - r
+  -  
+  - a
+  - t
+  -  
+  - c
+  - o
+  - m
+  - p
+  - l
+  - e
+  - t
+  - i
+  - o
+  - n
+  - .
 - **0.2.76** (2026-09-30)
   - T
   - h
