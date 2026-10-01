@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.92
+  version: 0.2.93
   updated: 2026-09-30
 
 milestones:
@@ -255,6 +255,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.93
+    date: 2026-10-01
+    uk: ["docs/deploy-agent.md — покрокова інструкція для агента (Claude Code), який розгортає сервер по SSH."]
+    en: ["docs/deploy-agent.md — step-by-step instructions for an agent (Claude Code) deploying the server over SSH."]
   - version: 0.2.92
     date: 2026-10-01
     uk: ["install_server.sh ставить також Claude Code і claude-gateway, сам генерує токен шлюзу й налаштовує бота класифікувати через нього."]
