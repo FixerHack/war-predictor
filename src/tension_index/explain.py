@@ -67,6 +67,14 @@ def flag_lines(flags: list[str], lang: str) -> list[str]:
     return out
 
 
+def shorten(text: str, limit: int = 160) -> str:
+    """Cut at a word boundary and mark the cut, instead of mid-word."""
+    if len(text) <= limit:
+        return text
+    cut = text[: limit - 1].rsplit(" ", 1)[0].rstrip(",;:—- ")
+    return cut + "…"
+
+
 def reasons(payload: dict, lang: str, limit: int = 3) -> list[str]:
     """Top contributors as short lines: who says what, with a quote when available."""
     lines = []
@@ -75,9 +83,9 @@ def reasons(payload: dict, lang: str, limit: int = 3) -> list[str]:
         note_uk = (c.get("note_uk") or "").strip()
         note = (c.get("note") or "").strip()
         if lang == "uk" and note_uk:
-            line += f" — {note_uk[:160]}"  # a Ukrainian summary, not a verbatim quote
+            line += f" — {shorten(note_uk)}"  # a Ukrainian summary, not a verbatim quote
         elif note:
-            line += f" — «{note[:160]}»"
+            line += f" — «{shorten(note)}»"
         lines.append(line)
     return lines
 

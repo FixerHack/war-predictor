@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.101
+  version: 0.2.102
   updated: 2026-10-03
 
 milestones:
@@ -264,6 +264,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.102
+    date: 2026-10-03
+    uk: ["Причини в боті й на карті обрізаються на межі слова з «…», а не посеред слова; HTTP_USER_AGENT у .env.example у лапках, тож .env можна підключати в shell."]
+    en: ["Reasons in the bot and on the map are cut at a word boundary with \"…\" instead of mid-word; HTTP_USER_AGENT in .env.example is quoted, so .env can be sourced in a shell."]
   - version: 0.2.101
     date: 2026-10-03
     uk: ["Шлюз Claude Code винесено в окремий репозиторій claude-gateway (з історією); з war-predictor прибрано gateway/, інструкцію розгортання доповнено перенесенням шлюзу й публікацією карти; додано docs/owner-steps.md — що зробити власниці."]
