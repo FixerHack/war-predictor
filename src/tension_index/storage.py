@@ -173,6 +173,12 @@ MIGRATIONS: list[str] = [
     """
     DELETE FROM classifications WHERE method = 'rules';
     """,
+    # 10: "borders closed" narrowed (some crossings closed for years is not a closed border);
+    # redo current advisories read that way
+    """
+    DELETE FROM classifications
+        WHERE ref_type = 'snapshot' AND payload LIKE '%"borders_closed": true%';
+    """,
 ]
 
 

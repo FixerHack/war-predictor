@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.96**, updated 2026-10-01.
+Version **0.2.97**, updated 2026-10-03.
 
-**Overall progress: 77%** · left ≈ 11.2 days · ✅ 64 · 🟡 14 · ⬜ 8 · ⛔ 4
+**Overall progress: 77%** · left ≈ 11.2 days · ✅ 65 · 🟡 14 · ⬜ 8 · ⛔ 4
 
 ## Milestones
 
@@ -128,7 +128,7 @@ Branch: `dev-history`
   - Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.
 - ✅ **S5.5** Wayback archive: long timeouts, retries on 429/5xx, progress in logs
 
-## S6. Change classification (Claude API) — 74%
+## S6. Change classification (Claude API) — 76%
 
 _Claude determines the reason and type of each change and turns it into a signal._
 
@@ -143,6 +143,7 @@ Branch: `dev-classifier`
   - CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed.
 - ✅ **S6.8** Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code
   - gateway/: token required, no tools or sessions, parallel call limit, systemd service; tension-index can classify through it (CLASSIFIER_PROVIDER=gateway).
+- ✅ **S6.9** False alarms from live data: drills and tests are not mobilisation or an emergency, some closed crossings are not a closed border, no random quotes
 - ✅ **S6.6** Quote filter: page fragments ("3 pays") are not shown
 
 ## S7. Scoring 0–10 — 100%
@@ -283,6 +284,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.97** (2026-10-03)
+  - Fixed false alarms: news about mobilisation drills and siren tests no longer trigger the floor of 9, and long-standing closure of some crossings (Poland - Belarus) no longer counts as a closed border; normal-level advisories read without Claude show no random quotes.
 - **0.2.96** (2026-10-01)
   - gateway/scripts/install.sh no longer reports a false failure on re-install: the /health check waits up to 30 s for the gateway to start.
 - **0.2.95** (2026-10-01)

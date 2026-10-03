@@ -293,13 +293,16 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
             when = parse_when(snap["source_updated"]) or fetched - timedelta(days=30)
             when = min(when, fetched)
         level = snap["level"] or cls.level
+        # A normal level read only by keyword rules has no meaningful quote (the first
+        # matching sentence, e.g. a COVID-19 pointer tagged as terrorism): show none.
+        quoted = cls.method == "claude" or advisory_strength(cfg, snap["source"], level) > 0
         base = {
             "country": snap["country"],
             "publisher": snap["source"],
             "observed_at": when,
             "reason": cls.reason,
             "state": True,
-            "note": usable_quote(cls.quote),
+            "note": usable_quote(cls.quote) if quoted else "",
             "note_uk": cls.summary_uk if cls.method == "claude" else "",
         }
         for signal in advisory_state_signals(cfg, cls, level, base):
