@@ -13,8 +13,8 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.96
-  updated: 2026-10-01
+  version: 0.2.97
+  updated: 2026-10-03
 
 milestones:
   - id: M1
@@ -132,6 +132,7 @@ stages:
       - {id: S6.3, status: todo, days: 1, owner: human, uk: "Ручна перевірка на 50 прикладах", en: "Manual check on 50 examples", note_uk: "Потрібен ключ API і реальні зміни; перевірити 50 класифікацій вручну.", note_en: "Needs an API key and real changes; review 50 classifications by hand."}
       - {id: S6.7, status: done, days: 0.3, uk: "Класифікатор через локальний Claude Code (claude -p, без API-ключа)", en: "Classifier through the local Claude Code CLI (claude -p, no API key)", note_uk: "CLASSIFIER_PROVIDER=claude_code: виклик claude -p зі схемою JSON, без інструментів і без збереження сесій; використовує ліміти підписки. На сервері потрібен claude setup-token.", note_en: "CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed."}
       - {id: S6.8, status: done, days: 1, uk: "Окремий інструмент claude-gateway: HTTP API (власний, сумісні з OpenAI й Anthropic) і MCP поверх Claude Code", en: "Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code", note_uk: "gateway/: токен обов'язковий, без інструментів і сесій, ліміт паралельних викликів, systemd-сервіс; tension-index може класифікувати через нього (CLASSIFIER_PROVIDER=gateway).", note_en: "gateway/: token required, no tools or sessions, parallel call limit, systemd service; tension-index can classify through it (CLASSIFIER_PROVIDER=gateway)."}
+      - {id: S6.9, status: done, days: 0.3, uk: "Хибні тривоги з живих даних: навчання й тести не є мобілізацією чи надзвичайним станом, окремі закриті переходи не є закритим кордоном, без випадкових цитат", en: "False alarms from live data: drills and tests are not mobilisation or an emergency, some closed crossings are not a closed border, no random quotes"}
 
       - {id: S6.6, status: done, days: 0.1, uk: "Фільтр цитат: уривки сторінок («3 pays») не показуються", en: "Quote filter: page fragments (\"3 pays\") are not shown"}
   - id: S7
@@ -257,6 +258,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.97
+    date: 2026-10-03
+    uk: ["Виправлено хибні тривоги: новини про навчання з мобілізації й тести сирен більше не вмикають поріг 9, а давнє закриття окремих переходів (Польща — Білорусь) не рахується закритим кордоном; для рекомендацій звичайного рівня без Claude не показуються випадкові цитати."]
+    en: ["Fixed false alarms: news about mobilisation drills and siren tests no longer trigger the floor of 9, and long-standing closure of some crossings (Poland - Belarus) no longer counts as a closed border; normal-level advisories read without Claude show no random quotes."]
   - version: 0.2.96
     date: 2026-10-01
     uk: ["gateway/scripts/install.sh більше не звітує про помилку під час повторного встановлення: перевірка /health чекає до 30 с, поки шлюз стартує."]

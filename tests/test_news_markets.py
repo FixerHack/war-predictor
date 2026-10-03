@@ -212,3 +212,43 @@ async def test_run_cycle_skips_gdelt_unless_asked(monkeypatch, settings):
     assert called == []
     await runner.run_cycle(settings, slow=True)
     assert called == [1]
+
+
+def test_preparedness_is_not_the_measure():
+    # LRT headlines from October 2026: drills and plans, not a declared mobilisation.
+    for title in (
+        "Lithuania launches largest annual mobilisation drills, tests wartime supply system",
+        "Lithuania plans first activation of state reserve during mobilisation exercise",
+        "PM urges Lithuanian banks to prepare for payments during national mobilisation",
+        "Lithuania to test air raid sirens on Tuesday",
+    ):
+        assert news.categorize(title) == "none", title
+        assert news.effective_category(title, "mobilisation") == "none", title
+    assert news.categorize("Moldova declares partial mobilisation") == "mobilisation"
+    assert news.effective_category("Estonia exercise near Narva", "military_threat") == (
+        "military_threat"
+    )
+
+
+async def test_relabelled_headlines_lose_their_signal(settings):
+    now = datetime.now(UTC)
+    title = "Lithuania launches largest annual mobilisation drills"
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        for feed, url in (("lrt_en", "https://a.example/1"), ("err", "https://b.example/1")):
+            await db.execute(
+                "INSERT INTO news_items (url, feed, tier, title, published, countries, seen_at, "
+                "category, severity, classified) VALUES (?, ?, 1, ?, ?, 'LT', ?, 'mobilisation', "
+                "0.6, 1)",
+                (url, feed, title, now.isoformat(), now.isoformat()),
+            )
+        # Written by an earlier version that took the drill for a mobilisation.
+        from tension_index.scoring import Signal
+
+        old = Signal(country="LT", block="domestic", kind="domestic:mobilisation", strength=0.6,
+                     publisher="news", observed_at=now, tier=1, confirmed=True,
+                     reason="military_threat", note=title)  # fmt: skip
+        await storage.upsert_signal(db, old, f"news:mobilisation:{now.date().isoformat()}")
+        await news.derive_news_signals(db, now)
+        async with db.execute("SELECT COUNT(*) FROM signals WHERE active = 1") as cur:
+            assert (await cur.fetchone())[0] == 0

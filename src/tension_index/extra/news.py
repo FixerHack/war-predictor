@@ -46,6 +46,22 @@ RULES: list[tuple[str, re.Pattern]] = [
     )
 ]  # fmt: skip
 
+# Preparedness news is not the measure itself: a "mobilisation exercise", a "siren test" or a
+# plan to close a border must not count as mobilisation or an emergency (the mobilisation
+# floor is 9). Applied to rule and Claude labels alike, also to headlines already stored.
+PREPAREDNESS = re.compile(
+    r"\b(drills?|exercises?|training|tests?|testing|rehears\w*|simulat\w*|plans?|planning|"
+    r"prepar\w*|readiness)\b",
+    re.I,
+)
+PREPAREDNESS_CATEGORIES = {"mobilisation", "domestic_emergency"}
+
+
+def effective_category(title: str, category: str) -> str:
+    if category in PREPAREDNESS_CATEGORIES and PREPAREDNESS.search(title):
+        return "none"
+    return category
+
 
 @lru_cache
 def load_config(path: Path = CONFIG_PATH) -> dict:
@@ -53,7 +69,8 @@ def load_config(path: Path = CONFIG_PATH) -> dict:
 
 
 def categorize(title: str) -> str:
-    return next((cat for cat, pattern in RULES if pattern.search(title)), "none")
+    category = next((cat for cat, pattern in RULES if pattern.search(title)), "none")
+    return effective_category(title, category)
 
 
 def parse_feed(content: bytes) -> list[tuple[str, str, str | None]]:
@@ -132,6 +149,7 @@ async def refine_with_claude(db: aiosqlite.Connection, claude: ClaudeClassifier)
         return
     for i, row in enumerate(rows):
         category, severity = labels.get(i, ("none", 0.0))
+        category = effective_category(row["title"], category)
         await db.execute(
             "UPDATE news_items SET category = ?, severity = ? WHERE url = ?",
             (category, severity, row["url"]),
@@ -151,9 +169,13 @@ async def derive_news_signals(db: aiosqlite.Connection, now: datetime) -> int:
         rows = await cur.fetchall()
     groups: dict[tuple[str, str], list] = {}
     for row in rows:
+        category = effective_category(row["title"], row["category"])
+        if category == "none":
+            continue
         for code in row["countries"].split(","):
-            groups.setdefault((code, row["category"]), []).append(row)
+            groups.setdefault((code, category), []).append(row)
     count = 0
+    current: set[tuple[str, str, str]] = set()  # (ref, kind, country) derived in this window
     for (code, category), items in groups.items():
         spec = cfg["categories"][category]
         feeds = {r["feed"] for r in items}
@@ -170,6 +192,17 @@ async def derive_news_signals(db: aiosqlite.Connection, now: datetime) -> int:
         )  # fmt: skip
         day = latest["published"][:10]
         await storage.upsert_signal(db, signal, f"news:{category}:{day}")
+        current.add((f"news:{category}:{day}", signal.kind, code))
         count += 1
+    # Within the window the groups above are the whole truth: switch off signals of headlines
+    # that no longer qualify (e.g. relabelled as a drill). Older days keep decaying as events.
+    async with db.execute(
+        "SELECT id, ref, kind, country FROM signals WHERE publisher = 'news' AND active = 1 "
+        "AND substr(ref, -10) >= ?",
+        (since[:10],),
+    ) as cur:
+        for row in await cur.fetchall():
+            if (row["ref"], row["kind"], row["country"]) not in current:
+                await db.execute("UPDATE signals SET active = 0 WHERE id = ?", (row["id"],))
     await db.commit()
     return count

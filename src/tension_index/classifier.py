@@ -102,8 +102,14 @@ _AIRSPACE_RULES = [
      r"(its |the )?airspace"),
 ]  # fmt: skip
 _BORDERS = re.compile(
-    r"borders? (crossings? )?(are |is |has been |have been |remain )?closed|"
+    r"borders? (are |is |has been |have been |remain )?closed|"
     r"closed (its |the )?borders?|frontières? fermées?|grenze (ist )?geschlossen",
+    re.I,
+)
+# Some crossing points closed (e.g. with Belarus for years) is not a closed border.
+_PARTIAL = re.compile(
+    r"\b(some|certain|several|individual|a number of|partially|partly|crossings?|"
+    r"certains|plusieurs|einige|einzelne)\b",
     re.I,
 )
 _LEVEL_LINE = re.compile(r"^LEVEL: (.*?) -> (.*)$", re.M)
@@ -151,7 +157,10 @@ def classify_rules(text: str, *, level_change: tuple[float, float] | None = None
         if re.search(pattern, low):
             result.airspace = state
             break
-    result.borders_closed = bool(_BORDERS.search(added))
+    result.borders_closed = any(
+        _BORDERS.search(sentence) and not _PARTIAL.search(sentence)
+        for sentence in re.split(r"(?<=[.!?])\s+|\n", added)
+    )
     result.measure_reason = _measure_reason(added)
 
     hits = {r: len(re.findall(p, low)) for r, p in _REASON_RULES.items()}
@@ -251,7 +260,9 @@ restricted as a whole or over a large part of it because of a security threat, n
 explicitly says flights operate normally, unknown otherwise. Routine NOTAMs, drone rules near \
 airports, strikes, weather, and restrictions limited to occupied or separatist areas that have \
 been in place for years are unknown.
-- borders_closed: true only if land borders of the country are stated to be closed.
+- borders_closed: true only if the country's land borders are stated to be closed as a whole, \
+or entirely with a neighbour, as a security measure. Some crossing points closed, crossings \
+closed for years (e.g. with Belarus or Russia), shorter opening hours or longer waits are false.
 - measure_reason: the reason for the staff posture, airspace or border measure you reported \
 (same values as reason; health for COVID-19 measures such as flight bans or reduced consular \
 services). Use unknown when no such measure is reported.
@@ -607,9 +618,10 @@ escalation signals. For each numbered headline return its category and a severit
 Categories (about the country named in the headline):
 - armed_attack: a military attack actually happened on its territory (missile/drone strike, \
 troops crossing the border, shelling).
-- mobilisation: the country actually declared or ordered mobilisation (not debates or drills).
+- mobilisation: the country actually declared or ordered mobilisation (not debates, plans, \
+preparations, exercises or drills - "mobilisation exercise" is none).
 - domestic_emergency: state of emergency, martial law, border closure, evacuation orders, \
-shelters prepared because of a threat, air-raid alerts.
+shelters prepared because of a threat, air-raid alerts (not siren tests, drills or plans).
 - aggressor_advisory: Russia's or Belarus's government advises its citizens to avoid or \
 leave the country, or reduces its embassy there.
 - hybrid_attack: sabotage, GPS jamming, airspace violations by drones/aircraft, attacks on \

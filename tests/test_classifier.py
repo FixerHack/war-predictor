@@ -404,3 +404,12 @@ async def test_gateway_provider(settings):
     assert out.method == "claude" and out.reason == "military_threat"
     assert seen["url"] == "http://gw:8787/v1/complete" and seen["auth"] == "Bearer tok"
     assert seen["body"]["model"] == "haiku" and "json_schema" in seen["body"]
+
+
+def test_rules_some_crossings_closed_is_not_closed_borders():
+    poland = (
+        "Some border crossings with Belarus remain closed. "
+        "The situation near the border with Ukraine remains volatile."
+    )
+    assert not classify_rules(poland).borders_closed
+    assert classify_rules("The country has closed its borders.").borders_closed
