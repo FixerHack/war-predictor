@@ -1,3 +1,3 @@
 """Tension Index: early-warning escalation signals for European countries."""
 
-__version__ = "0.2.99"
+__version__ = "0.2.100"

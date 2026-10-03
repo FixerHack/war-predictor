@@ -45,7 +45,7 @@
 
 ## Стек
 
-Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite (aiosqlite) · Claude Haiku 4.5 через OpenRouter, Anthropic API або локальний Claude Code (`CLASSIFIER_PROVIDER=claude_code`, за підпискою Claude) для класифікації змін · systemd на власному сервері · GitHub Actions (CI і Pages).
+Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite (aiosqlite) · Claude Haiku 4.5 через OpenRouter, Anthropic API або локальний Claude Code (`CLASSIFIER_PROVIDER=claude_code`, за підпискою Claude) для класифікації змін · systemd на власному сервері · GitHub Pages (публікує сервер) · GitHub Actions (CI, необов'язково).
 
 ## Структура
 
@@ -100,11 +100,9 @@ make site                  # переглянути сторінку прогр�
 make pages                 # опублікувати сторінку прогресу і панель (дані з data/tension.sqlite3) у gh-pages
 ```
 
-**Сторінка прогресу.** Є два способи публікації:
-- автоматично через GitHub Actions (`.github/workflows/pages.yml` оновлює гілку `gh-pages` після кожного push у `main`);
-- без Actions: `make pages` збирає сайт і пушить його в гілку `gh-pages` (Settings → Pages → Source: Deploy from a branch → `gh-pages` / `root`).
+**Публічна карта і сторінка прогресу.** Сервер публікує їх у гілку `gh-pages` кожні 30 хвилин (`tension-pages.timer` → `scripts/publish_pages.sh`), лише коли дані змінилися. У гілці зберігається один коміт — поточний сайт. Для цього на сервері потрібен deploy key із правом запису і `PAGES_REMOTE` у `.env` (див. [docs/owner-steps.md](docs/owner-steps.md)). Вручну: `make pages` (дані з локальної бази; сервер перезапише їх своїми за пів години).
 
-Pages налаштовано на гілку `gh-pages` (Settings → Pages → Deploy from a branch).
+Pages налаштовано на гілку `gh-pages` (Settings → Pages → Deploy from a branch → `gh-pages` / `root`).
 
 ## Сервер
 
@@ -131,6 +129,7 @@ nano .env                     # заповнити TELEGRAM_*
 | `tension-warcheck.timer` | щоденна звірка статусу війни з Wikipedia |
 | `tension-digest.timer` | щоденний дайджест підписникам (06:37 UTC) |
 | `tension-gdelt.timer` | щоденний збір GDELT (04:43 UTC, кілька хвилин) |
+| `tension-pages.timer` | кожні 30 хвилин: публічна карта й сторінка прогресу в `gh-pages`, якщо дані змінилися (потрібен `PAGES_REMOTE`) |
 
 Оновлення: `./scripts/deploy.sh` (гілка `main`) або `./scripts/deploy.sh dev-tg-bot` для тесту гілки.
 Стан: `./scripts/healthcheck.sh` (коди виходу: 0 OK, 1 WARN, 2 FAIL), логи: `journalctl -u tension-bot -f`.

@@ -98,7 +98,11 @@ async def build(db: aiosqlite.Connection, now: datetime | None = None) -> dict:
         }
         for code, e in war_status.context().items()
     }  # fmt: skip
-    return {"generated_at": now.isoformat(timespec="seconds"), "version": __version__,
+    # When the data was computed (the latest score), not when it was exported: the map says
+    # "updated" and an unchanged export is not published again.
+    computed = [c["updated"] for c in countries.values() if c["updated"]]
+    generated = max(computed) if computed else now.isoformat(timespec="seconds")
+    return {"generated_at": generated, "version": __version__,
             "countries": countries, "context": context}  # fmt: skip
 
 

@@ -60,3 +60,11 @@ def test_changelog_lines_are_lists(tmp_path):
     plan = build(src, tmp_path / "site", plan_dir=tmp_path)
     assert plan["changelog"][0]["uk"] == ["Один рядок"]
     assert "  - Один рядок" in (tmp_path / "PLAN.md").read_text(encoding="utf-8")
+
+
+def test_rebuilds_are_identical_with_source_date_epoch(tmp_path, monkeypatch):
+    """publish_pages.sh skips the push when nothing changed: the build must be repeatable."""
+    monkeypatch.setenv("SOURCE_DATE_EPOCH", "1790000000")
+    first = build(ROOT / "roadmap" / "roadmap.yaml", tmp_path / "a", plan_dir=tmp_path)
+    second = build(ROOT / "roadmap" / "roadmap.yaml", tmp_path / "b", plan_dir=tmp_path)
+    assert first["build"]["built_at"] == second["build"]["built_at"] == "2026-09-21T14:13:20+00:00"

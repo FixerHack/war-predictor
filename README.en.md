@@ -45,7 +45,7 @@ Admin commands (`TELEGRAM_ADMIN_IDS`): `/status`, `/collect`, `/warcheck`.
 
 ## Stack
 
-Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite (aiosqlite) · Claude Haiku 4.5 via OpenRouter, the Anthropic API or the local Claude Code CLI (`CLASSIFIER_PROVIDER=claude_code`, on a Claude subscription) to classify changes · systemd on our own server · GitHub Actions (CI and Pages).
+Python 3.12 · [uv](https://docs.astral.sh/uv/) · aiogram 3 · httpx · SQLite (aiosqlite) · Claude Haiku 4.5 via OpenRouter, the Anthropic API or the local Claude Code CLI (`CLASSIFIER_PROVIDER=claude_code`, on a Claude subscription) to classify changes · systemd on our own server · GitHub Pages (published by the server) · GitHub Actions (CI, optional).
 
 ## Layout
 
@@ -100,11 +100,9 @@ make site                  # preview the progress page at http://localhost:8000
 make pages                 # publish the progress page and dashboard (data from data/tension.sqlite3) to gh-pages
 ```
 
-**Progress page.** There are two ways to publish it:
-- automatically via GitHub Actions (`.github/workflows/pages.yml` refreshes the `gh-pages` branch on every push to `main`);
-- without Actions: `make pages` builds the site and pushes it to the `gh-pages` branch (Settings → Pages → Source: Deploy from a branch → `gh-pages` / `root`).
+**Public map and progress page.** The server publishes them to the `gh-pages` branch every 30 minutes (`tension-pages.timer` → `scripts/publish_pages.sh`), only when the data changed. The branch keeps a single commit, the current site. This needs a deploy key with write access on the server and `PAGES_REMOTE` in `.env` (see [docs/owner-steps.md](docs/owner-steps.md)). By hand: `make pages` (data from the local database; the server replaces it with its own within half an hour).
 
-Pages is set to serve the `gh-pages` branch (Settings → Pages → Deploy from a branch).
+Pages is set to serve the `gh-pages` branch (Settings → Pages → Deploy from a branch → `gh-pages` / `root`).
 
 ## Server
 
@@ -131,6 +129,7 @@ What runs:
 | `tension-warcheck.timer` | daily war status check against Wikipedia |
 | `tension-digest.timer` | daily digest to subscribers (06:37 UTC) |
 | `tension-gdelt.timer` | daily GDELT collection (04:43 UTC, a few minutes) |
+| `tension-pages.timer` | every 30 minutes: the public map and progress page to `gh-pages` when the data changed (needs `PAGES_REMOTE`) |
 
 Update: `./scripts/deploy.sh` (branch `main`) or `./scripts/deploy.sh dev-tg-bot` to test a branch.
 Status: `./scripts/healthcheck.sh` (exit codes: 0 OK, 1 WARN, 2 FAIL); logs: `journalctl -u tension-bot -f`.

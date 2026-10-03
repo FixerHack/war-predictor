@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.99**, updated 2026-10-03.
+Version **0.2.100**, updated 2026-10-03.
 
-**Overall progress: 78%** · left ≈ 10.9 days · ✅ 68 · 🟡 14 · ⬜ 7 · ⛔ 4
+**Overall progress: 78%** · left ≈ 11.1 days · ✅ 68 · 🟡 15 · ⬜ 7 · ⛔ 4
 
 ## Milestones
 
@@ -203,7 +203,7 @@ Branch: `dev-war-status`
 - ✅ **S10.5** Verify the Wikipedia parser against the live page
   - Verified on the live page: sections, Location column; France (French Guiana) excluded by review.
 
-## S11. Public dashboard — 96%
+## S11. Public dashboard — 93%
 
 _Country map and score history on free hosting._
 
@@ -223,6 +223,8 @@ Branch: `dev-dashboard`
   - Neighbours are not scored, only hatched for context; data in the context section of conflicts.yaml (needs human review).
 - ✅ **S11.5** Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method
 - ✅ **S11.8** Map colours match the bot: green, yellow, orange, red, critical (contrast ≥ 4.5:1 in both themes)
+- 🟡 **S11.9** Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)
+  - Code and the tension-pages timer are ready; needs a deploy key with write access (docs/owner-steps.md).
 
 ## S12. Operations — 69%
 
@@ -252,6 +254,8 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-10-03: GitHub Actions are optional: make check runs before every merge and the server publishes the map. Actions being locked for billing blocks nothing.
+- 2026-10-03: A country's refresh rate depends on its score; users never trigger fetches, so identical requests add no load.
 - 2026-10-01: claude-gateway is a separate service with its own directory, .env, unit and updates; programs (including war-predictor) connect to it, each with its own token.
 - 2026-10-01: Neighbours at war are shown on the map as context only (hatched, no score); the list is the context section of config/conflicts.yaml.
 - 2026-09-30: Surprise attacks (Armenia–Azerbaijan 2020) are tested for a reaction within 3 days: government advice did not change before the fighting began.
@@ -286,6 +290,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.100** (2026-10-03)
+  - The server publishes the public map every 30 minutes, only when the data changed; gh-pages keeps a single commit and the GitHub Actions Pages workflow is gone.
 - **0.2.99** (2026-10-03)
   - Each country is refreshed at a rate set by its score (0 every 12 h, 1–3 every 8 h, 4–6 every 4 h, 7–10 hourly); the collect timer is now hourly and the bot's dashboard shows how often the country is checked.
 - **0.2.98** (2026-10-03)

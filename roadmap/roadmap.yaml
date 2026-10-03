@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.99
+  version: 0.2.100
   updated: 2026-10-03
 
 milestones:
@@ -203,6 +203,7 @@ stages:
 
       - {id: S11.5, status: done, days: 0.5, uk: "Розгорнуте пояснення на карті (укр/англ): підсумок, блоки, що кажуть уряди, що помічено, повна методика", en: "Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method"}
       - {id: S11.8, status: done, days: 0.1, uk: "Кольори карти як у боті: зелений, жовтий, помаранчевий, червоний, критичний (контраст ≥ 4.5:1 в обох темах)", en: "Map colours match the bot: green, yellow, orange, red, critical (contrast ≥ 4.5:1 in both themes)"}
+      - {id: S11.9, status: in_progress, days: 0.3, uk: "Автопублікація карти з сервера кожні 30 хв (лише коли дані змінилися, gh-pages — один коміт)", en: "Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)", note_uk: "Код і таймер tension-pages готові; потрібен deploy key із правом запису (docs/owner-steps.md).", note_en: "Code and the tension-pages timer are ready; needs a deploy key with write access (docs/owner-steps.md)."}
   - id: S12
     branch: dev-ops
     uk: Експлуатація
@@ -228,6 +229,8 @@ stages:
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
+  - {date: 2026-10-03, uk: "GitHub Actions необов'язкові: перевірки робить make check перед кожним мерджем, а карту публікує сервер. Блокування Actions через білінг ні на що не впливає.", en: "GitHub Actions are optional: make check runs before every merge and the server publishes the map. Actions being locked for billing blocks nothing."}
+  - {date: 2026-10-03, uk: "Частота оновлення країни залежить від її балу; користувачі ніколи не запускають завантажень, тож однакові запити не множать навантаження.", en: "A country's refresh rate depends on its score; users never trigger fetches, so identical requests add no load."}
   - {date: 2026-10-01, uk: "claude-gateway — окремий сервіс зі своєю текою, .env, юнітом і оновленням; програми (зокрема war-predictor) підключаються до нього кожна своїм токеном.", en: "claude-gateway is a separate service with its own directory, .env, unit and updates; programs (including war-predictor) connect to it, each with its own token."}
   - {date: 2026-10-01, uk: "Сусіди у війні показуються на карті лише як контекст (штрихування, без балу); перелік — розділ context у config/conflicts.yaml.", en: "Neighbours at war are shown on the map as context only (hatched, no score); the list is the context section of config/conflicts.yaml."}
   - {date: 2026-09-30, uk: "Раптові напади (Вірменія–Азербайджан-2020) перевіряються на реакцію протягом 3 днів: рекомендації урядів не змінювались до початку боїв.", en: "Surprise attacks (Armenia–Azerbaijan 2020) are tested for a reaction within 3 days: government advice did not change before the fighting began."}
@@ -260,6 +263,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.100
+    date: 2026-10-03
+    uk: ["Публічну карту публікує сервер кожні 30 хвилин, лише коли дані змінилися; у gh-pages зберігається один коміт, а процес GitHub Actions для Pages прибрано."]
+    en: ["The server publishes the public map every 30 minutes, only when the data changed; gh-pages keeps a single commit and the GitHub Actions Pages workflow is gone."]
   - version: 0.2.99
     date: 2026-10-03
     uk: ["Кожна країна оновлюється з частотою за своїм балом (0 — раз на 12 год, 1–3 — 8 год, 4–6 — 4 год, 7–10 — щогодини); таймер збору тепер щогодинний, а панель бота показує, як часто перевіряється країна."]
