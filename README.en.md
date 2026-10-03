@@ -9,6 +9,7 @@ An escalation-signal indicator for European countries on a 0–10 scale. The sys
 - 📋 Plan: [PLAN.en.md](PLAN.en.md) (generated from [`roadmap/roadmap.yaml`](roadmap/roadmap.yaml))
 - 🧮 Scale algorithm: [docs/algorithm.md](docs/algorithm.md) (Ukrainian)
 - 🗂 Data sources and war trackers: [docs/sources.md](docs/sources.md) (Ukrainian)
+- ✅ What the owner has to do (access, decisions): [docs/owner-steps.md](docs/owner-steps.md) (Ukrainian)
 - 📊 Progress: https://fixerhack.github.io/war-predictor/
 - 🗺 Public dashboard (map, scores and reasons per country): https://fixerhack.github.io/war-predictor/dashboard/
 
@@ -116,7 +117,7 @@ nano .env                     # fill in TELEGRAM_*
 ./scripts/install_server.sh   # installs and starts the systemd units
 ```
 
-On the server, classification goes through the Claude Code gateway. It is a separate service in its own directory (`~/claude-gateway`), installed on its own (`gateway/scripts/install.sh`, see [`docs/deploy-agent.md`](docs/deploy-agent.md)). The bot connects to it like any client: `.env` sets `GATEWAY_URL` (default `http://127.0.0.1:8787`) and `GATEWAY_TOKEN` (one of the gateway's `GATEWAY_TOKENS`). Without a token the bot classifies with rules only.
+On the server, classification goes through the Claude Code gateway. It is a separate service from its own repository, [FixerHack/claude-gateway](https://github.com/FixerHack/claude-gateway), in its own directory (`~/claude-gateway`), installed on its own (that repository's `scripts/install.sh`, see [`docs/deploy-agent.md`](docs/deploy-agent.md)). The bot connects to it like any client: `.env` sets `GATEWAY_URL` (default `http://127.0.0.1:8787`) and `GATEWAY_TOKEN` (one of the gateway's `GATEWAY_TOKENS`). Without a token the bot classifies with rules only.
 
 What runs:
 
@@ -138,7 +139,7 @@ For external monitoring set `HEALTH_PING_URL` (e.g. free [healthchecks.io](https
 
 ## Claude Code gateway
 
-[`gateway/`](gateway/README.en.md) is a separate tool: an HTTP API (its own, OpenAI- and Anthropic-compatible) and an MCP server on top of Claude Code. Any program on the server can call Claude through it with ready-made requests, and `tension-index` can classify changes through it (`CLASSIFIER_PROVIDER=gateway`).
+[claude-gateway](https://github.com/FixerHack/claude-gateway) is a separate tool in its own repository: an HTTP API (its own, OpenAI- and Anthropic-compatible) and an MCP server on top of Claude Code. Any program on the server can call Claude through it with ready-made requests, and `tension-index` can classify changes through it (`CLASSIFIER_PROVIDER=gateway`).
 
 ## Branches and workflow
 

@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     # Classifier: "anthropic" (direct) or "openrouter". Empty model = provider default
     # (anthropic: claude-opus-5-5, openrouter: anthropic/claude-haiku-4.5).
     # claude_code: the local `claude` CLI (Claude Code, signed in with a Claude subscription)
-    # gateway: a claude-gateway service (gateway/ in this repo) at GATEWAY_URL
+    # gateway: a claude-gateway service (github.com/FixerHack/claude-gateway) at GATEWAY_URL
     classifier_provider: Literal["anthropic", "openrouter", "claude_code", "gateway"] = "anthropic"
     classifier_model: str = ""
     classifier_effort: str = "low"  # Anthropic API only; empty for models without effort

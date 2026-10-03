@@ -2,10 +2,10 @@
 
 Цей документ — для Claude Code (або іншого агента), який працює на комп'ютері власниці проєкту й має SSH-доступ до сервера. На сервері треба розгорнути **два окремі сервіси**:
 
-1. **claude-gateway** — шлюз Claude Code (HTTP API + MCP). Це самостійний сервіс, яким може користуватися будь-яка програма на сервері, не лише Tension Index. Він живе у власній теці `~/claude-gateway` і має свій `.env`, свій systemd-юніт і своє оновлення.
+1. **claude-gateway** — шлюз Claude Code (HTTP API + MCP) з окремого репозиторію [FixerHack/claude-gateway](https://github.com/FixerHack/claude-gateway). Це самостійний сервіс, яким може користуватися будь-яка програма на сервері, не лише Tension Index. Він живе у власній теці `~/claude-gateway` і має свій `.env`, свій systemd-юніт і своє оновлення.
 2. **war-predictor (Tension Index)** — бот і таймери збору даних, у теці `~/war-predictor`. До шлюзу він звертається як звичайний клієнт: через `GATEWAY_URL` і токен.
 
-Ці два сервіси не мають спільних файлів, віртуальних середовищ, `.env` чи юнітів. Оновлення, перезапуск чи видалення одного не зачіпає іншого. Код шлюзу поки лежить у тому самому репозиторії (`gateway/`), тому на сервер його забирають окремим sparse-клоном, у якому є лише `gateway/`.
+Ці два сервіси не мають спільних файлів, віртуальних середовищ, `.env` чи юнітів. Оновлення, перезапуск чи видалення одного не зачіпає іншого. Кожен має власний репозиторій.
 
 Пиши власниці українською й не звертайся до неї на ім'я.
 
@@ -14,7 +14,7 @@
 1. **Секрети не друкуй.** Токени (`TELEGRAM_BOT_TOKEN`, `CLAUDE_CODE_OAUTH_TOKEN`, `GATEWAY_TOKENS`, `GATEWAY_TOKEN`) не виводь у чат, не логуй і не передавай аргументами команд, які потрапляють в історію shell. Перевіряй лише, що рядок не порожній: `grep -c '^KEY=.\+' файл`.
 2. **Перед руйнівними чи незворотними діями питай.** Сюди входять видалення файлів чи баз, перевстановлення системи, зміни фаєрволу, відкриття портів назовні, перезапуск чужих сервісів і `apt upgrade` усієї системи. Встановлення наших залежностей і запуск наших інсталяторів дозволені.
 3. **Порти назовні не відкривай.** Шлюз слухає лише `127.0.0.1:8787`. HTTPS-проксі для доступу ззовні — окремий крок, лише за явною згодою власниці.
-4. **Не змішуй сервіси.** Шлюз ставиться тільки з `~/claude-gateway/gateway` через `gateway/scripts/install.sh`, а бот тільки з `~/war-predictor` через `scripts/install_server.sh`. Не запускай шлюз із теки `~/war-predictor/gateway`.
+4. **Не змішуй сервіси.** Шлюз ставиться тільки з `~/claude-gateway` через його `scripts/install.sh`, а бот тільки з `~/war-predictor` через `scripts/install_server.sh`.
 5. **Не запускай два боти з одним токеном Telegram.** Перед стартом бота на сервері зупини локальний (крок 2).
 6. **Не змінюй код у репозиторії.** Якщо скрипт падає через помилку в коді, опиши її (команда, вивід, гіпотеза) і зупинись, без латок на сервері.
 7. **Звітуй коротко після кожного етапу:** що зроблено, що перевірено, що далі.
@@ -63,8 +63,8 @@ pkill -f "tension-index bot" || true
 ### 3. Код шлюзу у власній теці
 
 ```bash
-ssh USER@HOST 'test -d ~/claude-gateway && (cd ~/claude-gateway && git pull --ff-only) || (git clone --filter=blob:none --sparse https://github.com/FixerHack/war-predictor.git ~/claude-gateway && cd ~/claude-gateway && git sparse-checkout set gateway)'
-ssh USER@HOST 'ls ~/claude-gateway/gateway'
+ssh USER@HOST 'test -d ~/claude-gateway && (cd ~/claude-gateway && git pull --ff-only) || git clone https://github.com/FixerHack/claude-gateway.git ~/claude-gateway'
+ssh USER@HOST 'ls ~/claude-gateway'
 ```
 
 У теці мають бути `pyproject.toml`, `uv.lock`, `scripts/` і `src/`. Якщо `git clone` питає логін, репозиторій приватний: зупинись і попроси власницю зробити його публічним або додати deploy key.
@@ -72,7 +72,7 @@ ssh USER@HOST 'ls ~/claude-gateway/gateway'
 ### 4. Встановлення й вхід Claude Code
 
 ```bash
-ssh -t USER@HOST 'cd ~/claude-gateway/gateway && ./scripts/install.sh'
+ssh -t USER@HOST 'cd ~/claude-gateway && ./scripts/install.sh'
 ```
 
 Скрипт ставить uv і Claude Code, створює `.env` зі згенерованим `GATEWAY_TOKENS` і встановлює юніт `claude-gateway.service`. Якщо Claude Code ще не залогінений, скрипт зупиниться з підказкою. Тоді:
@@ -80,19 +80,19 @@ ssh -t USER@HOST 'cd ~/claude-gateway/gateway && ./scripts/install.sh'
 1. Попроси власницю виконати на її Mac `claude setup-token`. Команда відкриє браузер і надрукує токен.
 2. Попроси її **самій** вписати токен на сервері, щоб він не проходив через чат:
    ```bash
-   ssh -t USER@HOST 'nano ~/claude-gateway/gateway/.env'   # рядок CLAUDE_CODE_OAUTH_TOKEN=...
+   ssh -t USER@HOST 'nano ~/claude-gateway/.env'   # рядок CLAUDE_CODE_OAUTH_TOKEN=...
    ```
 3. Перевір і запусти скрипт ще раз:
    ```bash
-   ssh USER@HOST 'grep -c "^CLAUDE_CODE_OAUTH_TOKEN=.\+" ~/claude-gateway/gateway/.env'   # має бути 1
-   ssh -t USER@HOST 'cd ~/claude-gateway/gateway && ./scripts/install.sh'
+   ssh USER@HOST 'grep -c "^CLAUDE_CODE_OAUTH_TOKEN=.\+" ~/claude-gateway/.env'   # має бути 1
+   ssh -t USER@HOST 'cd ~/claude-gateway && ./scripts/install.sh'
    ```
 
 ### 5. Перевірка шлюзу
 
 ```bash
 ssh USER@HOST 'systemctl is-active claude-gateway; curl -fsS http://127.0.0.1:8787/health'
-ssh USER@HOST 'cd ~/claude-gateway/gateway && set -a && . ./.env && set +a && curl -s -m 60 http://127.0.0.1:8787/v1/complete -H "Authorization: Bearer ${GATEWAY_TOKENS%%,*}" -H "Content-Type: application/json" -d "{\"prompt\":\"Reply with OK\"}" | head -c 300'
+ssh USER@HOST 'cd ~/claude-gateway && set -a && . ./.env && set +a && curl -s -m 60 http://127.0.0.1:8787/v1/complete -H "Authorization: Bearer ${GATEWAY_TOKENS%%,*}" -H "Content-Type: application/json" -d "{\"prompt\":\"Reply with OK\"}" | head -c 300'
 ```
 
 Що має бути: `active`, `{"ok":true,...}` і відповідь з `"text":"OK"`.
@@ -102,7 +102,7 @@ ssh USER@HOST 'cd ~/claude-gateway/gateway && set -a && . ./.env && set +a && cu
 Кожен клієнт шлюзу має отримати власний токен, щоб його доступ можна було відкликати окремо. Додай до `GATEWAY_TOKENS` другий токен, нічого не друкуючи:
 
 ```bash
-ssh USER@HOST 'cd ~/claude-gateway/gateway && T=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))") && sed -i "s/^GATEWAY_TOKENS=\(.\+\)$/GATEWAY_TOKENS=\1,$T/" .env && printf "%s" "$T" > ~/.war-predictor-gateway-token && chmod 600 ~/.war-predictor-gateway-token && sudo systemctl restart claude-gateway'
+ssh USER@HOST 'cd ~/claude-gateway && T=$(python3 -c "import secrets; print(secrets.token_urlsafe(32))") && sed -i "s/^GATEWAY_TOKENS=\(.\+\)$/GATEWAY_TOKENS=\1,$T/" .env && printf "%s" "$T" > ~/.war-predictor-gateway-token && chmod 600 ~/.war-predictor-gateway-token && sudo systemctl restart claude-gateway'
 ```
 
 Токен тимчасово лежить у `~/.war-predictor-gateway-token`. У кроці 9 він переїде в `.env` бота, а файл буде видалено.
@@ -169,19 +169,52 @@ ssh USER@HOST 'journalctl -u tension-bot -n 30 --no-pager'
 ssh USER@HOST 'systemctl cat claude-gateway | grep -E "WorkingDirectory|EnvironmentFile"; systemctl cat tension-bot | grep -E "WorkingDirectory"'
 ```
 
-Очікувано: `/home/USER/claude-gateway/gateway` у шлюзу і `/home/USER/war-predictor` у бота.
+Очікувано: `/home/USER/claude-gateway` у шлюзу і `/home/USER/war-predictor` у бота (для `root` — `/root/...`).
 
-### 12. Звіт
+---
+
+## Частина C. Публічна карта (GitHub Pages)
+
+### 12. Ключ для публікації карти
+
+Сервер кожні 30 хвилин публікує карту в гілку `gh-pages` (`tension-pages.timer`), лише коли дані змінилися. Для цього йому потрібен deploy key із правом запису. Ключ створюєш ти, а додає його на GitHub власниця. Приватний ключ нікуди не виводь; публічний можна показати.
+
+```bash
+ssh USER@HOST 'test -f ~/.ssh/war-predictor-pages || ssh-keygen -q -t ed25519 -N "" -C "war-predictor pages" -f ~/.ssh/war-predictor-pages; grep -q "^Host github-pages$" ~/.ssh/config 2>/dev/null || printf "Host github-pages\n  HostName github.com\n  User git\n  IdentityFile ~/.ssh/war-predictor-pages\n  IdentitiesOnly yes\n" >> ~/.ssh/config; chmod 600 ~/.ssh/config; ssh-keyscan -t ed25519 github.com 2>/dev/null >> ~/.ssh/known_hosts; cat ~/.ssh/war-predictor-pages.pub'
+```
+
+Попроси власницю: GitHub → репозиторій `war-predictor` → Settings → Deploy keys → Add deploy key, назва `server-pages`, вставити надрукований публічний ключ і **поставити галочку Allow write access**. Коли вона підтвердить:
+
+```bash
+ssh USER@HOST 'ssh -T git@github-pages 2>&1 | head -1'   # "Hi FixerHack/war-predictor! You've successfully authenticated..."
+ssh USER@HOST 'cd ~/war-predictor && grep -v "^PAGES_REMOTE=" .env > .env.tmp && echo "PAGES_REMOTE=git@github-pages:FixerHack/war-predictor.git" >> .env.tmp && mv .env.tmp .env && chmod 600 .env && ./scripts/install_server.sh 2>&1 | tail -5'
+ssh USER@HOST 'sudo systemctl start tension-pages.service; systemctl is-failed tension-pages.service; journalctl -u tension-pages -n 5 --no-pager'
+```
+
+Очікувано: `inactive` (не `failed`) і в журналі `Published` або `Nothing changed on gh-pages`. Через хвилину-дві карта на https://fixerhack.github.io/war-predictor/dashboard/ показує серверні дані.
+
+### 13. Звіт
 
 Наприкінці дай власниці короткий звіт:
 - **що працює:** сервіси `claude-gateway` і `tension-bot`, таймери, де лежить кожен сервіс;
 - **результати перевірок** з кроків 5 і 11;
 - **оновлення (окремо для кожного):**
-  - шлюз: `ssh USER@HOST 'cd ~/claude-gateway && git pull --ff-only && cd gateway && ./scripts/install.sh'`;
+  - шлюз: `ssh USER@HOST 'cd ~/claude-gateway && git pull --ff-only && ./scripts/install.sh'`;
   - бот: `ssh USER@HOST 'cd ~/war-predictor && ./scripts/deploy.sh'`;
 - **логи:** `journalctl -u claude-gateway -f`, `journalctl -u tension-bot -f`;
 - **як дати шлюз іншій програмі:** додати ще один токен до `GATEWAY_TOKENS` (як у кроці 6), перезапустити `claude-gateway` і передати програмі URL та цей токен;
-- **що лишилось за нею:** HTTPS для шлюзу ззовні (якщо потрібно), `HEALTH_PING_URL`, захист `main` на GitHub. Шлюз можна винести в окремий репозиторій, якщо вона захоче.
+- **що лишилось за нею:** HTTPS для шлюзу ззовні (якщо потрібно), `HEALTH_PING_URL`, захист `main` на GitHub. Повний перелік: [docs/owner-steps.md](owner-steps.md).
+
+## Перенесення шлюзу зі старої схеми
+
+До жовтня 2026 шлюз жив у `war-predictor/gateway/` і на сервер потрапляв sparse-клоном у `~/claude-gateway/gateway`. Якщо `systemctl cat claude-gateway` показує `WorkingDirectory=.../claude-gateway/gateway`, перенеси його на окремий репозиторій. Так зберігаються `.env` і всі токени, а простій становить кілька секунд (бот тим часом класифікує правилами):
+
+```bash
+ssh USER@HOST 'set -e; mv ~/claude-gateway ~/claude-gateway.old && git clone -q https://github.com/FixerHack/claude-gateway.git ~/claude-gateway && cp -p ~/claude-gateway.old/gateway/.env ~/claude-gateway/.env && cd ~/claude-gateway && ./scripts/install.sh 2>&1 | tail -3'
+ssh USER@HOST 'systemctl cat claude-gateway | grep WorkingDirectory; curl -fsS http://127.0.0.1:8787/health'
+```
+
+Потім повтори перевірку токена бота (крок 11). Стару теку `~/claude-gateway.old` видаляй лише з дозволу власниці.
 
 ## Типові проблеми
 
@@ -195,3 +228,4 @@ ssh USER@HOST 'systemctl cat claude-gateway | grep -E "WorkingDirectory|Environm
 | запит до шлюзу повертає 401 | `GATEWAY_TOKEN` бота не входить до `GATEWAY_TOKENS` шлюзу (кроки 6 і 9) |
 | у боті `Conflict: terminated by other getUpdates request` | працює другий бот із тим самим токеном (крок 2) |
 | `uv sync --frozen` падає | `git pull` не підтягнув `uv.lock`; перевір `git status` у відповідній теці |
+| `tension-pages` падає з `Permission denied (publickey)` або `denied to deploy key` | deploy key не додано або без Allow write access (крок 12) |

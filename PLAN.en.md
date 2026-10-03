@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.100**, updated 2026-10-03.
+Version **0.2.101**, updated 2026-10-03.
 
-**Overall progress: 78%** · left ≈ 11.1 days · ✅ 68 · 🟡 15 · ⬜ 7 · ⛔ 4
+**Overall progress: 77%** · left ≈ 11.2 days · ✅ 68 · 🟡 16 · ⬜ 7 · ⛔ 4
 
 ## Milestones
 
@@ -33,7 +33,7 @@ Branch: `dev-bootstrap`
 - ✅ **S0.13** Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root _(manual)_
   - Live: fixerhack.github.io/war-predictor
 - ⬜ **S0.15** Unlock GitHub Actions: Settings → Billing and plans (invoice / card) _(manual)_
-  - CI does not start: "account is locked due to a billing issue".
+  - Optional: make check runs the checks, the server publishes the map.
 - ✅ **S0.16** Publish the progress page without Actions (make pages → gh-pages branch)
 - ✅ **S0.17** Gateway installer waits up to 30 s for the service to start instead of a fixed 2 s
 - ⬜ **S0.14** Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip _(manual)_
@@ -128,7 +128,7 @@ Branch: `dev-history`
   - Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.
 - ✅ **S5.5** Wayback archive: long timeouts, retries on 429/5xx, progress in logs
 
-## S6. Change classification (Claude API) — 76%
+## S6. Change classification (Claude API) — 74%
 
 _Claude determines the reason and type of each change and turns it into a signal._
 
@@ -144,6 +144,8 @@ Branch: `dev-classifier`
 - ✅ **S6.8** Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code
   - gateway/: token required, no tools or sessions, parallel call limit, systemd service; tension-index can classify through it (CLASSIFIER_PROVIDER=gateway).
 - ✅ **S6.9** False alarms from live data: drills and tests are not mobilisation or an emergency, some closed crossings are not a closed border, no random quotes
+- 🟡 **S6.10** Claude Code gateway as its own repository FixerHack/claude-gateway with history; war-predictor is only a client
+  - Ready locally (~/Desktop/projects/claude-gateway); the GitHub repository has to be created and the server moved (docs/owner-steps.md).
 - ✅ **S6.6** Quote filter: page fragments ("3 pays") are not shown
 
 ## S7. Scoring 0–10 — 100%
@@ -290,6 +292,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.101** (2026-10-03)
+  - The Claude Code gateway moved to its own repository, claude-gateway (with history); gateway/ is gone from war-predictor, the deploy guide covers moving the gateway and publishing the map; docs/owner-steps.md lists what the owner has to do.
 - **0.2.100** (2026-10-03)
   - The server publishes the public map every 30 minutes, only when the data changed; gh-pages keeps a single commit and the GitHub Actions Pages workflow is gone.
 - **0.2.99** (2026-10-03)

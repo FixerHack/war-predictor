@@ -4,7 +4,7 @@
 #   git clone https://github.com/FixerHack/war-predictor.git ~/war-predictor
 #   cd ~/war-predictor && ./scripts/install_server.sh
 # Needs sudo for installing systemd units. Installs uv, the bot and its timers. The bot classifies
-# through claude-gateway, a separate service installed on its own (gateway/scripts/install.sh,
+# through claude-gateway, a separate service from its own repository (FixerHack/claude-gateway,
 # see docs/deploy-agent.md): put its URL and a token into .env (GATEWAY_URL, GATEWAY_TOKEN).
 source "$(dirname "$0")/_common.sh"
 

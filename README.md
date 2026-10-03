@@ -9,6 +9,7 @@
 - 📋 План робіт: [PLAN.md](PLAN.md) (генерується з [`roadmap/roadmap.yaml`](roadmap/roadmap.yaml))
 - 🧮 Алгоритм шкали: [docs/algorithm.md](docs/algorithm.md)
 - 🗂 Джерела даних і трекери війн: [docs/sources.md](docs/sources.md)
+- ✅ Що зробити власниці (доступи, рішення): [docs/owner-steps.md](docs/owner-steps.md)
 - 📊 Прогрес: https://fixerhack.github.io/war-predictor/
 - 🗺 Публічна панель (карта, бал і причини по країнах): https://fixerhack.github.io/war-predictor/dashboard/
 
@@ -116,7 +117,7 @@ nano .env                     # заповнити TELEGRAM_*
 ./scripts/install_server.sh   # встановить і запустить systemd-юніти
 ```
 
-Класифікація на сервері йде через шлюз Claude Code. Це окремий сервіс у своїй теці (`~/claude-gateway`), який ставиться окремо (`gateway/scripts/install.sh`, див. [`docs/deploy-agent.md`](docs/deploy-agent.md)). Бот підключається до нього як звичайний клієнт: у `.env` задаються `GATEWAY_URL` (за замовчуванням `http://127.0.0.1:8787`) і `GATEWAY_TOKEN` (один із `GATEWAY_TOKENS` шлюзу). Без токена бот класифікує лише правилами.
+Класифікація на сервері йде через шлюз Claude Code. Це окремий сервіс з власного репозиторію [FixerHack/claude-gateway](https://github.com/FixerHack/claude-gateway) у своїй теці (`~/claude-gateway`), який ставиться окремо (`scripts/install.sh` того репозиторію, див. [`docs/deploy-agent.md`](docs/deploy-agent.md)). Бот підключається до нього як звичайний клієнт: у `.env` задаються `GATEWAY_URL` (за замовчуванням `http://127.0.0.1:8787`) і `GATEWAY_TOKEN` (один із `GATEWAY_TOKENS` шлюзу). Без токена бот класифікує лише правилами.
 
 Що запускається:
 
@@ -138,7 +139,7 @@ nano .env                     # заповнити TELEGRAM_*
 
 ## Шлюз Claude Code
 
-[`gateway/`](gateway/README.md) — окремий інструмент: HTTP API (власний, сумісні з OpenAI й Anthropic) і MCP-сервер поверх Claude Code. Через нього будь-яка програма на сервері може звертатися до Claude готовими запитами, а `tension-index` — класифікувати зміни (`CLASSIFIER_PROVIDER=gateway`).
+[claude-gateway](https://github.com/FixerHack/claude-gateway) — окремий інструмент в окремому репозиторії: HTTP API (власний, сумісні з OpenAI й Anthropic) і MCP-сервер поверх Claude Code. Через нього будь-яка програма на сервері може звертатися до Claude готовими запитами, а `tension-index` — класифікувати зміни (`CLASSIFIER_PROVIDER=gateway`).
 
 ## Гілки і процес
 
