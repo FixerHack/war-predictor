@@ -1,8 +1,8 @@
 [Unit]
-Description=Full cycle every 3 hours
+Description=Hourly cycle; each country is fetched only when its refresh interval has passed
 
 [Timer]
-OnCalendar=*-*-* 00/3:07:00
+OnCalendar=*-*-* *:07:00
 RandomizedDelaySec=300
 Persistent=true
 

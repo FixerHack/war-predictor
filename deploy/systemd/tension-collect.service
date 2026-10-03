@@ -7,5 +7,5 @@ Wants=network-online.target
 Type=oneshot
 User=@APP_USER@
 WorkingDirectory=@APP_DIR@
-ExecStart=@UV@ run --frozen --no-dev tension-index run --notify
+ExecStart=@UV@ run --frozen --no-dev tension-index run --notify --adaptive
 TimeoutStartSec=20min

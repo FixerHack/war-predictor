@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.98**, updated 2026-10-03.
+Version **0.2.99**, updated 2026-10-03.
 
-**Overall progress: 77%** · left ≈ 11.2 days · ✅ 66 · 🟡 14 · ⬜ 8 · ⛔ 4
+**Overall progress: 78%** · left ≈ 10.9 days · ✅ 68 · 🟡 14 · ⬜ 7 · ⛔ 4
 
 ## Milestones
 
@@ -224,7 +224,7 @@ Branch: `dev-dashboard`
 - ✅ **S11.5** Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method
 - ✅ **S11.8** Map colours match the bot: green, yellow, orange, red, critical (contrast ≥ 4.5:1 in both themes)
 
-## S12. Operations — 35%
+## S12. Operations — 69%
 
 _The system runs unattended and reports failures._
 
@@ -234,8 +234,9 @@ Branch: `dev-ops`
 - ⬜ **S12.2** Dead-man switch on healthchecks.io (free) _(manual)_
 - 🟡 **S12.3** Auto-deploy from main (GitHub Actions → SSH)
   - .github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set.
-- ⬜ **S12.5** Server: install Claude Code, claude setup-token, run claude-gateway (systemd) behind an HTTPS proxy _(manual)_
-  - The gateway is deployed separately from the bot: ~/claude-gateway, gateway/scripts/install.sh; the bot connects with a token. Step by step: docs/deploy-agent.md.
+- ✅ **S12.5** Server: install Claude Code, claude setup-token, run claude-gateway (systemd) behind an HTTPS proxy _(manual)_
+  - Running since 2026-10-01: ~/claude-gateway, a separate service on 127.0.0.1 only; war-predictor uses it with its own token. No HTTPS proxy needed until something outside the server uses the gateway.
+- ✅ **S12.6** Refresh rate by country score: 0 every 12 h, 1–3 every 8 h, 4–6 every 4 h, 7–10 hourly; the bot and map read the stored result, so user requests never multiply fetches
 
 ## S13. MVP criteria — 62%
 
@@ -285,6 +286,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.99** (2026-10-03)
+  - Each country is refreshed at a rate set by its score (0 every 12 h, 1–3 every 8 h, 4–6 every 4 h, 7–10 hourly); the collect timer is now hourly and the bot's dashboard shows how often the country is checked.
 - **0.2.98** (2026-10-03)
   - Map colours now match the bot and README (green, yellow, orange, red, critical); before, the low level looked alarming brown in the dark theme.
 - **0.2.97** (2026-10-03)

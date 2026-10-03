@@ -30,6 +30,8 @@ TEXTS: dict[str, dict[str, str]] = {
     "language": {"uk": "Мова", "en": "Language"},
     "lang_name": {"uk": "українська", "en": "English"},
     "updated": {"uk": "Оновлено", "en": "Updated"},
+    "refresh_every": {"uk": "перевірка кожні {hours} год", "en": "checked every {hours} h"},
+    "refresh_hourly": {"uk": "перевірка щогодини", "en": "checked hourly"},
     "disclaimer": {
         "uk": "Це індикатор стану сигналів, а не прогноз і не порада щодо виїзду.",
         "en": "This is an indicator of signals, not a forecast or advice to leave.",
