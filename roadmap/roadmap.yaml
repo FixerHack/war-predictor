@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.97
+  version: 0.2.98
   updated: 2026-10-03
 
 milestones:
@@ -202,6 +202,7 @@ stages:
       - {id: S11.7, status: done, days: 0.5, uk: "Карта: сусіди у війні (Україна, Росія, Білорусь) для контексту; телефонна версія карти й сторінки плану", en: "Map: neighbours at war (Ukraine, Russia, Belarus) for context; phone layout for the map and the plan page", note_uk: "Сусіди не оцінюються шкалою, лише показані штрихуванням; дані в розділі context файлу conflicts.yaml (потребує перегляду людиною).", note_en: "Neighbours are not scored, only hatched for context; data in the context section of conflicts.yaml (needs human review)."}
 
       - {id: S11.5, status: done, days: 0.5, uk: "Розгорнуте пояснення на карті (укр/англ): підсумок, блоки, що кажуть уряди, що помічено, повна методика", en: "Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method"}
+      - {id: S11.8, status: done, days: 0.1, uk: "Кольори карти як у боті: зелений, жовтий, помаранчевий, червоний, критичний (контраст ≥ 4.5:1 в обох темах)", en: "Map colours match the bot: green, yellow, orange, red, critical (contrast ≥ 4.5:1 in both themes)"}
   - id: S12
     branch: dev-ops
     uk: Експлуатація
@@ -258,6 +259,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.98
+    date: 2026-10-03
+    uk: ["Кольори карти тепер як у боті й README (зелений, жовтий, помаранчевий, червоний, критичний); раніше низький рівень у темній темі виглядав тривожно-коричневим."]
+    en: ["Map colours now match the bot and README (green, yellow, orange, red, critical); before, the low level looked alarming brown in the dark theme."]
   - version: 0.2.97
     date: 2026-10-03
     uk: ["Виправлено хибні тривоги: новини про навчання з мобілізації й тести сирен більше не вмикають поріг 9, а давнє закриття окремих переходів (Польща — Білорусь) не рахується закритим кордоном; для рекомендацій звичайного рівня без Claude не показуються випадкові цитати."]
