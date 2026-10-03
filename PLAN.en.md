@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.101**, updated 2026-10-03.
+Version **0.2.102**, updated 2026-10-03.
 
 **Overall progress: 77%** · left ≈ 11.2 days · ✅ 68 · 🟡 16 · ⬜ 7 · ⛔ 4
 
@@ -292,6 +292,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.102** (2026-10-03)
+  - Reasons in the bot and on the map are cut at a word boundary with "…" instead of mid-word; HTTP_USER_AGENT in .env.example is quoted, so .env can be sourced in a shell.
 - **0.2.101** (2026-10-03)
   - The Claude Code gateway moved to its own repository, claude-gateway (with history); gateway/ is gone from war-predictor, the deploy guide covers moving the gateway and publishing the map; docs/owner-steps.md lists what the owner has to do.
 - **0.2.100** (2026-10-03)

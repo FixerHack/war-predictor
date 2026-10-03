@@ -66,3 +66,13 @@ async def test_export_time_is_the_latest_score(settings):
             computed = (await cur.fetchone())[0]
         later = datetime.now(UTC) + timedelta(hours=3)
         assert (await build(db, now=later))["generated_at"] == computed
+
+
+def test_reasons_are_cut_at_a_word_boundary():
+    from tension_index.explain import shorten
+
+    text = "Франція рекомендує посилену обережність на кордонах Польщі " * 5
+    short = shorten(text)
+    assert len(short) <= 160 and short.endswith("…") and not short.endswith(" …")
+    assert short[:-1] == text[: len(short) - 1]  # nothing invented, only cut
+    assert shorten("short") == "short"
