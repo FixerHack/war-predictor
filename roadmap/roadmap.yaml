@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.100
+  version: 0.2.101
   updated: 2026-10-03
 
 milestones:
@@ -42,7 +42,7 @@ stages:
       - {id: S0.11, status: done, days: 0.2, owner: human, uk: "Створити бота в @BotFather, тестовий канал, заповнити .env", en: "Create bot via @BotFather, test channel, fill in .env"}
       - {id: S0.12, status: done, days: 0.5, owner: human, uk: "Перший деплой на сервер: install_server.sh, перевірка healthcheck", en: "First server deploy: install_server.sh, verify healthcheck", note_uk: "Розгорнуто 2026-10-01 за docs/deploy-agent.md: claude-gateway у ~/claude-gateway і бот із таймерами у ~/war-predictor, окремі сервіси з автозапуском; бот звертається до шлюзу власним токеном.", note_en: "Deployed 2026-10-01 following docs/deploy-agent.md: claude-gateway in ~/claude-gateway and the bot with timers in ~/war-predictor, separate services started on boot; the bot uses its own gateway token."}
       - {id: S0.13, status: done, days: 0.2, owner: human, uk: "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root", en: "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root", note_uk: "Працює: fixerhack.github.io/war-predictor", note_en: "Live: fixerhack.github.io/war-predictor"}
-      - {id: S0.15, status: todo, days: 0.2, owner: human, uk: "Зняти блокування GitHub Actions: Settings → Billing and plans (рахунок / картка)", en: "Unlock GitHub Actions: Settings → Billing and plans (invoice / card)", note_uk: "CI не стартує: «account is locked due to a billing issue».", note_en: "CI does not start: \"account is locked due to a billing issue\"."}
+      - {id: S0.15, status: todo, days: 0.2, owner: human, uk: "Зняти блокування GitHub Actions: Settings → Billing and plans (рахунок / картка)", en: "Unlock GitHub Actions: Settings → Billing and plans (invoice / card)", note_uk: "Необов'язково: перевірки робить make check, карту публікує сервер.", note_en: "Optional: make check runs the checks, the server publishes the map."}
       - {id: S0.16, status: done, days: 0.2, uk: "Публікація сторінки прогресу без Actions (make pages → гілка gh-pages)", en: "Publish the progress page without Actions (make pages → gh-pages branch)"}
       - {id: S0.17, status: done, days: 0.1, uk: "Інсталятор шлюзу чекає на запуск сервісу до 30 с замість фіксованих 2 с", en: "Gateway installer waits up to 30 s for the service to start instead of a fixed 2 s"}
       - {id: S0.14, status: todo, days: 0.2, owner: human, uk: "Захист гілки main (тільки через PR, CI зелений); видалити гілку claude/funny-planck-leoxip", en: "Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip"}
@@ -133,6 +133,7 @@ stages:
       - {id: S6.7, status: done, days: 0.3, uk: "Класифікатор через локальний Claude Code (claude -p, без API-ключа)", en: "Classifier through the local Claude Code CLI (claude -p, no API key)", note_uk: "CLASSIFIER_PROVIDER=claude_code: виклик claude -p зі схемою JSON, без інструментів і без збереження сесій; використовує ліміти підписки. На сервері потрібен claude setup-token.", note_en: "CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed."}
       - {id: S6.8, status: done, days: 1, uk: "Окремий інструмент claude-gateway: HTTP API (власний, сумісні з OpenAI й Anthropic) і MCP поверх Claude Code", en: "Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code", note_uk: "gateway/: токен обов'язковий, без інструментів і сесій, ліміт паралельних викликів, systemd-сервіс; tension-index може класифікувати через нього (CLASSIFIER_PROVIDER=gateway).", note_en: "gateway/: token required, no tools or sessions, parallel call limit, systemd service; tension-index can classify through it (CLASSIFIER_PROVIDER=gateway)."}
       - {id: S6.9, status: done, days: 0.3, uk: "Хибні тривоги з живих даних: навчання й тести не є мобілізацією чи надзвичайним станом, окремі закриті переходи не є закритим кордоном, без випадкових цитат", en: "False alarms from live data: drills and tests are not mobilisation or an emergency, some closed crossings are not a closed border, no random quotes"}
+      - {id: S6.10, status: in_progress, days: 0.3, uk: "Шлюз Claude Code — окремий репозиторій FixerHack/claude-gateway з історією; war-predictor лише клієнт", en: "Claude Code gateway as its own repository FixerHack/claude-gateway with history; war-predictor is only a client", note_uk: "Локально готово (~/Desktop/projects/claude-gateway); потрібно створити репозиторій на GitHub і перенести сервер (docs/owner-steps.md).", note_en: "Ready locally (~/Desktop/projects/claude-gateway); the GitHub repository has to be created and the server moved (docs/owner-steps.md)."}
 
       - {id: S6.6, status: done, days: 0.1, uk: "Фільтр цитат: уривки сторінок («3 pays») не показуються", en: "Quote filter: page fragments (\"3 pays\") are not shown"}
   - id: S7
@@ -263,6 +264,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.101
+    date: 2026-10-03
+    uk: ["Шлюз Claude Code винесено в окремий репозиторій claude-gateway (з історією); з war-predictor прибрано gateway/, інструкцію розгортання доповнено перенесенням шлюзу й публікацією карти; додано docs/owner-steps.md — що зробити власниці."]
+    en: ["The Claude Code gateway moved to its own repository, claude-gateway (with history); gateway/ is gone from war-predictor, the deploy guide covers moving the gateway and publishing the map; docs/owner-steps.md lists what the owner has to do."]
   - version: 0.2.100
     date: 2026-10-03
     uk: ["Публічну карту публікує сервер кожні 30 хвилин, лише коли дані змінилися; у gh-pages зберігається один коміт, а процес GitHub Actions для Pages прибрано."]
