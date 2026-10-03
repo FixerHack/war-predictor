@@ -125,7 +125,13 @@ async def _war_check(args: argparse.Namespace) -> int:
 async def _run(args: argparse.Namespace) -> int:
     from tension_index.runner import run_cycle, score_alerts
 
-    report = await run_cycle(get_settings(), notify=args.notify, slow=args.all)
+    report = await run_cycle(get_settings(), notify=args.notify, slow=args.all,
+                             adaptive=args.adaptive)  # fmt: skip
+    if not report.due:
+        print("no country is due for a refresh")
+        return 0
+    if args.adaptive:
+        print(f"due: {','.join(report.due)}")
     for r in report.results:
         print(f"{r.source}: fetched={r.fetched} changed={r.changed} failed={r.failed} ok={r.ok}")
     print(f"classified: {report.classified}")
@@ -407,6 +413,10 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("run", help="full cycle: collect, classify, score, notify")
     p.add_argument("--notify", action="store_true", help="send alerts to Telegram")
     p.add_argument("--all", action="store_true", help="also run the slow daily GDELT collector")
+    p.add_argument(
+        "--adaptive", action="store_true",
+        help="only countries due by their score (config/weights.yaml, refresh)",
+    )  # fmt: skip
 
     sub.add_parser("gdelt", help="daily GDELT collection (media volume, RU/BY MFA advice)")
 

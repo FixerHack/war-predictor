@@ -179,6 +179,13 @@ MIGRATIONS: list[str] = [
     DELETE FROM classifications
         WHERE ref_type = 'snapshot' AND payload LIKE '%"borders_closed": true%';
     """,
+    # 11: when each country's advisories were last fetched (adaptive refresh, refresh.py)
+    """
+    CREATE TABLE country_checks (
+        country         TEXT PRIMARY KEY,
+        checked_at      TEXT NOT NULL
+    );
+    """,
 ]
 
 
@@ -524,6 +531,23 @@ async def latest_snapshots(db: aiosqlite.Connection) -> list[aiosqlite.Row]:
         "GROUP BY source, country) last ON last.id = s.id ORDER BY s.country, s.source"
     ) as cur:
         return list(await cur.fetchall())
+
+
+# --- Adaptive refresh -----------------------------------------------------------------------
+
+
+async def country_checks(db: aiosqlite.Connection) -> dict[str, str]:
+    async with db.execute("SELECT country, checked_at FROM country_checks") as cur:
+        return {r["country"]: r["checked_at"] for r in await cur.fetchall()}
+
+
+async def mark_checked(db: aiosqlite.Connection, countries: list[str], when: str) -> None:
+    await db.executemany(
+        "INSERT INTO country_checks (country, checked_at) VALUES (?, ?) "
+        "ON CONFLICT (country) DO UPDATE SET checked_at = excluded.checked_at",
+        [(code, when) for code in countries],
+    )
+    await db.commit()
 
 
 # --- Signals --------------------------------------------------------------------------------

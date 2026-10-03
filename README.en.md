@@ -125,7 +125,7 @@ What runs:
 | Unit | Purpose |
 |---|---|
 | `tension-bot.service` | the bot, restarted on failure |
-| `tension-collect.timer` | full cycle every 3 hours: collect, classify, score, alerts |
+| `tension-collect.timer` | hourly: collect for countries due a refresh (score 0 every 12 h, 1–3 every 8 h, 4–6 every 4 h, 7–10 hourly), classify, score, alerts |
 | `tension-health.timer` | health check every 15 minutes, Telegram alert on FAIL |
 | `tension-backup.timer` | daily SQLite backup, last 14 kept |
 | `tension-warcheck.timer` | daily war status check against Wikipedia |

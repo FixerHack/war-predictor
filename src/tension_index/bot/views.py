@@ -44,6 +44,7 @@ class DashboardData:
     digest: bool = False
     # other followed countries: (code, score or None, level or None, war status)
     others: list[tuple[str, float | None, str | None, str]] = field(default_factory=list)
+    refresh_hours: float | None = None  # how often the country is re-checked (refresh.py)
 
 
 def _flag(code: str) -> str:
@@ -140,7 +141,14 @@ def dashboard_screen(d: DashboardData) -> Screen:
     lines.append(f"📰 {t(lang, 'digest')}: {t(lang, 'on' if d.digest else 'off')}")
     lines.append(f"🌐 {t(lang, 'language')}: {t(lang, 'lang_name')}")
     if d.updated:
-        lines.append(f"🕒 {t(lang, 'updated')}: {d.updated.replace('T', ' ')[:16]} UTC")
+        line = f"🕒 {t(lang, 'updated')}: {d.updated.replace('T', ' ')[:16]} UTC"
+        if d.refresh_hours:
+            line += " · " + (
+                t(lang, "refresh_hourly")
+                if d.refresh_hours <= 1
+                else t(lang, "refresh_every", hours=f"{d.refresh_hours:g}")
+            )
+        lines.append(line)
     lines += ["", f"<i>{t(lang, 'disclaimer')}</i>"]
 
     kb = InlineKeyboardMarkup(

@@ -9,6 +9,7 @@ import asyncio
 import logging
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from html import escape
 
 import httpx
@@ -16,6 +17,7 @@ import httpx
 from tension_index import extra, storage
 from tension_index.collector import RunResult, collect_all, make_client
 from tension_index.config import Settings
+from tension_index.countries import COUNTRIES
 from tension_index.pipeline import (
     ScoreUpdate,
     classification_of,
@@ -41,6 +43,7 @@ class CycleReport:
     results: list[RunResult] = field(default_factory=list)
     classified: dict[str, int] = field(default_factory=dict)
     updates: list[ScoreUpdate] = field(default_factory=list)
+    due: list[str] = field(default_factory=list)  # countries whose advisories were fetched
 
     @property
     def ok(self) -> bool:
@@ -69,14 +72,32 @@ async def run_slow(settings: Settings) -> list[RunResult]:
     return results
 
 
-async def run_cycle(settings: Settings, notify: bool = False, slow: bool = False) -> CycleReport:
+async def run_cycle(
+    settings: Settings, notify: bool = False, slow: bool = False, adaptive: bool = False
+) -> CycleReport:
+    """`adaptive`: fetch only countries whose refresh interval has passed (refresh.py); with
+    none due, nothing runs. Otherwise every country is fetched."""
     from tension_index.notify import broadcast, broadcast_change, render_score, send
+    from tension_index.refresh import due_countries
     from tension_index.sources import REGISTRY
 
     report = CycleReport()
-    report.results = await collect_all(settings)
+    now = datetime.now(UTC)
+    report.due = list(COUNTRIES)
+    if adaptive:
+        async with storage.connect(settings.database_path) as db:
+            await storage.migrate(db)
+            report.due = await due_countries(db, now)
+        if not report.due:
+            log.info("no country is due for a refresh")
+            return report
+        log.info("due for a refresh: %s", ",".join(report.due))
+    report.results = await collect_all(
+        settings, countries=None if len(report.due) == len(COUNTRIES) else report.due
+    )
     async with make_client(settings) as client, storage.connect(settings.database_path) as db:
         await storage.migrate(db)
+        await storage.mark_checked(db, report.due, now.isoformat(timespec="seconds"))
         for name, collect in EXTRA_COLLECTORS.items():
             if name in SLOW_COLLECTORS and not slow:
                 continue

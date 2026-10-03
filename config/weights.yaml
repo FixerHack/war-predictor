@@ -120,6 +120,17 @@ floors:
   - {when: "aviation:airspace_closed", min_governments: 2, score: 8.0}
   - {when: "aviation:airspace_restricted", min_governments: 2, score: 6.0}
 
+# How often a country is re-checked, by its latest score: the first step with score < below.
+# The collect timer runs hourly; shared sources (news, aviation, markets) run whenever at
+# least one country is due. slack_minutes absorbs the timer's random delay.
+refresh:
+  steps:
+    - {below: 1.0, hours: 12}     # 0: calm
+    - {below: 4.0, hours: 8}      # 1-3
+    - {below: 7.0, hours: 4}      # 4-6
+    - {below: 99.0, hours: 1}     # 7-10
+  slack_minutes: 15
+
 # Minimum share of blocks with fresh data to publish a score.
 min_coverage: 0.5
 
