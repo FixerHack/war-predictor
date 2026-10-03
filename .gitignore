@@ -15,8 +15,9 @@ data/
 *.sqlite3-*
 backups/
 
-# Generated site
+# Generated site and backtest reports
 _site/
+reports/
 
 # OS / editors
 .DS_Store

@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.97**, updated 2026-10-03.
+Version **0.2.98**, updated 2026-10-03.
 
-**Overall progress: 77%** · left ≈ 11.2 days · ✅ 65 · 🟡 14 · ⬜ 8 · ⛔ 4
+**Overall progress: 77%** · left ≈ 11.2 days · ✅ 66 · 🟡 14 · ⬜ 8 · ⛔ 4
 
 ## Milestones
 
@@ -222,6 +222,7 @@ Branch: `dev-dashboard`
 - ✅ **S11.7** Map: neighbours at war (Ukraine, Russia, Belarus) for context; phone layout for the map and the plan page
   - Neighbours are not scored, only hatched for context; data in the context section of conflicts.yaml (needs human review).
 - ✅ **S11.5** Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method
+- ✅ **S11.8** Map colours match the bot: green, yellow, orange, red, critical (contrast ≥ 4.5:1 in both themes)
 
 ## S12. Operations — 35%
 
@@ -284,6 +285,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.98** (2026-10-03)
+  - Map colours now match the bot and README (green, yellow, orange, red, critical); before, the low level looked alarming brown in the dark theme.
 - **0.2.97** (2026-10-03)
   - Fixed false alarms: news about mobilisation drills and siren tests no longer trigger the floor of 9, and long-standing closure of some crossings (Poland - Belarus) no longer counts as a closed border; normal-level advisories read without Claude show no random quotes.
 - **0.2.96** (2026-10-01)
