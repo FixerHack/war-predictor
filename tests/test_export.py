@@ -56,3 +56,13 @@ async def test_export_has_context_neighbours(settings):
     ua = data["context"]["UA"]
     assert ua["status"] == "war" and ua["role"] == "at_war" and ua["name"]["uk"] == "Україна"
     assert data["context"]["BY"]["role"] == "aggressor_ally" and "UA" not in data["countries"]
+
+
+async def test_export_time_is_the_latest_score(settings):
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        await storage.insert_score(db, "PL", 1.0, "green", json.dumps({"raw": 0.1}))
+        async with db.execute("SELECT MAX(computed_at) FROM scores") as cur:
+            computed = (await cur.fetchone())[0]
+        later = datetime.now(UTC) + timedelta(hours=3)
+        assert (await build(db, now=later))["generated_at"] == computed

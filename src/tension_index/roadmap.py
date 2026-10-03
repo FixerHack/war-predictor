@@ -68,7 +68,12 @@ def compute(data: dict) -> dict:
         stage["stats"] = _stats(stage["tasks"])
     data["stats"] = _stats(all_tasks)
     data["build"] = {
-        "built_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        # SOURCE_DATE_EPOCH (the commit time, set by publish_pages.sh) keeps rebuilds equal.
+        "built_at": (
+            datetime.fromtimestamp(int(os.environ["SOURCE_DATE_EPOCH"]), UTC)
+            if os.environ.get("SOURCE_DATE_EPOCH")
+            else datetime.now(UTC)
+        ).isoformat(timespec="seconds"),
         "commit": os.environ.get("GITHUB_SHA", "")[:7],
     }
     return data

@@ -1,0 +1,11 @@
+[Unit]
+Description=Tension Index: publish the public map and progress page to gh-pages
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=@APP_USER@
+WorkingDirectory=@APP_DIR@
+ExecStart=@APP_DIR@/scripts/publish_pages.sh
+TimeoutStartSec=5min

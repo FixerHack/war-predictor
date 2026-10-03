@@ -67,6 +67,12 @@ sudo systemctl enable --now tension-bot.service
 sudo systemctl restart tension-bot.service
 sudo systemctl enable --now tension-collect.timer tension-health.timer tension-backup.timer \
   tension-warcheck.timer tension-digest.timer tension-gdelt.timer
+# The public map needs push access to GitHub (a deploy key, docs/owner-steps.md).
+if [[ -n "$(get_env .env PAGES_REMOTE)" ]]; then
+  sudo systemctl enable --now tension-pages.timer
+else
+  log "PAGES_REMOTE is empty: the public map is not published from this server"
+fi
 
 log "Status"
 systemctl --no-pager --lines=0 status tension-bot.service || true
