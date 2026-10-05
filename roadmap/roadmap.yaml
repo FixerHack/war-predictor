@@ -13,8 +13,8 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.102
-  updated: 2026-10-03
+  version: 0.2.103
+  updated: 2026-10-05
 
 milestones:
   - id: M1
@@ -133,7 +133,7 @@ stages:
       - {id: S6.7, status: done, days: 0.3, uk: "Класифікатор через локальний Claude Code (claude -p, без API-ключа)", en: "Classifier through the local Claude Code CLI (claude -p, no API key)", note_uk: "CLASSIFIER_PROVIDER=claude_code: виклик claude -p зі схемою JSON, без інструментів і без збереження сесій; використовує ліміти підписки. На сервері потрібен claude setup-token.", note_en: "CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed."}
       - {id: S6.8, status: done, days: 1, uk: "Окремий інструмент claude-gateway: HTTP API (власний, сумісні з OpenAI й Anthropic) і MCP поверх Claude Code", en: "Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code", note_uk: "gateway/: токен обов'язковий, без інструментів і сесій, ліміт паралельних викликів, systemd-сервіс; tension-index може класифікувати через нього (CLASSIFIER_PROVIDER=gateway).", note_en: "gateway/: token required, no tools or sessions, parallel call limit, systemd service; tension-index can classify through it (CLASSIFIER_PROVIDER=gateway)."}
       - {id: S6.9, status: done, days: 0.3, uk: "Хибні тривоги з живих даних: навчання й тести не є мобілізацією чи надзвичайним станом, окремі закриті переходи не є закритим кордоном, без випадкових цитат", en: "False alarms from live data: drills and tests are not mobilisation or an emergency, some closed crossings are not a closed border, no random quotes"}
-      - {id: S6.10, status: in_progress, days: 0.3, uk: "Шлюз Claude Code — окремий репозиторій FixerHack/claude-gateway з історією; war-predictor лише клієнт", en: "Claude Code gateway as its own repository FixerHack/claude-gateway with history; war-predictor is only a client", note_uk: "Локально готово (~/Desktop/projects/claude-gateway); потрібно створити репозиторій на GitHub і перенести сервер (docs/owner-steps.md).", note_en: "Ready locally (~/Desktop/projects/claude-gateway); the GitHub repository has to be created and the server moved (docs/owner-steps.md)."}
+      - {id: S6.10, status: done, days: 0.3, uk: "Шлюз Claude Code — окремий репозиторій FixerHack/claude-gateway з історією; war-predictor лише клієнт", en: "Claude Code gateway as its own repository FixerHack/claude-gateway with history; war-predictor is only a client", note_uk: "github.com/FixerHack/claude-gateway; на сервері з 2026-10-05 працює з ~/claude-gateway (новий репозиторій), токени збережено.", note_en: "github.com/FixerHack/claude-gateway; on the server since 2026-10-05 from ~/claude-gateway (the new repository), tokens kept."}
 
       - {id: S6.6, status: done, days: 0.1, uk: "Фільтр цитат: уривки сторінок («3 pays») не показуються", en: "Quote filter: page fragments (\"3 pays\") are not shown"}
   - id: S7
@@ -264,6 +264,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.103
+    date: 2026-10-05
+    uk: ["Шлюз на сервері перенесено на окремий репозиторій claude-gateway; бот оновлено (адаптивне оновлення, виправлені хибні тривоги), увімкнено dead-man ping на healthchecks.io."]
+    en: ["The server gateway now runs from the separate claude-gateway repository; the bot is updated (adaptive refresh, fixed false alarms) and the healthchecks.io dead-man ping is on."]
   - version: 0.2.102
     date: 2026-10-03
     uk: ["Причини в боті й на карті обрізаються на межі слова з «…», а не посеред слова; HTTP_USER_AGENT у .env.example у лапках, тож .env можна підключати в shell."]
