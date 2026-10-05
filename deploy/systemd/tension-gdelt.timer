@@ -1,8 +1,8 @@
 [Unit]
-Description=Daily GDELT collection at 04:43 UTC (before the morning cycle)
+Description=Daily GDELT collection at 07:43 UTC (after GDELT publishes the previous day's event file)
 
 [Timer]
-OnCalendar=*-*-* 04:43:00
+OnCalendar=*-*-* 07:43:00
 Persistent=true
 
 [Install]

@@ -29,6 +29,6 @@ MAX_AGE_HOURS = {"gdelt": 30, "ecb": 30}
 PROBE_URLS = {
     "easa": aviation.CZIB_PAGE,
     "opensky": aviation.OPENSKY + "?lamin=49&lomin=14&lamax=55&lomax=24",
-    "gdelt": gdelt.API + '?query="Poland" military&mode=timelinevolraw&timespan=1week&format=json',
+    "gdelt": gdelt.EVENTS_INDEX,
     "ecb": markets.FX + "?format=csvdata&lastNObservations=2",
 }

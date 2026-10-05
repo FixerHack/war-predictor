@@ -103,12 +103,6 @@ def test_gdelt_surge():
     ratio = gdelt.surge_ratio(series)
     assert ratio == 4.5 and gdelt.surge_strength(ratio) == 0.8
     assert gdelt.surge_ratio(series[:10]) is None
-    payload = {
-        "timeline": [
-            {"series": "Article Count", "data": [{"date": "20260801T000000Z", "value": 7}]}
-        ]
-    }
-    assert gdelt.daily_counts(payload) == [("20260801", 7.0)]
 
 
 async def test_gdelt_mfa_confirmation(settings):

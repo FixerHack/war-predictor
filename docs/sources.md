@@ -53,7 +53,7 @@
 
 | Джерело | Рівень | Доступ |
 |---|---|---|
-| GDELT DOC 2.0 API: `timelinevol`, `timelinetone`, фільтр за країною-джерелом | 3 | без ключа |
+| GDELT 1.0 щоденні файли подій (`data.gdeltproject.org/events`, обсяг військових подій по країні); DOC 2.0 API лише для порад МЗС РФ/РБ (сильно обмежує запити) | 3 | без ключа |
 | BBC, NATO, EEAS, ERR, LSM, LRT, Yle | 1 | RSS, тільки заголовки й посилання |
 | ISW, CrisisWatch, ECFR, RUSI | 2 | RSS / сайт |
 | Reuters, AP | 1 | відкритих RSS немає, доступні через GDELT |
