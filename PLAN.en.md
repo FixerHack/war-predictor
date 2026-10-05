@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.104**, updated 2026-10-05.
+Version **0.2.105**, updated 2026-10-05.
 
 **Overall progress: 78%** · left ≈ 10.9 days · ✅ 70 · 🟡 14 · ⬜ 7 · ⛔ 4
 
@@ -108,7 +108,7 @@ Branch: `dev-news`
 - 🟡 **S4.1** Tier 1–2 RSS, headlines and links only
   - Implemented: 13 feeds in config/feeds.yaml, an event counts only from 2+ feeds; check URLs: tension-index probe news
 - 🟡 **S4.2** GDELT: volume and tone per country
-  - Implemented: surge of military coverage vs 60 days (daily); counts only when news confirm.
+  - Surge of articles about military events vs 60 days from GDELT 1.0 daily event files (the DOC API throttles hard); counts only when news confirm. Tone not implemented.
 - 🟡 **S4.3** CrisisWatch: deterioration and Conflict Risk Alerts
   - Via the Crisis Group RSS in the news feeds.
 - 🟡 **S4.4** Domestic measures: mobilisation, emergency decrees, border closures
@@ -256,6 +256,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-10-05: GDELT media volume is counted from GDELT 1.0 daily event files (articles about CAMEO 15/18/19/20 events in the country), not the DOC 2.0 API: it answers 429 even at one request per 18 s and `{}` to queries that have data. The DOC API is kept for the single RU/BY MFA advice query.
 - 2026-10-03: GitHub Actions are optional: make check runs before every merge and the server publishes the map. Actions being locked for billing blocks nothing.
 - 2026-10-03: A country's refresh rate depends on its score; users never trigger fetches, so identical requests add no load.
 - 2026-10-01: claude-gateway is a separate service with its own directory, .env, unit and updates; programs (including war-predictor) connect to it, each with its own token.
@@ -279,6 +280,7 @@ Branch: `—`
 
 ## Risks
 
+- The GDELT DOC 2.0 API is overloaded: RU/BY MFA advice may go uncollected for days (the error shows in health and collect_runs). Fallback: the GDELT web ngrams dataset.
 - The gateway uses the signed-in person's Claude subscription: it must not be opened to other people; other people's programs need an API key.
 - Without OpenRouter credits classification falls back to rules only: reasons and embassy posture are cruder, the score less precise.
 - A genuine revert of an advisory within 7 days is not reported as a change (the state still updates).
@@ -292,6 +294,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.105** (2026-10-05)
+  - GDELT: military event volume now comes from daily event files (1 file a day instead of 38 queries that hit 429 and the 15-min kill); an empty `{}` answer is a failure, not a silent success; stop after 3 failures in a row; 10-min deadline and the run row is closed on timeout or systemd stop; timer at 07:43 UTC.
 - **0.2.104** (2026-10-05)
   - The server publishes the map every 30 minutes (deploy key added); publish_pages.sh no longer installs development tools on the server.
 - **0.2.103** (2026-10-05)

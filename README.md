@@ -90,7 +90,7 @@ cd war-predictor
 make test                  # тести
 make lint                  # ruff
 ./scripts/run.sh run       # повний цикл: збір → класифікація → бал (~1 хв)
-./scripts/run.sh gdelt     # щоденний збір GDELT окремо (кілька хвилин)
+./scripts/run.sh gdelt     # щоденний збір GDELT окремо (до 10 хвилин)
 ./scripts/run.sh why LU       # з чого складається бал країни (блоки, сигнали)
 ./scripts/run.sh collect --countries PL,EE   # лише збір для кількох країн
 ./scripts/run.sh probe us --country PL      # що насправді віддає джерело
@@ -129,7 +129,7 @@ nano .env                     # заповнити TELEGRAM_*
 | `tension-backup.timer` | щоденний бекап SQLite, зберігаються останні 14 |
 | `tension-warcheck.timer` | щоденна звірка статусу війни з Wikipedia |
 | `tension-digest.timer` | щоденний дайджест підписникам (06:37 UTC) |
-| `tension-gdelt.timer` | щоденний збір GDELT (04:43 UTC, кілька хвилин) |
+| `tension-gdelt.timer` | щоденний збір GDELT (07:43 UTC, до 10 хвилин) |
 | `tension-pages.timer` | кожні 30 хвилин: публічна карта й сторінка прогресу в `gh-pages`, якщо дані змінилися (потрібен `PAGES_REMOTE`) |
 
 Оновлення: `./scripts/deploy.sh` (гілка `main`) або `./scripts/deploy.sh dev-tg-bot` для тесту гілки.

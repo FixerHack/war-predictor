@@ -321,6 +321,18 @@ async def finish_run(
     await db.commit()
 
 
+async def abort_open_runs(db: aiosqlite.Connection, source: str, error: str) -> int:
+    """Close runs of `source` left unfinished (deadline, SIGTERM) as failed; returns how many."""
+    await db.rollback()  # drop the interrupted collector's half-written transaction
+    cur = await db.execute(
+        "UPDATE collect_runs SET finished_at = ?, ok = 0, failed = failed + 1, error = ? "
+        "WHERE source = ? AND finished_at IS NULL",
+        (utcnow(), error, source),
+    )
+    await db.commit()
+    return cur.rowcount
+
+
 async def last_runs(db: aiosqlite.Connection) -> list[aiosqlite.Row]:
     """Latest run per source (successful or not)."""
     async with db.execute(
