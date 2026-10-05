@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.103**, updated 2026-10-05.
+Version **0.2.104**, updated 2026-10-05.
 
-**Overall progress: 78%** · left ≈ 11.1 days · ✅ 69 · 🟡 15 · ⬜ 7 · ⛔ 4
+**Overall progress: 78%** · left ≈ 10.9 days · ✅ 70 · 🟡 14 · ⬜ 7 · ⛔ 4
 
 ## Milestones
 
@@ -205,7 +205,7 @@ Branch: `dev-war-status`
 - ✅ **S10.5** Verify the Wikipedia parser against the live page
   - Verified on the live page: sections, Location column; France (French Guiana) excluded by review.
 
-## S11. Public dashboard — 93%
+## S11. Public dashboard — 97%
 
 _Country map and score history on free hosting._
 
@@ -225,8 +225,8 @@ Branch: `dev-dashboard`
   - Neighbours are not scored, only hatched for context; data in the context section of conflicts.yaml (needs human review).
 - ✅ **S11.5** Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method
 - ✅ **S11.8** Map colours match the bot: green, yellow, orange, red, critical (contrast ≥ 4.5:1 in both themes)
-- 🟡 **S11.9** Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)
-  - Code and the tension-pages timer are ready; needs a deploy key with write access (docs/owner-steps.md).
+- ✅ **S11.9** Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)
+  - Running since 2026-10-05: tension-pages.timer, deploy key server-pages (this repository only).
 
 ## S12. Operations — 69%
 
@@ -292,6 +292,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.104** (2026-10-05)
+  - The server publishes the map every 30 minutes (deploy key added); publish_pages.sh no longer installs development tools on the server.
 - **0.2.103** (2026-10-05)
   - The server gateway now runs from the separate claude-gateway repository; the bot is updated (adaptive refresh, fixed false alarms) and the healthchecks.io dead-man ping is on.
 - **0.2.102** (2026-10-03)
