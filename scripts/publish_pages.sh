@@ -20,9 +20,9 @@ BUILD="$(mktemp -d)"
 trap 'rm -rf "$BUILD"' EXIT
 
 # PLAN*.md go to the temp dir: the checkout must stay clean for `git pull` in deploy.sh.
-uv run --frozen tension-index roadmap --out "$BUILD/site" --plan-dir "$BUILD" >/dev/null
+uv run --frozen --no-dev tension-index roadmap --out "$BUILD/site" --plan-dir "$BUILD" >/dev/null
 if [[ -f data/tension.sqlite3 ]]; then
-  uv run --frozen tension-index export --out "$BUILD/site/dashboard/scores.json" >/dev/null
+  uv run --frozen --no-dev tension-index export --out "$BUILD/site/dashboard/scores.json" >/dev/null
 else
   log "No data/tension.sqlite3: the map is published without scores.json"
 fi

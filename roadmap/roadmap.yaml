@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.103
+  version: 0.2.104
   updated: 2026-10-05
 
 milestones:
@@ -204,7 +204,7 @@ stages:
 
       - {id: S11.5, status: done, days: 0.5, uk: "Розгорнуте пояснення на карті (укр/англ): підсумок, блоки, що кажуть уряди, що помічено, повна методика", en: "Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method"}
       - {id: S11.8, status: done, days: 0.1, uk: "Кольори карти як у боті: зелений, жовтий, помаранчевий, червоний, критичний (контраст ≥ 4.5:1 в обох темах)", en: "Map colours match the bot: green, yellow, orange, red, critical (contrast ≥ 4.5:1 in both themes)"}
-      - {id: S11.9, status: in_progress, days: 0.3, uk: "Автопублікація карти з сервера кожні 30 хв (лише коли дані змінилися, gh-pages — один коміт)", en: "Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)", note_uk: "Код і таймер tension-pages готові; потрібен deploy key із правом запису (docs/owner-steps.md).", note_en: "Code and the tension-pages timer are ready; needs a deploy key with write access (docs/owner-steps.md)."}
+      - {id: S11.9, status: done, days: 0.3, uk: "Автопублікація карти з сервера кожні 30 хв (лише коли дані змінилися, gh-pages — один коміт)", en: "Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)", note_uk: "Працює з 2026-10-05: tension-pages.timer, deploy key server-pages (лише цей репозиторій).", note_en: "Running since 2026-10-05: tension-pages.timer, deploy key server-pages (this repository only)."}
   - id: S12
     branch: dev-ops
     uk: Експлуатація
@@ -264,6 +264,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.104
+    date: 2026-10-05
+    uk: ["Сервер публікує карту кожні 30 хвилин (deploy key додано); publish_pages.sh більше не ставить на сервер інструменти розробки."]
+    en: ["The server publishes the map every 30 minutes (deploy key added); publish_pages.sh no longer installs development tools on the server."]
   - version: 0.2.103
     date: 2026-10-05
     uk: ["Шлюз на сервері перенесено на окремий репозиторій claude-gateway; бот оновлено (адаптивне оновлення, виправлені хибні тривоги), увімкнено dead-man ping на healthchecks.io."]
