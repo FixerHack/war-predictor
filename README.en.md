@@ -90,7 +90,7 @@ Then fill in `.env` (bot token, channel ID, your Telegram ID in `TELEGRAM_ADMIN_
 make test                  # tests
 make lint                  # ruff
 ./scripts/run.sh run       # full cycle: collect → classify → score (~1 min)
-./scripts/run.sh gdelt     # daily GDELT collection on its own (up to 10 minutes)
+./scripts/run.sh gdelt     # daily GDELT collection on its own (up to 10 minutes; --force: again today)
 ./scripts/run.sh why LU       # what a country's score is made of (blocks, signals)
 ./scripts/run.sh collect --countries PL,EE   # collection only, a few countries
 ./scripts/run.sh probe us --country PL      # what a source really returns

@@ -13,8 +13,8 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.2.105
-  updated: 2026-10-05
+  version: 0.2.106
+  updated: 2026-10-06
 
 milestones:
   - id: M1
@@ -104,7 +104,7 @@ stages:
     goal_en: "Independent confirmation from media, analysis, markets and the country's own measures."
     tasks:
       - {id: S4.1, status: in_progress, days: 1, uk: "RSS рівнів 1–2, тільки заголовки й посилання", en: "Tier 1–2 RSS, headlines and links only", note_uk: "Реалізовано: 13 стрічок у config/feeds.yaml, подія рахується лише з 2+ стрічок; перевірити URL: tension-index probe news", note_en: "Implemented: 13 feeds in config/feeds.yaml, an event counts only from 2+ feeds; check URLs: tension-index probe news"}
-      - {id: S4.2, status: in_progress, days: 1, uk: "GDELT: обсяг і тональність по країні", en: "GDELT: volume and tone per country", note_uk: "Сплеск статей про військові події vs 60 днів за щоденними файлами подій GDELT 1.0 (DOC API сильно обмежує запити); рахується лише з підтвердженням новинами. Тональність не реалізовано.", note_en: "Surge of articles about military events vs 60 days from GDELT 1.0 daily event files (the DOC API throttles hard); counts only when news confirm. Tone not implemented."}
+      - {id: S4.2, status: in_progress, days: 1, uk: "GDELT: обсяг і тональність по країні", en: "GDELT: volume and tone per country", note_uk: "Сплеск унікальних статей про військові події за щоденними файлами GDELT 1.0 (DOC API сильно обмежує запити): обидва останні дні ≥2× медіани 60 днів і ≥15 статей; рахується лише з підтвердженням новинами. Дані розріджені, тональність не реалізовано.", note_en: "Surge of distinct articles about military events from GDELT 1.0 daily files (the DOC API throttles hard): both last days ≥2x the 60-day median and ≥15 articles; counts only when news confirm. Data is sparse; tone not implemented."}
       - {id: S4.3, status: in_progress, days: 0.5, uk: "CrisisWatch: погіршення і Conflict Risk Alert", en: "CrisisWatch: deterioration and Conflict Risk Alerts", note_uk: "Через RSS Crisis Group у стрічках новин.", note_en: "Via the Crisis Group RSS in the news feeds."}
       - {id: S4.4, status: in_progress, days: 1, uk: "Внутрішні заходи країни: мобілізація, надзвичайні укази, кордони", en: "Domestic measures: mobilisation, emergency decrees, border closures", note_uk: "З новин: надзвичайний стан, кордони, мобілізація (лише з 2+ стрічок).", note_en: "From news: emergency, borders, mobilisation (2+ feeds only)."}
       - {id: S4.5, status: in_progress, days: 0.5, uk: "Ринки: облігації і курси через ECB Data Portal", en: "Markets: bonds and FX via ECB Data Portal", note_uk: "ЄЦБ: спред 10-річних облігацій до Німеччини і курс валюти (раз на добу).", note_en: "ECB: 10y spread over Germany and FX (daily)."}
@@ -230,6 +230,7 @@ stages:
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
+  - {date: 2026-10-06, uk: "Службові повідомлення в TELEGRAM_CHAT_ID ідуть мовою, яку власник цього чату обрав у боті (за замовчуванням українська); оригінальний текст джерела показується згорнутим.", en: "Operator messages to TELEGRAM_CHAT_ID use the language the chat owner chose in the bot (Ukrainian by default); the original source text is shown folded."}
   - {date: 2026-10-05, uk: "Медійний обсяг GDELT рахується з щоденних файлів подій GDELT 1.0 (статті про події CAMEO 15/18/19/20 у країні), а не з DOC 2.0 API: той відповідає 429 навіть раз на 18 с і `{}` на запити з даними. DOC API лишився лише для одного запиту про поради МЗС РФ/РБ.", en: "GDELT media volume is counted from GDELT 1.0 daily event files (articles about CAMEO 15/18/19/20 events in the country), not the DOC 2.0 API: it answers 429 even at one request per 18 s and `{}` to queries that have data. The DOC API is kept for the single RU/BY MFA advice query."}
   - {date: 2026-10-03, uk: "GitHub Actions необов'язкові: перевірки робить make check перед кожним мерджем, а карту публікує сервер. Блокування Actions через білінг ні на що не впливає.", en: "GitHub Actions are optional: make check runs before every merge and the server publishes the map. Actions being locked for billing blocks nothing."}
   - {date: 2026-10-03, uk: "Частота оновлення країни залежить від її балу; користувачі ніколи не запускають завантажень, тож однакові запити не множать навантаження.", en: "A country's refresh rate depends on its score; users never trigger fetches, so identical requests add no load."}
@@ -266,6 +267,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.2.106
+    date: 2026-10-06
+    uk: ["Службові сповіщення (зміни рекомендацій, збої збирачів, health, статус війн) — мовою, обраною в боті: короткий опис зміни, а текст джерела згорнуто.", "Хибне «Collector fr failed (0 errors)» прибрано: джерело пропускається, якщо жодна з країн у черзі ним не покривається.", "GDELT: рахуються унікальні статті, а не сума згадок; сплеск — лише коли обидва останні дні ≥2× норми і ≥15 статей (один вірусний сюжет давав ×17–×30); `tension-index gdelt --force` перераховує день."]
+    en: ["Operator notices (advice changes, collector failures, health, war status) are in the language chosen in the bot: a short summary, the source text folded.", "False \"Collector fr failed (0 errors)\" removed: a source is skipped when none of the due countries is covered by it.", "GDELT: distinct articles instead of summed mentions; a surge needs both last days ≥2x usual and ≥15 articles (one viral story gave x17–x30); `tension-index gdelt --force` recomputes the day."]
   - version: 0.2.105
     date: 2026-10-05
     uk: ["GDELT: обсяг військових подій тепер з щоденних файлів подій (1 файл на день замість 38 запитів, що впиралися в 429 і обрив через 15 хв); порожня відповідь `{}` — помилка, а не тихий успіх; зупинка після 3 невдач поспіль; ліміт 10 хв і закриття запису запуску при тайм-ауті чи зупинці systemd; таймер о 07:43 UTC."]

@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.105**, updated 2026-10-05.
+Version **0.2.106**, updated 2026-10-06.
 
 **Overall progress: 78%** · left ≈ 10.9 days · ✅ 70 · 🟡 14 · ⬜ 7 · ⛔ 4
 
@@ -108,7 +108,7 @@ Branch: `dev-news`
 - 🟡 **S4.1** Tier 1–2 RSS, headlines and links only
   - Implemented: 13 feeds in config/feeds.yaml, an event counts only from 2+ feeds; check URLs: tension-index probe news
 - 🟡 **S4.2** GDELT: volume and tone per country
-  - Surge of articles about military events vs 60 days from GDELT 1.0 daily event files (the DOC API throttles hard); counts only when news confirm. Tone not implemented.
+  - Surge of distinct articles about military events from GDELT 1.0 daily files (the DOC API throttles hard): both last days ≥2x the 60-day median and ≥15 articles; counts only when news confirm. Data is sparse; tone not implemented.
 - 🟡 **S4.3** CrisisWatch: deterioration and Conflict Risk Alerts
   - Via the Crisis Group RSS in the news feeds.
 - 🟡 **S4.4** Domestic measures: mobilisation, emergency decrees, border closures
@@ -256,6 +256,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-10-06: Operator messages to TELEGRAM_CHAT_ID use the language the chat owner chose in the bot (Ukrainian by default); the original source text is shown folded.
 - 2026-10-05: GDELT media volume is counted from GDELT 1.0 daily event files (articles about CAMEO 15/18/19/20 events in the country), not the DOC 2.0 API: it answers 429 even at one request per 18 s and `{}` to queries that have data. The DOC API is kept for the single RU/BY MFA advice query.
 - 2026-10-03: GitHub Actions are optional: make check runs before every merge and the server publishes the map. Actions being locked for billing blocks nothing.
 - 2026-10-03: A country's refresh rate depends on its score; users never trigger fetches, so identical requests add no load.
@@ -294,6 +295,10 @@ Branch: `—`
 
 ## Changelog
 
+- **0.2.106** (2026-10-06)
+  - Operator notices (advice changes, collector failures, health, war status) are in the language chosen in the bot: a short summary, the source text folded.
+  - False "Collector fr failed (0 errors)" removed: a source is skipped when none of the due countries is covered by it.
+  - GDELT: distinct articles instead of summed mentions; a surge needs both last days ≥2x usual and ≥15 articles (one viral story gave x17–x30); `tension-index gdelt --force` recomputes the day.
 - **0.2.105** (2026-10-05)
   - GDELT: military event volume now comes from daily event files (1 file a day instead of 38 queries that hit 429 and the 15-min kill); an empty `{}` answer is a failure, not a silent success; stop after 3 failures in a row; 10-min deadline and the run row is closed on timeout or systemd stop; timer at 07:43 UTC.
 - **0.2.104** (2026-10-05)

@@ -175,7 +175,15 @@ async def collect_all(
                 continue
             if not sources and name in settings.disabled_sources:
                 continue  # switched off in settings (DISABLED_SOURCES)
-            result = await collect_source(db, cls(client), countries)
+            source = cls(client)
+            if countries and not any(
+                source.supports(c) for code, c in COUNTRIES.items() if code in countries
+            ):
+                # e.g. only France is due and France does not advise on itself: no run at all,
+                # otherwise an empty run reads as a failure.
+                log.info("%s: none of the due countries is covered, skipped", name)
+                continue
+            result = await collect_source(db, source, countries)
             log.info(
                 "%s: fetched=%d changed=%d failed=%d ok=%s",
                 name,

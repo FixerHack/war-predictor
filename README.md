@@ -90,7 +90,7 @@ cd war-predictor
 make test                  # тести
 make lint                  # ruff
 ./scripts/run.sh run       # повний цикл: збір → класифікація → бал (~1 хв)
-./scripts/run.sh gdelt     # щоденний збір GDELT окремо (до 10 хвилин)
+./scripts/run.sh gdelt     # щоденний збір GDELT окремо (до 10 хвилин; --force: повторно сьогодні)
 ./scripts/run.sh why LU       # з чого складається бал країни (блоки, сигнали)
 ./scripts/run.sh collect --countries PL,EE   # лише збір для кількох країн
 ./scripts/run.sh probe us --country PL      # що насправді віддає джерело

@@ -11,7 +11,6 @@ import signal
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from html import escape
 
 import httpx
 
@@ -63,12 +62,14 @@ def score_alerts(updates: list[ScoreUpdate], threshold: float = 1.0) -> list[Sco
     ]
 
 
-async def run_extra(db, client, settings: Settings, name: str) -> RunResult:
+async def run_extra(db, client, settings: Settings, name: str, **kwargs: object) -> RunResult:
     """One non-advisory collector under its deadline. On a deadline, error or cancellation the
     collect_runs row is still closed (ok=0) so health never sees a run stuck in progress."""
     deadline = EXTRA_DEADLINES.get(name, 120.0)
     try:
-        result = await asyncio.wait_for(EXTRA_COLLECTORS[name](db, client, settings), deadline)
+        result = await asyncio.wait_for(
+            EXTRA_COLLECTORS[name](db, client, settings, **kwargs), deadline
+        )
     except (httpx.HTTPError, ValueError, KeyError, TimeoutError, asyncio.CancelledError) as exc:
         if isinstance(exc, TimeoutError):
             error = f"deadline of {deadline:.0f} s exceeded"
@@ -91,8 +92,8 @@ async def run_extra(db, client, settings: Settings, name: str) -> RunResult:
     return result
 
 
-async def run_slow(settings: Settings) -> list[RunResult]:
-    """The daily slow collectors (GDELT) on their own. SIGTERM (systemd stop or timeout)
+async def run_slow(settings: Settings, force: bool = False) -> list[RunResult]:
+    """The daily slow collectors (GDELT) on their own; `force` ignores the once-a-day limit. SIGTERM (systemd stop or timeout)
     cancels the run cleanly: the collect_runs row is closed as failed before exiting."""
     results = []
     loop = asyncio.get_running_loop()
@@ -105,7 +106,8 @@ async def run_slow(settings: Settings) -> list[RunResult]:
             for name in SLOW_COLLECTORS:
                 log.info("collecting %s (daily, deadline %.0f s)", name, EXTRA_DEADLINES[name])
                 try:
-                    results.append(await run_extra(db, client, settings, name))
+                    options = {"force": True} if force else {}
+                    results.append(await run_extra(db, client, settings, name, **options))
                 except asyncio.CancelledError:
                     if task is not None:
                         task.uncancel()  # handled: exit with a failed result, not a traceback
@@ -121,7 +123,14 @@ async def run_cycle(
 ) -> CycleReport:
     """`adaptive`: fetch only countries whose refresh interval has passed (refresh.py); with
     none due, nothing runs. Otherwise every country is fetched."""
-    from tension_index.notify import broadcast, broadcast_change, render_score, send
+    from tension_index.notify import (
+        broadcast,
+        broadcast_change,
+        render_admin_change,
+        render_collector_failed,
+        render_score,
+        send_admin,
+    )
     from tension_index.refresh import due_countries
     from tension_index.sources import REGISTRY
 
@@ -159,15 +168,13 @@ async def run_cycle(
                     if cls and cls.change_type == "editorial":
                         continue  # formatting/contact edits are not worth a push
                     summary = {"uk": cls.summary_uk, "en": cls.summary_en} if cls else None
-                    await send(settings, f"🔔 <b>{country}</b> · {escape(label)}\n"
-                               f"<pre>{escape(diff[:3000])}</pre>")  # fmt: skip
+                    await send_admin(settings, render_admin_change(
+                        country, label, diff, summary, cls.quote if cls else ""))  # fmt: skip
                     await broadcast_change(settings, country, label, diff, summary,
                                            cls.quote if cls else "")  # fmt: skip
                 if not r.ok:
-                    await send(
-                        settings,
-                        f"❌ Collector <b>{escape(r.source)}</b> failed ({r.failed} errors)\n"
-                        f"<pre>{escape(chr(10).join(r.errors[:5]))}</pre>",
+                    await send_admin(
+                        settings, render_collector_failed(r.source, r.failed, r.fetched, r.errors)
                     )
             for u in score_alerts(report.updates):
                 payload = u.result.as_dict()
