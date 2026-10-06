@@ -1,9 +1,11 @@
 """GDELT (free, no key): block E media volume and block D aggressor advice.
 
 - Volume: GDELT 1.0 daily event exports (one static zip per day, no rate limit) give the
-  number of articles about military events (CAMEO roots 15/18/19/20) located in each
-  country; a surge (last 2 days vs the median of the prior 60) is a tier-3 media signal that
-  counts only when tier 1-2 news confirm activity in the same country. The DOC 2.0 API used
+  number of distinct articles about military events (CAMEO roots 15/18/19/20) located in
+  each country. The data is sparse (a few to a few dozen articles per country a day) and one
+  viral story or a geocoding slip can multiply a day, so a surge needs both of the last 2
+  days at 2x the median of the prior 60 and a minimum absolute level. It is a tier-3 media
+  signal that counts only when tier 1-2 news confirm activity in the same country. The DOC 2.0 API used
   before throttles hard (429 even at one request per 5 s, `{}` for busy queries), so 38
   timeline queries could not finish in time.
 - Russian/Belarusian MFA advice: one DOC 2.0 query for Russian-language articles about the
@@ -38,8 +40,8 @@ MFA_QUERY = '("МИД России" OR "МИД РФ" OR "МИД Белорусс
 # CAMEO event roots: 15 force posture, 18 assault, 19 fight, 20 mass violence.
 MILITARY_ROOTS = frozenset({"15", "18", "19", "20"})
 # Columns of the 58-column daily export (tab-separated, no header).
-COL_ROOT, COL_ARTICLES, COL_GEO_COUNTRY = 28, 33, 51
-SERIES_KEY = "conflict"
+COL_ROOT, COL_GEO_COUNTRY, COL_URL = 28, 51, 57
+SERIES_KEY = "conflict_urls"  # distinct articles a day
 HISTORY_DAYS = 62  # 2 recent days + 60 for the baseline
 BACKFILL_PER_RUN = 20  # older days fetched per run until the history is complete
 MAX_FAILURES = 3  # consecutive failed/empty responses before giving up
@@ -47,6 +49,8 @@ PAUSE_SECONDS = 5.5  # between DOC API requests
 FILE_PAUSE_SECONDS = 1.0  # between static event files
 MIN_INTERVAL_HOURS = 20
 SURGE_RATIO = 2.0
+MIN_BASE = 5.0  # median articles a day below which a ratio is noise
+MIN_RECENT = 15.0  # articles on each of the last 2 days
 _ISO_BY_FIPS = {fips: iso for iso, fips in FIPS.items() if iso in COUNTRIES}
 
 
@@ -55,31 +59,32 @@ class EmptyResponse(ValueError):
 
 
 def parse_events(data: bytes) -> dict[str, float]:
-    """{ISO: articles about military events} from a zipped daily export."""
-    totals = dict.fromkeys(COUNTRIES, 0.0)
+    """{ISO: distinct articles about military events} from a zipped daily export. Articles,
+    not GDELT's NumArticles sum: one story reported by 1,400 outlets is one data point."""
+    urls: dict[str, set[str]] = {code: set() for code in COUNTRIES}
     rows = 0
     archive = zipfile.ZipFile(io.BytesIO(data))
     with archive, archive.open(archive.namelist()[0]) as raw:
         for line in io.TextIOWrapper(raw, encoding="utf-8", errors="replace"):
             fields = line.split("\t")
-            if len(fields) <= COL_GEO_COUNTRY:
+            if len(fields) <= COL_URL:
                 continue
             rows += 1
             iso = _ISO_BY_FIPS.get(fields[COL_GEO_COUNTRY])
             if iso and fields[COL_ROOT] in MILITARY_ROOTS:
-                totals[iso] += float(fields[COL_ARTICLES] or 0)
+                urls[iso].add(fields[COL_URL].strip())
     if not rows:
         raise EmptyResponse("event file has no rows")
-    return totals
+    return {code: float(len(found)) for code, found in urls.items()}
 
 
 def surge_ratio(counts: list[tuple[str, float]]) -> float | None:
     values = [v for _, v in counts]
     if len(values) < 30:
         return None
-    recent = statistics.mean(values[-2:])
+    recent = min(values[-2:])  # both days, so a one-day spike is not a surge
     base = statistics.median(values[-62:-2])
-    return recent / base if base >= 3 else None
+    return recent / base if base >= MIN_BASE and recent >= MIN_RECENT else None
 
 
 def surge_strength(ratio: float) -> float:
@@ -156,6 +161,9 @@ async def collect_events(
 ) -> None:  # fmt: skip
     """Fetch missing daily event files into `series`; stop after MAX_FAILURES in a row."""
     days = days_to_fetch(await _stored_days(db), today)
+    if not days:
+        result.fetched = 1  # history complete (a forced re-run): nothing to download
+        return
     streak = 0
     for i, day in enumerate(days):
         if i:
@@ -187,6 +195,11 @@ async def collect_events(
 
 
 async def surge_signals(db: aiosqlite.Connection, now: datetime) -> int:
+    ref = f"gdelt:{now:%Y-%m-%d}"
+    # A re-run on the same day recomputes the day's surges instead of adding to them.
+    await db.execute(
+        "UPDATE signals SET active = 0 WHERE ref = ? AND kind = 'media:gdelt_surge'", (ref,)
+    )
     count = 0
     fresh = f"{now.date() - timedelta(days=3):%Y%m%d}"
     for code in COUNTRIES:
@@ -203,7 +216,7 @@ async def surge_signals(db: aiosqlite.Connection, now: datetime) -> int:
             note=f"military-related coverage x{ratio:.1f} vs usual",
             note_uk=f"публікацій на військову тему в {ratio:.1f} раза більше за звичне",
         )  # fmt: skip
-        await storage.upsert_signal(db, signal, f"gdelt:{now:%Y-%m-%d}")
+        await storage.upsert_signal(db, signal, ref)
         count += 1
     return count
 
@@ -214,10 +227,11 @@ async def collect_gdelt(
     settings: Settings,
     pause: float = PAUSE_SECONDS,
     file_pause: float = FILE_PAUSE_SECONDS,
+    force: bool = False,
 ) -> RunResult:
     now = datetime.now(UTC)
     result = RunResult(source="gdelt")
-    if await _recently_ran(db, now):
+    if not force and await _recently_ran(db, now):
         result.fetched = 1  # nothing to do today; not a failure
         return result
     run_id = await storage.start_run(db, "gdelt")

@@ -16,19 +16,21 @@ from tension_index.extra import gdelt
 YESTERDAY = datetime.now(UTC).date() - timedelta(days=1)
 
 
-def _row(fips: str, root: str, articles: int) -> str:
+def _row(fips: str, root: str, url: str) -> str:
     fields = [""] * 58
-    fields[gdelt.COL_ROOT], fields[gdelt.COL_ARTICLES] = root, str(articles)
-    fields[gdelt.COL_GEO_COUNTRY] = fips
+    fields[gdelt.COL_ROOT], fields[gdelt.COL_GEO_COUNTRY], fields[gdelt.COL_URL] = root, fips, url
     return "\t".join(fields) + "\n"
 
 
 def events_zip(poland_articles: int) -> bytes:
-    rows = (
-        _row("PL", "19", poland_articles)
-        + _row("PL", "04", 500)  # consult: not military
-        + _row("AU", "18", 4)  # FIPS AU is Austria
-        + _row("AS", "18", 99)  # FIPS AS is Australia: not monitored
+    rows = "".join(
+        _row("PL", "19", f"https://pl.example/{i}") * 3  # several events per article
+        for i in range(poland_articles)
+    )
+    rows += (
+        _row("PL", "04", "https://pl.example/talks")  # consult: not military
+        + _row("AU", "18", "https://at.example/1")  # FIPS AU is Austria
+        + _row("AS", "18", "https://au.example/1")  # FIPS AS is Australia: not monitored
     )
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w") as z:
@@ -46,19 +48,27 @@ MFA = {"articles": [
 ]}  # fmt: skip
 
 
-async def _collect(db, settings, handler) -> RunResult:
+async def _collect(db, settings, handler, force=False) -> RunResult:
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as c:
-        return await gdelt.collect_gdelt(db, c, settings, pause=0, file_pause=0)
+        return await gdelt.collect_gdelt(db, c, settings, pause=0, file_pause=0, force=force)
 
 
 async def _last_run(db):
     return (await storage.last_runs(db))[0]
 
 
-def test_parse_events():
+def test_parse_events_counts_distinct_articles():
     totals = gdelt.parse_events(events_zip(7))
-    assert totals["PL"] == 7 and totals["AT"] == 4 and totals["FR"] == 0
+    assert totals["PL"] == 7 and totals["AT"] == 1 and totals["FR"] == 0
     assert len(totals) == len(gdelt.COUNTRIES)
+
+
+def test_one_day_spike_or_tiny_numbers_are_not_a_surge():
+    quiet = [(f"d{i:02d}", 10.0) for i in range(60)]
+    assert gdelt.surge_ratio(quiet + [("a", 300.0), ("b", 12.0)]) is None  # 12 < MIN_RECENT
+    assert gdelt.surge_ratio(quiet + [("a", 300.0), ("b", 25.0)]) == 2.5  # min of both days
+    tiny = [(f"d{i:02d}", 2.0) for i in range(60)]
+    assert gdelt.surge_ratio(tiny + [("a", 20.0), ("b", 20.0)]) is None  # base below MIN_BASE
 
 
 def test_days_to_fetch_backfills_newest_first():
@@ -75,8 +85,8 @@ async def test_collect_events_and_surge(settings):
             day = f"{YESTERDAY + timedelta(days=1) - timedelta(days=i):%Y%m%d}"
             await db.execute(
                 "INSERT INTO series (source, country, key, period, value) "
-                "VALUES ('gdelt', 'PL', 'conflict', ?, 10)",
-                (day,),
+                "VALUES ('gdelt', 'PL', ?, ?, 10)",
+                (gdelt.SERIES_KEY, day),
             )
         await db.commit()
         requested = []
@@ -96,6 +106,10 @@ async def test_collect_events_and_surge(settings):
                 ("PL", "media:gdelt_surge"),
             ]
         assert (await _last_run(db))["ok"] == 1
+        # A forced re-run the same day recomputes the surges instead of stacking them.
+        assert (await _collect(db, settings, handler, force=True)).ok
+        async with db.execute("SELECT COUNT(*) FROM signals WHERE active = 1") as cur:
+            assert (await cur.fetchone())[0] == 2
 
 
 async def test_empty_mfa_answer_is_recorded_not_silent(settings):

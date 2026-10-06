@@ -101,7 +101,7 @@ def test_gdelt_surge():
         ("20260801", 50.0),
     ]
     ratio = gdelt.surge_ratio(series)
-    assert ratio == 4.5 and gdelt.surge_strength(ratio) == 0.8
+    assert ratio == 4.0 and gdelt.surge_strength(ratio) == 0.7
     assert gdelt.surge_ratio(series[:10]) is None
 
 

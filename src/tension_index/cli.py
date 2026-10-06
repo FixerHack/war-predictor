@@ -33,7 +33,12 @@ async def _init_db() -> int:
 
 async def _collect(args: argparse.Namespace) -> int:
     from tension_index.collector import collect_all
-    from tension_index.notify import broadcast_change, send
+    from tension_index.notify import (
+        broadcast_change,
+        render_admin_change,
+        render_collector_failed,
+        send_admin,
+    )
     from tension_index.sources import REGISTRY
 
     settings = get_settings()
@@ -42,24 +47,19 @@ async def _collect(args: argparse.Namespace) -> int:
         label = REGISTRY[r.source].label if r.source in REGISTRY else r.source
         for country, diff, _ in r.changes:
             if args.notify:
-                await send(
-                    settings,
-                    f"🔔 <b>{country}</b> · {escape(label)}: advisory changed\n"
-                    f"<pre>{escape(diff[:3000])}</pre>",
-                )
+                await send_admin(settings, render_admin_change(country, label, diff))
                 await broadcast_change(settings, country, label, diff)
         if not r.ok and args.notify:
-            await send(
-                settings,
-                f"❌ Collector <b>{escape(r.source)}</b> failed "
-                f"({r.failed} errors)\n<pre>{escape(chr(10).join(r.errors[:5]))}</pre>",
+            await send_admin(
+                settings, render_collector_failed(r.source, r.failed, r.fetched, r.errors)
             )
     return 0 if all(r.ok for r in results) else 2
 
 
 async def _health(args: argparse.Namespace) -> int:
     from tension_index.health import Status, run_checks
-    from tension_index.notify import send
+    from tension_index.i18n import t
+    from tension_index.notify import send_admin
 
     settings = get_settings()
     report = await run_checks(settings)
@@ -69,7 +69,10 @@ async def _health(args: argparse.Namespace) -> int:
         else report.as_text()
     )
     if report.status == Status.FAIL and args.notify:
-        await send(settings, f"<b>Healthcheck FAIL</b>\n<pre>{escape(report.as_text())}</pre>")
+        await send_admin(
+            settings,
+            lambda lang: f"{t(lang, 'admin_health_fail')}\n<pre>{escape(report.as_text())}</pre>",
+        )
     if report.status != Status.FAIL and settings.health_ping_url:
         try:
             async with httpx.AsyncClient(timeout=10) as client:
@@ -82,7 +85,8 @@ async def _health(args: argparse.Namespace) -> int:
 async def _war_check(args: argparse.Namespace) -> int:
     from tension_index import war_status
     from tension_index.collector import make_client
-    from tension_index.notify import send
+    from tension_index.i18n import t
+    from tension_index.notify import send_admin
 
     settings = get_settings()
     try:
@@ -106,18 +110,17 @@ async def _war_check(args: argparse.Namespace) -> int:
     except (httpx.HTTPError, KeyError, ValueError) as exc:
         print(f"war-check failed: {type(exc).__name__}: {exc}", file=sys.stderr)
         if args.notify:
-            await send(settings, f"❌ war-check failed: {escape(str(exc))}")
+            error = escape(str(exc))
+            await send_admin(settings, lambda lang: t(lang, "admin_war_check_failed", error=error))
         return 2
     diff = war_status.mismatches(war_status.load(), detected)
     mentioned = ", ".join(f"{code}={sev}" for code, sev in sorted(detected.items())) or "none"
     print(f"Monitored countries mentioned on Wikipedia: {mentioned}")
     print("\n".join(diff) or "No mismatches with Wikipedia")
     if diff and args.notify:
-        await send(
+        await send_admin(
             settings,
-            "⚠️ <b>War status: review config/conflicts.yaml</b>\n<pre>"
-            + escape("\n".join(diff))
-            + "</pre>",
+            lambda lang: f"{t(lang, 'admin_war_review')}\n<pre>{escape(chr(10).join(diff))}</pre>",
         )
     return 1 if diff else 0
 
@@ -222,10 +225,10 @@ async def _digest() -> int:
     return 0
 
 
-async def _gdelt() -> int:
+async def _gdelt(args: argparse.Namespace) -> int:
     from tension_index.runner import run_slow
 
-    results = await run_slow(get_settings())
+    results = await run_slow(get_settings(), force=args.force)
     for r in results:
         print(f"{r.source}: fetched={r.fetched} changed={r.changed} failed={r.failed} ok={r.ok}")
     return 0 if all(r.ok for r in results) else 2
@@ -418,7 +421,8 @@ def build_parser() -> argparse.ArgumentParser:
         help="only countries due by their score (config/weights.yaml, refresh)",
     )  # fmt: skip
 
-    sub.add_parser("gdelt", help="daily GDELT collection (media volume, RU/BY MFA advice)")
+    p = sub.add_parser("gdelt", help="daily GDELT collection (media volume, RU/BY MFA advice)")
+    p.add_argument("--force", action="store_true", help="run even if it already ran today")
 
     p = sub.add_parser("why", help="explain a country's latest score (blocks and signals)")
     p.add_argument("country", help="ISO code, e.g. LU")
@@ -465,7 +469,7 @@ def main(argv: list[str] | None = None) -> None:
         "probe": lambda: _probe(args),
         "classify": lambda: _classify(),
         "run": lambda: _run(args),
-        "gdelt": lambda: _gdelt(),
+        "gdelt": lambda: _gdelt(args),
         "digest": lambda: _digest(),
         "changes": lambda: _changes(args),
         "why": lambda: _why(args),

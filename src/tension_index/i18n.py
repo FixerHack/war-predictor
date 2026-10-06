@@ -167,6 +167,32 @@ TEXTS: dict[str, dict[str, str]] = {
         "uk": "🔔 {flag} <b>{country}</b>: змінилась рекомендація ({source})",
         "en": "🔔 {flag} <b>{country}</b>: travel advice changed ({source})",
     },
+    # Operator messages (TELEGRAM_CHAT_ID), in the language the operator uses in the bot.
+    "admin_diff": {
+        "uk": "Що змінилось у тексті (мовою джерела):",
+        "en": "Text diff (in the source's language):",
+    },
+    "admin_no_summary": {
+        "uk": "Короткого опису немає: класифікатор недоступний.",
+        "en": "No summary: the classifier is unavailable.",
+    },
+    "admin_collector_failed": {
+        "uk": "❌ Збирач <b>{source}</b> не спрацював (помилок: {failed})",
+        "en": "❌ Collector <b>{source}</b> failed ({failed} errors)",
+    },
+    "admin_nothing_fetched": {
+        "uk": "Нічого не завантажено і помилок немає.",
+        "en": "Nothing was fetched and there were no errors.",
+    },
+    "admin_health_fail": {"uk": "<b>Перевірка стану: FAIL</b>", "en": "<b>Healthcheck FAIL</b>"},
+    "admin_war_check_failed": {
+        "uk": "❌ Перевірка статусу війн не вдалася: {error}",
+        "en": "❌ war-check failed: {error}",
+    },
+    "admin_war_review": {
+        "uk": "⚠️ <b>Статус війн: перевірте config/conflicts.yaml</b>",
+        "en": "⚠️ <b>War status: review config/conflicts.yaml</b>",
+    },
 }
 
 

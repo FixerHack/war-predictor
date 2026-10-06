@@ -40,6 +40,28 @@ async def send(settings: Settings, text: str) -> bool:
         await bot.session.close()
 
 
+async def admin_lang(settings: Settings) -> str:
+    """Language of TELEGRAM_CHAT_ID: the one its owner chose in the bot, Ukrainian otherwise."""
+    from tension_index import storage
+    from tension_index.i18n import DEFAULT_LANG
+
+    try:
+        chat_id = int(settings.telegram_chat_id)
+    except ValueError:
+        return DEFAULT_LANG
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        user = await storage.get_user(db, chat_id)
+    return (user.lang if user else None) or DEFAULT_LANG
+
+
+async def send_admin(settings: Settings, render: Callable[[str], str]) -> bool:
+    """Send `render(lang)` to TELEGRAM_CHAT_ID in the language its owner uses in the bot."""
+    if not (settings.telegram_bot_token and settings.telegram_chat_id):
+        return await send(settings, render("en"))  # only logged
+    return await send(settings, render(await admin_lang(settings)))
+
+
 async def broadcast(settings: Settings, country: str, render: Callable[[str], str]) -> int:
     """Send `render(lang)` to every user following `country` with alerts on, each in their
     own language. Returns the number of messages delivered."""
@@ -89,6 +111,47 @@ def render_change(
         if quote:
             body += f"\n<i>«{escape(quote[:300])}»</i>"
         return f"{head}\n{body}\n\n<i>{t(lang, 'disclaimer')}</i>"
+
+    return render
+
+
+def render_admin_change(
+    country: str,
+    source_label: str,
+    diff: str,
+    summary: dict[str, str] | None = None,
+    quote: str = "",
+) -> Callable[[str], str]:
+    """Change notice for the operator: the summary in their language, the original text diff
+    folded under it (the source text itself stays in the source's language)."""
+    from tension_index.countries import get_country
+    from tension_index.i18n import t
+
+    c = get_country(country)
+
+    def render(lang: str) -> str:
+        head = t(lang, "alert_change", flag=c.flag, country=escape(c.title(lang)),
+                 source=escape(source_label))  # fmt: skip
+        text = (summary or {}).get(lang, "")
+        body = escape(text) if text else t(lang, "admin_no_summary")
+        if quote:
+            body += f"\n<i>«{escape(quote[:300])}»</i>"
+        return (f"{head}\n{body}\n\n{t(lang, 'admin_diff')}\n"
+                f"<blockquote expandable>{escape(diff[:2500])}</blockquote>")  # fmt: skip
+
+    return render
+
+
+def render_collector_failed(source: str, failed: int, fetched: int, errors: list[str]):
+    from tension_index.i18n import t
+
+    def render(lang: str) -> str:
+        text = t(lang, "admin_collector_failed", source=escape(source), failed=failed)
+        if not errors and not fetched:
+            text += "\n" + t(lang, "admin_nothing_fetched")
+        if errors:
+            text += f"\n<pre>{escape(chr(10).join(e[:300] for e in errors[:5]))}</pre>"
+        return text
 
     return render
 
