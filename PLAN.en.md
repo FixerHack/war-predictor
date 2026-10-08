@@ -139,7 +139,7 @@ Branch: `dev-classifier`
 - ✅ **S6.2** Call only on changed fragments, prompt caching, spend cap
   - Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key.
 - ⬜ **S6.3** Manual check on 50 examples _(manual)_
-  - Sheet: tension-index review (on the server) → reports/classification-review.md, the latest 50 Claude classifications; mark right/wrong.
+  - Sheet: tension-index review → reports/classification-review.md (the same edit across countries is one entry); 30 distinct edits as of 2026-10-08; mark right/wrong.
 - ✅ **S6.7** Classifier through the local Claude Code CLI (claude -p, no API key)
   - CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed.
 - ✅ **S6.8** Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code
