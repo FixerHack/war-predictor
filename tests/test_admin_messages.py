@@ -55,7 +55,7 @@ def test_review_sheet():
                       '"normal", "airspace": "unknown", "summary_uk": "Додано про крадіжки."}'}  # fmt: skip
     sheet = review_sheet([row])
     assert "## 1. NL · us · 2026-10-06T04:08 (зміна #7)" in sheet
-    assert "причина: **crime**" in sheet and "Додано про крадіжки." in sheet
+    assert "причина: **злочинність**" in sheet and "Додано про крадіжки." in sheet
     assert "    +Petty crime is common." in sheet
 
 

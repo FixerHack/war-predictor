@@ -2,15 +2,15 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.6.0**, updated 2026-10-08.
+Version **0.6.1**, updated 2026-10-08.
 
-**Overall progress: 89%** · left ≈ 5.6 days · ✅ 85 · 🟡 1 · ⬜ 5 · ⛔ 4
+**Overall progress: 89%** · left ≈ 5.4 days · ✅ 86 · 🟡 1 · ⬜ 4 · ⛔ 4
 
 ## Milestones
 
 - **M1** — MVP: 14 days of unattended collection, backtest scores Ukraine 7+ before 2022-02-24, every alert explained
 
-## S0. Foundation & infrastructure — 93%
+## S0. Foundation & infrastructure — 96%
 
 _Repository, working environment on the MacBook and server, keys, Telegram bot._
 
@@ -36,7 +36,8 @@ Branch: `dev-bootstrap`
   - Optional: make check runs the checks, the server publishes the map.
 - ✅ **S0.16** Publish the progress page without Actions (make pages → gh-pages branch)
 - ✅ **S0.17** Gateway installer waits up to 30 s for the service to start instead of a fixed 2 s
-- ⬜ **S0.14** Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip _(manual)_
+- ✅ **S0.14** Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip _(manual)_
+  - Ruleset protect-main: no force-push or deletion of main (no PR requirement: work is merged locally); branch claude/funny-planck-leoxip deleted.
 
 ## S1. Input decisions — 100%
 
@@ -301,6 +302,9 @@ Branch: `—`
 
 ## Changelog
 
+- **0.6.1** (2026-10-08)
+  - main is protected from force-push and deletion; the old claude/funny-planck-leoxip branch is deleted.
+  - The classification review sheet is in Ukrainian (reason and change type names).
 - **0.6.0** (2026-10-08)
   - Stages S1, S4, S5, S11 finished: the source list is approved, the disclaimer has a liability and data sources section, historical episodes re-run (all PASS).
   - France: the level (green/yellow/orange/red, zones separately) is now read from the "Zones de vigilance" section; before, no level was found at all.
