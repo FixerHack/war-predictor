@@ -251,8 +251,11 @@ async def collect_gdelt(
     return result
 
 
-async def mfa_signals(db: aiosqlite.Connection, articles: list[dict], now: datetime) -> int:
-    """Aggressor advice to its citizens about a country: 2+ outlets = confirmed."""
+async def mfa_signals(
+    db: aiosqlite.Connection, articles: list[dict], now: datetime, publisher: str = "gdelt"
+) -> int:
+    """Aggressor advice to its citizens about a country: 2+ outlets = confirmed. One signal
+    per publisher, country and day."""
     by_country: dict[str, list[dict]] = {}
     for article in articles:
         for code in countries_in_ru(article.get("title", "")):
@@ -263,9 +266,9 @@ async def mfa_signals(db: aiosqlite.Connection, articles: list[dict], now: datet
         confirmed = len(domains) >= 2
         signal = Signal(
             country=code, block="aggressor", kind="aggressor:mfa_advisory", strength=0.8,
-            publisher="gdelt", observed_at=now, tier=2 if confirmed else 3, confirmed=confirmed,
-            reason="military_threat", note=items[0].get("title", "")[:200],
+            publisher=publisher, observed_at=now, tier=2 if confirmed else 3,
+            confirmed=confirmed, reason="military_threat", note=items[0].get("title", "")[:200],
         )  # fmt: skip
-        await storage.upsert_signal(db, signal, f"gdelt-mfa:{now:%Y-%m-%d}")
+        await storage.upsert_signal(db, signal, f"{publisher}-mfa:{now:%Y-%m-%d}")
         count += 1
     return count

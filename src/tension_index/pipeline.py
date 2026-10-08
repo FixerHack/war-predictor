@@ -37,7 +37,8 @@ from tension_index.scoring import (
 
 log = logging.getLogger(__name__)
 
-# Publishers whose level is not structured: the classifier reads it from the text.
+# Publishers whose level may be missing from the page: the classifier reads it from the text
+# when the collector could not (France states it in prose; fr.py parses it).
 TEXT_LEVEL_PUBLISHERS = {"fr"}
 
 
@@ -137,7 +138,7 @@ async def classify_pending(
         if done and not (done["method"] == PENDING and claude is not None and claude.available):
             continue
         strength = advisory_strength(cfg, snap["source"], snap["level"])
-        needs_text_level = snap["source"] in TEXT_LEVEL_PUBLISHERS
+        needs_text_level = snap["source"] in TEXT_LEVEL_PUBLISHERS and not snap["level"]
         kwargs = None
         if strength > 0 or needs_text_level:
             kwargs = {"publisher": snap["source"], "country": snap["country"],

@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.2.106**, updated 2026-10-06.
+Version **0.6.0**, updated 2026-10-08.
 
-**Overall progress: 78%** · left ≈ 10.9 days · ✅ 70 · 🟡 14 · ⬜ 7 · ⛔ 4
+**Overall progress: 89%** · left ≈ 5.6 days · ✅ 85 · 🟡 1 · ⬜ 5 · ⛔ 4
 
 ## Milestones
 
@@ -38,7 +38,7 @@ Branch: `dev-bootstrap`
 - ✅ **S0.17** Gateway installer waits up to 30 s for the service to start instead of a fixed 2 s
 - ⬜ **S0.14** Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip _(manual)_
 
-## S1. Input decisions — 80%
+## S1. Input decisions — 100%
 
 _Fix scope, format and sources._
 
@@ -48,15 +48,16 @@ Branch: `—`
   - Ukraine excluded: active war keeps the scale at maximum.
 - ✅ **S1.2** Format: public service
 - ✅ **S1.3** Advisory sources: US, UK, Israel, Canada, Australia, Germany, France + Russian and Belarusian MFA
-- 🟡 **S1.4** Approve the source list (docs/sources.md) _(manual)_
-  - Source catalogue with access and verification status is ready, needs approval.
+- ✅ **S1.4** Approve the source list (docs/sources.md) _(manual)_
+  - Approved by the owner on 2026-10-08.
 - ✅ **S1.5** Development: project owner + Claude Code; own server
 - ✅ **S1.6** Budget: free stack, only Claude API is paid (10–20 $ cap)
-- ⬜ **S1.7** Legal disclaimer text (not a forecast, not advice) _(manual)_
+- ✅ **S1.7** Legal disclaimer text (not a forecast, not advice) _(manual)_
+  - Text: bot and site ("an indicator of signals, not a forecast or advice to leave"); the site has a liability and data sources section (licences).
 - ✅ **S1.8** 0–10 scale algorithm (docs/algorithm.md)
 - ✅ **S1.9** Research of sources and war trackers (docs/sources.md)
 
-## S2. Official advisory collection — 71%
+## S2. Official advisory collection — 85%
 
 _Regular collection of advisories, storing every text version._
 
@@ -73,50 +74,50 @@ Branch: `dev-collector`
   - Verified on live data 30 Sep–1 Oct 2026.
 - ⛔ **S2.6** Australia (Smartraveller destinations-export)
   - Smartraveller does not answer automated requests (export and pages, tested 2026-09-30); disabled via DISABLED_SOURCES=au.
-- 🟡 **S2.7** France (diplomatie.gouv.fr, scraping)
-  - Page text only, level set by the classifier; verify with probe fr
+- ✅ **S2.7** France (diplomatie.gouv.fr, scraping)
+  - Two pages per country: alerts and the "Zones de vigilance" section; the level (vert/jaune/orange/rouge, zones as *_parts) is parsed, the classifier only as a fallback.
 - ⛔ **S2.8** Israel (NSC travel warnings)
   - NSC page is a JS app with no known API; needs a sample response. Low weight for Europe.
-- 🟡 **S2.9** Russian and Belarusian MFA advisories to own citizens
-  - Via GDELT: Russian-language reports of RU/BY MFA advice, 2+ outlets = confirmed.
+- ✅ **S2.9** Russian and Belarusian MFA advisories to own citizens
+  - Hourly: headlines of TASS, RIA, Interfax, Lenta, RG (MFA/embassy + travel/citizens + country), 2+ outlets = confirmed; the GDELT DOC query stays as a fallback (often 429). BelTA and the ministries' sites refuse the server.
 - ✅ **S2.10** Telegram alert when a source breaks
 - ✅ **S2.11** Strip update dates and boilerplate before diffing
-- 🟡 **S2.12** US: RSS feed gone (404) — fallback to the cadataapi.state.gov API (RSS/Atom/JSON)
-  - API format only assumed; needs a probe us check.
+- ✅ **S2.12** US: RSS feed gone (404) — fallback to the cadataapi.state.gov API (RSS/Atom/JSON)
+  - Works on the server through the API (hourly successful runs, changes arrive).
 
-## S3. Aviation & airspace — 33%
+## S3. Aviation & airspace — 60%
 
 _Official airspace warnings and actual traffic drops._
 
 Branch: `dev-aviation`
 
-- 🟡 **S3.1** EASA Conflict Zone Information Bulletins
-  - Implemented (page parsing); verify: tension-index probe easa
+- ✅ **S3.1** EASA Conflict Zone Information Bulletins
+  - Works on the server (hourly successful runs).
 - ⛔ **S3.2** NOTAM: airspace restrictions and closures
   - No free European NOTAM API (EUROCONTROL EAD is paid). Airspace limits come from advisory texts and CZIBs.
-- 🟡 **S3.3** OpenSky: drop in flights per airport
-  - Implemented via OpenSky (traffic drop); baseline needs ~3 weeks of samples.
+- ✅ **S3.3** OpenSky: drop in flights per airport
+  - Collecting since 2026-10-01; the hour-of-week norm appears after ~3 weeks (around 22.10), drops do not count before.
 - ✅ **S3.6** Air traffic drop: norm only from 3+ weeks, 20-aircraft and 3σ thresholds, signal cleared on recovery
   - The false LU signal ("3 aircraft vs usual 10") can no longer happen.
 
-## S4. News, analysis, domestic measures — 50%
+## S4. News, analysis, domestic measures — 100%
 
 _Independent confirmation from media, analysis, markets and the country's own measures._
 
 Branch: `dev-news`
 
-- 🟡 **S4.1** Tier 1–2 RSS, headlines and links only
-  - Implemented: 13 feeds in config/feeds.yaml, an event counts only from 2+ feeds; check URLs: tension-index probe news
-- 🟡 **S4.2** GDELT: volume and tone per country
-  - Surge of distinct articles about military events from GDELT 1.0 daily files (the DOC API throttles hard): both last days ≥2x the 60-day median and ≥15 articles; counts only when news confirm. Data is sparse; tone not implemented.
-- 🟡 **S4.3** CrisisWatch: deterioration and Conflict Risk Alerts
-  - Via the Crisis Group RSS in the news feeds.
-- 🟡 **S4.4** Domestic measures: mobilisation, emergency decrees, border closures
-  - From news: emergency, borders, mobilisation (2+ feeds only).
-- 🟡 **S4.5** Markets: bonds and FX via ECB Data Portal
-  - ECB: 10y spread over Germany and FX (daily).
+- ✅ **S4.1** Tier 1–2 RSS, headlines and links only
+  - 11 feeds in config/feeds.yaml, all working on the server; an event counts only from 2+ feeds.
+- ✅ **S4.2** GDELT: volume and tone per country
+  - Surge of distinct articles about military events from GDELT 1.0 daily files (both last days ≥2x the 60-day median, ≥15 articles; only with news confirmation). Tone is not used: the DOC API is unavailable and tone in the event files is too sparse.
+- ✅ **S4.3** CrisisWatch: deterioration and Conflict Risk Alerts
+  - Crisis Group feed among the news feeds (tier 2).
+- ✅ **S4.4** Domestic measures: mobilisation, emergency decrees, border closures
+  - From news: emergency, borders, mobilisation (2+ feeds only; drills do not count).
+- ✅ **S4.5** Markets: bonds and FX via ECB Data Portal
+  - ECB: 10-year bond spread to Germany and the exchange rate, daily; works on the server.
 
-## S5. Historical archive — 76%
+## S5. Historical archive — 100%
 
 _Past advisory versions to test the scale on known episodes._
 
@@ -124,8 +125,8 @@ Branch: `dev-history`
 
 - ✅ **S5.1** Download past versions from the Wayback Machine (CDX API)
   - tension-index history: Wayback captures (daily 45 days before the event, every 5 days earlier) into data/history.sqlite3.
-- 🟡 **S5.2** Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25
-  - Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.
+- ✅ **S5.2** Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25
+  - 4 episodes loaded, backtest on 0.2.106: all PASS (Ukraine 7 at 66 days, Israel at 134 days, Armenia reaction in 2 days, France 2016 control max 3.0).
 - ✅ **S5.5** Wayback archive: long timeouts, retries on 429/5xx, progress in logs
 
 ## S6. Change classification (Claude API) — 78%
@@ -138,7 +139,7 @@ Branch: `dev-classifier`
 - ✅ **S6.2** Call only on changed fragments, prompt caching, spend cap
   - Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key.
 - ⬜ **S6.3** Manual check on 50 examples _(manual)_
-  - Needs an API key and real changes; review 50 classifications by hand.
+  - Sheet: tension-index review (on the server) → reports/classification-review.md, the latest 50 Claude classifications; mark right/wrong.
 - ✅ **S6.7** Classifier through the local Claude Code CLI (claude -p, no API key)
   - CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed.
 - ✅ **S6.8** Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code
@@ -200,12 +201,13 @@ Branch: `dev-war-status`
 - ✅ **S10.1** Curated config/conflicts.yaml based on RULAC (Moldova, Cyprus — occupation; borders with war and aggressor)
 - ✅ **S10.2** Daily check against Wikipedia, mismatches to admins (war-check)
 - ⬜ **S10.3** Obtain a UCDP API token _(manual)_
+  - Email mertcan.yilmaz@pcr.uu.se with a short project description; reply within 3–5 working days. Token → UCDP_TOKEN in the server .env.
 - ⛔ **S10.4** UCDP Candidate Events as a second automatic source
   - Waiting for the UCDP token (S10.3).
 - ✅ **S10.5** Verify the Wikipedia parser against the live page
   - Verified on the live page: sections, Location column; France (French Guiana) excluded by review.
 
-## S11. Public dashboard — 97%
+## S11. Public dashboard — 100%
 
 _Country map and score history on free hosting._
 
@@ -217,8 +219,8 @@ Branch: `dev-dashboard`
   - Tile map of 38 countries, single-hue scale validated for colour blindness, light and dark.
 - ✅ **S11.3** Country page: score history and change explanations
   - Country card: score, reasons with quotes, flags, war status, 90-day chart; table of all countries; #PL links.
-- 🟡 **S11.4** Disclaimer and methodology on the site _(manual)_
-  - Working disclaimer and methodology on the page; final wording approved by the owner (S1.7).
+- ✅ **S11.4** Disclaimer and methodology on the site _(manual)_
+  - Methodology, disclaimer, liability and source attribution on the map page.
 - ✅ **S11.6** Ukrainian explanations: the classifier's summary instead of the English quote (map, bot, alerts)
   - English quotes remain for ENG and where no Ukrainian summary exists yet (news, rule-based classification).
 - ✅ **S11.7** Map: neighbours at war (Ukraine, Russia, Belarus) for context; phone layout for the map and the plan page
@@ -228,14 +230,15 @@ Branch: `dev-dashboard`
 - ✅ **S11.9** Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)
   - Running since 2026-10-05: tension-pages.timer, deploy key server-pages (this repository only).
 
-## S12. Operations — 69%
+## S12. Operations — 86%
 
 _The system runs unattended and reports failures._
 
 Branch: `dev-ops`
 
 - ✅ **S12.1** Daily SQLite backup with rotation
-- ⬜ **S12.2** Dead-man switch on healthchecks.io (free) _(manual)_
+- ✅ **S12.2** Dead-man switch on healthchecks.io (free) _(manual)_
+  - The healthchecks.io ping from health is on at the server since 2026-10-05.
 - 🟡 **S12.3** Auto-deploy from main (GitHub Actions → SSH)
   - .github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set.
 - ✅ **S12.5** Server: install Claude Code, claude setup-token, run claude-gateway (systemd) behind an HTTPS proxy _(manual)_
@@ -256,6 +259,8 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-10-08: France's level is read from the "Zones de vigilance" text: the colour of the whole country or of zones (*_parts: yellow 0.1, orange 0.3, red 0.45 — like the UK partial warnings); a country without a stated colour is green, as on the ministry's map.
+- 2026-10-08: RU/BY MFA advice to their citizens is taken from headlines of five Russian outlets (publisher ru_media, aggressor block); GDELT tone is not used.
 - 2026-10-06: Operator messages to TELEGRAM_CHAT_ID use the language the chat owner chose in the bot (Ukrainian by default); the original source text is shown folded.
 - 2026-10-05: GDELT media volume is counted from GDELT 1.0 daily event files (articles about CAMEO 15/18/19/20 events in the country), not the DOC 2.0 API: it answers 429 even at one request per 18 s and `{}` to queries that have data. The DOC API is kept for the single RU/BY MFA advice query.
 - 2026-10-03: GitHub Actions are optional: make check runs before every merge and the server publishes the map. Actions being locked for billing blocks nothing.
@@ -281,7 +286,8 @@ Branch: `—`
 
 ## Risks
 
-- The GDELT DOC 2.0 API is overloaded: RU/BY MFA advice may go uncollected for days (the error shows in health and collect_runs). Fallback: the GDELT web ngrams dataset.
+- RU/BY MFA advice is seen only through Russian outlets: if they do not report it or change headline wording, the signal is lost; Belarusian sources (BelTA, mfa.gov.by) refuse the server.
+- GDELT data is sparse (a few to dozens of articles per country a day) and sometimes mis-geocoded: a media surge is a weak tier-3 signal, counted only with news confirmation.
 - The gateway uses the signed-in person's Claude subscription: it must not be opened to other people; other people's programs need an API key.
 - Without OpenRouter credits classification falls back to rules only: reasons and embassy posture are cruder, the score less precise.
 - A genuine revert of an advisory within 7 days is not reported as a change (the state still updates).
@@ -295,6 +301,12 @@ Branch: `—`
 
 ## Changelog
 
+- **0.6.0** (2026-10-08)
+  - Stages S1, S4, S5, S11 finished: the source list is approved, the disclaimer has a liability and data sources section, historical episodes re-run (all PASS).
+  - France: the level (green/yellow/orange/red, zones separately) is now read from the "Zones de vigilance" section; before, no level was found at all.
+  - RU/BY MFA advice: hourly from TASS, RIA, Interfax, Lenta, RG headlines (GDELT answered 429 to this query almost always).
+  - review command: a sheet of the latest 50 Claude classifications for a manual check.
+  - Deactivated 27 false GDELT surges of 06–07.10 computed with the old metric.
 - **0.2.106** (2026-10-06)
   - Operator notices (advice changes, collector failures, health, war status) are in the language chosen in the bot: a short summary, the source text folded.
   - False "Collector fr failed (0 errors)" removed: a source is skipped when none of the due countries is covered by it.

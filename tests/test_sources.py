@@ -155,12 +155,50 @@ async def test_us():
     assert cz.level == "2"
 
 
-async def test_fr_uses_main_content():
-    page = "<html><nav>Menu Accueil</nav><main><h1>Pologne</h1><p>Vigilance normale.</p></main><footer>x</footer></html>"
-    async with client({"https://www.diplomatie.gouv.fr": page}) as c:
+def _fr_security(zones: str) -> str:
+    return (
+        "<html><nav>Menu</nav><main><h1>Sécurité</h1><h2>Zones de vigilance</h2>"
+        "<p>Dernière actualisation le 11/03/2026, information toujours valable à la date du jour</p>"
+        f"{zones}<h2>Risques encourus et recommandations associées</h2>"
+        "<p>Il est formellement déconseillé de photographier les installations militaires.</p>"
+        "</main></html>"
+    )
+
+
+async def test_fr_reads_alerts_and_vigilance_level():
+    alerts = "<html><nav>Menu Accueil</nav><main><h1>Pologne</h1><p>Frontière fermée.</p></main><footer>x</footer></html>"
+    security = _fr_security(
+        "<p>La Pologne figure en vigilance normale (vert sur la carte sécuritaire).</p>"
+    )
+    routes = {"https://www.diplomatie.gouv.fr/fr/information-par-pays/pologne/conseils": security,
+              "https://www.diplomatie.gouv.fr": alerts}  # fmt: skip
+    async with client(routes) as c:
         adv = await FrSource(c).fetch(get_country("PL"))
-    assert adv.text == "Pologne\nVigilance normale." and adv.level is None
-    assert not FrSource(c).supports(get_country("FR"))
+        assert adv.level == "vert"
+        assert adv.text.startswith("Pologne\nFrontière fermée.\n\nZones de vigilance:\n")
+        assert "La Pologne figure en vigilance normale" in adv.text
+        assert "photographier" not in adv.text  # outside the zones section
+        assert not FrSource(c).supports(get_country("FR"))
+    async with client({"https://www.diplomatie.gouv.fr": alerts}) as c:
+        with pytest.raises(SourceFormatError):  # no zones section: the country fails
+            await FrSource(c).fetch(get_country("PL"))
+
+
+@pytest.mark.parametrize(
+    ("zones", "level"),
+    [
+        (["L’ensemble du pays est en vigilance normale."], "vert"),
+        (["Région de Transnistrie", "Les voyages en Transnistrie sont déconseillés sauf raison impérative."], "orange_parts"),
+        (["Zone de vigilance renforcée", "Communes de Mitrovica Nord", "Il est déconseillé de faire de la randonnée."], "jaune_parts"),
+        (["Le pays figure en vigilance renforcée.", "Zone de vigilance renforcée au nord."], "jaune"),
+        (["L’ensemble du territoire est formellement déconseillé."], "rouge"),
+        ([], None),
+    ],
+)  # fmt: skip
+def test_fr_vigilance_level(zones, level):
+    from tension_index.sources.fr import vigilance_level
+
+    assert vigilance_level(zones) == level
 
 
 def test_fr_alerts_text_drops_page_furniture():

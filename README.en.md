@@ -95,6 +95,7 @@ make lint                  # ruff
 ./scripts/run.sh collect --countries PL,EE   # collection only, a few countries
 ./scripts/run.sh probe us --country PL      # what a source really returns
 ./scripts/run.sh health    # system health
+./scripts/run.sh review    # the latest 50 Claude classifications for a manual check (reports/)
 ./scripts/run.sh bot       # bot (Ctrl+C to stop)
 make plan                  # regenerate PLAN.md after editing roadmap.yaml
 make site                  # preview the progress page at http://localhost:8000

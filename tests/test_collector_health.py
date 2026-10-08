@@ -154,3 +154,30 @@ async def test_flapping_source_records_one_change(settings):
         # Known versions are not stored again (so they are not re-classified every run).
         async with db.execute("SELECT COUNT(*) FROM snapshots") as cur:
             assert (await cur.fetchone())[0] == 2
+
+
+async def test_first_level_from_a_source_is_a_baseline(settings):
+    """A source that starts stating levels (France after its parser learnt them) must not
+    report every country as changed; a later level change is a change again."""
+    from tension_index.sources.base import Advisory, Source
+
+    class Leveled(Source):
+        name = "lvl"
+        level: str | None = None
+        text = "Advice."
+
+        def supports(self, country):
+            return True
+
+        async def fetch(self, country):
+            return Advisory(country=country.code, url="u", text=self.text, level=self.level)
+
+    source = Leveled(None)
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        await collect_source(db, source, ["PL"])
+        source.level, source.text = "vert", "Advice.\nZones de vigilance: vert."
+        assert (await collect_source(db, source, ["PL"])).changed == 0
+        source.level = "orange_parts"
+        result = await collect_source(db, source, ["PL"])
+    assert result.changed == 1 and result.changes[0][1].startswith("LEVEL: vert -> orange_parts")
