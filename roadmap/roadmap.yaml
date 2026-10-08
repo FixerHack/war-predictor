@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.6.0
+  version: 0.6.1
   updated: 2026-10-08
 
 milestones:
@@ -45,7 +45,7 @@ stages:
       - {id: S0.15, status: todo, days: 0.2, owner: human, uk: "Зняти блокування GitHub Actions: Settings → Billing and plans (рахунок / картка)", en: "Unlock GitHub Actions: Settings → Billing and plans (invoice / card)", note_uk: "Необов'язково: перевірки робить make check, карту публікує сервер.", note_en: "Optional: make check runs the checks, the server publishes the map."}
       - {id: S0.16, status: done, days: 0.2, uk: "Публікація сторінки прогресу без Actions (make pages → гілка gh-pages)", en: "Publish the progress page without Actions (make pages → gh-pages branch)"}
       - {id: S0.17, status: done, days: 0.1, uk: "Інсталятор шлюзу чекає на запуск сервісу до 30 с замість фіксованих 2 с", en: "Gateway installer waits up to 30 s for the service to start instead of a fixed 2 s"}
-      - {id: S0.14, status: todo, days: 0.2, owner: human, uk: "Захист гілки main (тільки через PR, CI зелений); видалити гілку claude/funny-planck-leoxip", en: "Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip"}
+      - {id: S0.14, status: done, days: 0.2, owner: human, uk: "Захист гілки main (тільки через PR, CI зелений); видалити гілку claude/funny-planck-leoxip", en: "Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip", note_uk: "Правило protect-main: заборона force-push і видалення main (без вимоги PR: зміни зливаються локально); гілку claude/funny-planck-leoxip видалено.", note_en: "Ruleset protect-main: no force-push or deletion of main (no PR requirement: work is merged locally); branch claude/funny-planck-leoxip deleted."}
 
   - id: S1
     branch: "—"
@@ -270,6 +270,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.6.1
+    date: 2026-10-08
+    uk: ["main захищено від force-push і видалення; стару гілку claude/funny-planck-leoxip видалено.", "Аркуш перевірки класифікацій — українською (назви причин і типів змін)."]
+    en: ["main is protected from force-push and deletion; the old claude/funny-planck-leoxip branch is deleted.", "The classification review sheet is in Ukrainian (reason and change type names)."]
   - version: 0.6.0
     date: 2026-10-08
     uk: ["Завершено етапи S1, S4, S5, S11: перелік джерел затверджено, застереження доповнено розділом про відповідальність і джерела даних, історичні епізоди перераховано (усі PASS).", "Франція: рівень (зелений/жовтий/помаранчевий/червоний, окремо для зон) тепер читається з розділу «Zones de vigilance»; раніше рівень не визначався зовсім.", "Поради МЗС РФ/РБ: щогодини із заголовків ТАСС, РИА, Интерфакс, Лента, РГ (GDELT на цьому запиті майже завжди відповідав 429).", "Команда review: аркуш 50 останніх класифікацій Claude для ручної перевірки.", "Вимкнено 27 хибних сплесків GDELT за 06–07.10, порахованих за старою метрикою."]

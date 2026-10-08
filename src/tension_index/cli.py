@@ -185,14 +185,29 @@ async def _changes(args: argparse.Namespace) -> int:
 
 REVIEW_HEAD = """# Перевірка класифікацій ({n})
 
-Для кожної зміни: чи правильно визначено причину, тип зміни, статус персоналу й небо, і чи
-опис передає суть. Поставте `x` у потрібну дужку; якщо невірно — коротко, як має бути.
-Довідка: причина — armed_conflict (збройний конфлікт), military_threat (військова загроза),
-hybrid_attack (гібридна атака), civil_unrest (заворушення), terrorism, crime, health,
-natural_disaster, unknown; тип — level_raised / level_lowered (рівень змінено), staff_posture
-(персонал посольства), consular, borders, airspace, security_update (оновлення безпеки),
-editorial (редакторська правка, не рахується).
+Для кожної зміни: чи правильно визначено причину і тип зміни (найважливіше), персонал
+посольства й небо, і чи опис не вводить в оману. Поставте `x` у потрібну дужку; якщо невірно —
+коротко, як має бути. «Редакторська правка» на бал не впливає. Текст зміни — мовою джерела.
 """
+
+
+REVIEW_UK = {
+    "armed_conflict": "збройний конфлікт", "military_threat": "військова загроза",
+    "hybrid_attack": "гібридна атака", "civil_unrest": "заворушення/протести",
+    "terrorism": "тероризм", "crime": "злочинність", "health": "здоров'я",
+    "natural_disaster": "стихійне лихо", "level_raised": "рівень підвищено",
+    "level_lowered": "рівень знижено", "staff_posture": "персонал посольства",
+    "consular": "консульські послуги", "borders": "кордони", "airspace": "небо",
+    "security_update": "оновлення безпекової інформації", "editorial": "редакторська правка",
+    "none": "без змін", "normal": "звичайний", "limited_consular_services": "обмежені послуги",
+    "authorized_departure": "дозволено виїзд", "ordered_departure": "наказано виїзд",
+    "embassy_suspended": "посольство закрито", "restricted": "обмежене", "closed": "закрите",
+    "unknown": "не вказано",
+}  # fmt: skip
+
+
+def _uk(value: object) -> str:
+    return REVIEW_UK.get(str(value), str(value))
 
 
 def _edit_key(diff: str) -> tuple[str, ...]:
@@ -217,8 +232,9 @@ def review_sheet(rows: list, limit: int = 50) -> str:
             f"## {i}. {r['country']} · {r['source']} · {r['detected_at'][:16]} (зміна #{r['id']})\n\n"
             + (f"Та сама правка ще в: {', '.join(also)}\n\n" if also else "")
             + f"{diff}\n\n"
-            f"- причина: **{c.get('reason')}** · тип: **{c.get('change_type')}** · персонал: "
-            f"**{c.get('staff_posture')}** · небо: **{c.get('airspace')}** · кордони закрито: "
+            f"- причина: **{_uk(c.get('reason'))}** · тип: **{_uk(c.get('change_type'))}** · "
+            f"персонал: **{_uk(c.get('staff_posture'))}** · небо: **{_uk(c.get('airspace'))}** · "
+            "кордони закрито: "
             f"**{'так' if c.get('borders_closed') else 'ні'}**\n"
             f"- опис: {c.get('summary_uk') or '—'}\n"
             f"- цитата: {c.get('quote') or '—'}\n\n"
