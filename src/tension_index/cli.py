@@ -183,6 +183,56 @@ async def _changes(args: argparse.Namespace) -> int:
     return 0
 
 
+REVIEW_HEAD = """# Перевірка класифікацій ({n})
+
+Для кожної зміни: чи правильно визначено причину, тип зміни, статус персоналу й небо, і чи
+опис передає суть. Поставте `x` у потрібну дужку; якщо невірно — коротко, як має бути.
+Довідка: причина — armed_conflict (збройний конфлікт), military_threat (військова загроза),
+hybrid_attack (гібридна атака), civil_unrest (заворушення), terrorism, crime, health,
+natural_disaster, unknown; тип — level_raised / level_lowered (рівень змінено), staff_posture
+(персонал посольства), consular, borders, airspace, security_update (оновлення безпеки),
+editorial (редакторська правка, не рахується).
+"""
+
+
+def review_sheet(rows: list) -> str:
+    """Markdown sheet of model classifications for a manual check (S6.3)."""
+    parts = [REVIEW_HEAD.format(n=len(rows))]
+    for i, r in enumerate(rows, 1):
+        c = json.loads(r["payload"])
+        diff = "\n".join("    " + ln for ln in r["diff"].splitlines()[:14])
+        parts.append(
+            f"## {i}. {r['country']} · {r['source']} · {r['detected_at'][:16]} (зміна #{r['id']})\n\n"
+            f"{diff}\n\n"
+            f"- причина: **{c.get('reason')}** · тип: **{c.get('change_type')}** · персонал: "
+            f"**{c.get('staff_posture')}** · небо: **{c.get('airspace')}** · кордони закрито: "
+            f"**{'так' if c.get('borders_closed') else 'ні'}**\n"
+            f"- опис: {c.get('summary_uk') or '—'}\n"
+            f"- цитата: {c.get('quote') or '—'}\n\n"
+            "Оцінка: [ ] вірно  [ ] невірно — як має бути: \n"
+        )
+    return "\n".join(parts)
+
+
+async def _review(args: argparse.Namespace) -> int:
+    """Export the latest model classifications of changes for a manual check."""
+    settings = get_settings()
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        async with db.execute(
+            "SELECT ch.id, ch.source, ch.country, ch.detected_at, ch.diff, k.payload "
+            "FROM changes ch JOIN classifications k ON k.ref_type = 'change' AND k.ref_id = ch.id "
+            "WHERE k.method = 'claude' ORDER BY ch.id DESC LIMIT ?",
+            (args.last,),
+        ) as cur:
+            rows = list(await cur.fetchall())
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)  # noqa: ASYNC240 - one-off CLI export
+    out.write_text(review_sheet(rows), encoding="utf-8")  # noqa: ASYNC240
+    print(f"{len(rows)} classifications -> {args.out}")
+    return 0
+
+
 async def _why(args: argparse.Namespace) -> int:
     """What the latest score of a country is made of: blocks, flags and active signals."""
     from datetime import UTC, datetime
@@ -398,6 +448,9 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("changes", help="show recent advisory changes with their diff")
     p.add_argument("--source", help="e.g. us")
     p.add_argument("--last", type=int, default=10)
+    p = sub.add_parser("review", help="export model classifications for a manual check")
+    p.add_argument("--last", type=int, default=50)
+    p.add_argument("--out", default="reports/classification-review.md")
 
     p = sub.add_parser("export", help="write the public dashboard data (scores.json)")
     p.add_argument("--out", default="_site/dashboard/scores.json")
@@ -473,6 +526,7 @@ def main(argv: list[str] | None = None) -> None:
         "digest": lambda: _digest(),
         "changes": lambda: _changes(args),
         "why": lambda: _why(args),
+        "review": lambda: _review(args),
         "export": lambda: _export(args),
         "history": lambda: _history(args),
         "backtest": lambda: _backtest(args),

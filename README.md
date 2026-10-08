@@ -95,6 +95,7 @@ make lint                  # ruff
 ./scripts/run.sh collect --countries PL,EE   # лише збір для кількох країн
 ./scripts/run.sh probe us --country PL      # що насправді віддає джерело
 ./scripts/run.sh health    # стан системи
+./scripts/run.sh review    # 50 останніх класифікацій Claude для ручної перевірки (reports/)
 ./scripts/run.sh bot       # бот (Ctrl+C для зупинки)
 make plan                  # перегенерувати PLAN.md після зміни roadmap.yaml
 make site                  # переглянути сторінку прогресу на http://localhost:8000

@@ -17,6 +17,7 @@ PUBLISHERS = {
     "opensky": ("✈️ Авіатрафік (OpenSky)", "✈️ Air traffic (OpenSky)"),
     "gdelt": ("📰 Медіа (GDELT)", "📰 Media (GDELT)"),
     "news": ("📰 Новини", "📰 News"),
+    "ru_media": ("🇷🇺 Російські медіа про поради МЗС РФ/РБ", "🇷🇺 Russian media on RU/BY MFA advice"),
     "ecb": ("💶 Ринки (ЄЦБ)", "💶 Markets (ECB)"),
 }
 KINDS = {

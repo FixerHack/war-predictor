@@ -44,3 +44,16 @@ async def test_source_without_due_countries_is_skipped(settings):
     # empty run must not be reported as a failed collector (no request is made either).
     results = await collector.collect_all(settings, sources=["fr"], countries=["FR"])
     assert results == []
+
+
+def test_review_sheet():
+    from tension_index.cli import review_sheet
+
+    row = {"id": 7, "source": "us", "country": "NL", "detected_at": "2026-10-06T04:08:00+00:00",
+           "diff": "+Petty crime is common.",
+           "payload": '{"reason": "crime", "change_type": "security_update", "staff_posture": '
+                      '"normal", "airspace": "unknown", "summary_uk": "Додано про крадіжки."}'}  # fmt: skip
+    sheet = review_sheet([row])
+    assert "## 1. NL · us · 2026-10-06T04:08 (зміна #7)" in sheet
+    assert "причина: **crime**" in sheet and "Додано про крадіжки." in sheet
+    assert "    +Petty crime is common." in sheet

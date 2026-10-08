@@ -5,13 +5,14 @@ run in `collect_runs` (health + coverage) and writes signals. `BLOCKS` maps coll
 scoring block, used for coverage.
 """
 
-from tension_index.extra import aviation, gdelt, markets, news
+from tension_index.extra import aviation, gdelt, markets, news, ru_mfa
 
 COLLECTORS = {
     "easa": aviation.collect_czib,
     "opensky": aviation.collect_traffic,
     "news": news.collect_news,
     "gdelt": gdelt.collect_gdelt,
+    "ru_mfa": ru_mfa.collect_ru_mfa,
     "ecb": markets.collect_markets,
 }
 BLOCKS = {
@@ -19,6 +20,7 @@ BLOCKS = {
     "opensky": "aviation",
     "news": "media",
     "gdelt": "media",
+    "ru_mfa": "aggressor",
     "ecb": "markets",
 }
 
@@ -30,5 +32,6 @@ PROBE_URLS = {
     "easa": aviation.CZIB_PAGE,
     "opensky": aviation.OPENSKY + "?lamin=49&lomin=14&lamax=55&lomax=24",
     "gdelt": gdelt.EVENTS_INDEX,
+    "ru_mfa": ru_mfa.FEEDS[0],
     "ecb": markets.FX + "?format=csvdata&lastNObservations=2",
 }

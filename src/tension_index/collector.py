@@ -121,6 +121,8 @@ async def collect_source(
         )
         if previous is None:
             continue  # first sighting is the baseline, not a change
+        if previous.level is None and advisory.level is not None:
+            continue  # the source starts stating levels: a new baseline, not a change
         diff = changed_fragment(previous_text, text)
         if previous.level != advisory.level:
             diff = f"LEVEL: {previous.level} -> {advisory.level}\n{diff}"
