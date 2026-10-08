@@ -57,3 +57,17 @@ def test_review_sheet():
     assert "## 1. NL · us · 2026-10-06T04:08 (зміна #7)" in sheet
     assert "причина: **crime**" in sheet and "Додано про крадіжки." in sheet
     assert "    +Petty crime is common." in sheet
+
+
+def test_review_sheet_lists_a_repeated_edit_once():
+    from tension_index.cli import review_sheet
+
+    def row(i, country, line):
+        return {"id": i, "source": "gov_uk", "country": country,
+                "detected_at": "2026-10-07T21:10:00+00:00",
+                "diff": f"@@ -1 +1 @@\n Terrorism in {country}\n-staying safe abroad\n+{line}",
+                "payload": '{"reason": "terrorism", "change_type": "editorial"}'}  # fmt: skip
+
+    sheet = review_sheet([row(3, "MK", "staying safe"), row(2, "ME", "staying safe"),
+                          row(1, "AL", "new text")])  # fmt: skip
+    assert "Перевірка класифікацій (2)" in sheet and "Та сама правка ще в: ME" in sheet

@@ -195,15 +195,28 @@ editorial (редакторська правка, не рахується).
 """
 
 
-def review_sheet(rows: list) -> str:
-    """Markdown sheet of model classifications for a manual check (S6.3)."""
-    parts = [REVIEW_HEAD.format(n=len(rows))]
-    for i, r in enumerate(rows, 1):
+def _edit_key(diff: str) -> tuple[str, ...]:
+    """The added/removed lines: the same edit made in many countries has the same key."""
+    return tuple(ln for ln in diff.splitlines() if ln[:1] in "+-" and ln[:3] not in ("+++", "---"))
+
+
+def review_sheet(rows: list, limit: int = 50) -> str:
+    """Markdown sheet of model classifications for a manual check (S6.3). The same edit made
+    across many countries (e.g. one GOV.UK wording change) is listed once."""
+    groups: dict[tuple[str, ...], list] = {}
+    for r in rows:
+        groups.setdefault((r["source"], *_edit_key(r["diff"])), []).append(r)
+    picked = list(groups.values())[:limit]
+    parts = [REVIEW_HEAD.format(n=len(picked))]
+    for i, same in enumerate(picked, 1):
+        r = same[0]
         c = json.loads(r["payload"])
+        also = sorted({x["country"] for x in same[1:]} - {r["country"]})
         diff = "\n".join("    " + ln for ln in r["diff"].splitlines()[:14])
         parts.append(
             f"## {i}. {r['country']} · {r['source']} · {r['detected_at'][:16]} (зміна #{r['id']})\n\n"
-            f"{diff}\n\n"
+            + (f"Та сама правка ще в: {', '.join(also)}\n\n" if also else "")
+            + f"{diff}\n\n"
             f"- причина: **{c.get('reason')}** · тип: **{c.get('change_type')}** · персонал: "
             f"**{c.get('staff_posture')}** · небо: **{c.get('airspace')}** · кордони закрито: "
             f"**{'так' if c.get('borders_closed') else 'ні'}**\n"
@@ -223,12 +236,12 @@ async def _review(args: argparse.Namespace) -> int:
             "SELECT ch.id, ch.source, ch.country, ch.detected_at, ch.diff, k.payload "
             "FROM changes ch JOIN classifications k ON k.ref_type = 'change' AND k.ref_id = ch.id "
             "WHERE k.method = 'claude' ORDER BY ch.id DESC LIMIT ?",
-            (args.last,),
+            (args.last * 20,),  # identical edits collapse into one entry
         ) as cur:
             rows = list(await cur.fetchall())
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)  # noqa: ASYNC240 - one-off CLI export
-    out.write_text(review_sheet(rows), encoding="utf-8")  # noqa: ASYNC240
+    out.write_text(review_sheet(rows, args.last), encoding="utf-8")  # noqa: ASYNC240
     print(f"{len(rows)} classifications -> {args.out}")
     return 0
 
