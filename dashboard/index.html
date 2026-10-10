@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tension Index · Europe</title>
+<meta name="description" content="Escalation-signal indicator for European countries (0–10). Not a forecast.">
+<!-- Data: scores.json next to this page, written by `tension-index export`. -->
+<style>
+:root {
+  --bg: #f4f5f3; --surface: #fcfcfb; --ink: #1b2129; --ink-2: #4a5462; --ink-3: #6b7480;
+  --line: #d6dad6; --focus: #2d5b8c; --empty: #e4e6e2; --empty-ink: #4a5462;
+  /* Level colours = the bot's and README's: green, yellow, orange, red, critical */
+  --l0: #2e8049; --l1: #e3c341; --l2: #ec8a2d; --l3: #c62f25; --l4: #6e1220;
+  --on0: #ffffff; --on1: #1b2129; --on2: #1b2129; --on3: #ffffff; --on4: #ffffff;
+  --chart: #1b2129; --band: rgba(156, 53, 39, 0.07);
+  --hatch: rgba(111, 32, 25, 0.38); --hatch-2: rgba(74, 84, 98, 0.30);
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121412; --surface: #1a1a19; --ink: #e8eae6; --ink-2: #aab1b9; --ink-3: #8a929b;
+    --line: #33373a; --focus: #7fa9d6; --empty: #26292a; --empty-ink: #aab1b9;
+    /* Dark: same hues, lifted for the dark surface; dark text on every step */
+    --l0: #3f9d5f; --l1: #dcbd45; --l2: #e8862f; --l3: #e5534a; --l4: #a3162b;
+    --on0: #0f1411; --on1: #121412; --on2: #121412; --on3: #121412; --on4: #ffffff;
+    --chart: #e8eae6; --band: rgba(227, 138, 98, 0.08);
+    --hatch: rgba(245, 181, 151, 0.42); --hatch-2: rgba(170, 177, 185, 0.32);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121412; --surface: #1a1a19; --ink: #e8eae6; --ink-2: #aab1b9; --ink-3: #8a929b;
+  --line: #33373a; --focus: #7fa9d6; --empty: #26292a; --empty-ink: #aab1b9;
+  --l0: #3f9d5f; --l1: #dcbd45; --l2: #e8862f; --l3: #e5534a; --l4: #a3162b;
+  --on0: #0f1411; --on1: #121412; --on2: #121412; --on3: #121412; --on4: #ffffff;
+  --chart: #e8eae6; --band: rgba(227, 138, 98, 0.08);
+  --hatch: rgba(245, 181, 151, 0.42); --hatch-2: rgba(170, 177, 185, 0.32);
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-variant-numeric: tabular-nums; padding-bottom: env(safe-area-inset-bottom, 0); }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 56px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+h1 { font-size: clamp(1.4rem, 4vw, 2.1rem); margin: 0; line-height: 1.15; }
+.meta { color: var(--ink-2); font-size: 0.9rem; margin-top: 4px; }
+.controls { display: flex; gap: 6px; }
+.btn { font: inherit; font-size: 0.85rem; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); cursor: pointer; text-decoration: none; }
+.btn[aria-pressed="true"] { border-color: var(--focus); color: var(--focus); }
+.btn:focus-visible, .tile:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.notice { margin: 18px 0; padding: 12px 14px; background: var(--surface); border-left: 4px solid var(--l2);
+  border-radius: 0 6px 6px 0; font-size: 0.92rem; color: var(--ink-2); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 0.85rem; color: var(--ink-2); margin: 8px 0 14px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+.cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+.map { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; }
+.tile { appearance: none; border: 0; border-radius: 6px; aspect-ratio: 1 / 1; padding: 2px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; font: inherit;
+  background: var(--empty); color: var(--empty-ink); min-width: 0; }
+.tile .c { font-weight: 700; font-size: clamp(0.62rem, 1.9vw, 0.95rem); line-height: 1; }
+.tile .v { font-size: clamp(0.58rem, 1.6vw, 0.82rem); line-height: 1.2; }
+.tile[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.panel h2 { margin: 0; font-size: 1.25rem; }
+.big { display: flex; align-items: baseline; gap: 10px; margin: 8px 0 4px; }
+.big .n { font-size: 2.6rem; font-weight: 700; line-height: 1; }
+.big .lv { color: var(--ink-2); }
+.panel ul { margin: 6px 0 0; padding-left: 18px; }
+.panel li { margin: 4px 0; font-size: 0.92rem; }
+.sub { font-weight: 600; margin-top: 14px; font-size: 0.95rem; }
+.muted { color: var(--ink-3); font-size: 0.85rem; }
+svg.chart { width: 100%; height: auto; display: block; margin-top: 8px; overflow: visible; }
+.chart text { fill: var(--ink-3); font-size: 10px; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface); font-size: 0.8rem;
+  padding: 4px 8px; border-radius: 4px; white-space: nowrap; transform: translate(-50%, -120%); display: none; }
+.chartbox { position: relative; }
+details { margin-top: 24px; }
+summary { cursor: pointer; font-weight: 600; }
+table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.9rem; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--ink-2); font-weight: 600; }
+td.num { text-align: right; }
+section.method { margin-top: 28px; font-size: 0.95rem; color: var(--ink-2); }
+.summary { margin: 10px 0 4px; font-size: 0.95rem; }
+.summary p { margin: 6px 0; }
+.blocks { display: grid; grid-template-columns: minmax(0, 9.5em) minmax(0, 1fr) 3em; gap: 6px 10px; align-items: center; margin-top: 8px; font-size: 0.88rem; }
+.blocks .bar { height: 10px; background: var(--empty); border-radius: 5px; overflow: hidden; }
+.blocks .bar span { display: block; height: 100%; background: var(--l2); border-radius: 5px; }
+.blocks .pct { text-align: right; color: var(--ink-2); }
+.panel li .q { display: block; color: var(--ink-3); font-size: 0.85rem; }
+section.method h3 { font-size: 1rem; color: var(--ink); margin: 18px 0 4px; }
+section.method dl { margin: 6px 0; }
+section.method dt { font-weight: 600; color: var(--ink); margin-top: 8px; }
+section.method dd { margin: 2px 0 0; }
+section.method ul { padding-left: 20px; }
+section.method h2 { font-size: 1.1rem; color: var(--ink); }
+footer { margin-top: 28px; font-size: 0.8rem; color: var(--ink-3); }
+/* Neighbours at war: context only, never scored - hatched, not a level colour */
+.tile.ctx { background: var(--surface) repeating-linear-gradient(135deg, transparent 0 5px, var(--hatch) 5px 8px);
+  color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--hatch); }
+.tile.ctx.ally { background: var(--surface) repeating-linear-gradient(135deg, transparent 0 5px, var(--hatch-2) 5px 8px);
+  box-shadow: inset 0 0 0 1.5px var(--hatch-2); }
+.tile.ctx[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--ink); }
+.tile.span { aspect-ratio: auto; }
+.sw.hatch { background: repeating-linear-gradient(135deg, transparent 0 3px, var(--hatch) 3px 5px); box-shadow: inset 0 0 0 1px var(--hatch); }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--band); }
+td button.link { all: unset; cursor: pointer; }
+td button.link:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* Phones */
+@media (max-width: 600px) {
+  .wrap { padding: 14px 12px 40px; }
+  header { gap: 8px; }
+  .controls .btn { padding: 6px 10px; }
+  .notice { margin: 12px 0; font-size: 0.86rem; padding: 10px 12px; }
+  .legend { gap: 6px 10px; font-size: 0.78rem; }
+  .map { gap: 3px; }
+  .tile { border-radius: 4px; padding: 1px; }
+  .tile .c { font-size: 0.66rem; }
+  .tile .v { font-size: 0.58rem; }
+  .tile.ctx .v { font-size: 0.5rem; max-width: 100%; overflow: hidden; overflow-wrap: anywhere; text-align: center; }
+  .panel { padding: 14px 12px; }
+  .big .n { font-size: 2.2rem; }
+  .blocks { grid-template-columns: minmax(0, 7.6em) minmax(0, 1fr) 2.6em; font-size: 0.82rem; }
+  table { font-size: 0.84rem; }
+  th, td { padding: 7px 4px; }
+  section.method { font-size: 0.9rem; }
+}
+a { color: var(--focus); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1 id="title">Індекс напруги: Європа</h1>
+      <div class="meta" id="meta"></div>
+    </div>
+    <div class="controls">
+      <button class="btn" data-lang="uk" type="button">УКР</button>
+      <button class="btn" data-lang="en" type="button">ENG</button>
+      <button class="btn" id="themeBtn" type="button" aria-label="Theme">◐</button>
+    </div>
+  </header>
+  <div class="notice" id="notice"></div>
+  <div class="legend" id="legend"></div>
+  <div class="cols">
+    <div>
+      <div class="map" id="map" role="group"></div>
+      <p class="muted" id="maphint"></p>
+    </div>
+    <div class="panel" id="panel" aria-live="polite"></div>
+  </div>
+  <details id="tablebox"><summary id="tabletitle"></summary><div id="table"></div></details>
+  <section class="method" id="method"></section>
+  <footer id="foot"></footer>
+</div>
+<script>
+const GRID = { // approximate geography, 9 columns
+  IS:[0,0], NO:[4,0], SE:[5,0], FI:[6,0], EE:[7,0],
+  IE:[1,1], GB:[2,1], DK:[4,1], LV:[7,1],
+  BE:[2,2], NL:[3,2], DE:[4,2], PL:[5,2], LT:[6,2],
+  FR:[2,3], LU:[3,3], CZ:[4,3], SK:[5,3],
+  ES:[1,4], CH:[3,4], AT:[4,4], HU:[5,4], RO:[6,4], MD:[7,4],
+  PT:[0,5], IT:[3,5], SI:[4,5], HR:[5,5], RS:[6,5], BG:[7,5],
+  MT:[3,6], BA:[5,6], ME:[6,6], XK:[7,6],
+  AL:[6,7], MK:[7,7], GR:[7,8], CY:[8,8],
+};
+// Neighbours shown for context: [col, row, colSpan, rowSpan]
+const CTX_GRID = { RU: [8, 0, 1, 3], BY: [7, 2, 1, 1], UA: [6, 3, 2, 1] };
+const LEVELS = ["green", "yellow", "orange", "red", "critical"];
+const WAR = { none: "", frozen: "🧊", clashes: "🟠", active: "🔴", war: "🟥" };
+const T = {
+  uk: { title: "Індекс напруги: Європа", updated: "Оновлено", nodata: "немає даних",
+        notice: "Індикатор стану сигналів ескалації (0–10) за офіційними рекомендаціями урядів, авіацією, новинами й ринками. Це не прогноз і не порада щодо виїзду.",
+        levels: { green: "0–2 низький: базовий фон", yellow: "3–4 помірний: поодинокі зміни", orange: "5–6 підвищений: кілька блоків", red: "7–8 високий: виїзд персоналу, небо", critical: "9–10 критичний" },
+        lvl: { green: "низький", yellow: "помірний", orange: "підвищений", red: "високий", critical: "критичний" },
+        hint: "Натисніть на країну, щоб побачити деталі. Посилання на країну: …/dashboard/#PL",
+        war: "Статус війни", why: "Чому", flags: "Позначки", history: "Бал за 90 днів", calibrating: "⏳ Даних ще недостатньо для балу.",
+        warS: { none: "збройного конфлікту немає", frozen: "заморожений конфлікт / окупація частини території", clashes: "окремі збройні інциденти", active: "збройний конфлікт", war: "війна" },
+        table: "Таблиця всіх країн", country: "Країна", score: "Бал", level: "Рівень",
+        methodTitle: "Як рахується", method: "Шість блоків сигналів (рекомендації урядів і статус посольств, авіація, внутрішні заходи, сигнали агресора, медіа, ринки) поєднуються як незалежні підтвердження. Важать причина, кількість незалежних джерел, синхронність держав і відхилення від звичного рівня країни. Вирішальні події (виїзд персоналу посольств, закриття неба, мобілізація) гарантують мінімальний бал. Ваги — стартова гіпотеза, їх перевіряють на історичних епізодах.",
+        algo: "Алгоритм", sources: "Джерела", progress: "Хід проєкту", empty: "Даних ще немає: панель заповниться після першого розрахунку.", tt: "бал",
+        ctxLegend: "війна поруч (не оцінюється)",
+        ctxRole: { at_war: "на території йде війна", aggressor: "веде війну (агресор)", aggressor_ally: "територію використано для нападу" },
+        ctxShort: { at_war: "війна", aggressor: "агресор", aggressor_ally: "—" },
+        ctxNote: "Не оцінюється шкалою: індекс охоплює 38 європейських країн і показує сигнали ескалації там, де війни ще немає. Сусіди тут — для контексту.",
+        summaryT: "Пояснення", blocksT: "Блоки сигналів", govT: "Що кажуть уряди", seenT: "Що помічено", noSignals: "Інших тривожних сигналів немає.",
+        state: "триває", event: "подія", strength: "сила", normal: "звичайний рівень", raised: "підвищений рівень",
+        outOf: "з 10", levelWord: "рівень сигналів",
+        mean: { green: "Фон звичайний: джерела не показують ознак ескалації або лише рутинні зміни.",
+                yellow: "Є поодинокі зміни, які варто відстежувати, але вони поки не складаються в загальну картину.",
+                orange: "Кілька незалежних сигналів одночасно або один сильний сигнал у ключовому блоці.",
+                red: "Сильні сигнали: виїзд персоналу посольств, закриття неба або узгоджене підвищення рівня кількома урядами.",
+                critical: "Вирішальні події: наказ кількох урядів про виїзд персоналу, мобілізація, закриття неба." },
+        main: "Найбільше важать", quiet: "Жоден блок не показує тривожних сигналів: усі джерела на звичайному фоні.",
+        floorHit: "Спрацювала порогова подія, тому бал не нижчий за встановлений для неї мінімум.",
+        notForecast: "Це опис того, що зараз видно в джерелах, а не ймовірність і не прогноз.",
+        flagText: { short_history: "Історії спостережень менше 30 днів, тому порівняння зі звичним рівнем країни ще не враховується.",
+                    low_coverage: "Свіжі дані є менше ніж з половини блоків: бал не публікується (крім порогових подій).",
+                    synchrony: "Кілька урядів ({n}) посилили рекомендації протягом тижня: бал помножено на 1,2.",
+                    isolated: "Зростання лише в цій країні, сусіди спокійні: можливо, локальна причина.",
+                    regional_escalation: "Зростання в більшості сусідніх країн одночасно: регіональна ескалація." },
+        blk: { advisories: ["Рекомендації урядів", "Рівні порад щодо подорожей США, Великої Британії, Німеччини, Канади й Франції та статус їхніх посольств (дозвіл або наказ на виїзд персоналу)."],
+               aviation: ["Авіація", "Бюлетені EASA щодо зон конфлікту, закриття чи обмеження повітряного простору, різке падіння авіатрафіку за даними OpenSky."],
+               domestic: ["Внутрішні заходи", "Мобілізація, надзвичайний стан, закриття кордонів."],
+               aggressor: ["Сигнали агресора", "МЗС Росії чи Білорусі радить своїм громадянам уникати країни, прямі погрози, гібридні атаки (дрони, саботаж, глушіння GPS)."],
+               media: ["Медіа", "Новини про ескалацію, підтверджені щонайменше двома виданнями, і сплеск уваги медіа до військової теми (GDELT)."],
+               markets: ["Ринки", "Стрибки спреду державних облігацій і падіння курсу валюти (дані ЄЦБ)."] },
+        methodFull: [
+          ["Що це і чим не є", ["Індекс напруги показує, скільки сигналів ескалації зараз видно у відкритих джерелах щодо кожної з 38 країн Європи, за шкалою 0–10. Це індикатор стану, а не ймовірність війни і не прогноз. Високий бал означає «багато джерел одночасно б'ють на сполох», а не «війна почнеться».", "Бал не є порадою їхати чи залишатися. Для рішень користуйтеся офіційними рекомендаціями свого уряду."]],
+          ["Рівні шкали", "LEVELS"],
+          ["Шість блоків", "BLOCKS"],
+          ["Як блоки поєднуються", ["Кожен блок отримує значення від 0 до 100%. У кожного блоку є «стеля» (рекомендації урядів, авіація й внутрішні заходи — до 60%, сигнали агресора — 40%, медіа — 35%, ринки — 15%): один блок, навіть заповнений повністю, не дає максимального балу. Блоки поєднуються як незалежні підтвердження: кожен наступний тривожний блок наближає загальний рівень до максимуму, але ніколи не додає більше, ніж залишилося.", "Усередині блоку одне видання рахується один раз (його найсильніший сигнал), а різні видання підсилюють одне одного. Для країн ЄС і НАТО рекомендації урядів важать на чверть менше: союзники рідко заздалегідь підвищують рівень небезпеки одне для одного.", "Разові події (оновлення рекомендацій, новини, падіння трафіку) з часом згасають, а стани (поточний рівень рекомендації, закрите небо) діють, поки тривають. Підсумок перетворюється на бал 0–10 кривою, яка розтягує нижню частину шкали, щоб ранні помірні сигнали було видно."]],
+          ["Порогові події", ["Деякі події самі по собі гарантують мінімальний бал, щоб шкала лишалася зрозумілою:", "• дозвіл на виїзд персоналу посольства хоча б одного уряду — не нижче 7;", "• наказ про виїзд персоналу або закриття посольства щонайменше двома урядами — не нижче 9;", "• мобілізація — не нижче 9;", "• закриття повітряного простору за даними щонайменше двох незалежних джерел — не нижче 8, обмеження — не нижче 6."]],
+          ["Позначки", ["«Коротка історія» — даних менше 30 днів, порівняння з нормою країни ще вимкнене. «Синхронність» — три й більше урядів посилили рекомендації протягом тижня (бал ×1,2). «Лише ця країна» — сусіди спокійні. «Регіональна ескалація» — зростання в більшості сусідів. Якщо свіжі дані є менше ніж з половини блоків, бал не публікується (крім порогових подій)."]],
+          ["Обмеження", ["Уряди змінюють рекомендації із запізненням і з політичних міркувань. Новини й трафік бувають шумними, тому одне джерело рідко дає високий бал. Ваги — стартова гіпотеза: їх перевіряють на історичних епізодах (Україна 2022, Вірменія й Азербайджан 2020, Ізраїль 2024). Дані оновлюються кожні 3 години, медіа (GDELT) — раз на добу."]],
+        ] },
+  en: { title: "Tension Index: Europe", updated: "Updated", nodata: "no data",
+        notice: "An indicator of escalation signals (0–10) from governments' travel advice, aviation, news and markets. Not a forecast and not advice to leave.",
+        levels: { green: "0–2 low: baseline", yellow: "3–4 moderate: isolated changes", orange: "5–6 elevated: several blocks", red: "7–8 high: staff departure, airspace", critical: "9–10 critical" },
+        lvl: { green: "low", yellow: "moderate", orange: "elevated", red: "high", critical: "critical" },
+        hint: "Select a country for details. Link to a country: …/dashboard/#PL",
+        war: "War status", why: "Why", flags: "Flags", history: "Score, last 90 days", calibrating: "⏳ Not enough data for a score yet.",
+        warS: { none: "no armed conflict", frozen: "frozen conflict / partial occupation", clashes: "sporadic armed clashes", active: "armed conflict", war: "war" },
+        table: "Table of all countries", country: "Country", score: "Score", level: "Level",
+        methodTitle: "How it is scored", method: "Six signal blocks (government advice and embassy posture, aviation, domestic measures, aggressor signals, media, markets) combine as independent confirmations. What counts: the stated reason, the number of independent sources, governments acting in sync, and deviation from the country's usual level. Decisive events (embassy staff departure, airspace closure, mobilisation) guarantee a minimum score. Weights are a starting hypothesis, tested on historical episodes.",
+        algo: "Algorithm", sources: "Sources", progress: "Project progress", empty: "No data yet: the dashboard fills in after the first scoring run.", tt: "score",
+        ctxLegend: "war next door (not scored)",
+        ctxRole: { at_war: "war on its territory", aggressor: "waging the war (aggressor)", aggressor_ally: "territory used for the attack" },
+        ctxShort: { at_war: "war", aggressor: "aggr.", aggressor_ally: "—" },
+        ctxNote: "Not scored: the index covers 38 European countries and shows escalation signals where there is no war yet. Neighbours are shown for context.",
+        summaryT: "Explanation", blocksT: "Signal blocks", govT: "What governments say", seenT: "What was observed", noSignals: "No other warning signals.",
+        state: "ongoing", event: "event", strength: "strength", normal: "usual level", raised: "raised level",
+        outOf: "out of 10", levelWord: "signal level",
+        mean: { green: "Usual background: sources show no signs of escalation, or only routine edits.",
+                yellow: "Isolated changes worth watching, but they do not yet add up to a pattern.",
+                orange: "Several independent signals at once, or one strong signal in a key block.",
+                red: "Strong signals: embassy staff departure, airspace closure, or several governments raising their advice together.",
+                critical: "Decisive events: ordered staff departure by several governments, mobilisation, airspace closure." },
+        main: "Weighing most", quiet: "No block shows warning signals: every source is at its usual background.",
+        floorHit: "A threshold event occurred, so the score is not below the minimum set for it.",
+        notForecast: "This describes what the sources show now; it is not a probability or a forecast.",
+        flagText: { short_history: "Less than 30 days of observations, so comparison with the country's usual level is not applied yet.",
+                    low_coverage: "Fresh data from fewer than half of the blocks: no score is published (except threshold events).",
+                    synchrony: "Several governments ({n}) tightened their advice within a week: the score is multiplied by 1.2.",
+                    isolated: "Rising in this country only while neighbours are calm: possibly a local cause.",
+                    regional_escalation: "Rising in most neighbouring countries at once: a regional escalation." },
+        blk: { advisories: ["Government advice", "Travel advice levels from the US, UK, Germany, Canada and France, and their embassies' posture (authorized or ordered staff departure)."],
+               aviation: ["Aviation", "EASA conflict zone bulletins, airspace closures or restrictions, sharp drops in air traffic from OpenSky data."],
+               domestic: ["Domestic measures", "Mobilisation, state of emergency, border closures."],
+               aggressor: ["Aggressor signals", "Russian or Belarusian foreign ministry telling its citizens to avoid the country, direct threats, hybrid attacks (drones, sabotage, GPS jamming)."],
+               media: ["Media", "Escalation news confirmed by at least two outlets, and surges of military-related coverage (GDELT)."],
+               markets: ["Markets", "Government bond spread jumps and currency drops (ECB data)."] },
+        methodFull: [
+          ["What it is and isn't", ["The Tension Index shows how many escalation signals are currently visible in open sources for each of 38 European countries, on a 0–10 scale. It is a state indicator, not a probability of war and not a forecast. A high score means \u201cmany sources are raising alarms at once\u201d, not \u201ca war will start\u201d.", "The score is not advice to leave or to stay. For decisions, follow your own government's official travel advice."]],
+          ["Scale levels", "LEVELS"],
+          ["Six blocks", "BLOCKS"],
+          ["How blocks combine", ["Each block gets a value from 0 to 100%. Every block has a cap (government advice, aviation and domestic measures up to 60%, aggressor signals 40%, media 35%, markets 15%): one block, even fully alarmed, cannot produce the maximum score. Blocks combine as independent confirmations: each further alarmed block moves the total towards the maximum but never adds more than what is left.", "Within a block one publisher counts once (its strongest signal), while different publishers reinforce each other. For EU and NATO members, government advice weighs a quarter less: allies rarely raise each other's danger level in advance.", "One-off events (advice updates, news, traffic drops) fade over time, while states (the current advice level, a closed airspace) hold while they last. The total becomes a 0–10 score through a curve that stretches the low end of the scale so early, moderate signals are visible."]],
+          ["Threshold events", ["Some events guarantee a minimum score on their own, to keep the scale interpretable:", "• authorized departure of embassy staff by at least one government: at least 7;", "• ordered departure or embassy closure by at least two governments: at least 9;", "• mobilisation: at least 9;", "• airspace closed, reported by at least two independent sources: at least 8; restricted: at least 6."]],
+          ["Flags", ["\u201cShort history\u201d: under 30 days of data, comparison with the country's norm is off. \u201cSynchrony\u201d: three or more governments tightened their advice within a week (score ×1.2). \u201cThis country only\u201d: neighbours are calm. \u201cRegional escalation\u201d: most neighbours are rising. With fresh data from fewer than half of the blocks, no score is published (except threshold events)."]],
+          ["Limitations", ["Governments update their advice late and for political reasons. News and traffic data are noisy, so a single source rarely produces a high score. The weights are a starting hypothesis, tested on historical episodes (Ukraine 2022, Armenia and Azerbaijan 2020, Israel 2024). Data refresh every 3 hours, media (GDELT) once a day."]],
+        ] },
+};
+const REPO = "https://github.com/FixerHack/war-predictor/blob/main/";
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+                set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let lang = store.get("lang") === "en" ? "en" : "uk";
+let data = null;
+let selected = (location.hash || "").slice(1).toUpperCase() || null;
+
+const idx = (level) => LEVELS.indexOf(level);
+const fill = (c) => c && c.score != null && idx(c.level) >= 0 ? `var(--l${idx(c.level)})` : "var(--empty)";
+const ink = (c) => c && c.score != null && idx(c.level) >= 0 ? `var(--on${idx(c.level)})` : "var(--empty-ink)";
+
+function renderLegend() {
+  const t = T[lang];
+  document.getElementById("legend").innerHTML = LEVELS.map((l, i) =>
+    `<span><span class="sw" style="background:var(--l${i})"></span>${esc(t.levels[l])}</span>`).join("") +
+    `<span><span class="sw" style="background:var(--empty)"></span>⏳ ${esc(t.nodata)}</span>` +
+    `<span><span class="sw hatch"></span>⚔ ${esc(t.ctxLegend)}</span>`;
+}
+
+function renderMap() {
+  const map = document.getElementById("map");
+  map.setAttribute("aria-label", T[lang].title);
+  map.innerHTML = Object.entries(GRID).map(([code, [col, row]]) => {
+    const c = data?.countries?.[code];
+    const name = c ? c.name[lang] : code;
+    const val = c && c.score != null ? c.score.toFixed(1) : "⏳";
+    const war = c ? WAR[c.war.status] : "";
+    const label = `${name}: ${c && c.score != null ? `${val} (${T[lang].lvl[c.level]})` : T[lang].nodata}`;
+    return `<button class="tile" type="button" data-code="${code}" aria-pressed="${code === selected}"
+      title="${esc(label)}" aria-label="${esc(label)}"
+      style="grid-column:${col + 1};grid-row:${row + 1};background:${fill(c)};color:${ink(c)}">
+      <span class="c">${code}</span><span class="v">${esc(val)}${war ? " " + war : ""}</span></button>`;
+  }).join("") + Object.entries(CTX_GRID).map(([code, [col, row, cs, rs]]) => {
+    const c = data?.context?.[code];
+    if (!c) return "";
+    const label = `${c.name[lang]}: ${T[lang].ctxRole[c.role]}`;
+    const icon = c.role === "aggressor_ally" ? "" : "⚔ ";
+    return `<button class="tile ctx${c.role === "aggressor_ally" ? " ally" : ""}${cs > 1 || rs > 1 ? " span" : ""}" type="button"
+      data-code="${code}" aria-pressed="${code === selected}" title="${esc(label)}" aria-label="${esc(label)}"
+      style="grid-column:${col + 1} / span ${cs};grid-row:${row + 1} / span ${rs}">
+      <span class="c">${code}</span><span class="v">${icon}${esc(T[lang].ctxShort[c.role])}</span></button>`;
+  }).join("");
+  map.querySelectorAll(".tile").forEach((b) => b.onclick = () => select(b.dataset.code, true));
+}
+
+function chart(history) {
+  const W = 480, H = 170, L = 26, R = 8, TOP = 8, B = 20;
+  const pts = history.map(([d, v]) => ({ d, v }));
+  if (!pts.length) return "";
+  const x = (i) => L + (pts.length === 1 ? (W - L - R) / 2 : (i * (W - L - R)) / (pts.length - 1));
+  const y = (v) => TOP + (1 - v / 10) * (H - TOP - B);
+  const grid = [0, 3, 5, 7, 9, 10].map((v) =>
+    `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1" ${v % 10 ? 'stroke-dasharray="3 3"' : ""}/>` +
+    `<text x="${L - 6}" y="${y(v) + 3}" text-anchor="end">${v}</text>`).join("");
+  let path = "", open = false;
+  pts.forEach((p, i) => {
+    if (p.v == null) { open = false; return; }
+    path += `${open ? "L" : "M"}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`; open = true;
+  });
+  const last = [...pts.keys()].reverse().find((i) => pts[i].v != null);
+  const marker = last != null ? `<circle cx="${x(last)}" cy="${y(pts[last].v)}" r="4" fill="var(--chart)" stroke="var(--surface)" stroke-width="2"/>` : "";
+  const first = pts[0].d, lastD = pts[pts.length - 1].d;
+  return `<div class="chartbox"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(T[lang].history)}">
+    ${grid}<path d="${path}" fill="none" stroke="var(--chart)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${marker}<line class="cross" y1="${TOP}" y2="${H - B}" stroke="var(--ink-3)" stroke-width="1" visibility="hidden"/>
+    <text x="${L}" y="${H - 4}">${esc(first)}</text><text x="${W - R}" y="${H - 4}" text-anchor="end">${esc(lastD)}</text>
+    <rect class="hit" x="${L}" y="0" width="${W - L - R}" height="${H}" fill="transparent"/></svg><div class="tip"></div></div>`;
+}
+
+function wireChart(history) {
+  const box = document.querySelector(".chartbox");
+  if (!box) return;
+  const svg = box.querySelector("svg"), tip = box.querySelector(".tip"), cross = svg.querySelector(".cross");
+  const W = 480, L = 26, R = 8;
+  const move = (ev) => {
+    const r = svg.getBoundingClientRect();
+    const vx = ((ev.clientX - r.left) / r.width) * W;
+    const i = Math.max(0, Math.min(history.length - 1, Math.round(((vx - L) / (W - L - R)) * (history.length - 1))));
+    const [d, v] = history[i];
+    const px = L + (history.length === 1 ? (W - L - R) / 2 : (i * (W - L - R)) / (history.length - 1));
+    cross.setAttribute("x1", px); cross.setAttribute("x2", px); cross.setAttribute("visibility", "visible");
+    tip.style.display = "block"; tip.style.left = `${(px / W) * 100}%`; tip.style.top = "0";
+    tip.textContent = `${d} · ${T[lang].tt} ${v == null ? "—" : v.toFixed(1)}`;
+  };
+  const hide = () => { tip.style.display = "none"; cross.setAttribute("visibility", "hidden"); };
+  svg.addEventListener("pointermove", move); svg.addEventListener("pointerleave", hide);
+}
+
+const BLOCKS = ["advisories", "aviation", "domestic", "aggressor", "media", "markets"];
+const fmtDate = (iso) => String(iso || "").replace("T", " ").slice(0, 16);
+
+function flagText(key) {
+  const t = T[lang], [name, n] = key.split(":");
+  return t.flagText[name] ? t.flagText[name].replace("{n}", n || "") : "";
+}
+
+function summary(c) {
+  const t = T[lang], out = [];
+  if (c.score == null) return "";
+  out.push(`<strong>${esc(c.name[lang])}: ${c.score.toFixed(1)} ${esc(t.outOf)}, ${esc(t.lvl[c.level])} ${esc(t.levelWord)}.</strong> ${esc(t.mean[c.level])}`);
+  const main = (c.contributors || []).filter((x) => x.value > 0.05).slice(0, 3);
+  out.push(main.length ? `${esc(t.main)}: ${main.map((x) => `${esc(x.publisher[lang])} (${esc(x.kind[lang])})`).join("; ")}.` : esc(t.quiet));
+  if ((c.floors || []).length) out.push(esc(t.floorHit));
+  (c.flag_keys || []).map(flagText).filter(Boolean).forEach((f) => out.push(esc(f)));
+  out.push(`<span class="muted">${esc(t.notForecast)}</span>`);
+  return `<div class="sub">${esc(t.summaryT)}</div><div class="summary">${out.map((x) => `<p>${x}</p>`).join("")}</div>`;
+}
+
+function blocksView(c) {
+  const t = T[lang], b = c.blocks || {};
+  if (!Object.keys(b).length) return "";
+  return `<div class="sub">${esc(t.blocksT)}</div><div class="blocks">` + BLOCKS.map((k) => {
+    const v = Math.max(0, Math.min(1, b[k] || 0)), pct = Math.round(v * 100);
+    return `<span title="${esc(t.blk[k][1])}">${esc(t.blk[k][0])}</span>` +
+      `<span class="bar" role="img" aria-label="${esc(t.blk[k][0])}: ${pct}%"><span style="width:${pct}%"></span></span><span class="pct">${pct}%</span>`;
+  }).join("") + `</div>`;
+}
+
+function signalItem(s, gov) {
+  const t = T[lang];
+  const what = gov ? (s.strength >= 0.1 ? `${t.raised} (${t.strength} ${s.strength.toFixed(2)})` : t.normal)
+    : `${s.kind[lang]} · ${s.state ? t.state : t.event} · ${t.strength} ${s.strength.toFixed(2)}`;
+  // Ukrainian summary when there is one (not a verbatim quote), else the original quote.
+  const note = lang === "uk" && s.note_uk ? `<span class="q">${esc(s.note_uk.slice(0, 220))}</span>`
+    : s.note ? `<span class="q">«${esc(s.note.slice(0, 220))}»</span>` : "";
+  return `<li>${esc(s.publisher[lang])}: ${esc(what)} <span class="muted">${esc(fmtDate(s.observed_at))}</span>${note}</li>`;
+}
+
+function signalsView(c) {
+  const t = T[lang], all = c.signals || [];
+  const gov = all.filter((s) => s.kind.en === "advisory level");
+  const seen = all.filter((s) => s.kind.en !== "advisory level" && s.strength > 0);
+  let html = "";
+  if (gov.length) html += `<div class="sub">${esc(t.govT)}</div><ul>${gov.map((s) => signalItem(s, true)).join("")}</ul>`;
+  if (all.length) html += `<div class="sub">${esc(t.seenT)}</div>` + (seen.length ? `<ul>${seen.map((s) => signalItem(s, false)).join("")}</ul>` : `<p class="muted">${esc(t.noSignals)}</p>`);
+  return html;
+}
+
+function renderPanel() {
+  const t = T[lang], panel = document.getElementById("panel");
+  if (!data) { panel.innerHTML = `<p>${esc(t.empty)}</p>`; return; }
+  const ctx = selected && data.context?.[selected];
+  if (ctx) {
+    panel.innerHTML = `<h2>${ctx.flag} ${esc(ctx.name[lang])}</h2>` +
+      `<div class="big"><span class="n" aria-hidden="true">⚔</span><span class="lv">${esc(t.ctxRole[ctx.role])}</span></div>` +
+      (ctx.note[lang] ? `<p>${esc(ctx.note[lang])}</p>` : "") + `<p class="muted">${esc(t.ctxNote)}</p>`;
+    return;
+  }
+  const code = selected && data.countries[selected] ? selected
+    : Object.entries(data.countries).sort((a, b) => (b[1].score ?? -1) - (a[1].score ?? -1))[0][0];
+  const c = data.countries[code];
+  const score = c.score != null
+    ? `<div class="big"><span class="n">${c.score.toFixed(1)}</span><span class="lv">/ 10 · ${esc(t.lvl[c.level])}</span></div>`
+    : `<p>${esc(t.calibrating)}</p>`;
+  const war = `<div class="sub">${esc(t.war)}</div><div>${WAR[c.war.status] || "🟢"} ${esc(t.warS[c.war.status])}${c.war.note[lang] ? `<div class="muted">${esc(c.war.note[lang])}</div>` : ""}</div>`;
+  const legacy = !c.blocks && c.reasons[lang].length ? `<div class="sub">${esc(t.why)}</div><ul>${c.reasons[lang].map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : "";
+  const hist = c.history.length ? `<div class="sub">${esc(t.history)}</div>${chart(c.history)}` : "";
+  panel.innerHTML = `<h2>${c.flag} ${esc(c.name[lang])}</h2>${score}${summary(c)}${legacy}${blocksView(c)}${signalsView(c)}${war}${hist}` +
+    (c.updated ? `<p class="muted">${esc(t.updated)}: ${esc(fmtDate(c.updated))} UTC</p>` : "");
+  wireChart(c.history);
+}
+
+function renderMethod() {
+  const t = T[lang];
+  const body = t.methodFull.map(([h, content]) => {
+    let inner;
+    if (content === "LEVELS") inner = `<dl>${LEVELS.map((l) => `<dt>${esc(t.levels[l])}</dt><dd>${esc(t.mean[l])}</dd>`).join("")}</dl>`;
+    else if (content === "BLOCKS") inner = `<dl>${BLOCKS.map((k) => `<dt>${esc(t.blk[k][0])}</dt><dd>${esc(t.blk[k][1])}</dd>`).join("")}</dl>`;
+    else inner = content.map((x) => `<p>${esc(x)}</p>`).join("");
+    return `<h3>${esc(h)}</h3>${inner}`;
+  }).join("");
+  document.getElementById("method").innerHTML = `<h2>${esc(t.methodTitle)}</h2><p>${esc(t.method)}</p>${body}` +
+    `<p><a href="${REPO}docs/algorithm.md">${esc(t.algo)}</a> · <a href="${REPO}docs/sources.md">${esc(t.sources)}</a> · <a href="../">${esc(t.progress)}</a></p>`;
+}
+
+function renderTable() {
+  const t = T[lang];
+  document.getElementById("tabletitle").textContent = t.table;
+  if (!data) { document.getElementById("table").innerHTML = ""; return; }
+  const rows = Object.entries(data.countries).sort((a, b) => (b[1].score ?? -1) - (a[1].score ?? -1) || a[1].name[lang].localeCompare(b[1].name[lang]));
+  document.getElementById("table").innerHTML = `<table><thead><tr><th>${esc(t.country)}</th><th class="num">${esc(t.score)}</th><th>${esc(t.level)}</th><th>${esc(t.war)}</th></tr></thead><tbody>` +
+    rows.map(([code, c]) => `<tr data-code="${code}"><td><button class="link" type="button">${c.flag} ${esc(c.name[lang])}</button></td><td class="num">${c.score != null ? c.score.toFixed(1) : "—"}</td>` +
+      `<td>${c.score != null ? esc(t.lvl[c.level]) : "⏳"}</td><td>${WAR[c.war.status] || "🟢"} ${esc(t.warS[c.war.status])}</td></tr>`).join("") +
+    `</tbody></table>`;
+  document.querySelectorAll("#table tbody tr").forEach((tr) => tr.onclick = () => select(tr.dataset.code, true));
+}
+
+function render() {
+  const t = T[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+  document.getElementById("title").textContent = t.title;
+  document.title = t.title;
+  document.getElementById("notice").textContent = t.notice;
+  document.getElementById("maphint").textContent = t.hint;
+  document.getElementById("meta").textContent = data ? `${t.updated}: ${data.generated_at.replace("T", " ").slice(0, 16)} UTC` : "";
+  renderMethod();
+  document.getElementById("foot").textContent = data ? `v${data.version}` : "";
+  renderLegend(); renderMap(); renderPanel(); renderTable();
+}
+
+function select(code, byUser = false) {
+  selected = code;
+  history.replaceState(null, "", `#${code}`);
+  renderMap(); renderPanel();
+  // On one-column layouts the panel is below the map: bring it into view.
+  if (byUser && matchMedia("(max-width: 860px)").matches) {
+    document.getElementById("panel").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; store.set("lang", lang); render(); }));
+const savedTheme = store.get("theme");
+if (savedTheme === "light" || savedTheme === "dark") document.documentElement.dataset.theme = savedTheme;
+document.getElementById("themeBtn").addEventListener("click", () => {
+  const cur = document.documentElement.dataset.theme;
+  const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const next = dark ? "light" : "dark";
+  document.documentElement.dataset.theme = next; store.set("theme", next);
+});
+window.addEventListener("hashchange", () => { const c = location.hash.slice(1).toUpperCase(); if (c) select(c); });
+
+render();
+fetch("scores.json", { cache: "no-store" })
+  .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then((json) => { data = json; render(); })
+  .catch(() => { data = null; render(); });
+</script>
+</body>
+</html>
