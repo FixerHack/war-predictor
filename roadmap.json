@@ -1,0 +1,2230 @@
+{
+  "project": {
+    "name_uk": "Індекс напруги: Європа",
+    "name_en": "Tension Index: Europe",
+    "repo": "FixerHack/war-predictor",
+    "version": "0.2.106",
+    "updated": "2026-10-06"
+  },
+  "milestones": [
+    {
+      "id": "M1",
+      "uk": "MVP: 14 днів автономного збору, бал 7+ для України до 24.02.2022 на історії, кожне сповіщення з поясненням",
+      "en": "MVP: 14 days of unattended collection, backtest scores Ukraine 7+ before 2022-02-24, every alert explained"
+    }
+  ],
+  "stages": [
+    {
+      "id": "S0",
+      "branch": "dev-bootstrap",
+      "uk": "Фундамент та інфраструктура",
+      "en": "Foundation & infrastructure",
+      "goal_uk": "Репозиторій, робоче середовище на MacBook і сервері, ключі, Telegram-бот.",
+      "goal_en": "Repository, working environment on the MacBook and server, keys, Telegram bot.",
+      "tasks": [
+        {
+          "id": "S0.1",
+          "status": "done",
+          "days": 0.2,
+          "uk": "Репозиторій, гілка main за замовчуванням, правила іменування гілок",
+          "en": "Repository, main as default branch, branch naming rules",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.2",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Python 3.12 + uv, структура пакета, CLI tension-index",
+          "en": "Python 3.12 + uv, package layout, tension-index CLI",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.3",
+          "status": "done",
+          "days": 0.5,
+          "uk": "SQLite-сховище з міграціями, повні версії текстів",
+          "en": "SQLite storage with migrations, full text versions",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.4",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Healthcheck (CLI, скрипт, таймер systemd, алерт у Telegram, dead-man ping)",
+          "en": "Healthcheck (CLI, script, systemd timer, Telegram alert, dead-man ping)",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.5",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Скрипти запуску, деплою і встановлення на сервер (systemd)",
+          "en": "Run, deploy and server install scripts (systemd)",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.6",
+          "status": "done",
+          "days": 0.3,
+          "uk": "CI: ruff + pytest через uv",
+          "en": "CI: ruff + pytest via uv",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.7",
+          "status": "done",
+          "days": 0.5,
+          "uk": "План + сторінка прогресу на GitHub Pages",
+          "en": "Plan + progress page on GitHub Pages",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.8",
+          "status": "done",
+          "days": 0.3,
+          "uk": "README українською та англійською",
+          "en": "README in Ukrainian and English",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.9",
+          "status": "done",
+          "days": 0.3,
+          "owner": "human",
+          "uk": "MacBook: встановити uv і Claude Code, клонувати репозиторій, ./scripts/bootstrap.sh",
+          "en": "MacBook: install uv and Claude Code, clone the repo, ./scripts/bootstrap.sh"
+        },
+        {
+          "id": "S0.10",
+          "status": "done",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "OpenRouter: поповнення, ключ API (OPENROUTER_API_KEY у .env), ліміт витрат",
+          "en": "OpenRouter: top-up, API key (OPENROUTER_API_KEY in .env), spend limit",
+          "note_uk": "Замість OpenRouter класифікатор працює через локальний Claude Code за підпискою (CLASSIFIER_PROVIDER=claude_code).",
+          "note_en": "Instead of OpenRouter the classifier runs through the local Claude Code CLI on a subscription (CLASSIFIER_PROVIDER=claude_code)."
+        },
+        {
+          "id": "S0.11",
+          "status": "done",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Створити бота в @BotFather, тестовий канал, заповнити .env",
+          "en": "Create bot via @BotFather, test channel, fill in .env"
+        },
+        {
+          "id": "S0.12",
+          "status": "done",
+          "days": 0.5,
+          "owner": "human",
+          "uk": "Перший деплой на сервер: install_server.sh, перевірка healthcheck",
+          "en": "First server deploy: install_server.sh, verify healthcheck",
+          "note_uk": "Розгорнуто 2026-10-01 за docs/deploy-agent.md: claude-gateway у ~/claude-gateway і бот із таймерами у ~/war-predictor, окремі сервіси з автозапуском; бот звертається до шлюзу власним токеном.",
+          "note_en": "Deployed 2026-10-01 following docs/deploy-agent.md: claude-gateway in ~/claude-gateway and the bot with timers in ~/war-predictor, separate services started on boot; the bot uses its own gateway token."
+        },
+        {
+          "id": "S0.13",
+          "status": "done",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Увімкнути GitHub Pages: Source → Deploy from a branch → gh-pages / root",
+          "en": "Enable GitHub Pages: Source → Deploy from a branch → gh-pages / root",
+          "note_uk": "Працює: fixerhack.github.io/war-predictor",
+          "note_en": "Live: fixerhack.github.io/war-predictor"
+        },
+        {
+          "id": "S0.15",
+          "status": "todo",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Зняти блокування GitHub Actions: Settings → Billing and plans (рахунок / картка)",
+          "en": "Unlock GitHub Actions: Settings → Billing and plans (invoice / card)",
+          "note_uk": "Необов'язково: перевірки робить make check, карту публікує сервер.",
+          "note_en": "Optional: make check runs the checks, the server publishes the map."
+        },
+        {
+          "id": "S0.16",
+          "status": "done",
+          "days": 0.2,
+          "uk": "Публікація сторінки прогресу без Actions (make pages → гілка gh-pages)",
+          "en": "Publish the progress page without Actions (make pages → gh-pages branch)",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.17",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Інсталятор шлюзу чекає на запуск сервісу до 30 с замість фіксованих 2 с",
+          "en": "Gateway installer waits up to 30 s for the service to start instead of a fixed 2 s",
+          "owner": "claude"
+        },
+        {
+          "id": "S0.14",
+          "status": "todo",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Захист гілки main (тільки через PR, CI зелений); видалити гілку claude/funny-planck-leoxip",
+          "en": "Protect main (PR only, CI green); delete branch claude/funny-planck-leoxip"
+        }
+      ],
+      "stats": {
+        "percent": 93,
+        "days_total": 5.4,
+        "days_left": 0.4,
+        "counts": {
+          "done": 15,
+          "in_progress": 0,
+          "todo": 2,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 5.0,
+          "in_progress": 0,
+          "todo": 0.4,
+          "blocked": 0
+        },
+        "tasks": 17
+      }
+    },
+    {
+      "id": "S1",
+      "branch": "—",
+      "uk": "Вхідні рішення",
+      "en": "Input decisions",
+      "goal_uk": "Зафіксувати обсяг, формат і джерела.",
+      "goal_en": "Fix scope, format and sources.",
+      "tasks": [
+        {
+          "id": "S1.1",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Країни: ЄС-27, Велика Британія, Норвегія, Швейцарія, Ісландія, Молдова, Західні Балкани (38)",
+          "en": "Countries: EU-27, UK, Norway, Switzerland, Iceland, Moldova, Western Balkans (38)",
+          "note_uk": "Україну не включено: активна війна, шкала там постійно максимальна.",
+          "note_en": "Ukraine excluded: active war keeps the scale at maximum.",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.2",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Формат: публічний сервіс",
+          "en": "Format: public service",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.3",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Джерела рекомендацій: США, Велика Британія, Ізраїль, Канада, Австралія, Німеччина, Франція + МЗС РФ і Білорусі",
+          "en": "Advisory sources: US, UK, Israel, Canada, Australia, Germany, France + Russian and Belarusian MFA",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.4",
+          "status": "in_progress",
+          "days": 0.2,
+          "owner": "human",
+          "uk": "Затвердити перелік джерел (docs/sources.md)",
+          "en": "Approve the source list (docs/sources.md)",
+          "note_uk": "Каталог джерел із доступом і статусом перевірки готовий, потрібне затвердження.",
+          "note_en": "Source catalogue with access and verification status is ready, needs approval."
+        },
+        {
+          "id": "S1.5",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Розробка: власник проєкту + Claude Code; сервер власний",
+          "en": "Development: project owner + Claude Code; own server",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.6",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Бюджет: безкоштовний стек, платний лише Claude API (ліміт 10–20 $)",
+          "en": "Budget: free stack, only Claude API is paid (10–20 $ cap)",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.7",
+          "status": "todo",
+          "days": 0.3,
+          "owner": "human",
+          "uk": "Текст юридичного застереження (не прогноз, не порада)",
+          "en": "Legal disclaimer text (not a forecast, not advice)"
+        },
+        {
+          "id": "S1.8",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Алгоритм шкали 0–10 (docs/algorithm.md)",
+          "en": "0–10 scale algorithm (docs/algorithm.md)",
+          "owner": "claude"
+        },
+        {
+          "id": "S1.9",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Ресьорч джерел і трекерів війн (docs/sources.md)",
+          "en": "Research of sources and war trackers (docs/sources.md)",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 80,
+        "days_total": 2.0,
+        "days_left": 0.4,
+        "counts": {
+          "done": 7,
+          "in_progress": 1,
+          "todo": 1,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 1.5,
+          "in_progress": 0.2,
+          "todo": 0.3,
+          "blocked": 0
+        },
+        "tasks": 9
+      }
+    },
+    {
+      "id": "S2",
+      "branch": "dev-collector",
+      "uk": "Збір офіційних рекомендацій",
+      "en": "Official advisory collection",
+      "goal_uk": "Регулярне отримання рекомендацій зі збереженням кожної версії тексту.",
+      "goal_en": "Regular collection of advisories, storing every text version.",
+      "tasks": [
+        {
+          "id": "S2.1",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Каркас джерел, збереження версій, виявлення змін (diff)",
+          "en": "Source framework, version storage, change detection (diff)",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.2",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Велика Британія (GOV.UK Content API)",
+          "en": "UK (GOV.UK Content API)",
+          "note_uk": "Перевірено на живих даних (PL, EE, MD).",
+          "note_en": "Verified on live data (PL, EE, MD).",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.3",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Німеччина (Auswärtiges Amt OpenData API)",
+          "en": "Germany (Auswärtiges Amt OpenData API)",
+          "note_uk": "Перевірено на живих даних 30.09–01.10.2026.",
+          "note_en": "Verified on live data 30 Sep–1 Oct 2026.",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.4",
+          "status": "done",
+          "days": 1,
+          "uk": "США (RSS TAsTWs + сторінки країн + Security Alerts посольств)",
+          "en": "US (TAsTWs RSS + country pages + embassy Security Alerts)",
+          "note_uk": "Перевірено на живих даних. Стрічка віддає дві розкладки тих самих порад — обидві зводяться до одного канонічного тексту.",
+          "note_en": "Verified on live data. The feed serves two layouts of the same advice — both reduce to one canonical text.",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.5",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Канада (open data JSON)",
+          "en": "Canada (open data JSON)",
+          "note_uk": "Перевірено на живих даних 30.09–01.10.2026.",
+          "note_en": "Verified on live data 30 Sep–1 Oct 2026.",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.6",
+          "status": "blocked",
+          "days": 0.5,
+          "uk": "Австралія (Smartraveller destinations-export)",
+          "en": "Australia (Smartraveller destinations-export)",
+          "note_uk": "Сайт Smartraveller не відповідає на автоматичні запити (експорт і сторінки, перевірено 30.09.2026); вимкнено через DISABLED_SOURCES=au.",
+          "note_en": "Smartraveller does not answer automated requests (export and pages, tested 2026-09-30); disabled via DISABLED_SOURCES=au.",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.7",
+          "status": "in_progress",
+          "days": 0.5,
+          "uk": "Франція (diplomatie.gouv.fr, парсинг)",
+          "en": "France (diplomatie.gouv.fr, scraping)",
+          "note_uk": "Лише текст сторінки, рівень визначає класифікатор; перевірити probe fr",
+          "note_en": "Page text only, level set by the classifier; verify with probe fr",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.8",
+          "status": "blocked",
+          "days": 0.5,
+          "uk": "Ізраїль (NSC travel warnings)",
+          "en": "Israel (NSC travel warnings)",
+          "note_uk": "Сторінка NSC — JS-застосунок без відомого API; потрібен зразок відповіді. Для Європи вага низька.",
+          "note_en": "NSC page is a JS app with no known API; needs a sample response. Low weight for Europe.",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.9",
+          "status": "in_progress",
+          "days": 1,
+          "uk": "МЗС РФ і Білорусі: рекомендації своїм громадянам",
+          "en": "Russian and Belarusian MFA advisories to own citizens",
+          "note_uk": "Через GDELT: російськомовні публікації про поради МЗС РФ/РБ, 2+ видання = підтверджено.",
+          "note_en": "Via GDELT: Russian-language reports of RU/BY MFA advice, 2+ outlets = confirmed.",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.10",
+          "status": "done",
+          "days": 0.2,
+          "uk": "Алерт у Telegram, якщо джерело зламалося",
+          "en": "Telegram alert when a source breaks",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.11",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Очищення тексту від дат оновлення і службових елементів",
+          "en": "Strip update dates and boilerplate before diffing",
+          "owner": "claude"
+        },
+        {
+          "id": "S2.12",
+          "status": "in_progress",
+          "days": 0.3,
+          "uk": "США: стрічка RSS зникла (404) — резерв через API cadataapi.state.gov (RSS/Atom/JSON)",
+          "en": "US: RSS feed gone (404) — fallback to the cadataapi.state.gov API (RSS/Atom/JSON)",
+          "note_uk": "Формат API перевірено лише на припущеннях; потрібна перевірка probe us.",
+          "note_en": "API format only assumed; needs a probe us check.",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 71,
+        "days_total": 6.5,
+        "days_left": 1.9,
+        "counts": {
+          "done": 7,
+          "in_progress": 3,
+          "todo": 0,
+          "blocked": 2
+        },
+        "days_by_status": {
+          "done": 3.7,
+          "in_progress": 1.8,
+          "todo": 0,
+          "blocked": 1.0
+        },
+        "tasks": 12
+      }
+    },
+    {
+      "id": "S3",
+      "branch": "dev-aviation",
+      "uk": "Авіація і повітряний простір",
+      "en": "Aviation & airspace",
+      "goal_uk": "Офіційні попередження щодо неба і фактичне падіння трафіку.",
+      "goal_en": "Official airspace warnings and actual traffic drops.",
+      "tasks": [
+        {
+          "id": "S3.1",
+          "status": "in_progress",
+          "days": 1,
+          "uk": "EASA Conflict Zone Information Bulletins",
+          "en": "EASA Conflict Zone Information Bulletins",
+          "note_uk": "Реалізовано (парсинг сторінки); перевірити: tension-index probe easa",
+          "note_en": "Implemented (page parsing); verify: tension-index probe easa",
+          "owner": "claude"
+        },
+        {
+          "id": "S3.2",
+          "status": "blocked",
+          "days": 1.5,
+          "uk": "NOTAM: обмеження і закриття повітряного простору",
+          "en": "NOTAM: airspace restrictions and closures",
+          "note_uk": "Безкоштовного API NOTAM для Європи немає (EUROCONTROL EAD платний). Обмеження неба беремо з текстів рекомендацій і CZIB.",
+          "note_en": "No free European NOTAM API (EUROCONTROL EAD is paid). Airspace limits come from advisory texts and CZIBs.",
+          "owner": "claude"
+        },
+        {
+          "id": "S3.3",
+          "status": "in_progress",
+          "days": 1,
+          "uk": "OpenSky: падіння кількості рейсів за аеропортом",
+          "en": "OpenSky: drop in flights per airport",
+          "note_uk": "Реалізовано через OpenSky (падіння трафіку); норма з’явиться після ~3 тижнів збору.",
+          "note_en": "Implemented via OpenSky (traffic drop); baseline needs ~3 weeks of samples.",
+          "owner": "claude"
+        },
+        {
+          "id": "S3.6",
+          "status": "done",
+          "days": 0.25,
+          "uk": "Падіння авіатрафіку: норма лише з 3+ тижнів, поріг 20 літаків і 3σ, сигнал знімається після відновлення",
+          "en": "Air traffic drop: norm only from 3+ weeks, 20-aircraft and 3σ thresholds, signal cleared on recovery",
+          "note_uk": "Хибний сигнал LU («3 літаки замість 10») більше не можливий.",
+          "note_en": "The false LU signal (\"3 aircraft vs usual 10\") can no longer happen.",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 33,
+        "days_total": 3.8,
+        "days_left": 2.5,
+        "counts": {
+          "done": 1,
+          "in_progress": 2,
+          "todo": 0,
+          "blocked": 1
+        },
+        "days_by_status": {
+          "done": 0.25,
+          "in_progress": 2,
+          "todo": 0,
+          "blocked": 1.5
+        },
+        "tasks": 4
+      }
+    },
+    {
+      "id": "S4",
+      "branch": "dev-news",
+      "uk": "Новини, аналітика, внутрішні заходи",
+      "en": "News, analysis, domestic measures",
+      "goal_uk": "Незалежні підтвердження з медіа, аналітики, ринків і рішень самої країни.",
+      "goal_en": "Independent confirmation from media, analysis, markets and the country's own measures.",
+      "tasks": [
+        {
+          "id": "S4.1",
+          "status": "in_progress",
+          "days": 1,
+          "uk": "RSS рівнів 1–2, тільки заголовки й посилання",
+          "en": "Tier 1–2 RSS, headlines and links only",
+          "note_uk": "Реалізовано: 13 стрічок у config/feeds.yaml, подія рахується лише з 2+ стрічок; перевірити URL: tension-index probe news",
+          "note_en": "Implemented: 13 feeds in config/feeds.yaml, an event counts only from 2+ feeds; check URLs: tension-index probe news",
+          "owner": "claude"
+        },
+        {
+          "id": "S4.2",
+          "status": "in_progress",
+          "days": 1,
+          "uk": "GDELT: обсяг і тональність по країні",
+          "en": "GDELT: volume and tone per country",
+          "note_uk": "Сплеск унікальних статей про військові події за щоденними файлами GDELT 1.0 (DOC API сильно обмежує запити): обидва останні дні ≥2× медіани 60 днів і ≥15 статей; рахується лише з підтвердженням новинами. Дані розріджені, тональність не реалізовано.",
+          "note_en": "Surge of distinct articles about military events from GDELT 1.0 daily files (the DOC API throttles hard): both last days ≥2x the 60-day median and ≥15 articles; counts only when news confirm. Data is sparse; tone not implemented.",
+          "owner": "claude"
+        },
+        {
+          "id": "S4.3",
+          "status": "in_progress",
+          "days": 0.5,
+          "uk": "CrisisWatch: погіршення і Conflict Risk Alert",
+          "en": "CrisisWatch: deterioration and Conflict Risk Alerts",
+          "note_uk": "Через RSS Crisis Group у стрічках новин.",
+          "note_en": "Via the Crisis Group RSS in the news feeds.",
+          "owner": "claude"
+        },
+        {
+          "id": "S4.4",
+          "status": "in_progress",
+          "days": 1,
+          "uk": "Внутрішні заходи країни: мобілізація, надзвичайні укази, кордони",
+          "en": "Domestic measures: mobilisation, emergency decrees, border closures",
+          "note_uk": "З новин: надзвичайний стан, кордони, мобілізація (лише з 2+ стрічок).",
+          "note_en": "From news: emergency, borders, mobilisation (2+ feeds only).",
+          "owner": "claude"
+        },
+        {
+          "id": "S4.5",
+          "status": "in_progress",
+          "days": 0.5,
+          "uk": "Ринки: облігації і курси через ECB Data Portal",
+          "en": "Markets: bonds and FX via ECB Data Portal",
+          "note_uk": "ЄЦБ: спред 10-річних облігацій до Німеччини і курс валюти (раз на добу).",
+          "note_en": "ECB: 10y spread over Germany and FX (daily).",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 50,
+        "days_total": 4.0,
+        "days_left": 2.0,
+        "counts": {
+          "done": 0,
+          "in_progress": 5,
+          "todo": 0,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0,
+          "in_progress": 4.0,
+          "todo": 0,
+          "blocked": 0
+        },
+        "tasks": 5
+      }
+    },
+    {
+      "id": "S5",
+      "branch": "dev-history",
+      "uk": "Історичний архів",
+      "en": "Historical archive",
+      "goal_uk": "Старі версії рекомендацій для перевірки шкали на відомих епізодах.",
+      "goal_en": "Past advisory versions to test the scale on known episodes.",
+      "tasks": [
+        {
+          "id": "S5.1",
+          "status": "done",
+          "days": 1,
+          "uk": "Завантаження старих версій з Wayback Machine (CDX API)",
+          "en": "Download past versions from the Wayback Machine (CDX API)",
+          "note_uk": "tension-index history: знімки Wayback (щодня за 45 днів до події, раз на 5 днів раніше) в окрему базу data/history.sqlite3.",
+          "note_en": "tension-index history: Wayback captures (daily 45 days before the event, every 5 days earlier) into data/history.sqlite3.",
+          "owner": "claude"
+        },
+        {
+          "id": "S5.2",
+          "status": "in_progress",
+          "days": 1,
+          "uk": "Епізоди: Україна 2021–22, Вірменія/Азербайджан 2020, Ізраїль/Іран 2024–25",
+          "en": "Episodes: Ukraine 2021–22, Armenia/Azerbaijan 2020, Israel/Iran 2024–25",
+          "note_uk": "Епізоди в config/episodes.yaml (Україна 2022, Азербайджан 2020, Ізраїль 2024, контроль Франція 2016); завантаження потребує мережі, запустити локально.",
+          "note_en": "Episodes in config/episodes.yaml (Ukraine 2022, Azerbaijan 2020, Israel 2024, control France 2016); loading needs network, run locally.",
+          "owner": "claude"
+        },
+        {
+          "id": "S5.5",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Архів Wayback: довгі таймаути, повтори при 429/5xx, прогрес у логах",
+          "en": "Wayback archive: long timeouts, retries on 429/5xx, progress in logs",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 76,
+        "days_total": 2.1,
+        "days_left": 0.5,
+        "counts": {
+          "done": 2,
+          "in_progress": 1,
+          "todo": 0,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 1.1,
+          "in_progress": 1,
+          "todo": 0,
+          "blocked": 0
+        },
+        "tasks": 3
+      }
+    },
+    {
+      "id": "S6",
+      "branch": "dev-classifier",
+      "uk": "Класифікація змін (Claude API)",
+      "en": "Change classification (Claude API)",
+      "goal_uk": "Claude визначає причину і тип кожної зміни та перетворює її на сигнал.",
+      "goal_en": "Claude determines the reason and type of each change and turns it into a signal.",
+      "tasks": [
+        {
+          "id": "S6.1",
+          "status": "done",
+          "days": 1,
+          "uk": "Промпт і JSON-схема: причина, тип зміни, персонал, кордони, цитата",
+          "en": "Prompt and JSON schema: reason, change type, staff, borders, quote",
+          "owner": "claude"
+        },
+        {
+          "id": "S6.2",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Виклик лише на змінених фрагментах, кешування промпту, ліміт витрат",
+          "en": "Call only on changed fragments, prompt caching, spend cap",
+          "note_uk": "Лише змінені фрагменти, кеш системного промпту, ліміт викликів CLASSIFIER_MAX_CALLS; без ключа працюють правила.",
+          "note_en": "Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key.",
+          "owner": "claude"
+        },
+        {
+          "id": "S6.3",
+          "status": "todo",
+          "days": 1,
+          "owner": "human",
+          "uk": "Ручна перевірка на 50 прикладах",
+          "en": "Manual check on 50 examples",
+          "note_uk": "Потрібен ключ API і реальні зміни; перевірити 50 класифікацій вручну.",
+          "note_en": "Needs an API key and real changes; review 50 classifications by hand."
+        },
+        {
+          "id": "S6.7",
+          "status": "done",
+          "days": 0.3,
+          "uk": "Класифікатор через локальний Claude Code (claude -p, без API-ключа)",
+          "en": "Classifier through the local Claude Code CLI (claude -p, no API key)",
+          "note_uk": "CLASSIFIER_PROVIDER=claude_code: виклик claude -p зі схемою JSON, без інструментів і без збереження сесій; використовує ліміти підписки. На сервері потрібен claude setup-token.",
+          "note_en": "CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed.",
+          "owner": "claude"
+        },
+        {
+          "id": "S6.8",
+          "status": "done",
+          "days": 1,
+          "uk": "Окремий інструмент claude-gateway: HTTP API (власний, сумісні з OpenAI й Anthropic) і MCP поверх Claude Code",
+          "en": "Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code",
+          "note_uk": "gateway/: токен обов'язковий, без інструментів і сесій, ліміт паралельних викликів, systemd-сервіс; tension-index може класифікувати через нього (CLASSIFIER_PROVIDER=gateway).",
+          "note_en": "gateway/: token required, no tools or sessions, parallel call limit, systemd service; tension-index can classify through it (CLASSIFIER_PROVIDER=gateway).",
+          "owner": "claude"
+        },
+        {
+          "id": "S6.9",
+          "status": "done",
+          "days": 0.3,
+          "uk": "Хибні тривоги з живих даних: навчання й тести не є мобілізацією чи надзвичайним станом, окремі закриті переходи не є закритим кордоном, без випадкових цитат",
+          "en": "False alarms from live data: drills and tests are not mobilisation or an emergency, some closed crossings are not a closed border, no random quotes",
+          "owner": "claude"
+        },
+        {
+          "id": "S6.10",
+          "status": "done",
+          "days": 0.3,
+          "uk": "Шлюз Claude Code — окремий репозиторій FixerHack/claude-gateway з історією; war-predictor лише клієнт",
+          "en": "Claude Code gateway as its own repository FixerHack/claude-gateway with history; war-predictor is only a client",
+          "note_uk": "github.com/FixerHack/claude-gateway; на сервері з 2026-10-05 працює з ~/claude-gateway (новий репозиторій), токени збережено.",
+          "note_en": "github.com/FixerHack/claude-gateway; on the server since 2026-10-05 from ~/claude-gateway (the new repository), tokens kept.",
+          "owner": "claude"
+        },
+        {
+          "id": "S6.6",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Фільтр цитат: уривки сторінок («3 pays») не показуються",
+          "en": "Quote filter: page fragments (\"3 pays\") are not shown",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 78,
+        "days_total": 4.5,
+        "days_left": 1.0,
+        "counts": {
+          "done": 7,
+          "in_progress": 0,
+          "todo": 1,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 3.5,
+          "in_progress": 0,
+          "todo": 1,
+          "blocked": 0
+        },
+        "tasks": 8
+      }
+    },
+    {
+      "id": "S7",
+      "branch": "dev-scoring",
+      "uk": "Розрахунок балу 0–10",
+      "en": "Scoring 0–10",
+      "goal_uk": "Зважена оцінка з модифікаторами, числа в config/weights.yaml.",
+      "goal_en": "Weighted score with modifiers, numbers in config/weights.yaml.",
+      "tasks": [
+        {
+          "id": "S7.1",
+          "status": "done",
+          "days": 1,
+          "uk": "Рушій балу: блоки А–Е, стелі, причини, згасання, верифікація, порогові події",
+          "en": "Scoring engine: blocks A–F, caps, reasons, decay, verification, floors",
+          "owner": "claude"
+        },
+        {
+          "id": "S7.2",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Норма країни і відхилення, синхронність держав, регіональна розбіжність",
+          "en": "Country baseline and deviation, cross-government synchrony, regional divergence",
+          "owner": "claude"
+        },
+        {
+          "id": "S7.3",
+          "status": "done",
+          "days": 1,
+          "uk": "Таблиця сигналів і щоденний розрахунок балу для всіх країн",
+          "en": "Signals table and daily score computation for all countries",
+          "note_uk": "tension-index run: збір → класифікація → сигнали → бал; бал без достатнього покриття не публікується (крім порогових подій).",
+          "note_en": "tension-index run: collect → classify → signals → score; no score without enough coverage (except threshold events).",
+          "owner": "claude"
+        },
+        {
+          "id": "S7.4",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Пояснення балу у сповіщеннях і на панелі",
+          "en": "Score explanation in alerts and on the dashboard",
+          "owner": "claude"
+        },
+        {
+          "id": "S7.5",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Захист від «мерехтіння» джерел (A → B → A) і команда why",
+          "en": "Guard against flapping sources (A → B → A) and the why command",
+          "note_uk": "Повернення до версії, яку бачили за останні 7 днів, не вважається зміною; такі зміни не дають подій у балі. tension-index why LU показує блоки й активні сигнали.",
+          "note_en": "Returning to a version seen within 7 days is not a change; such changes produce no score events. tension-index why LU lists blocks and active signals.",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 100,
+        "days_total": 3.5,
+        "days_left": 0.0,
+        "counts": {
+          "done": 5,
+          "in_progress": 0,
+          "todo": 0,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 3.5,
+          "in_progress": 0,
+          "todo": 0,
+          "blocked": 0
+        },
+        "tasks": 5
+      }
+    },
+    {
+      "id": "S8",
+      "branch": "dev-backtest",
+      "uk": "Перевірка на історії",
+      "en": "Backtesting",
+      "goal_uk": "Шкала має спрацьовувати на відомих епізодах вчасно і без масових хибних тривог.",
+      "goal_en": "The scale must fire on known episodes in time and without mass false alarms.",
+      "tasks": [
+        {
+          "id": "S8.1",
+          "status": "done",
+          "days": 1.5,
+          "uk": "Прогін шкали на історичних епізодах",
+          "en": "Replay the scale on historical episodes",
+          "note_uk": "Архів Wayback, класифікація Claude Haiku 4.5 через Claude Code: Україна-2022 — 7 з 20.12.2021 (за 66 днів); Вірменія–Азербайджан-2020 — реакція 3+ на 2-й день (раптовий напад); Ізраїль-2024 — 7 з початку вікна (виїзд персоналу США); Франція-2016 (контроль) — максимум 3.0. Усі PASS.",
+          "note_en": "Wayback archive, Claude Haiku 4.5 classification via Claude Code: Ukraine 2022 — 7 from 20 Dec 2021 (66 days ahead); Armenia–Azerbaijan 2020 — reaction 3+ on day 2 (surprise attack); Israel 2024 — 7 from the window start (US staff departure); France 2016 (control) — max 3.0. All PASS.",
+          "owner": "claude"
+        },
+        {
+          "id": "S8.2",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Звіт про хибні тривоги і пропуски",
+          "en": "False alarm and miss report",
+          "owner": "claude"
+        },
+        {
+          "id": "S8.3",
+          "status": "done",
+          "days": 1,
+          "uk": "Коригування ваг",
+          "en": "Weight tuning",
+          "note_uk": "Обмежено надбавку за сплеск, звужено синхронність, окрема причина для заходів, пороги неба з двох джерел, нижча вага регіональних попереджень. Перегляд після 30+ днів живої історії.",
+          "note_en": "Capped surge bonus, narrowed synchrony, separate measure reason, two-source airspace floors, lower weight for regional warnings. Revisit after 30+ days of live history.",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 100,
+        "days_total": 3.0,
+        "days_left": 0.0,
+        "counts": {
+          "done": 3,
+          "in_progress": 0,
+          "todo": 0,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 3.0,
+          "in_progress": 0,
+          "todo": 0,
+          "blocked": 0
+        },
+        "tasks": 3
+      }
+    },
+    {
+      "id": "S9",
+      "branch": "dev-tg-bot",
+      "uk": "Telegram-бот і сповіщення",
+      "en": "Telegram bot & alerts",
+      "goal_uk": "Бот з вибором мови й країни, панеллю і сповіщеннями з поясненням.",
+      "goal_en": "Bot with language and country choice, a dashboard and explained alerts.",
+      "tasks": [
+        {
+          "id": "S9.1",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Базовий бот на aiogram 3 і адмінські команди /status, /collect, /warcheck",
+          "en": "Base aiogram 3 bot and admin commands /status, /collect, /warcheck",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.2",
+          "status": "done",
+          "days": 1,
+          "uk": "Онбординг: мова (укр/англ) → країна → панель",
+          "en": "Onboarding: language (uk/en) → country → dashboard",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.3",
+          "status": "done",
+          "days": 1,
+          "uk": "Інлайн-панель: бал, статус війни, сусіди, зміни за 7 днів; перемикачі сповіщень, країни, мови",
+          "en": "Inline dashboard: score, war status, neighbours, 7-day changes; toggles for alerts, country, language",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.4",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Розсилка змін підписникам країни їхньою мовою",
+          "en": "Change alerts to a country's subscribers in their language",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.5",
+          "status": "done",
+          "days": 1,
+          "uk": "Сповіщення при зміні балу на 1+ з поясненням і цитатою",
+          "en": "Alerts on score change of 1+ with explanation and quote",
+          "note_uk": "Бал змінився на 1+ → підписникам приходить пояснення з джерелами й цитатами.",
+          "note_en": "Score moves by 1+ → subscribers get an explanation with sources and quotes.",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.6",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Щоденний підсумок по регіону",
+          "en": "Daily regional digest",
+          "note_uk": "Щоденний дайджест (перемикач на панелі, таймер 06:37 UTC): бал, зміна за добу, зростання в регіоні.",
+          "note_en": "Daily digest (toggle on the dashboard, 06:37 UTC timer): score, 24 h change, regional rises.",
+          "owner": "claude"
+        },
+        {
+          "id": "S9.7",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Кілька країн на одного користувача",
+          "en": "Several countries per user",
+          "note_uk": "До 5 країн: список з позначками, перемикання картки кнопками.",
+          "note_en": "Up to 5 countries: ticked list, switch the detailed card by buttons.",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 100,
+        "days_total": 5.0,
+        "days_left": 0.0,
+        "counts": {
+          "done": 7,
+          "in_progress": 0,
+          "todo": 0,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 5.0,
+          "in_progress": 0,
+          "todo": 0,
+          "blocked": 0
+        },
+        "tasks": 7
+      }
+    },
+    {
+      "id": "S10",
+      "branch": "dev-war-status",
+      "uk": "Статус війни",
+      "en": "War status",
+      "goal_uk": "Показувати, чи вже йде війна на території країни, окремо від шкали ескалації.",
+      "goal_en": "Show whether a war is already under way on the country's territory, separately from the escalation scale.",
+      "tasks": [
+        {
+          "id": "S10.1",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Довідник config/conflicts.yaml на основі RULAC (Молдова, Кіпр — окупація; сусідство з війною і агресором)",
+          "en": "Curated config/conflicts.yaml based on RULAC (Moldova, Cyprus — occupation; borders with war and aggressor)",
+          "owner": "claude"
+        },
+        {
+          "id": "S10.2",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Щоденна звірка з Wikipedia, розбіжності адміну (war-check)",
+          "en": "Daily check against Wikipedia, mismatches to admins (war-check)",
+          "owner": "claude"
+        },
+        {
+          "id": "S10.3",
+          "status": "todo",
+          "days": 0.5,
+          "owner": "human",
+          "uk": "Отримати токен UCDP API",
+          "en": "Obtain a UCDP API token"
+        },
+        {
+          "id": "S10.4",
+          "status": "blocked",
+          "days": 0.5,
+          "uk": "UCDP Candidate Events як друге автоматичне джерело",
+          "en": "UCDP Candidate Events as a second automatic source",
+          "note_uk": "Чекає токена UCDP (S10.3).",
+          "note_en": "Waiting for the UCDP token (S10.3).",
+          "owner": "claude"
+        },
+        {
+          "id": "S10.5",
+          "status": "done",
+          "days": 0.3,
+          "uk": "Перевірити парсер Wikipedia на живій сторінці",
+          "en": "Verify the Wikipedia parser against the live page",
+          "note_uk": "Перевірено на живій сторінці: розділи, колонка Location; Франція (Французька Гвіана) виключена вручну.",
+          "note_en": "Verified on the live page: sections, Location column; France (French Guiana) excluded by review.",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 57,
+        "days_total": 2.3,
+        "days_left": 1.0,
+        "counts": {
+          "done": 3,
+          "in_progress": 0,
+          "todo": 1,
+          "blocked": 1
+        },
+        "days_by_status": {
+          "done": 1.3,
+          "in_progress": 0,
+          "todo": 0.5,
+          "blocked": 0.5
+        },
+        "tasks": 5
+      }
+    },
+    {
+      "id": "S11",
+      "branch": "dev-dashboard",
+      "uk": "Публічна панель",
+      "en": "Public dashboard",
+      "goal_uk": "Карта країн і історія балу на безкоштовному хостингу.",
+      "goal_en": "Country map and score history on free hosting.",
+      "tasks": [
+        {
+          "id": "S11.1",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Експорт scores.json (публічне API тільки для читання)",
+          "en": "Export scores.json (read-only public API)",
+          "note_uk": "tension-index export → dashboard/scores.json (бал, рівень, причини, статус війни, 90 днів історії).",
+          "note_en": "tension-index export → dashboard/scores.json (score, level, reasons, war status, 90-day history).",
+          "owner": "claude"
+        },
+        {
+          "id": "S11.2",
+          "status": "done",
+          "days": 1,
+          "uk": "Карта Європи з кольорами рівнів",
+          "en": "Map of Europe coloured by level",
+          "note_uk": "Карта-сітка 38 країн, одновідтінкова шкала, перевірена на кольоросліпість, у світлій і темній темах.",
+          "note_en": "Tile map of 38 countries, single-hue scale validated for colour blindness, light and dark.",
+          "owner": "claude"
+        },
+        {
+          "id": "S11.3",
+          "status": "done",
+          "days": 1,
+          "uk": "Сторінка країни: історія балу і пояснення змін",
+          "en": "Country page: score history and change explanations",
+          "note_uk": "Картка країни: бал, причини з цитатами, позначки, статус війни, графік 90 днів; таблиця всіх країн; посилання #PL.",
+          "note_en": "Country card: score, reasons with quotes, flags, war status, 90-day chart; table of all countries; #PL links.",
+          "owner": "claude"
+        },
+        {
+          "id": "S11.4",
+          "status": "in_progress",
+          "days": 0.3,
+          "owner": "human",
+          "uk": "Юридичне застереження і методологія на сайті",
+          "en": "Disclaimer and methodology on the site",
+          "note_uk": "Робочий текст застереження й методології на сторінці; остаточний текст затверджує власник (S1.7).",
+          "note_en": "Working disclaimer and methodology on the page; final wording approved by the owner (S1.7)."
+        },
+        {
+          "id": "S11.6",
+          "status": "done",
+          "days": 0.3,
+          "uk": "Пояснення українською: короткий виклад від класифікатора замість англійської цитати (карта, бот, сповіщення)",
+          "en": "Ukrainian explanations: the classifier's summary instead of the English quote (map, bot, alerts)",
+          "note_uk": "Цитати англійською лишаються для ENG і там, де українського викладу ще немає (новини, класифікація правилами).",
+          "note_en": "English quotes remain for ENG and where no Ukrainian summary exists yet (news, rule-based classification).",
+          "owner": "claude"
+        },
+        {
+          "id": "S11.7",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Карта: сусіди у війні (Україна, Росія, Білорусь) для контексту; телефонна версія карти й сторінки плану",
+          "en": "Map: neighbours at war (Ukraine, Russia, Belarus) for context; phone layout for the map and the plan page",
+          "note_uk": "Сусіди не оцінюються шкалою, лише показані штрихуванням; дані в розділі context файлу conflicts.yaml (потребує перегляду людиною).",
+          "note_en": "Neighbours are not scored, only hatched for context; data in the context section of conflicts.yaml (needs human review).",
+          "owner": "claude"
+        },
+        {
+          "id": "S11.5",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Розгорнуте пояснення на карті (укр/англ): підсумок, блоки, що кажуть уряди, що помічено, повна методика",
+          "en": "Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method",
+          "owner": "claude"
+        },
+        {
+          "id": "S11.8",
+          "status": "done",
+          "days": 0.1,
+          "uk": "Кольори карти як у боті: зелений, жовтий, помаранчевий, червоний, критичний (контраст ≥ 4.5:1 в обох темах)",
+          "en": "Map colours match the bot: green, yellow, orange, red, critical (contrast ≥ 4.5:1 in both themes)",
+          "owner": "claude"
+        },
+        {
+          "id": "S11.9",
+          "status": "done",
+          "days": 0.3,
+          "uk": "Автопублікація карти з сервера кожні 30 хв (лише коли дані змінилися, gh-pages — один коміт)",
+          "en": "Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)",
+          "note_uk": "Працює з 2026-10-05: tension-pages.timer, deploy key server-pages (лише цей репозиторій).",
+          "note_en": "Running since 2026-10-05: tension-pages.timer, deploy key server-pages (this repository only).",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 97,
+        "days_total": 4.5,
+        "days_left": 0.1,
+        "counts": {
+          "done": 8,
+          "in_progress": 1,
+          "todo": 0,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 4.2,
+          "in_progress": 0.3,
+          "todo": 0,
+          "blocked": 0
+        },
+        "tasks": 9
+      }
+    },
+    {
+      "id": "S12",
+      "branch": "dev-ops",
+      "uk": "Експлуатація",
+      "en": "Operations",
+      "goal_uk": "Система працює без ручного втручання і повідомляє про збої.",
+      "goal_en": "The system runs unattended and reports failures.",
+      "tasks": [
+        {
+          "id": "S12.1",
+          "status": "done",
+          "days": 0.2,
+          "uk": "Щоденний бекап SQLite з ротацією",
+          "en": "Daily SQLite backup with rotation",
+          "owner": "claude"
+        },
+        {
+          "id": "S12.2",
+          "status": "todo",
+          "days": 0.3,
+          "owner": "human",
+          "uk": "Dead-man switch на healthchecks.io (безкоштовно)",
+          "en": "Dead-man switch on healthchecks.io (free)"
+        },
+        {
+          "id": "S12.3",
+          "status": "in_progress",
+          "days": 0.5,
+          "uk": "Автодеплой з main (GitHub Actions → SSH)",
+          "en": "Auto-deploy from main (GitHub Actions → SSH)",
+          "note_uk": "Процес .github/workflows/deploy.yml готовий (SSH → scripts/deploy.sh); запрацює після розблокування Actions і секретів DEPLOY_*.",
+          "note_en": ".github/workflows/deploy.yml is ready (SSH → scripts/deploy.sh); runs once Actions are unlocked and DEPLOY_* secrets are set.",
+          "owner": "claude"
+        },
+        {
+          "id": "S12.5",
+          "status": "done",
+          "owner": "human",
+          "days": 0.3,
+          "uk": "Сервер: встановити Claude Code, claude setup-token, запустити claude-gateway (systemd) за HTTPS-проксі",
+          "en": "Server: install Claude Code, claude setup-token, run claude-gateway (systemd) behind an HTTPS proxy",
+          "note_uk": "Працює з 2026-10-01: ~/claude-gateway, окремий сервіс лише на 127.0.0.1; war-predictor звертається до нього власним токеном. HTTPS-проксі не потрібен, доки шлюзом не користуються ззовні.",
+          "note_en": "Running since 2026-10-01: ~/claude-gateway, a separate service on 127.0.0.1 only; war-predictor uses it with its own token. No HTTPS proxy needed until something outside the server uses the gateway."
+        },
+        {
+          "id": "S12.6",
+          "status": "done",
+          "days": 0.5,
+          "uk": "Частота оновлення за балом країни: 0 — раз на 12 год, 1–3 — 8 год, 4–6 — 4 год, 7–10 — щогодини; бот і карта читають збережений результат, тож запити користувачів не множать завантажень",
+          "en": "Refresh rate by country score: 0 every 12 h, 1–3 every 8 h, 4–6 every 4 h, 7–10 hourly; the bot and map read the stored result, so user requests never multiply fetches",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 69,
+        "days_total": 1.8,
+        "days_left": 0.6,
+        "counts": {
+          "done": 3,
+          "in_progress": 1,
+          "todo": 1,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 1.0,
+          "in_progress": 0.5,
+          "todo": 0.3,
+          "blocked": 0
+        },
+        "tasks": 5
+      }
+    },
+    {
+      "id": "S13",
+      "branch": "—",
+      "uk": "Критерії MVP",
+      "en": "MVP criteria",
+      "goal_uk": "Мінімальна робоча версія готова, коли виконано всі три умови.",
+      "goal_en": "The MVP is done when all three conditions hold.",
+      "tasks": [
+        {
+          "id": "S13.1",
+          "status": "todo",
+          "days": 0.5,
+          "uk": "14 днів збору поспіль без ручного втручання",
+          "en": "14 consecutive days of collection without manual intervention",
+          "owner": "claude"
+        },
+        {
+          "id": "S13.2",
+          "status": "done",
+          "days": 0.5,
+          "uk": "На епізоді України бал досягає 7+ до 24.02.2022",
+          "en": "On the Ukraine episode the score reaches 7+ before 2022-02-24",
+          "note_uk": "Бектест на архіві Wayback: 7 з 20.12.2021, за 66 днів до 24.02.2022.",
+          "note_en": "Wayback archive backtest: 7 from 20 Dec 2021, 66 days before 24 Feb 2022.",
+          "owner": "claude"
+        },
+        {
+          "id": "S13.3",
+          "status": "done",
+          "days": 0.3,
+          "uk": "Кожне сповіщення містить джерело, опис зміни і цитату",
+          "en": "Every alert contains the source, a description of the change and a quote",
+          "note_uk": "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.",
+          "note_en": "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes.",
+          "owner": "claude"
+        }
+      ],
+      "stats": {
+        "percent": 62,
+        "days_total": 1.3,
+        "days_left": 0.5,
+        "counts": {
+          "done": 2,
+          "in_progress": 0,
+          "todo": 1,
+          "blocked": 0
+        },
+        "days_by_status": {
+          "done": 0.8,
+          "in_progress": 0,
+          "todo": 0.5,
+          "blocked": 0
+        },
+        "tasks": 3
+      }
+    }
+  ],
+  "decisions": [
+    {
+      "date": "2026-10-06",
+      "uk": "Службові повідомлення в TELEGRAM_CHAT_ID ідуть мовою, яку власник цього чату обрав у боті (за замовчуванням українська); оригінальний текст джерела показується згорнутим.",
+      "en": "Operator messages to TELEGRAM_CHAT_ID use the language the chat owner chose in the bot (Ukrainian by default); the original source text is shown folded."
+    },
+    {
+      "date": "2026-10-05",
+      "uk": "Медійний обсяг GDELT рахується з щоденних файлів подій GDELT 1.0 (статті про події CAMEO 15/18/19/20 у країні), а не з DOC 2.0 API: той відповідає 429 навіть раз на 18 с і `{}` на запити з даними. DOC API лишився лише для одного запиту про поради МЗС РФ/РБ.",
+      "en": "GDELT media volume is counted from GDELT 1.0 daily event files (articles about CAMEO 15/18/19/20 events in the country), not the DOC 2.0 API: it answers 429 even at one request per 18 s and `{}` to queries that have data. The DOC API is kept for the single RU/BY MFA advice query."
+    },
+    {
+      "date": "2026-10-03",
+      "uk": "GitHub Actions необов'язкові: перевірки робить make check перед кожним мерджем, а карту публікує сервер. Блокування Actions через білінг ні на що не впливає.",
+      "en": "GitHub Actions are optional: make check runs before every merge and the server publishes the map. Actions being locked for billing blocks nothing."
+    },
+    {
+      "date": "2026-10-03",
+      "uk": "Частота оновлення країни залежить від її балу; користувачі ніколи не запускають завантажень, тож однакові запити не множать навантаження.",
+      "en": "A country's refresh rate depends on its score; users never trigger fetches, so identical requests add no load."
+    },
+    {
+      "date": "2026-10-01",
+      "uk": "claude-gateway — окремий сервіс зі своєю текою, .env, юнітом і оновленням; програми (зокрема war-predictor) підключаються до нього кожна своїм токеном.",
+      "en": "claude-gateway is a separate service with its own directory, .env, unit and updates; programs (including war-predictor) connect to it, each with its own token."
+    },
+    {
+      "date": "2026-10-01",
+      "uk": "Сусіди у війні показуються на карті лише як контекст (штрихування, без балу); перелік — розділ context у config/conflicts.yaml.",
+      "en": "Neighbours at war are shown on the map as context only (hatched, no score); the list is the context section of config/conflicts.yaml."
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Раптові напади (Вірменія–Азербайджан-2020) перевіряються на реакцію протягом 3 днів: рекомендації урядів не змінювались до початку боїв.",
+      "en": "Surprise attacks (Armenia–Azerbaijan 2020) are tested for a reaction within 3 days: government advice did not change before the fighting began."
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Заходи з рекомендацій і пороги рахуються лише з безпекової причини заходу (релевантність ≥ 0.7 для заходів, ≥ 0.5 для порогів).",
+      "en": "Advisory measures and floors count only for a security reason for the measure (relevance ≥ 0.7 for measures, ≥ 0.5 for floors)."
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Регіональні попередження: Британія «avoid all travel to parts» 0.45, «all but essential to parts» 0.3, Німеччина Teilreisewarnung 0.35 — вони здебільшого стосуються давно окупованих чи прикордонних районів.",
+      "en": "Regional warnings: UK \"avoid all travel to parts\" 0.45, \"all but essential to parts\" 0.3, German partial warning 0.35 — they mostly cover long-occupied or border areas."
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Пороги неба (8 / 6) — лише за двох незалежних джерел, як і поріг наказу про виїзд персоналу.",
+      "en": "Airspace floors (8 / 6) only with two independent sources, like the ordered-departure floor."
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Наказ про виїзд лише родин дипломатів = дозволений виїзд персоналу (поріг 7), не наказ про виїзд персоналу (поріг 9 при двох урядах).",
+      "en": "Ordered departure of family members only = authorized staff departure (floor 7), not ordered staff departure (floor 9 with two governments)."
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Надбавка за відхилення від норми не більше 0.10 до R; синхронність — лише підвищення рівня, статус персоналу, консульські/прикордонні/авіаційні заходи з релевантністю причини ≥ 0.5.",
+      "en": "Surge bonus at most 0.10 to R; synchrony counts only level raises, staff posture, consular/border/airspace measures with reason relevance ≥ 0.5."
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Класифікація змін: Claude Haiku 4.5 через OpenRouter",
+      "en": "Change classification: Claude Haiku 4.5 via OpenRouter"
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Заморські території європейських країн не впливають на статус війни; винятки фіксуються вручну в wikipedia_ignore",
+      "en": "Overseas territories of European countries do not affect war status; exclusions are recorded by hand in wikipedia_ignore"
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Деплой на сервер відкладено; пріоритет — бот і система на MacBook",
+      "en": "Server deploy postponed; priority is the bot and system on the MacBook"
+    },
+    {
+      "date": "2026-09-27",
+      "uk": "Шкала 0–10 замість ймовірності: описує стан сигналів, а не прогнозує війну",
+      "en": "0–10 scale instead of a probability: describes signals, does not forecast war"
+    },
+    {
+      "date": "2026-09-27",
+      "uk": "Рекомендації посольств для країн ЄС і НАТО важать менше: союзники рідко заздалегідь піднімають рівень",
+      "en": "Advisories weigh less for EU/NATO members: allies rarely raise levels in advance"
+    },
+    {
+      "date": "2026-09-27",
+      "uk": "Порівняння з власною нормою країни, а не за абсолютним рівнем",
+      "en": "Compare against the country's own baseline, not absolute levels"
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Власний сервер (systemd) замість GitHub Actions за розкладом; Python 3.12 + uv, aiogram 3",
+      "en": "Own server (systemd) instead of scheduled GitHub Actions; Python 3.12 + uv, aiogram 3"
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Гілки: main за замовчуванням, робота в dev-<область>, fix-<що>, docs-<що>",
+      "en": "Branches: main by default, work in dev-<area>, fix-<what>, docs-<what>"
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Блоки поєднуються як незалежні підтвердження зі стелею внеску кожного блоку",
+      "en": "Blocks combine as independent confirmations, each with a contribution cap"
+    },
+    {
+      "date": "2026-09-30",
+      "uk": "Статус війни окремо від шкали; довідник ведеться вручну, автоматика лише пропонує зміни",
+      "en": "War status is separate from the scale; curated by hand, automation only proposes changes"
+    }
+  ],
+  "risks": [
+    {
+      "uk": "DOC 2.0 API GDELT перевантажений: поради МЗС РФ/РБ можуть не збиратися днями (помилка видна в health і collect_runs). Запасний варіант — набір web ngrams GDELT.",
+      "en": "The GDELT DOC 2.0 API is overloaded: RU/BY MFA advice may go uncollected for days (the error shows in health and collect_runs). Fallback: the GDELT web ngrams dataset."
+    },
+    {
+      "uk": "Шлюз використовує підписку Claude того, хто залогінений: його не можна відкривати стороннім людям; для чужих програм потрібен ключ API.",
+      "en": "The gateway uses the signed-in person's Claude subscription: it must not be opened to other people; other people's programs need an API key."
+    },
+    {
+      "uk": "Без кредитів OpenRouter класифікація йде лише правилами: причини й статус посольств визначаються грубіше, бал менш точний.",
+      "en": "Without OpenRouter credits classification falls back to rules only: reasons and embassy posture are cruder, the score less precise."
+    },
+    {
+      "uk": "Справжнє повернення рекомендації до попередньої версії протягом 7 днів не буде окремою зміною (стан однаково оновлюється).",
+      "en": "A genuine revert of an advisory within 7 days is not reported as a change (the state still updates)."
+    },
+    {
+      "uk": "Частина урядових сайтів блокує автоматичні запити (Австралія); джерело можна втратити без попередження",
+      "en": "Some government sites block automated requests (Australia); a source can be lost without notice"
+    },
+    {
+      "uk": "GitHub Actions заблоковані через білінг акаунта: CI не перевіряє зміни, до розблокування перевірки лише локально (make check)",
+      "en": "GitHub Actions locked by an account billing issue: no CI until unlocked, checks run locally only (make check)"
+    },
+    {
+      "uk": "Блокування збору: сайти держав можуть блокувати запити з сервера",
+      "en": "Collection blocking: government sites may block requests from the server"
+    },
+    {
+      "uk": "Умови використання: Reuters і AP без відкритих RSS; ліцензія ACLED для публічного сервісу",
+      "en": "Terms of use: no open Reuters/AP RSS; ACLED licence for a public service"
+    },
+    {
+      "uk": "Публічна відповідальність: бал сприймуть як прогноз; потрібні застереження і методологія",
+      "en": "Public responsibility: the score will be read as a forecast; disclaimer and methodology needed"
+    },
+    {
+      "uk": "Неперевірені ваги: до етапу S8 це експертна гіпотеза",
+      "en": "Untested weights: an expert hypothesis until stage S8"
+    },
+    {
+      "uk": "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка",
+      "en": "Automatic war trackers list countries hit only by spillover; manual review needed"
+    }
+  ],
+  "changelog": [
+    {
+      "version": "0.2.106",
+      "date": "2026-10-06",
+      "uk": [
+        "Службові сповіщення (зміни рекомендацій, збої збирачів, health, статус війн) — мовою, обраною в боті: короткий опис зміни, а текст джерела згорнуто.",
+        "Хибне «Collector fr failed (0 errors)» прибрано: джерело пропускається, якщо жодна з країн у черзі ним не покривається.",
+        "GDELT: рахуються унікальні статті, а не сума згадок; сплеск — лише коли обидва останні дні ≥2× норми і ≥15 статей (один вірусний сюжет давав ×17–×30); `tension-index gdelt --force` перераховує день."
+      ],
+      "en": [
+        "Operator notices (advice changes, collector failures, health, war status) are in the language chosen in the bot: a short summary, the source text folded.",
+        "False \"Collector fr failed (0 errors)\" removed: a source is skipped when none of the due countries is covered by it.",
+        "GDELT: distinct articles instead of summed mentions; a surge needs both last days ≥2x usual and ≥15 articles (one viral story gave x17–x30); `tension-index gdelt --force` recomputes the day."
+      ]
+    },
+    {
+      "version": "0.2.105",
+      "date": "2026-10-05",
+      "uk": [
+        "GDELT: обсяг військових подій тепер з щоденних файлів подій (1 файл на день замість 38 запитів, що впиралися в 429 і обрив через 15 хв); порожня відповідь `{}` — помилка, а не тихий успіх; зупинка після 3 невдач поспіль; ліміт 10 хв і закриття запису запуску при тайм-ауті чи зупинці systemd; таймер о 07:43 UTC."
+      ],
+      "en": [
+        "GDELT: military event volume now comes from daily event files (1 file a day instead of 38 queries that hit 429 and the 15-min kill); an empty `{}` answer is a failure, not a silent success; stop after 3 failures in a row; 10-min deadline and the run row is closed on timeout or systemd stop; timer at 07:43 UTC."
+      ]
+    },
+    {
+      "version": "0.2.104",
+      "date": "2026-10-05",
+      "uk": [
+        "Сервер публікує карту кожні 30 хвилин (deploy key додано); publish_pages.sh більше не ставить на сервер інструменти розробки."
+      ],
+      "en": [
+        "The server publishes the map every 30 minutes (deploy key added); publish_pages.sh no longer installs development tools on the server."
+      ]
+    },
+    {
+      "version": "0.2.103",
+      "date": "2026-10-05",
+      "uk": [
+        "Шлюз на сервері перенесено на окремий репозиторій claude-gateway; бот оновлено (адаптивне оновлення, виправлені хибні тривоги), увімкнено dead-man ping на healthchecks.io."
+      ],
+      "en": [
+        "The server gateway now runs from the separate claude-gateway repository; the bot is updated (adaptive refresh, fixed false alarms) and the healthchecks.io dead-man ping is on."
+      ]
+    },
+    {
+      "version": "0.2.102",
+      "date": "2026-10-03",
+      "uk": [
+        "Причини в боті й на карті обрізаються на межі слова з «…», а не посеред слова; HTTP_USER_AGENT у .env.example у лапках, тож .env можна підключати в shell."
+      ],
+      "en": [
+        "Reasons in the bot and on the map are cut at a word boundary with \"…\" instead of mid-word; HTTP_USER_AGENT in .env.example is quoted, so .env can be sourced in a shell."
+      ]
+    },
+    {
+      "version": "0.2.101",
+      "date": "2026-10-03",
+      "uk": [
+        "Шлюз Claude Code винесено в окремий репозиторій claude-gateway (з історією); з war-predictor прибрано gateway/, інструкцію розгортання доповнено перенесенням шлюзу й публікацією карти; додано docs/owner-steps.md — що зробити власниці."
+      ],
+      "en": [
+        "The Claude Code gateway moved to its own repository, claude-gateway (with history); gateway/ is gone from war-predictor, the deploy guide covers moving the gateway and publishing the map; docs/owner-steps.md lists what the owner has to do."
+      ]
+    },
+    {
+      "version": "0.2.100",
+      "date": "2026-10-03",
+      "uk": [
+        "Публічну карту публікує сервер кожні 30 хвилин, лише коли дані змінилися; у gh-pages зберігається один коміт, а процес GitHub Actions для Pages прибрано."
+      ],
+      "en": [
+        "The server publishes the public map every 30 minutes, only when the data changed; gh-pages keeps a single commit and the GitHub Actions Pages workflow is gone."
+      ]
+    },
+    {
+      "version": "0.2.99",
+      "date": "2026-10-03",
+      "uk": [
+        "Кожна країна оновлюється з частотою за своїм балом (0 — раз на 12 год, 1–3 — 8 год, 4–6 — 4 год, 7–10 — щогодини); таймер збору тепер щогодинний, а панель бота показує, як часто перевіряється країна."
+      ],
+      "en": [
+        "Each country is refreshed at a rate set by its score (0 every 12 h, 1–3 every 8 h, 4–6 every 4 h, 7–10 hourly); the collect timer is now hourly and the bot's dashboard shows how often the country is checked."
+      ]
+    },
+    {
+      "version": "0.2.98",
+      "date": "2026-10-03",
+      "uk": [
+        "Кольори карти тепер як у боті й README (зелений, жовтий, помаранчевий, червоний, критичний); раніше низький рівень у темній темі виглядав тривожно-коричневим."
+      ],
+      "en": [
+        "Map colours now match the bot and README (green, yellow, orange, red, critical); before, the low level looked alarming brown in the dark theme."
+      ]
+    },
+    {
+      "version": "0.2.97",
+      "date": "2026-10-03",
+      "uk": [
+        "Виправлено хибні тривоги: новини про навчання з мобілізації й тести сирен більше не вмикають поріг 9, а давнє закриття окремих переходів (Польща — Білорусь) не рахується закритим кордоном; для рекомендацій звичайного рівня без Claude не показуються випадкові цитати."
+      ],
+      "en": [
+        "Fixed false alarms: news about mobilisation drills and siren tests no longer trigger the floor of 9, and long-standing closure of some crossings (Poland - Belarus) no longer counts as a closed border; normal-level advisories read without Claude show no random quotes."
+      ]
+    },
+    {
+      "version": "0.2.96",
+      "date": "2026-10-01",
+      "uk": [
+        "gateway/scripts/install.sh більше не звітує про помилку під час повторного встановлення: перевірка /health чекає до 30 с, поки шлюз стартує."
+      ],
+      "en": [
+        "gateway/scripts/install.sh no longer reports a false failure on re-install: the /health check waits up to 30 s for the gateway to start."
+      ]
+    },
+    {
+      "version": "0.2.95",
+      "date": "2026-10-01",
+      "uk": [
+        "Перший деплой на сервер: claude-gateway і war-predictor працюють як окремі systemd-сервіси з автозапуском; перший прогін класифікував зміни через шлюз і опублікував 38/38 балів."
+      ],
+      "en": [
+        "First server deploy: claude-gateway and war-predictor run as separate systemd services started on boot; the first run classified changes through the gateway and published 38/38 scores."
+      ]
+    },
+    {
+      "version": "0.2.94",
+      "date": "2026-10-01",
+      "uk": [
+        "Шлюз і war-predictor розгортаються окремо: у шлюзу власний інсталятор (gateway/scripts/install.sh), тека, .env і сервіс; install_server.sh ставить лише бота й таймери, а до шлюзу бот підключається токеном.",
+        "Інструкцію для агента-розгортальника переписано під дві окремі установки."
+      ],
+      "en": [
+        "The gateway and war-predictor are deployed separately: the gateway has its own installer (gateway/scripts/install.sh), directory, .env and service; install_server.sh installs only the bot and timers, which connect to the gateway with a token.",
+        "The deployment agent instructions now describe two separate installations."
+      ]
+    },
+    {
+      "version": "0.2.93",
+      "date": "2026-10-01",
+      "uk": [
+        "docs/deploy-agent.md — покрокова інструкція для агента (Claude Code), який розгортає сервер по SSH."
+      ],
+      "en": [
+        "docs/deploy-agent.md — step-by-step instructions for an agent (Claude Code) deploying the server over SSH."
+      ]
+    },
+    {
+      "version": "0.2.92",
+      "date": "2026-10-01",
+      "uk": [
+        "install_server.sh ставить також Claude Code і claude-gateway, сам генерує токен шлюзу й налаштовує бота класифікувати через нього."
+      ],
+      "en": [
+        "install_server.sh also installs Claude Code and claude-gateway, generates the gateway token and sets the bot to classify through it."
+      ]
+    },
+    {
+      "version": "0.2.91",
+      "date": "2026-10-01",
+      "uk": [
+        "claude-gateway — самостійний проєкт із власним uv.lock (не входить у залежності бота)."
+      ],
+      "en": [
+        "claude-gateway is a standalone project with its own uv.lock (not part of the bot's dependencies)."
+      ]
+    },
+    {
+      "version": "0.2.90",
+      "date": "2026-10-01",
+      "uk": [
+        "Новий окремий інструмент claude-gateway: будь-яка програма може звертатися до Claude Code на сервері через HTTP (власний формат, OpenAI- чи Anthropic-сумісний) або MCP.",
+        "Класифікатор tension-index може працювати через шлюз (CLASSIFIER_PROVIDER=gateway)."
+      ],
+      "en": [
+        "New separate tool claude-gateway: any program can call Claude Code on the server over HTTP (own format, OpenAI- or Anthropic-compatible) or MCP.",
+        "The tension-index classifier can run through the gateway (CLASSIFIER_PROVIDER=gateway)."
+      ]
+    },
+    {
+      "version": "0.2.88",
+      "date": "2026-10-01",
+      "uk": [
+        "Карта показує Україну (війна), Росію (агресор) і Білорусь (територію використано для нападу) — для контексту, без балу.",
+        "Телефонна версія: карта без горизонтальної прокрутки, панель країни прокручується до видимої області, таблиця клікабельна; на сторінці плану можна сховати виконані завдання, журнал змін згорнуто після 15 записів.",
+        "Виправлено: записи журналу змін одним рядком ламали PLAN.md і сторінку плану."
+      ],
+      "en": [
+        "The map shows Ukraine (war), Russia (aggressor) and Belarus (territory used for the attack) for context, without a score.",
+        "Phone layout: no horizontal scroll on the map, the country panel scrolls into view, the table is clickable; the plan page can hide finished tasks and folds the changelog after 15 entries.",
+        "Fixed: changelog entries written as one string broke PLAN.md and the plan page."
+      ]
+    },
+    {
+      "version": "0.2.87",
+      "date": "2026-09-30",
+      "uk": [
+        "Дашборд бота: значення рівня одним реченням, позначки й порогові події, три причини, кнопка «Детальніше на карті»; рівні названо нейтрально, як на карті (низький…критичний)."
+      ],
+      "en": [
+        "Bot dashboard: the level meaning in one sentence, flags and threshold events, three reasons, a \"Details on the map\" button; levels have neutral names, as on the map (low…critical)."
+      ]
+    },
+    {
+      "version": "0.2.86",
+      "date": "2026-09-30",
+      "uk": [
+        "Держдеп: дві розкладки однієї рекомендації (розриви рядків, блок «If you decide to travel», службові примітки) зводяться до одного тексту — мерехтіння зникає без хвилі змін при оновленні."
+      ],
+      "en": [
+        "State Department: two layouts of one advisory (line breaks, the \"If you decide to travel\" block, update notes) reduce to one text — the flapping stops without a wave of changes on upgrade."
+      ]
+    },
+    {
+      "version": "0.2.80",
+      "date": "2026-09-30",
+      "uk": [
+        "Етап бектесту завершено: усі чотири історичні епізоди проходять із класифікацією моделлю."
+      ],
+      "en": [
+        "Backtest stage finished: all four historical episodes pass with model classification."
+      ]
+    },
+    {
+      "version": "0.2.77",
+      "date": "2026-09-30",
+      "uk": [
+        "Лог Claude Code показує номер кожного виклику, а не лічильник на момент завершення."
+      ],
+      "en": [
+        "The Claude Code log shows each call's own number, not the counter at completion."
+      ]
+    },
+    {
+      "version": "0.2.76",
+      "date": "2026-09-30",
+      "uk": [
+        "Класифікатор робить до 4 викликів моделі паралельно (CLASSIFIER_CONCURRENCY), а через Claude Code — без розширеного обдумування; класифікація має стати в кілька разів швидшою."
+      ],
+      "en": [
+        "The classifier makes up to 4 model calls in parallel (CLASSIFIER_CONCURRENCY), and via Claude Code without extended thinking; classification should be several times faster."
+      ]
+    },
+    {
+      "version": "0.2.75",
+      "date": "2026-09-30",
+      "uk": [
+        "Класифікатор через Claude Code пише прогрес кожного виклику; якщо CLI не відповідає 90 с, виклики зупиняються до кінця запуску."
+      ],
+      "en": [
+        "The Claude Code classifier logs every call; if the CLI does not answer in 90 s, calls stop for the rest of the run."
+      ]
+    },
+    {
+      "version": "0.2.74",
+      "date": "2026-09-30",
+      "uk": [
+        "Новий провайдер класифікатора — локальний Claude Code за підпискою; епізод Вірменія–Азербайджан-2020 перевіряє реакцію (бал 3+ протягом 3 днів після нападу), а не раннє попередження."
+      ],
+      "en": [
+        "New classifier provider — the local Claude Code CLI on a subscription; the Armenia–Azerbaijan 2020 episode tests the reaction (score 3+ within 3 days of the attack), not an early warning."
+      ]
+    },
+    {
+      "version": "0.2.73",
+      "date": "2026-09-30",
+      "uk": [
+        "Класифікатор зупиняється після першої відмови через ключ чи кредити (401/402/403) і не шле сотні запитів; тексти, класифіковані правилами під час недоступності моделі, модель перекласифікує пізніше. Правила беруть причину заходу з речення, де він згаданий."
+      ],
+      "en": [
+        "The classifier stops after the first key or credit refusal (401/402/403) instead of sending hundreds of requests; texts classified by rules while the model was unavailable are re-classified by the model later. Rules take a measure's reason from the sentence that states it."
+      ]
+    },
+    {
+      "version": "0.2.72",
+      "date": "2026-09-30",
+      "uk": [
+        "Заходи з невказаною безпековою причиною («непередбачувана ситуація») знову рахуються; відсікаються лише явно невійськові причини (COVID, попіл, погода, злочинність, тероризм)."
+      ],
+      "en": [
+        "Measures with an unspecified security reason (\"unpredictable situation\") count again; only clearly non-military reasons are excluded (COVID, ash, weather, crime, terrorism)."
+      ]
+    },
+    {
+      "version": "0.2.71",
+      "date": "2026-09-30",
+      "uk": [
+        "Окрема причина для заходів (статус посольства, небо, кордони): карантинні заходи COVID-19 у рекомендації про конфлікт більше не піднімають бал і не вмикають порогів; один уряд із «закритим небом» дає 0.7 блоку авіації, а не 1.0."
+      ],
+      "en": [
+        "A separate reason for measures (embassy posture, airspace, borders): COVID-19 measures in a conflict advisory no longer raise the score or trigger floors; one government's \"airspace closed\" gives the aviation block 0.7, not 1.0."
+      ]
+    },
+    {
+      "version": "0.2.70",
+      "date": "2026-09-30",
+      "uk": [
+        "Повторне завантаження архіву пропускає вже завантажене (--refresh — завантажити заново), а дублікати зі старих баз прибираються автоматично."
+      ],
+      "en": [
+        "Loading the archive again skips what is already loaded (--refresh reloads), and duplicates in older databases are removed automatically."
+      ]
+    },
+    {
+      "version": "0.2.69",
+      "date": "2026-09-30",
+      "uk": [
+        "Сигнали з рекомендацій (небо, статус посольства, кордони) вимикаються, коли нова класифікація того самого тексту їх більше не підтверджує."
+      ],
+      "en": [
+        "Advisory-derived signals (airspace, embassy posture, borders) switch off when a new classification of the same text no longer supports them."
+      ]
+    },
+    {
+      "version": "0.2.68",
+      "date": "2026-09-30",
+      "uk": [
+        "Версії, що чергуються, більше не зберігаються й не класифікуються повторно (економія викликів моделі); регіональні попередження (Британія «to parts», Німеччина Teilreisewarnung) важать менше; закриття неба зараховується лише з безпекової причини."
+      ],
+      "en": [
+        "Alternating versions are no longer stored or re-classified (saves model calls); regional warnings (UK \"to parts\", German partial warning) weigh less; airspace closures count only for a security reason."
+      ]
+    },
+    {
+      "version": "0.2.67",
+      "date": "2026-09-30",
+      "uk": [
+        "Держдеп: резервне джерело після зникнення RSS; закриття неба через вулканічний попіл чи погоду більше не рахується сигналом безпеки; модель визначає причину за загальним рівнем країни, а не за окремими регіонами."
+      ],
+      "en": [
+        "State Department: fallback source after the RSS feed disappeared; airspace closures for volcanic ash or weather no longer count as security signals; the model takes the reason for the country's overall level, not for single regions."
+      ]
+    },
+    {
+      "version": "0.2.66",
+      "date": "2026-09-30",
+      "uk": [
+        "Класифікації правилами перераховуються ще раз після звуження правил для неба."
+      ],
+      "en": [
+        "Rule-based classifications are redone once more after narrowing the airspace rules."
+      ]
+    },
+    {
+      "version": "0.2.65",
+      "date": "2026-09-30",
+      "uk": [
+        "Пороги для закритого чи обмеженого неба тепер вимагають двох незалежних джерел; правила й модель не вважають обмеженням неба рутинні NOTAM, правила для дронів і давні регіональні заборони."
+      ],
+      "en": [
+        "Airspace closed/restricted floors now need two independent sources; rules and the model no longer treat routine NOTAMs, drone rules or long-standing regional bans as airspace restrictions."
+      ]
+    },
+    {
+      "version": "0.2.64",
+      "date": "2026-09-30",
+      "uk": [
+        "Виправлено правила класифікації: повні сторінки з маркерами списку чи телефонами більше не сприймаються як diff; нові формулювання статусу посольств (відкликання, переїзд, призупинення); шум «Still valid» і голих дат прибрано. Правилові класифікації буде перераховано."
+      ],
+      "en": [
+        "Fixed rule classification: full pages with bullets or phone numbers are no longer read as diffs; new embassy posture wordings (withdrawal, relocation, suspension); \"Still valid\" and bare-date noise removed. Rule-based classifications are redone."
+      ]
+    },
+    {
+      "version": "0.2.63",
+      "date": "2026-09-30",
+      "uk": [
+        "Завантаження архіву Wayback більше не обривається на повільних відповідях: таймаут 120 с і до 3 повторів."
+      ],
+      "en": [
+        "Wayback archive loading no longer fails on slow answers: 120 s timeout and up to 3 retries."
+      ]
+    },
+    {
+      "version": "0.2.62",
+      "date": "2026-09-30",
+      "uk": [
+        "Українською мовою пояснення тепер показують короткий виклад українською замість англійської цитати; шаблонні примітки (авіатрафік, медіа, ринки) перекладено."
+      ],
+      "en": [
+        "In Ukrainian, explanations now show a Ukrainian summary instead of the English quote; templated notes (air traffic, media, markets) are translated."
+      ]
+    },
+    {
+      "version": "0.2.61",
+      "date": "2026-09-30",
+      "uk": [
+        "Налаштування шкали: обмежено надбавку за сплеск і звужено синхронність урядів до справжнього посилення рекомендацій; хибна тривога для Франції-2015 зникла."
+      ],
+      "en": [
+        "Scale tuning: capped the surge bonus and narrowed government synchrony to real tightening; the France 2015 false alarm is gone."
+      ]
+    },
+    {
+      "version": "0.2.60",
+      "date": "2026-09-30",
+      "uk": [
+        "Цитати коротші за 4 слова (уривки навігації) більше не показуються в поясненнях."
+      ],
+      "en": [
+        "Quotes shorter than 4 words (navigation fragments) are no longer shown in explanations."
+      ]
+    },
+    {
+      "version": "0.2.59",
+      "date": "2026-09-30",
+      "uk": [
+        "Карта пояснює бал кожної країни: короткий підсумок, заповненість шести блоків, рівні рекомендацій урядів і всі помічені сигнали з цитатами, плюс повна методика. Прибрано хибні сигнали падіння авіатрафіку для малих країн."
+      ],
+      "en": [
+        "The map explains every country's score: a short summary, the six blocks, government advice levels and all observed signals with quotes, plus the full method. False air-traffic-drop signals for small countries removed."
+      ]
+    },
+    {
+      "version": "0.2.57",
+      "date": "2026-09-30",
+      "uk": [
+        "Джерела, що перемикаються між двома версіями тексту (як стрічка США), більше не створюють змін і не піднімають бал; нова команда why пояснює бал країни."
+      ],
+      "en": [
+        "Sources that swing between two text versions (like the US feed) no longer create changes or lift the score; new why command explains a country's score."
+      ]
+    },
+    {
+      "version": "0.2.56",
+      "date": "2026-09-30",
+      "uk": [
+        "GDELT — окрема щоденна команда і таймер; run більше не чекає на нього",
+        "США: дублікати записів з різним текстом більше не дають хибних змін"
+      ],
+      "en": [
+        "GDELT is its own daily command and timer; run no longer waits for it",
+        "US: duplicate items with different text no longer cause false changes"
+      ]
+    },
+    {
+      "version": "0.2.55",
+      "date": "2026-09-30",
+      "uk": [
+        "США: службові примітки про перевидання не рахуються змінами"
+      ],
+      "en": [
+        "US: reissue notes are not counted as changes"
+      ]
+    },
+    {
+      "version": "0.2.54",
+      "date": "2026-09-30",
+      "uk": [
+        "run: прогрес і ліміти часу для авіації, новин, GDELT, ЄЦБ",
+        "США: детермінований вибір запису країни (менше хибних «змін»)",
+        "Команда changes: останні зміни з diff"
+      ],
+      "en": [
+        "run: progress and time limits for aviation, news, GDELT, ECB",
+        "US: deterministic item choice per country (fewer false changes)",
+        "changes command: recent changes with diff"
+      ]
+    },
+    {
+      "version": "0.2.53",
+      "date": "2026-09-30",
+      "uk": [
+        "Ліміт 2 хвилини на джерело: сайт, що завис, не зупиняє цикл",
+        "Австралію вимкнено за замовчуванням (DISABLED_SOURCES)",
+        "Лог «collecting …» перед кожним джерелом"
+      ],
+      "en": [
+        "2-minute limit per source: a hanging site no longer stalls the cycle",
+        "Australia disabled by default (DISABLED_SOURCES)",
+        "\"collecting …\" log line before each source"
+      ]
+    },
+    {
+      "version": "0.2.52",
+      "date": "2026-09-30",
+      "uk": [
+        "Австралія: сторінки країн замість повільного експорту (рівень після «Overall advice level»)",
+        "Новини: прибрано Kyiv Independent (404)"
+      ],
+      "en": [
+        "Australia: country pages instead of the slow export (level after \"Overall advice level\")",
+        "News: dropped Kyiv Independent (404)"
+      ]
+    },
+    {
+      "version": "0.2.51",
+      "date": "2026-09-30",
+      "uk": [
+        "Зрозуміла помилка при неправильному .env; назва моделі в CLASSIFIER_PROVIDER розпізнається як OpenRouter"
+      ],
+      "en": [
+        "Readable error for a bad .env; a model id in CLASSIFIER_PROVIDER is read as OpenRouter"
+      ]
+    },
+    {
+      "version": "0.2.50",
+      "date": "2026-09-30",
+      "uk": [
+        "Класифікатор через OpenRouter (Claude Haiku 4.5) як основний варіант; Anthropic API напряму лишається"
+      ],
+      "en": [
+        "Classifier via OpenRouter (Claude Haiku 4.5) as the main option; direct Anthropic API remains"
+      ]
+    },
+    {
+      "version": "0.2.49",
+      "date": "2026-09-30",
+      "uk": [
+        "США: країна визначається за назвою (теги у стрічці — FIPS, не ISO)",
+        "Австралія: довший тайм-аут; Франція: нова адреса сторінки й очищення від меню",
+        "Новини: прибрано NATO/ISW/ECFR (недоступні), додано Politico Europe і Kyiv Independent",
+        "GDELT: повтор після 429; probe easa показує знайдені бюлетені"
+      ],
+      "en": [
+        "US: country matched by name (feed tags are FIPS, not ISO)",
+        "Australia: longer timeout; France: new page URL and menu stripping",
+        "News: dropped NATO/ISW/ECFR (unreachable), added Politico Europe and Kyiv Independent",
+        "GDELT: retry after 429; probe easa shows parsed bulletins"
+      ]
+    },
+    {
+      "version": "0.2.48",
+      "date": "2026-09-30",
+      "uk": [
+        "GDELT: зупинка після 3 невдач поспіль, якщо сервіс недоступний"
+      ],
+      "en": [
+        "GDELT: stop after 3 consecutive failures when the service is unreachable"
+      ]
+    },
+    {
+      "version": "0.2.47",
+      "date": "2026-09-30",
+      "uk": [
+        "Автодеплой з main через SSH (після розблокування Actions)",
+        "Стан реалізації джерел у docs/sources.md"
+      ],
+      "en": [
+        "Auto-deploy from main over SSH (once Actions are unlocked)",
+        "Source implementation status in docs/sources.md"
+      ]
+    },
+    {
+      "version": "0.2.44",
+      "date": "2026-09-30",
+      "uk": [
+        "Публічна панель: карта Європи, картка країни з графіком, таблиця, методологія (/dashboard/)",
+        "Експорт scores.json"
+      ],
+      "en": [
+        "Public dashboard: map of Europe, country card with chart, table, methodology (/dashboard/)",
+        "scores.json export"
+      ]
+    },
+    {
+      "version": "0.2.40",
+      "date": "2026-09-30",
+      "uk": [
+        "Бот: до 5 країн на користувача, перемикання між ними, щоденний дайджест"
+      ],
+      "en": [
+        "Bot: up to 5 countries per user, switching between them, daily digest"
+      ]
+    },
+    {
+      "version": "0.2.38",
+      "date": "2026-09-30",
+      "uk": [
+        "Архів Wayback для історичних епізодів (tension-index history)",
+        "Бектест шкали з PASS/FAIL-звітами (tension-index backtest)"
+      ],
+      "en": [
+        "Wayback archive for historical episodes (tension-index history)",
+        "Scale backtest with PASS/FAIL reports (tension-index backtest)"
+      ]
+    },
+    {
+      "version": "0.2.33",
+      "date": "2026-09-30",
+      "uk": [
+        "Новини: 13 стрічок, категорії заголовків (правила + Claude), підтвердження двома стрічками",
+        "GDELT: сплески уваги медіа і поради МЗС РФ/РБ",
+        "Ринки ЄЦБ: спреди облігацій і курси валют",
+        "probe news / gdelt / ecb"
+      ],
+      "en": [
+        "News: 13 feeds, headline categories (rules + Claude), two-feed confirmation",
+        "GDELT: media surges and RU/BY MFA advice",
+        "ECB markets: bond spreads and FX",
+        "probe news / gdelt / ecb"
+      ]
+    },
+    {
+      "version": "0.2.27",
+      "date": "2026-09-30",
+      "uk": [
+        "Авіація: бюлетені EASA щодо зон конфлікту, падіння авіатрафіку (OpenSky) із захистом від збоїв даних"
+      ],
+      "en": [
+        "Aviation: EASA conflict zone bulletins, air traffic drops (OpenSky) with data-outage guard"
+      ]
+    },
+    {
+      "version": "0.2.24",
+      "date": "2026-09-30",
+      "uk": [
+        "Сигнали з рекомендацій, щоденний бал, пояснення",
+        "Команда run (повний цикл) і сповіщення про зміну балу",
+        "Бот показує бал і причини"
+      ],
+      "en": [
+        "Signals from advisories, daily score, explanations",
+        "run command (full cycle) and score-change alerts",
+        "Bot shows the score and reasons"
+      ]
+    },
+    {
+      "version": "0.2.21",
+      "date": "2026-09-30",
+      "uk": [
+        "Класифікатор змін: правила + Claude (строга JSON-схема, кешування, ліміт викликів)",
+        "Команда classify"
+      ],
+      "en": [
+        "Change classifier: rules + Claude (strict JSON schema, caching, call cap)",
+        "classify command"
+      ]
+    },
+    {
+      "version": "0.2.18",
+      "date": "2026-09-30",
+      "uk": [
+        "Джерела: Німеччина, США, Канада, Австралія, Франція",
+        "Очищення службових рядків (дати оновлення)",
+        "Команда probe для перевірки джерел"
+      ],
+      "en": [
+        "Sources: Germany, US, Canada, Australia, France",
+        "Boilerplate (update dates) stripped before diffing",
+        "probe command to inspect sources"
+      ]
+    },
+    {
+      "version": "0.2.10",
+      "date": "2026-09-30",
+      "uk": [
+        "Статус війни: список ручних винятків wikipedia_ignore; Франція — Brazilian drug war (Французька Гвіана)",
+        "Звірка з Wikipedia перевірена на живій сторінці"
+      ],
+      "en": [
+        "War status: reviewed exclusions via wikipedia_ignore; France — Brazilian drug war (French Guiana)",
+        "Wikipedia check verified on the live page"
+      ]
+    },
+    {
+      "version": "0.2.9",
+      "date": "2026-09-30",
+      "uk": [
+        "war-check --explain: правильна назва конфлікту і текст клітинки Location"
+      ],
+      "en": [
+        "war-check --explain: correct conflict name and Location cell text"
+      ]
+    },
+    {
+      "version": "0.2.8",
+      "date": "2026-09-30",
+      "uk": [
+        "Статус війни за Wikipedia: лише колонка Location (учасники конфліктів за кордоном не рахуються)",
+        "war-check --explain: звідки взялася згадка країни"
+      ],
+      "en": [
+        "Wikipedia war status: Location column only (parties to conflicts abroad no longer count)",
+        "war-check --explain: where a country mention comes from"
+      ]
+    },
+    {
+      "version": "0.2.7",
+      "date": "2026-09-30",
+      "uk": [
+        "Парсер Wikipedia працює з відрендереним HTML і підзаголовками будь-якого рівня",
+        "war-check --headings: діагностика структури сторінки"
+      ],
+      "en": [
+        "Wikipedia parser works on rendered HTML and headings of any level",
+        "war-check --headings: page structure diagnostics"
+      ]
+    },
+    {
+      "version": "0.2.6",
+      "date": "2026-09-30",
+      "uk": [
+        "Перевірено на MacBook: bootstrap, бот (онбординг і панель), збір GOV.UK, healthcheck",
+        "war-check: помилка, якщо розмітка Wikipedia змінилась; вивід розпізнаних країн"
+      ],
+      "en": [
+        "Verified on the MacBook: bootstrap, bot (onboarding and dashboard), GOV.UK collection, healthcheck",
+        "war-check: fails if the Wikipedia layout changes; prints recognised countries"
+      ]
+    },
+    {
+      "version": "0.2.2",
+      "date": "2026-09-30",
+      "uk": [
+        "Сторінка прогресу опублікована з гілки gh-pages",
+        "Процес pages.yml оновлює gh-pages замість прямої публікації"
+      ],
+      "en": [
+        "Progress page live from the gh-pages branch",
+        "pages.yml now refreshes gh-pages instead of deploying directly"
+      ]
+    },
+    {
+      "version": "0.2.1",
+      "date": "2026-09-30",
+      "uk": [
+        "Публікація сторінки прогресу без GitHub Actions: make pages → гілка gh-pages"
+      ],
+      "en": [
+        "Publish the progress page without GitHub Actions: make pages → gh-pages branch"
+      ]
+    },
+    {
+      "version": "0.2.0",
+      "date": "2026-09-30",
+      "uk": [
+        "Бот: мова → країна → інлайн-панель із перемикачами",
+        "Статус війни: довідник RULAC + звірка з Wikipedia",
+        "Алгоритм шкали і рушій балу з тестами",
+        "Каталог джерел",
+        "План об'єднано з попереднім дашбордом"
+      ],
+      "en": [
+        "Bot: language → country → inline dashboard with toggles",
+        "War status: RULAC-based list + Wikipedia check",
+        "Scale algorithm and scoring engine with tests",
+        "Source catalogue",
+        "Plan merged with the earlier dashboard"
+      ]
+    },
+    {
+      "version": "0.1.1",
+      "date": "2026-09-30",
+      "uk": [
+        "Каркас проєкту: uv, SQLite, збирач GOV.UK, бот, healthcheck, скрипти, CI, Pages"
+      ],
+      "en": [
+        "Project skeleton: uv, SQLite, GOV.UK collector, bot, healthcheck, scripts, CI, Pages"
+      ]
+    },
+    {
+      "version": "0.1.0",
+      "date": "2026-09-27",
+      "uk": [
+        "Створено дашборд проєкту",
+        "Зафіксовано вхідні рішення"
+      ],
+      "en": [
+        "Project dashboard created",
+        "Input decisions recorded"
+      ]
+    }
+  ],
+  "ideas": [
+    {
+      "uk": "Сигнал «тиші»: країна зникла з медіа при активних рекомендаціях",
+      "en": "\"Silence\" signal: country drops out of the media while advisories are active"
+    },
+    {
+      "uk": "Message Batches API для історичного архіву — вдвічі дешевше",
+      "en": "Message Batches API for the historical archive — half the price"
+    },
+    {
+      "uk": "Перехід на PostgreSQL, якщо з'явиться багато користувачів",
+      "en": "Move to PostgreSQL if user numbers grow"
+    }
+  ],
+  "stats": {
+    "percent": 78,
+    "days_total": 49.6,
+    "days_left": 10.9,
+    "counts": {
+      "done": 70,
+      "in_progress": 14,
+      "todo": 7,
+      "blocked": 4
+    },
+    "days_by_status": {
+      "done": 33.85,
+      "in_progress": 9.8,
+      "todo": 3.0,
+      "blocked": 3.0
+    },
+    "tasks": 95
+  },
+  "build": {
+    "built_at": "2026-10-06T08:47:59+00:00",
+    "commit": "fd38894"
+  }
+}
