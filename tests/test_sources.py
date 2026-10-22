@@ -381,3 +381,16 @@ If you decide to travel to Malta: Enroll in STEP.</description></item></channel>
         async with client({"https://travel.state.gov": feed}) as c:
             result = await collect_source(db, UsSource(c), ["MT"])
     assert result.changed == 0
+
+
+async def test_fr_maintenance_fails_the_run_once_and_clearly():
+    from tension_index.sources.base import SourceUnavailable
+
+    stub = (
+        "<!doctype html><html><head><meta http-equiv='refresh' content='120'>"
+        "<title>Maintenance en cours - Ministère de l'Europe et des affaires étrangères</title>"
+        "</head><body></body></html>"
+    )
+    async with client({"https://www.diplomatie.gouv.fr": stub}) as c:
+        with pytest.raises(SourceUnavailable, match="maintenance"):
+            await FrSource(c).prepare()

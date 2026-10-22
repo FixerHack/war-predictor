@@ -26,6 +26,10 @@ class SourceFormatError(ValueError):
     """The response did not look as expected (layout/API change). Run `tension-index probe`."""
 
 
+class SourceUnavailable(SourceFormatError):
+    """The publisher says it is down (e.g. a maintenance page): temporary, not a layout change."""
+
+
 class Source(abc.ABC):
     """One publishing government. Implementations only fetch and parse; storage and
     diffing happen in the collector. `name` doubles as the publisher key in weights.yaml."""
