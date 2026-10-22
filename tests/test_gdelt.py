@@ -129,9 +129,10 @@ async def test_empty_mfa_answer_is_recorded_not_silent(settings):
 
         result = await _collect(db, settings, handler)
         assert calls["doc"] == gdelt.MAX_FAILURES
-        assert result.failed == 1 and result.ok  # the events part worked
+        # The DOC MFA query is only a fallback (ru_mfa RSS is the source): noted, not a failure.
+        assert result.failed == 0 and result.ok
         assert any("not published yet" in e for e in result.errors)
-        mfa = next(e for e in result.errors if e.startswith("mfa:"))
+        mfa = next(e for e in result.errors if e.startswith("mfa (fallback):"))
         assert "429" in mfa and "empty {}" in mfa
         assert "empty {}" in (await _last_run(db))["error"]
 
@@ -189,3 +190,23 @@ def test_gdelt_deadline_is_below_the_unit_timeout():
     unit = Path(__file__).parents[1] / "deploy/systemd/tension-gdelt.service"
     minutes = int(re.search(r"TimeoutStartSec=(\d+)min", unit.read_text())[1])
     assert runner.EXTRA_DEADLINES["gdelt"] + 60 <= minutes * 60
+
+
+async def test_yesterday_not_published_is_not_a_failure(settings):
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+
+        def handler(request):
+            if "api.gdeltproject.org" in str(request.url):
+                return httpx.Response(200, json={"articles": []})
+            return httpx.Response(404)  # nothing new yet; history already complete below
+
+        await db.executemany(
+            "INSERT INTO series (source, country, key, period, value) VALUES ('gdelt', 'PL', ?, ?, 1)",
+            [
+                (gdelt.SERIES_KEY, f"{YESTERDAY - timedelta(days=d):%Y%m%d}")
+                for d in range(1, gdelt.HISTORY_DAYS + 1)
+            ],
+        )
+        result = await _collect(db, settings, handler)
+        assert result.ok and result.failed == 0

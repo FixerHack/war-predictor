@@ -2,7 +2,7 @@
 Description=Daily GDELT collection at 07:43 UTC (after GDELT publishes the previous day's event file)
 
 [Timer]
-OnCalendar=*-*-* 07:43:00
+OnCalendar=*-*-* 09:43:00
 Persistent=true
 
 [Install]

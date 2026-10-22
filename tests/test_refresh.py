@@ -100,3 +100,36 @@ async def test_many_users_asking_about_one_country_fetch_nothing(monkeypatch, se
             await handler(cb, data, settings)
         screens.append(msg.edit_text.call_args.args[0])
     assert screens[0] == screens[1] and "5.4" in screens[0] and "кожні 4 год" in screens[0]
+
+
+async def test_collector_failure_is_reported_on_the_second_in_a_row(monkeypatch, settings):
+    from tension_index import notify
+    from tension_index.collector import RunResult
+
+    sent = []
+
+    async def fake_send_admin(settings_, render):
+        sent.append(render("uk"))
+
+    async def failing_easa(db, client, settings_):
+        run_id = await storage.start_run(db, "easa")
+        await storage.finish_run(db, run_id, ok=False, fetched=0, changed=0, failed=1, error="503")
+        return RunResult(source="easa", failed=1, errors=["503 Service Unavailable"])
+
+    async def no_collect(settings_, sources=None, countries=None, db_path=None):
+        return []
+
+    monkeypatch.setattr(notify, "send_admin", fake_send_admin)
+    monkeypatch.setattr(runner, "collect_all", no_collect)
+    monkeypatch.setattr(runner, "EXTRA_COLLECTORS", {"easa": failing_easa})
+    monkeypatch.setattr(runner, "make_classifier", lambda s: None)
+
+    for _ in range(4):
+        await runner.run_cycle(settings, notify=True)
+    assert len(sent) == 1 and "easa" in sent[0]  # second failure only; not every hour
+
+    async with storage.connect(settings.database_path) as db:
+        assert await storage.failed_in_a_row(db, "easa") == 4
+        run_id = await storage.start_run(db, "easa")
+        await storage.finish_run(db, run_id, ok=True, fetched=1, changed=0, failed=0, error=None)
+        assert await storage.failed_in_a_row(db, "easa") == 0
