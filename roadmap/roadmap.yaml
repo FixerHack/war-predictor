@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.6.3
+  version: 0.6.4
   updated: 2026-10-22
 
 milestones:
@@ -225,7 +225,7 @@ stages:
     goal_uk: "Мінімальна робоча версія готова, коли виконано всі три умови."
     goal_en: "The MVP is done when all three conditions hold."
     tasks:
-      - {id: S13.1, status: todo, days: 0.5, uk: "14 днів збору поспіль без ручного втручання", en: "14 consecutive days of collection without manual intervention"}
+      - {id: S13.1, status: done, days: 0.5, uk: "14 днів збору поспіль без ручного втручання", en: "14 consecutive days of collection without manual intervention", note_uk: "6–22 жовтня 2026: 189 циклів збору без ручного втручання, рекомендації урядів, новини й авіація без збоїв (EASA 5 разів 503 з їхнього боку; GDELT виправлено 22.10).", note_en: "6–22 October 2026: 189 collection cycles without manual intervention; government advice, news and aviation without failures (EASA 503 five times on their side; GDELT fixed on 22 Oct)."}
       - {id: S13.2, status: done, days: 0.5, uk: "На епізоді України бал досягає 7+ до 24.02.2022", en: "On the Ukraine episode the score reaches 7+ before 2022-02-24", note_uk: "Бектест на архіві Wayback: 7 з 20.12.2021, за 66 днів до 24.02.2022.", note_en: "Wayback archive backtest: 7 from 20 Dec 2021, 66 days before 24 Feb 2022."}
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
@@ -270,6 +270,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.6.4
+    date: 2026-10-22
+    uk: ["Критерій MVP «14 днів збору без ручного втручання» виконано (6–22 жовтня)."]
+    en: ["MVP criterion \"14 days of unattended collection\" met (6–22 October)."]
   - version: 0.6.3
     date: 2026-10-22
     uk: ["Сторінка технічних робіт МЗС Франції тепер дає одну зрозумілу помилку («сайт на обслуговуванні»), збережені рекомендації лишаються чинними; оновлено aiohttp 3.14.5 і certifi 2026.10.19 (вразливості Dependabot)."]
