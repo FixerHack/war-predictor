@@ -17,10 +17,13 @@ from tension_index.sources.base import (
     Advisory,
     Source,
     SourceFormatError,
+    SourceUnavailable,
     html_to_text,
     main_content,
 )
 
+# The stub served during maintenance (title "Maintenance en cours - Ministère ...").
+MAINTENANCE = re.compile(r"maintenance en cours", re.I)
 PAGE = "https://www.diplomatie.gouv.fr/fr/information-par-pays/{slug}/dernieres-minutes-et-alertes"
 SECURITY = (
     "https://www.diplomatie.gouv.fr/fr/information-par-pays/{slug}/conseils-aux-voyageurs-securite"
@@ -112,6 +115,13 @@ class FrSource(Source):
 
     def supports(self, country: Country) -> bool:
         return country.code in SLUGS  # no advice about France itself
+
+    async def prepare(self) -> None:
+        """During maintenance every page is the same stub: fail the run once, clearly, instead
+        of 37 "no 'Zones de vigilance' section" errors. Stored advice stays in force."""
+        page = await self.get(PAGE.format(slug=SLUGS["PL"]))
+        if MAINTENANCE.search(page.text[:5000]):
+            raise SourceUnavailable("diplomatie.gouv.fr: site under maintenance")
 
     async def fetch(self, country: Country) -> Advisory:
         slug = SLUGS[country.code]
