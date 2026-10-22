@@ -13,8 +13,8 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.6.1
-  updated: 2026-10-08
+  version: 0.6.2
+  updated: 2026-10-22
 
 milestones:
   - id: M1
@@ -270,6 +270,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.6.2
+    date: 2026-10-22
+    uk: ["Менше шуму в Telegram: про збій збирача адміну пишеться один раз, на другій помилці поспіль (одиничні 503 від EASA більше не надходять). GDELT: неопублікований вчорашній файл і запасний запит МЗС (429) не позначають запуск як збій; таймер перенесено на 09:43 UTC."]
+    en: ["Less noise in Telegram: the admin hears about a collector failure once, on the second failure in a row (single EASA 503s no longer arrive). GDELT: an unpublished file for yesterday and the fallback MFA query (429) no longer mark the run failed; the timer moved to 09:43 UTC."]
   - version: 0.6.1
     date: 2026-10-08
     uk: ["main захищено від force-push і видалення; стару гілку claude/funny-planck-leoxip видалено.", "Аркуш перевірки класифікацій — українською (назви причин і типів змін)."]

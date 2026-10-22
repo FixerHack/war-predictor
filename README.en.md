@@ -130,7 +130,7 @@ What runs:
 | `tension-backup.timer` | daily SQLite backup, last 14 kept |
 | `tension-warcheck.timer` | daily war status check against Wikipedia |
 | `tension-digest.timer` | daily digest to subscribers (06:37 UTC) |
-| `tension-gdelt.timer` | daily GDELT collection (07:43 UTC, up to 10 minutes) |
+| `tension-gdelt.timer` | daily GDELT collection (09:43 UTC, up to 10 minutes) |
 | `tension-pages.timer` | every 30 minutes: the public map and progress page to `gh-pages` when the data changed (needs `PAGES_REMOTE`) |
 
 Update: `./scripts/deploy.sh` (branch `main`) or `./scripts/deploy.sh dev-tg-bot` to test a branch.

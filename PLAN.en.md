@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.6.1**, updated 2026-10-08.
+Version **0.6.2**, updated 2026-10-22.
 
 **Overall progress: 89%** · left ≈ 5.4 days · ✅ 86 · 🟡 1 · ⬜ 4 · ⛔ 4
 
@@ -302,6 +302,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.6.2** (2026-10-22)
+  - Less noise in Telegram: the admin hears about a collector failure once, on the second failure in a row (single EASA 503s no longer arrive). GDELT: an unpublished file for yesterday and the fallback MFA query (429) no longer mark the run failed; the timer moved to 09:43 UTC.
 - **0.6.1** (2026-10-08)
   - main is protected from force-push and deletion; the old claude/funny-planck-leoxip branch is deleted.
   - The classification review sheet is in Ukrainian (reason and change type names).

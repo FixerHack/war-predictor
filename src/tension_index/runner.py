@@ -35,6 +35,8 @@ EXTRA_COLLECTORS: dict[str, Collector] = dict(extra.COLLECTORS)
 # Seconds per collector. GDELT (daily event files + one throttled DOC query) must stay well
 # below TimeoutStartSec=15min of tension-gdelt.service, so the run row is always closed.
 EXTRA_DEADLINES = {"gdelt": 600.0, "news": 180.0}
+# Collector failures in a row before the admin is told (once per outage).
+ALERT_AFTER_FAILURES = 2
 # Slow daily collectors run from their own timer (`tension-index gdelt`), not every cycle.
 SLOW_COLLECTORS = {"gdelt"}
 
@@ -172,7 +174,9 @@ async def run_cycle(
                         country, label, diff, summary, cls.quote if cls else ""))  # fmt: skip
                     await broadcast_change(settings, country, label, diff, summary,
                                            cls.quote if cls else "")  # fmt: skip
-                if not r.ok:
+                # A single 503 from a government site is noise: tell the admin on the second
+                # failure in a row (once), the healthcheck catches longer outages anyway.
+                if not r.ok and await storage.failed_in_a_row(db, r.source) == ALERT_AFTER_FAILURES:
                     await send_admin(
                         settings, render_collector_failed(r.source, r.failed, r.fetched, r.errors)
                     )

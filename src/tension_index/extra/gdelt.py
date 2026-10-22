@@ -171,8 +171,10 @@ async def collect_events(
         try:
             response = await client.get(EVENTS.format(day=day))
             if response.status_code == 404 and i == 0:
-                # Yesterday's file is published around 07:00 UTC; not a broken source.
+                # Yesterday's file is published around 07:00 UTC, sometimes later; it is
+                # fetched on the next run (missing days are filled). Not a broken source.
                 result.errors.append(f"events {day}: not published yet")
+                result.fetched = max(result.fetched, 1)
                 continue
             response.raise_for_status()
             totals = parse_events(response.content)
@@ -244,8 +246,9 @@ async def collect_gdelt(
         }, pause)  # fmt: skip
         result.changed += await mfa_signals(db, payload.get("articles") or [], now)
     except (httpx.HTTPError, ValueError) as exc:
-        result.failed += 1
-        result.errors.append(f"mfa: {type(exc).__name__}: {exc}")
+        # Only a fallback: RU/BY MFA advice comes from Russian RSS (ru_mfa) every hour, and
+        # GDELT DOC often answers 429. Noted, but not a failure of the daily run.
+        result.errors.append(f"mfa (fallback): {type(exc).__name__}: {exc}")
     await db.commit()
     await storage.finish(db, result, run_id)
     return result

@@ -333,6 +333,21 @@ async def abort_open_runs(db: aiosqlite.Connection, source: str, error: str) -> 
     return cur.rowcount
 
 
+async def failed_in_a_row(db: aiosqlite.Connection, source: str, limit: int = 50) -> int:
+    """How many of a source's latest finished runs failed, counting back to the last success."""
+    async with db.execute(
+        "SELECT ok FROM collect_runs WHERE source = ? AND ok IS NOT NULL ORDER BY id DESC LIMIT ?",
+        (source, limit),
+    ) as cur:
+        rows = await cur.fetchall()
+    count = 0
+    for row in rows:
+        if row["ok"]:
+            break
+        count += 1
+    return count
+
+
 async def last_runs(db: aiosqlite.Connection) -> list[aiosqlite.Row]:
     """Latest run per source (successful or not)."""
     async with db.execute(
