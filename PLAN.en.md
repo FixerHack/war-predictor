@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.6.3**, updated 2026-10-22.
+Version **0.6.4**, updated 2026-10-22.
 
-**Overall progress: 89%** · left ≈ 5.4 days · ✅ 86 · 🟡 1 · ⬜ 4 · ⛔ 4
+**Overall progress: 90%** · left ≈ 4.9 days · ✅ 87 · 🟡 1 · ⬜ 3 · ⛔ 4
 
 ## Milestones
 
@@ -246,13 +246,14 @@ Branch: `dev-ops`
   - Running since 2026-10-01: ~/claude-gateway, a separate service on 127.0.0.1 only; war-predictor uses it with its own token. No HTTPS proxy needed until something outside the server uses the gateway.
 - ✅ **S12.6** Refresh rate by country score: 0 every 12 h, 1–3 every 8 h, 4–6 every 4 h, 7–10 hourly; the bot and map read the stored result, so user requests never multiply fetches
 
-## S13. MVP criteria — 62%
+## S13. MVP criteria — 100%
 
 _The MVP is done when all three conditions hold._
 
 Branch: `—`
 
-- ⬜ **S13.1** 14 consecutive days of collection without manual intervention
+- ✅ **S13.1** 14 consecutive days of collection without manual intervention
+  - 6–22 October 2026: 189 collection cycles without manual intervention; government advice, news and aviation without failures (EASA 503 five times on their side; GDELT fixed on 22 Oct).
 - ✅ **S13.2** On the Ukraine episode the score reaches 7+ before 2022-02-24
   - Wayback archive backtest: 7 from 20 Dec 2021, 66 days before 24 Feb 2022.
 - ✅ **S13.3** Every alert contains the source, a description of the change and a quote
@@ -302,6 +303,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.6.4** (2026-10-22)
+  - MVP criterion "14 days of unattended collection" met (6–22 October).
 - **0.6.3** (2026-10-22)
   - The French MFA maintenance page now gives one clear error ("site under maintenance") and stored advice stays in force; aiohttp 3.14.5 and certifi 2026.10.19 (Dependabot vulnerabilities).
 - **0.6.2** (2026-10-22)
