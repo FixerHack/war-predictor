@@ -349,7 +349,7 @@ async def _translate(args: argparse.Namespace) -> int:
     out = Path(args.out) if args.out else LOCALES
     out.mkdir(parents=True, exist_ok=True)
     for lang in targets(args.lang):
-        stats = await translate_lang(claude, lang, out)
+        stats = await translate_lang(claude, lang, out, args.parallel)
         print(f"{lang}: {stats}")
         if claude.stopped:
             print(f"stopped: {claude.stopped}")
@@ -501,6 +501,9 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("translate", help="machine-translate the interface (locales/<lang>.json)")
     p.add_argument("--lang", type=_csv, help="language codes (default: all but uk and en)")
     p.add_argument("--out", help="directory for the locale files (default: the package's locales/)")
+    p.add_argument(
+        "--parallel", type=int, default=2, help="model calls at once (spares usage limits)"
+    )
     sub.add_parser("digest", help="send the daily summary to users with the digest on")
 
     p = sub.add_parser("changes", help="show recent advisory changes with their diff")

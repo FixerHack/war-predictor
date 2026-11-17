@@ -144,14 +144,16 @@ def save(path: Path, flat: dict[str, str], hashes: dict[str, str], site_template
     path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
 
-async def translate_lang(claude, lang: str, out_dir: Path) -> dict[str, int]:
+async def translate_lang(
+    claude, lang: str, out_dir: Path, parallel: int = PARALLEL
+) -> dict[str, int]:
     en, uk, site_template = sources()
     path = out_dir / f"{lang}.json"
     flat, hashes = load(path)
     todo = [k for k, v in en.items() if hashes.get(k) != digest(v) or k not in flat]
     stats = {"kept": len(en) - len(todo), "translated": 0, "rejected": 0}
     system = PROMPT.format(language=ENGLISH_NAMES[lang])
-    slots = asyncio.Semaphore(PARALLEL)
+    slots = asyncio.Semaphore(max(1, parallel))  # low on a shared subscription
 
     async def one(keys: list[str]) -> None:
         payload = [{"key": k, "en": en[k], "uk": uk.get(k, "")} for k in keys]
