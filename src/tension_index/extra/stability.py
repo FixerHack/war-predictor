@@ -66,11 +66,14 @@ for an indicator of institutional stability. Label each numbered headline.
 
 Categories - only about {country}'s OWN government, head of state, parliament, army, police or \
 security services; news about other countries, sport, culture, economy or crime is none:
-- pro_aggressor_policy: the authorities take or announce decisions that favour Russia or \
-Belarus against Ukraine or the EU/NATO line: veto or block sanctions, stop aid to Ukraine, \
-deals with or visits to the aggressor's leadership, leaving a common position.
-- security_purge: sudden dismissal, resignation or arrest of top military, police or \
-intelligence commanders, or of the defence/interior minister.
+- pro_aggressor_policy: {country}'s authorities take or announce decisions that favour Russia \
+or Belarus against Ukraine or the EU/NATO line: veto or block sanctions, stop aid to Ukraine, \
+deals with or visits to the aggressor's leadership, leaving a common position. Strengthening \
+defence, NATO or allied (e.g. US) presence is the opposite: none. Decisions of other \
+governments about {country} are none.
+- security_purge: sudden dismissal, resignation or arrest of the commanders of the army, \
+police, intelligence or border guard, or of the defence or interior minister. Managers of \
+companies, power plants or agencies and staff of other ministries are none.
 - armed_unmarked: armed people in uniform without insignia, attacks by people in uniform, \
 paramilitary groups appearing, security forces used against civilians or institutions.
 - power_grab: coup attempt, irregular emergency rule, parliament dissolved or elections \
@@ -201,7 +204,9 @@ async def stability_score(db: aiosqlite.Connection, code: str, now: datetime | N
     cfg = load_config()["stability"]
     now = now or datetime.now(UTC)
     rows = await events(db, code, (now - timedelta(days=cfg["window_days"])).isoformat())
-    keep = 1.0
+    # One event reported in several headlines counts once: the strongest per kind and day;
+    # days of one kind add up as confirmations but never beyond that kind's weight.
+    strongest: dict[tuple[str, str], float] = {}
     out = []
     for row in rows:
         weight = cfg["categories"][row["category"]]["weight"]
@@ -209,12 +214,19 @@ async def stability_score(db: aiosqlite.Connection, code: str, now: datetime | N
         sure = confirmed(row, rows)
         value = weight * row["severity"] * 0.5 ** (age / cfg["half_life_days"])
         value *= 1.0 if sure else cfg["unconfirmed_factor"]
-        keep *= 1.0 - min(0.95, value)
+        key = (row["category"], row["published"][:10])
+        strongest[key] = max(strongest.get(key, 0.0), value)
         out.append({
             "at": row["published"][:16], "category": row["category"], "feed": row["feed"],
             "severity": round(row["severity"], 2), "confirmed": sure, "value": round(value, 3),
             "text": {"orig": row["title"], "uk": row["title_uk"] or row["title_en"], "en": row["title_en"]},
         })  # fmt: skip
+    per_kind: dict[str, float] = {}
+    for (category, _), value in strongest.items():
+        per_kind[category] = 1.0 - (1.0 - per_kind.get(category, 0.0)) * (1.0 - value)
+    keep = 1.0
+    for category, value in per_kind.items():
+        keep *= 1.0 - min(value, cfg["categories"][category]["weight"])
     raw = 1.0 - keep
     score = round(10.0 * raw ** cfg["curve_gamma"], 1) if raw > 0 else 0.0
     return {"score": score, "events": out}

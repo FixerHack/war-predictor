@@ -120,3 +120,21 @@ async def test_no_claude_means_nothing_is_labelled(settings):
         await storage.migrate(db)
         assert await stability.label_headlines(db, None, ["PL"]) == 0
         assert (await stability.stability_score(db, "PL", NOW)) == {"score": 0.0, "events": []}
+
+
+async def test_one_event_in_several_headlines_counts_once(settings):
+    async def score(n: int) -> float:
+        async with storage.connect(settings.database_path) as db:
+            await storage.migrate(db)
+            await db.execute("DELETE FROM national_items")
+            for i in range(n):
+                await db.execute(
+                    "INSERT INTO national_items (url, country, feed, tier, title, published, seen_at, "
+                    "classified, category, severity) VALUES (?, 'HU', 'telex', 2, 't', ?, ?, 1, "
+                    "'security_purge', 1.0)",
+                    (f"https://x/{i}", NOW.isoformat(), NOW.isoformat()),
+                )
+            await db.commit()
+            return (await stability.stability_score(db, "HU", NOW))["score"]
+
+    assert await score(3) == await score(1) > 0
