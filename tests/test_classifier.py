@@ -413,3 +413,42 @@ def test_rules_some_crossings_closed_is_not_closed_borders():
     )
     assert not classify_rules(poland).borders_closed
     assert classify_rules("The country has closed its borders.").borders_closed
+
+
+async def test_claude_quote_must_be_in_the_text(settings):
+    """Paraphrased quotes (seen in the November 2026 review) are replaced by the rules quote."""
+    invented = {**PAYLOAD, "quote": "The FCDO warns of incidents near the Moldova-Ukraine border."}
+    client, _ = fake_client(invented)
+    claude = ClaudeClassifier(settings, client=client)
+    text = "@@ -1 +1,2 @@\n+There have been incidents near Moldova–Ukraine border crossings.\n"
+    fallback = classify_rules(text)
+    result = await claude.classify(publisher="gov_uk", country="MD", text=text,
+                                   level_before=None, level_after=None, fallback=fallback)  # fmt: skip
+    assert result.quote == fallback.quote != invented["quote"]
+
+    copied = {
+        **PAYLOAD,
+        "quote": "There have been incidents near Moldova–Ukraine border crossings.",
+    }
+    client, _ = fake_client(copied)
+    result = await ClaudeClassifier(settings, client=client).classify(
+        publisher="gov_uk",
+        country="MD",
+        text=text,
+        level_before=None,
+        level_after=None,
+        fallback=classify_rules(text),
+    )
+    assert result.quote == copied["quote"]
+
+
+def test_new_reasons_have_a_relevance():
+    from tension_index.scoring import load_config, relevance
+
+    cfg = load_config()
+    assert relevance(cfg, "criminal_attack") < relevance(cfg, "terrorism")
+    assert (
+        relevance(cfg, "terrorism")
+        < relevance(cfg, "war_spillover")
+        < relevance(cfg, "hybrid_attack")
+    )

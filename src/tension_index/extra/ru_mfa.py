@@ -31,8 +31,13 @@ FEEDS = (
     "https://rg.ru/xml/index.xml",
 )
 _WHO = re.compile(r"\bМИД\b|посольств|Ростуризм", re.I)
-_WHAT = re.compile(r"поездк|турист|россиян|белорус\w* граждан|граждан\w* (России|РФ)|"
-                   r"воздерж|покинуть|выезд|не рекоменд", re.I)  # fmt: skip
+# Advice itself: avoid travel, leave, do not go. "Russians" alone is not advice: embassies
+# also check whether Russians were hurt in an incident (Kraków, November 2026).
+_WHAT = re.compile(r"поездк|воздерж|покинуть|покинули|выезд|не рекоменд|не посещать|"
+                   r"не ездить|опасн|угроз", re.I)  # fmt: skip
+# Consular routine about an incident, not advice about the country.
+_ROUTINE = re.compile(r"выясня|пострадал|погиб|ранен|задержан|соболезн|опознан|"
+                      r"консульск\w* помощ|связ\w+ с (семь|родствен)", re.I)  # fmt: skip
 _NOT_OURS = re.compile(r"МИД (Украины|Латвии|Литвы|Эстонии|Польши|Молдавии|Финляндии)", re.I)
 
 
@@ -42,7 +47,7 @@ def advice_headlines(items: list[tuple[str, str, str | None]], domain: str) -> l
         {"title": title, "domain": domain, "url": link}
         for title, link, _ in items
         if _WHO.search(title) and _WHAT.search(title) and not _NOT_OURS.search(title)
-        and countries_in_ru(title)
+        and not _ROUTINE.search(title) and countries_in_ru(title)
     ]  # fmt: skip
 
 

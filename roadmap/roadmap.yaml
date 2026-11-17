@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.6.5
+  version: 0.6.6
   updated: 2026-11-17
 
 milestones:
@@ -129,7 +129,7 @@ stages:
     tasks:
       - {id: S6.1, status: done, days: 1, uk: "Промпт і JSON-схема: причина, тип зміни, персонал, кордони, цитата", en: "Prompt and JSON schema: reason, change type, staff, borders, quote"}
       - {id: S6.2, status: done, days: 0.5, uk: "Виклик лише на змінених фрагментах, кешування промпту, ліміт витрат", en: "Call only on changed fragments, prompt caching, spend cap", note_uk: "Лише змінені фрагменти, кеш системного промпту, ліміт викликів CLASSIFIER_MAX_CALLS; без ключа працюють правила.", note_en: "Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key."}
-      - {id: S6.3, status: todo, days: 1, owner: human, uk: "Ручна перевірка на 50 прикладах", en: "Manual check on 50 examples", note_uk: "Аркуш: tension-index review → reports/classification-review.md (однакова правка в багатьох країнах — один пункт); на 2026-10-08 — 30 різних правок; позначити вірно/невірно.", note_en: "Sheet: tension-index review → reports/classification-review.md (the same edit across countries is one entry); 30 distinct edits as of 2026-10-08; mark right/wrong."}
+      - {id: S6.3, status: done, days: 1, owner: human, uk: "Ручна перевірка на 50 прикладах", en: "Manual check on 50 examples", note_uk: "17.11.2026: 50 класифікацій переглянуто разом із власником, середня оцінка 8.9/10; правила уточнено (протести лише з насильством, зняті попередження, наслідки війни поруч, рівні тероризму, лише дослівні цитати).", note_en: "17 Nov 2026: 50 classifications reviewed with the owner, average 8.9/10; rules refined (unrest only with violence, removed warnings, war spillover, terrorism grades, verbatim quotes only)."}
       - {id: S6.7, status: done, days: 0.3, uk: "Класифікатор через локальний Claude Code (claude -p, без API-ключа)", en: "Classifier through the local Claude Code CLI (claude -p, no API key)", note_uk: "CLASSIFIER_PROVIDER=claude_code: виклик claude -p зі схемою JSON, без інструментів і без збереження сесій; використовує ліміти підписки. На сервері потрібен claude setup-token.", note_en: "CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed."}
       - {id: S6.8, status: done, days: 1, uk: "Окремий інструмент claude-gateway: HTTP API (власний, сумісні з OpenAI й Anthropic) і MCP поверх Claude Code", en: "Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code", note_uk: "gateway/: токен обов'язковий, без інструментів і сесій, ліміт паралельних викликів, systemd-сервіс; tension-index може класифікувати через нього (CLASSIFIER_PROVIDER=gateway).", note_en: "gateway/: token required, no tools or sessions, parallel call limit, systemd service; tension-index can classify through it (CLASSIFIER_PROVIDER=gateway)."}
       - {id: S6.9, status: done, days: 0.3, uk: "Хибні тривоги з живих даних: навчання й тести не є мобілізацією чи надзвичайним станом, окремі закриті переходи не є закритим кордоном, без випадкових цитат", en: "False alarms from live data: drills and tests are not mobilisation or an emergency, some closed crossings are not a closed border, no random quotes"}
@@ -231,6 +231,7 @@ stages:
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
+  - {date: 2026-11-17, uk: "Правила класифікації від власника: протести піднімають бал лише з насильством; зняте попередження знімає свій внесок одразу після повторної перевірки; випадкові дрони й уламки з війни поруч — окрема причина «наслідки війни поруч» (0.5), навмисні вторгнення далеко від війни — гібридна атака; напад одинака (0.1) < теракт (0.2) < атака військових чи спецслужб іншої держави (військова загроза).", en: "Classification rules from the owner: unrest raises the score only with violence; a removed warning drops its contribution once re-checked; stray drones and debris from a war next door are their own reason, war spillover (0.5), deliberate incursions far from a war are hybrid attacks; a lone attacker (0.1) < terrorism (0.2) < an attack by another state's military or services (military threat)."}
   - {date: 2026-10-08, uk: "Рівень Франції читається з тексту розділу «Zones de vigilance»: колір усієї країни або зони (*_parts: жовтий 0.1, помаранчевий 0.3, червоний 0.45 — як часткові попередження Британії); без названого кольору країна зелена, як на карті МЗС.", en: "France's level is read from the \"Zones de vigilance\" text: the colour of the whole country or of zones (*_parts: yellow 0.1, orange 0.3, red 0.45 — like the UK partial warnings); a country without a stated colour is green, as on the ministry's map."}
   - {date: 2026-10-08, uk: "Поради МЗС РФ/РБ своїм громадянам беруться із заголовків п'яти російських видань (публікатор ru_media, блок «агресор»); тональність GDELT не використовується.", en: "RU/BY MFA advice to their citizens is taken from headlines of five Russian outlets (publisher ru_media, aggressor block); GDELT tone is not used."}
   - {date: 2026-10-06, uk: "Службові повідомлення в TELEGRAM_CHAT_ID ідуть мовою, яку власник цього чату обрав у боті (за замовчуванням українська); оригінальний текст джерела показується згорнутим.", en: "Operator messages to TELEGRAM_CHAT_ID use the language the chat owner chose in the bot (Ukrainian by default); the original source text is shown folded."}
@@ -271,6 +272,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.6.6
+    date: 2026-11-17
+    uk: ["Класифікатор за підсумками перевірки 50 змін: протести рахуються лише з насильством, зняті попередження прибирають свій внесок, нові причини «наслідки війни поруч» і «напад одинака», лише дослівні цитати; виправлено хибну тривогу Польщі (консульська новина посольства РФ рахувалася як порада МЗС)."]
+    en: ["Classifier after reviewing 50 changes: unrest counts only with violence, removed warnings drop their contribution, new reasons war spillover and lone attacker, verbatim quotes only; fixed Poland's false alarm (a consular news item of the Russian embassy counted as MFA advice)."]
   - version: 0.6.5
     date: 2026-11-17
     uk: ["Замість плиток — справжня карта Європи з кордонами: колір за рівнем, підсвічування й підказка при наведенні, Мальта, Люксембург і Кіпр — кружечками; Крим показано як частину України."]

@@ -331,31 +331,61 @@ async def derive_advisory_signals(db: aiosqlite.Connection) -> int:
     for change_id in flaps:
         await db.execute("UPDATE signals SET active = 0 WHERE ref = ?", (f"change:{change_id}",))
     async with db.execute(
-        "SELECT c.id, c.country, c.source, c.detected_at, k.payload FROM changes c "
+        "SELECT c.id, c.country, c.source, c.detected_at, c.new_snapshot, k.payload FROM changes c "
         "JOIN classifications k ON k.ref_type = 'change' AND k.ref_id = c.id"
     ) as cur:
-        for row in await cur.fetchall():
-            if row["id"] in flaps:
-                continue
-            cls = Classification.from_json(row["payload"])
-            if cls.change_type not in ADVISORY_EVENT_TYPES:
-                continue
-            event = Signal(
-                country=row["country"],
-                block="advisories",
-                kind=f"advisory_update:{cls.change_type}",
-                strength=cfg["advisory_events"][cls.change_type],
-                publisher=row["source"],
-                observed_at=datetime.fromisoformat(row["detected_at"]),
-                reason=cls.reason,
-                state=False,
-                note=cls.summary_en or usable_quote(cls.quote),
-                note_uk=cls.summary_uk,
+        rows = await cur.fetchall()
+    removals = []
+    for row in rows:
+        if row["id"] in flaps:
+            continue
+        cls = Classification.from_json(row["payload"])
+        if cls.change_type == "warning_removed":
+            removals.append((row, cls))
+        if cls.change_type not in ADVISORY_EVENT_TYPES:
+            # Re-read as editorial (or a removal): an event it gave earlier no longer holds.
+            await db.execute(
+                "UPDATE signals SET active = 0 WHERE ref = ?", (f"change:{row['id']}",)
             )
-            await storage.upsert_signal(db, event, f"change:{row['id']}")
-            count += 1
+            continue
+        event = Signal(
+            country=row["country"],
+            block="advisories",
+            kind=f"advisory_update:{cls.change_type}",
+            strength=cfg["advisory_events"][cls.change_type],
+            publisher=row["source"],
+            observed_at=datetime.fromisoformat(row["detected_at"]),
+            reason=cls.reason,
+            state=False,
+            note=cls.summary_en or usable_quote(cls.quote),
+            note_uk=cls.summary_uk,
+        )
+        await storage.upsert_signal(db, event, f"change:{row['id']}")
+        count += 1
+    await cancel_removed_warnings(db, removals)
     await db.commit()
     return count
+
+
+async def cancel_removed_warnings(
+    db: aiosqlite.Connection, removals: list[tuple[aiosqlite.Row, Classification]]
+) -> None:
+    """A government removed a warning: its earlier events with the same reason end at once -
+    but only once re-checked, i.e. the version without the warning is still current and a later
+    fetch of the country saw it again (a page that briefly lost a section is not a removal)."""
+    checks = await storage.country_checks(db)
+    for row, cls in removals:
+        latest = await storage.latest_snapshot(db, row["source"], row["country"])
+        checked = checks.get(row["country"])
+        if latest is None or latest.id != row["new_snapshot"]:
+            continue  # superseded or reverted since
+        if checked is None or checked <= row["detected_at"]:
+            continue  # not re-checked yet
+        await db.execute(
+            "UPDATE signals SET active = 0 WHERE publisher = ? AND country = ? AND reason = ? "
+            "AND state = 0 AND ref LIKE 'change:%' AND observed_at <= ?",
+            (row["source"], row["country"], cls.reason, row["detected_at"]),
+        )
 
 
 async def active_signals(

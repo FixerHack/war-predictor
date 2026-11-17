@@ -19,12 +19,12 @@ from tension_index.config import Settings
 log = logging.getLogger(__name__)
 
 REASONS = (
-    "armed_conflict", "military_threat", "hybrid_attack", "civil_unrest", "terrorism",
-    "crime", "health", "natural_disaster", "unknown",
+    "armed_conflict", "military_threat", "hybrid_attack", "war_spillover", "civil_unrest",
+    "terrorism", "criminal_attack", "crime", "health", "natural_disaster", "unknown",
 )  # fmt: skip
 CHANGE_TYPES = (
     "level_raised", "level_lowered", "staff_posture", "consular", "borders", "airspace",
-    "security_update", "editorial", "none",
+    "security_update", "warning_removed", "editorial", "none",
 )  # fmt: skip
 STAFF = (
     "normal", "limited_consular_services", "authorized_departure", "ordered_departure",
@@ -194,6 +194,14 @@ def classify_rules(text: str, *, level_change: tuple[float, float] | None = None
     return result
 
 
+def _squash(text: str) -> str:
+    """Compare quotes ignoring whitespace, case and typographic apostrophes/quotes."""
+    text = text.translate(
+        str.maketrans({"’": "'", "‘": "'", "“": '"', "”": '"', "«": '"', "»": '"'})
+    )
+    return " ".join(text.lower().split())
+
+
 def usable_quote(text: str) -> str:
     """A quote worth showing to users: a sentence, not a page fragment like "3 pays"."""
     text = " ".join(text.split())[:300]
@@ -239,27 +247,43 @@ only when it sets the overall level; e.g. "Level 4 due to COVID-19, some areas h
 risk due to armed conflict" is health.
   armed_conflict = fighting, military attacks, missiles, invasion, war on or near the territory.
   military_threat = troop build-ups, military exercises near the border, mobilisation, \
-threat of attack.
-  hybrid_attack = drones over infrastructure, sabotage, GPS jamming, cyber attacks by a state.
-  civil_unrest = protests, riots, political instability. terrorism = terrorist threat or attacks.
+threat of attack; also an attack on the country by a foreign state's military, special forces \
+or intelligence services.
+  hybrid_attack = deliberate state actions short of war: drones over infrastructure or \
+military sites (above all far from any war zone, e.g. Russian drones over Finland, the Baltic \
+states or Germany), sabotage, GPS jamming, cyber attacks attributed to a state.
+  war_spillover = a war in a neighbouring country reaching this one by accident: a stray drone \
+or missile debris near the border with the war zone, crossings or airports briefly closed \
+because of nearby strikes (e.g. Moldova, Romania or Poland next to Ukraine). Say so in the \
+summaries, and whose drone it was if the text states it.
+  civil_unrest = protests, riots, political instability.
+  terrorism = a terrorist attack or intimidation campaign, or a raised terrorism threat level.
+  criminal_attack = violence by a lone or mentally ill person without a terrorist organisation \
+or political aim, as the authorities describe it.
   crime, health, natural_disaster as named. unknown = no reason stated or only editorial text.
   Judge the reason by substance, not by keywords: "no known terrorist threat" is not terrorism.
 - change_type: what changed. level_raised / level_lowered when the overall level changed; \
 staff_posture for embassy staff departures or embassy closure; consular for changes to consular \
 services; borders for border closures or crossing restrictions; airspace for flight or airspace \
-restrictions; security_update for other substantive security wording; editorial for formatting, \
-contact details, dates or non-security topics (visas, customs, driving); none if nothing changed.
+restrictions; security_update for other substantive security wording; warning_removed when a \
+security, unrest, weather or other warning was removed or expired and not replaced by one of \
+the same kind (use the removed warning's reason); editorial for formatting, contact details, \
+dates or non-security topics (visas, customs, driving); none if nothing changed.
+  Protests, strikes, marches and celebrations are security_update only when violence, riots, \
+looting, clashes with police or curfews are reported; planned or peaceful ones are editorial.
 - level: only for publishers without structured levels (France: vert, jaune, orange, rouge as \
 stated for the whole country); otherwise an empty string.
 - staff_posture: the embassy staff situation stated in the text. authorized_departure = \
 voluntary departure of staff/families allowed; ordered_departure = departure ordered; \
 embassy_suspended = embassy closed or operations suspended; limited_consular_services; \
-normal if explicitly normal; unknown if not mentioned.
+normal only if the text explicitly says the embassy operates normally; unknown if not \
+mentioned (never assume normal).
 - airspace: closed / restricted if the text says the country's airspace is closed or \
 restricted as a whole or over a large part of it because of a security threat, normal if it \
 explicitly says flights operate normally, unknown otherwise. Routine NOTAMs, drone rules near \
-airports, strikes, weather, and restrictions limited to occupied or separatist areas that have \
-been in place for years are unknown.
+airports, strikes, weather, possible or brief airport closures during drone alerts, and \
+restrictions limited to occupied or separatist areas that have been in place for years are \
+unknown.
 - borders_closed: true only if the country's land borders are stated to be closed as a whole, \
 or entirely with a neighbour, as a security measure. Some crossing points closed, crossings \
 closed for years (e.g. with Belarus or Russia), shorter opening hours or longer waits are false.
@@ -579,7 +603,10 @@ class ClaudeClassifier:
             fallback.notes.append("claude: unparseable output, rules used")
             return fallback
         result.method = "claude"
-        result.quote = usable_quote(result.quote) or fallback.quote
+        # A quote must be copied, not paraphrased: one that is not in the text is dropped.
+        quote = usable_quote(result.quote)
+        source = re.sub(r"(?m)^[+\- ]", "", text)  # diff markers are not part of the text
+        result.quote = quote if quote and _squash(quote) in _squash(source) else fallback.quote
         # Keep the deterministic level-change direction: it comes from structured data.
         if fallback.change_type in ("level_raised", "level_lowered"):
             result.change_type = fallback.change_type

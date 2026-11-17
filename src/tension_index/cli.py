@@ -193,12 +193,14 @@ REVIEW_HEAD = """# Перевірка класифікацій ({n})
 
 REVIEW_UK = {
     "armed_conflict": "збройний конфлікт", "military_threat": "військова загроза",
-    "hybrid_attack": "гібридна атака", "civil_unrest": "заворушення/протести",
-    "terrorism": "тероризм", "crime": "злочинність", "health": "здоров'я",
+    "hybrid_attack": "гібридна атака", "war_spillover": "наслідки війни поруч",
+    "civil_unrest": "заворушення/протести", "terrorism": "тероризм",
+    "criminal_attack": "напад одинака", "crime": "злочинність", "health": "здоров'я",
     "natural_disaster": "стихійне лихо", "level_raised": "рівень підвищено",
     "level_lowered": "рівень знижено", "staff_posture": "персонал посольства",
     "consular": "консульські послуги", "borders": "кордони", "airspace": "небо",
-    "security_update": "оновлення безпекової інформації", "editorial": "редакторська правка",
+    "security_update": "оновлення безпекової інформації", "warning_removed": "попередження знято",
+    "editorial": "редакторська правка",
     "none": "без змін", "normal": "звичайний", "limited_consular_services": "обмежені послуги",
     "authorized_departure": "дозволено виїзд", "ordered_departure": "наказано виїзд",
     "embassy_suspended": "посольство закрито", "restricted": "обмежене", "closed": "закрите",
