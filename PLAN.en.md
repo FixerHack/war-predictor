@@ -4,7 +4,7 @@
 
 Version **0.7.0**, updated 2026-11-17.
 
-**Overall progress: 92%** · left ≈ 4.1 days · ✅ 93 · 🟡 1 · ⬜ 3 · ⛔ 4
+**Overall progress: 93%** · left ≈ 4.0 days · ✅ 94 · 🟡 1 · ⬜ 2 · ⛔ 4
 
 ## Milestones
 
@@ -101,7 +101,7 @@ Branch: `dev-aviation`
 - ✅ **S3.6** Air traffic drop: norm only from 3+ weeks, 20-aircraft and 3σ thresholds, signal cleared on recovery
   - The false LU signal ("3 aircraft vs usual 10") can no longer happen.
 
-## S4. News, analysis, domestic measures — 96%
+## S4. News, analysis, domestic measures — 100%
 
 _Independent confirmation from media, analysis, markets and the country's own measures._
 
@@ -118,7 +118,8 @@ Branch: `dev-news`
 - ✅ **S4.5** Markets: bonds and FX via ECB Data Portal
   - ECB: 10-year bond spread to Germany and the exchange rate, daily; works on the server.
 - ✅ **S4.6** Government and security forces scale: 48 national outlets of all 38 countries, headlines labelled by Claude with structured cross-checks, an own 0–10 scale in the country panel, the most serious signals in the domestic block
-- ⬜ **S4.7** Approve the national media list (docs/sources.md, section Ж) _(manual)_
+- ✅ **S4.7** Approve the national media list (docs/sources.md, section Ж) _(manual)_
+  - Approved 17 Nov 2026; edited if an outlet turns out unreliable.
 
 ## S5. Historical archive — 100%
 
