@@ -31,7 +31,15 @@ class FakeClaude:
     async def _call(self, system, user, schema, max_tokens):
         self.prompts.append((system, user))
         items = [
-            {"i": i, "category": cat, "severity": sev, "title_uk": f"uk {i}", "title_en": f"en {i}"}
+            {
+                "i": i,
+                "category": cat,
+                "severity": sev,
+                "title_uk": f"uk {i}",
+                "title_en": f"en {i}",
+                "institution": "army" if cat == "security_purge" else "government",
+                "benefits_aggressor": cat == "pro_aggressor_policy",
+            }  # fmt: skip
             for i, (cat, sev) in self.labels.items()
         ]
         return json.dumps({"items": items}), ""
@@ -138,3 +146,14 @@ async def test_one_event_in_several_headlines_counts_once(settings):
             return (await stability.stability_score(db, "HU", NOW))["score"]
 
     assert await score(3) == await score(1) > 0
+
+
+def test_cross_checks_drop_labels_the_structure_contradicts():
+    assert stability.checked("security_purge", {"institution": "other"}) == "none"
+    assert stability.checked("security_purge", {"institution": "army"}) == "security_purge"
+    assert stability.checked("pro_aggressor_policy", {"benefits_aggressor": False}) == "none"
+    assert (
+        stability.checked("pro_aggressor_policy", {"benefits_aggressor": True})
+        == "pro_aggressor_policy"
+    )
+    assert stability.checked("violent_unrest", {}) == "violent_unrest"

@@ -39,6 +39,18 @@ CATEGORIES = (
     "leader_absence", "violent_unrest", "trust_drop", "none",
 )  # fmt: skip
 MAX_PER_CALL = 60
+INSTITUTIONS = (
+    "army", "police", "intelligence", "border_guard", "defence_ministry", "interior_ministry",
+    "head_of_state", "government", "parliament", "other",
+)  # fmt: skip
+SECURITY = {
+    "army",
+    "police",
+    "intelligence",
+    "border_guard",
+    "defence_ministry",
+    "interior_ministry",
+}
 SCHEMA = {
     "type": "object",
     "properties": {
@@ -50,10 +62,20 @@ SCHEMA = {
                     "i": {"type": "integer"},
                     "category": {"type": "string", "enum": list(CATEGORIES)},
                     "severity": {"type": "number"},
+                    "institution": {"type": "string", "enum": list(INSTITUTIONS)},
+                    "benefits_aggressor": {"type": "boolean"},
                     "title_uk": {"type": "string"},
                     "title_en": {"type": "string"},
                 },
-                "required": ["i", "category", "severity", "title_uk", "title_en"],
+                "required": [
+                    "i",
+                    "category",
+                    "severity",
+                    "institution",
+                    "benefits_aggressor",
+                    "title_uk",
+                    "title_en",
+                ],
                 "additionalProperties": False,
             },
         }
@@ -85,6 +107,9 @@ explanation, makes unexplained or secret trips, flees the country.
 - trust_drop: a poll showing low or falling trust in the police, army or government.
 - none: everything else.
 
+institution: which institution of {country} the headline is about (other for companies, \
+power plants, agencies, courts or anything else). benefits_aggressor: true only if the \
+decision or event directly helps Russia or Belarus or weakens support for Ukraine.
 severity 0..1: 1 = official and confirmed; 0.5 = reported, alleged or partial; 0.2 = talk, \
 plans or opposition claims. Label by what the headline states, not by alarming words.
 For every headline that is not none, give title_uk and title_en: the headline translated \
@@ -154,6 +179,7 @@ async def label_headlines(db: aiosqlite.Connection, claude, countries: list[str]
         for i, row in enumerate(rows):
             x = items.get(i, {})
             category = x.get("category") if x.get("category") in CATEGORIES else "none"
+            category = checked(category, x)
             severity = max(0.0, min(1.0, float(x.get("severity") or 0)))
             await db.execute(
                 "UPDATE national_items SET classified = 1, category = ?, severity = ?, "
@@ -183,6 +209,16 @@ async def events(db: aiosqlite.Connection, code: str, since: str) -> list[aiosql
         (code, since),
     ) as cur:
         return list(await cur.fetchall())
+
+
+def checked(category: str, label: dict) -> str:
+    """Structured cross-checks the prose of the prompt alone did not secure (live test,
+    17 Nov 2026: a nuclear plant manager as a security purge, a business trip as pro-aggressor)."""
+    if category == "security_purge" and label.get("institution") not in SECURITY:
+        return "none"
+    if category == "pro_aggressor_policy" and not label.get("benefits_aggressor"):
+        return "none"
+    return category
 
 
 def confirmed(row, rows) -> bool:
