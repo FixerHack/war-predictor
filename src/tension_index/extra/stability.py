@@ -306,6 +306,7 @@ async def derive_signals(db: aiosqlite.Connection, countries: list[str], now: da
     cfg = load_config()["stability"]
     since = (now - timedelta(days=cfg["window_days"])).isoformat()
     count = 0
+    current: set[tuple[str, str]] = set()
     for code in countries:
         rows = await events(db, code, since)
         best: dict[tuple[str, str], aiosqlite.Row] = {}
@@ -326,7 +327,17 @@ async def derive_signals(db: aiosqlite.Connection, countries: list[str], now: da
                 note=row["title_en"] or row["title"], note_uk=row["title_uk"],
             )  # fmt: skip
             await storage.upsert_signal(db, signal, f"national:{category}:{day}")
+            current.add((f"national:{category}:{day}", code))
             count += 1
+    # Within the window the labels are the whole truth: a relabelled headline loses its signal.
+    async with db.execute(
+        "SELECT id, ref, country FROM signals WHERE publisher = 'national' AND active = 1 "
+        "AND observed_at >= ?",
+        (since,),
+    ) as cur:
+        for row in await cur.fetchall():
+            if row["country"] in countries and (row["ref"], row["country"]) not in current:
+                await db.execute("UPDATE signals SET active = 0 WHERE id = ?", (row["id"],))
     await db.commit()
     return count
 

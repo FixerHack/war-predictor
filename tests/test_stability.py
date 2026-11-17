@@ -175,3 +175,23 @@ def test_cross_checks_drop_labels_the_structure_contradicts():
     assert check("violent_unrest", {"violence": False}) == "none"
     assert check("trust_drop", {"poll": False}) == "none"
     assert check("leader_absence", {}) == "leader_absence"
+
+
+async def test_relabelled_headline_loses_its_tension_signal(settings):
+    async with storage.connect(settings.database_path) as db:
+        await storage.migrate(db)
+        await db.execute(
+            "INSERT INTO national_items (url, country, feed, tier, title, published, seen_at, "
+            "classified, category, severity) VALUES ('https://x/1', 'FR', 'franceinfo', 2, 't', ?, ?, "
+            "1, 'armed_unmarked', 0.5)",
+            (NOW.isoformat(), NOW.isoformat()),
+        )
+        await db.commit()
+        await stability.derive_signals(db, ["FR"], NOW)
+        await db.execute("UPDATE national_items SET category = 'none'")  # relabelled
+        await db.commit()
+        await stability.derive_signals(db, ["FR"], NOW)
+        async with db.execute(
+            "SELECT COUNT(*) FROM signals WHERE publisher = 'national' AND active = 1"
+        ) as cur:
+            assert (await cur.fetchone())[0] == 0
