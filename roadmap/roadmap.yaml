@@ -13,8 +13,8 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.6.4
-  updated: 2026-10-22
+  version: 0.6.5
+  updated: 2026-11-17
 
 milestones:
   - id: M1
@@ -205,6 +205,7 @@ stages:
       - {id: S11.5, status: done, days: 0.5, uk: "Розгорнуте пояснення на карті (укр/англ): підсумок, блоки, що кажуть уряди, що помічено, повна методика", en: "Detailed explanation on the map (uk/en): summary, blocks, what governments say, what was observed, full method"}
       - {id: S11.8, status: done, days: 0.1, uk: "Кольори карти як у боті: зелений, жовтий, помаранчевий, червоний, критичний (контраст ≥ 4.5:1 в обох темах)", en: "Map colours match the bot: green, yellow, orange, red, critical (contrast ≥ 4.5:1 in both themes)"}
       - {id: S11.9, status: done, days: 0.3, uk: "Автопублікація карти з сервера кожні 30 хв (лише коли дані змінилися, gh-pages — один коміт)", en: "Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)", note_uk: "Працює з 2026-10-05: tension-pages.timer, deploy key server-pages (лише цей репозиторій).", note_en: "Running since 2026-10-05: tension-pages.timer, deploy key server-pages (this repository only)."}
+      - {id: S11.10, status: done, days: 0.5, uk: "Справжня карта Європи з кордонами (Natural Earth): колір за рівнем, підсвічування й підказка при наведенні, вибір кліком і з клавіатури; Крим — частина України", en: "A real map of Europe with borders (Natural Earth): colour by level, highlight and tooltip on hover, selection by click and keyboard; Crimea is part of Ukraine"}
   - id: S12
     branch: dev-ops
     uk: Експлуатація
@@ -270,6 +271,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.6.5
+    date: 2026-11-17
+    uk: ["Замість плиток — справжня карта Європи з кордонами: колір за рівнем, підсвічування й підказка при наведенні, Мальта, Люксембург і Кіпр — кружечками; Крим показано як частину України."]
+    en: ["Tiles replaced with a real map of Europe with borders: colour by level, highlight and tooltip on hover, Malta, Luxembourg and Cyprus as dots; Crimea is shown as part of Ukraine."]
   - version: 0.6.4
     date: 2026-10-22
     uk: ["Критерій MVP «14 днів збору без ручного втручання» виконано (6–22 жовтня)."]

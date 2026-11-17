@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.6.4**, updated 2026-10-22.
+Version **0.6.5**, updated 2026-11-17.
 
-**Overall progress: 90%** · left ≈ 4.9 days · ✅ 87 · 🟡 1 · ⬜ 3 · ⛔ 4
+**Overall progress: 90%** · left ≈ 4.9 days · ✅ 88 · 🟡 1 · ⬜ 3 · ⛔ 4
 
 ## Milestones
 
@@ -230,6 +230,7 @@ Branch: `dev-dashboard`
 - ✅ **S11.8** Map colours match the bot: green, yellow, orange, red, critical (contrast ≥ 4.5:1 in both themes)
 - ✅ **S11.9** Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)
   - Running since 2026-10-05: tension-pages.timer, deploy key server-pages (this repository only).
+- ✅ **S11.10** A real map of Europe with borders (Natural Earth): colour by level, highlight and tooltip on hover, selection by click and keyboard; Crimea is part of Ukraine
 
 ## S12. Operations — 86%
 
@@ -303,6 +304,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.6.5** (2026-11-17)
+  - Tiles replaced with a real map of Europe with borders: colour by level, highlight and tooltip on hover, Malta, Luxembourg and Cyprus as dots; Crimea is shown as part of Ukraine.
 - **0.6.4** (2026-10-22)
   - MVP criterion "14 days of unattended collection" met (6–22 October).
 - **0.6.3** (2026-10-22)
