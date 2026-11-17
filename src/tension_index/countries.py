@@ -21,7 +21,11 @@ class Country:
         return "".join(chr(0x1F1E6 + ord(ch) - ord("A")) for ch in self.code)
 
     def title(self, lang: str) -> str:
-        return self.name_uk if lang == "uk" else self.name
+        if lang == "uk":
+            return self.name_uk
+        from tension_index.i18n import locale
+
+        return locale(lang).get("country", {}).get(self.code) or self.name
 
 
 REGIONS = ("nordic_baltic", "central_eastern", "western", "southern", "balkans")

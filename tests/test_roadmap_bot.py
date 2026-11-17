@@ -33,10 +33,11 @@ def test_cli_parses():
 
 
 def test_every_bot_text_has_both_languages():
-    from tension_index.i18n import LANGS, TEXTS
+    from tension_index.i18n import TEXTS
+    from tension_index.languages import SOURCE
 
-    for key, entry in TEXTS.items():
-        assert set(entry) == set(LANGS), key
+    for key, entry in TEXTS.items():  # uk and en by hand; the rest comes from locales/
+        assert set(entry) == set(SOURCE), key
 
 
 def test_package_version_matches_roadmap():

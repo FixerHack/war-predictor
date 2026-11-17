@@ -4,7 +4,7 @@
 
 from __future__ import annotations
 
-from tension_index.i18n import t
+from tension_index.i18n import locale, t
 
 PUBLISHERS = {
     "us": ("🇺🇸 Держдеп США", "🇺🇸 US State Dept"),
@@ -46,13 +46,17 @@ KINDS = {
 
 def publisher_label(publisher: str, lang: str) -> str:
     uk, en = PUBLISHERS.get(publisher, (publisher, publisher))
-    return uk if lang == "uk" else en
+    if lang == "uk":
+        return uk
+    return locale(lang).get("pub", {}).get(publisher) or en
 
 
 def kind_label(kind: str, lang: str) -> str:
     if kind in KINDS:
         uk, en = KINDS[kind]
-        return uk if lang == "uk" else en
+        if lang == "uk":
+            return uk
+        return locale(lang).get("kind", {}).get(kind) or en
     if kind.startswith("advisory_update"):
         return t(lang, "kind_update")
     return kind.split(":")[-1].replace("_", " ")

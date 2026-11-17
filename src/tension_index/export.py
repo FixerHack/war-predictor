@@ -17,9 +17,12 @@ MAX_SIGNALS = 15
 
 
 def _labels(publisher: str, kind: str) -> dict:
+    # uk/en inline; the codes let the page use its translated labels for other languages.
     return {
         "publisher": {lang: explain.publisher_label(publisher, lang) for lang in ("uk", "en")},
         "kind": {lang: explain.kind_label(kind, lang) for lang in ("uk", "en")},
+        "pcode": publisher,
+        "kcode": kind,
     }
 
 
