@@ -178,6 +178,16 @@ def build(source: Path, out: Path, plan_dir: Path | None = None) -> dict:
         for name in ("index.html", "europe.json"):
             if (dashboard / name).exists():
                 shutil.copyfile(dashboard / name, out / "dashboard" / name)
+        from tension_index.i18n import site_catalog
+        from tension_index.languages import LANGUAGES
+
+        (out / "dashboard" / "i18n").mkdir(exist_ok=True)
+        for lang in LANGUAGES:
+            catalog = site_catalog(lang)
+            if catalog:
+                (out / "dashboard" / "i18n" / f"{lang}.json").write_text(
+                    json.dumps(catalog, ensure_ascii=False, separators=(",", ":")), encoding="utf-8"
+                )
     (out / ".nojekyll").write_text("")
     if plan_dir is not None:
         (plan_dir / "PLAN.md").write_text(render_markdown(data, "uk"), encoding="utf-8")

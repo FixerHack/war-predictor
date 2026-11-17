@@ -15,6 +15,7 @@ import re
 from dataclasses import asdict, dataclass, field
 
 from tension_index.config import Settings
+from tension_index.languages import ENGLISH_NAMES, local_languages
 
 log = logging.getLogger(__name__)
 
@@ -47,6 +48,8 @@ class Classification:
     quote: str = ""
     summary_uk: str = ""
     summary_en: str = ""
+    # The same summary in the country's own languages (languages.local_languages), lang -> text.
+    summaries: dict[str, str] = field(default_factory=dict)
     method: str = "rules"
     notes: list[str] = field(default_factory=list)
 
@@ -224,10 +227,19 @@ SCHEMA = {
         "quote": {"type": "string"},
         "summary_uk": {"type": "string"},
         "summary_en": {"type": "string"},
+        "summaries_local": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {"lang": {"type": "string"}, "text": {"type": "string"}},
+                "required": ["lang", "text"],
+                "additionalProperties": False,
+            },
+        },
     },
     "required": [
         "reason", "change_type", "level", "staff_posture", "airspace", "borders_closed",
-        "measure_reason", "quote", "summary_uk", "summary_en",
+        "measure_reason", "quote", "summary_uk", "summary_en", "summaries_local",
     ],
     "additionalProperties": False,
 }  # fmt: skip
@@ -293,7 +305,9 @@ services). Use unknown when no such measure is reported.
 - quote: one sentence copied verbatim from the added or current text that best supports the \
 classification (max 300 characters). Empty if nothing substantive.
 - summary_uk / summary_en: one short neutral sentence each (Ukrainian / English) saying what \
-changed, for a notification to the public. Do not speculate or predict."""
+changed, for a notification to the public. Do not speculate or predict.
+- summaries_local: the same sentence in each language listed under "Local languages" (lang = \
+its code); an empty list when none are listed."""
 
 
 # Models that accept server-side refusal fallbacks (`fallbacks: "default"`).
@@ -582,8 +596,10 @@ class ClaudeClassifier:
             fallback.notes.append(f"claude: {self.stopped or 'per-run cap reached'}, rules used")
             fallback.method = PENDING  # the model gets it on a later run
             return fallback
+        local = local_languages(country)
+        names = ", ".join(f"{code} ({ENGLISH_NAMES[code]})" for code in local) or "none"
         user = (
-            f"Publisher: {publisher}\nCountry: {country}\n"
+            f"Publisher: {publisher}\nCountry: {country}\nLocal languages: {names}\n"
             f"Level before: {level_before or 'n/a'}\nLevel after: {level_after or 'n/a'}\n\n"
             f"<advisory>\n{text[:12000]}\n</advisory>"
         )
@@ -595,10 +611,15 @@ class ClaudeClassifier:
             return fallback
         try:
             data = json.loads(text_out)
-            optional = {"measure_reason"}  # added later; older outputs lack it
+            optional = {"measure_reason", "summaries_local"}  # added later; older outputs lack them
             result = Classification(**{
-                k: data[k] for k in SCHEMA["required"] if k in data or k not in optional
+                k: data[k] for k in SCHEMA["required"]
+                if (k in data or k not in optional) and k != "summaries_local"
             })  # fmt: skip
+            result.summaries = {
+                x["lang"]: x["text"].strip() for x in data.get("summaries_local") or []
+                if x.get("lang") in local and x.get("text", "").strip()
+            }  # fmt: skip
         except (ValueError, KeyError, TypeError):
             fallback.notes.append("claude: unparseable output, rules used")
             return fallback

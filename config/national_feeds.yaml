@@ -1,0 +1,63 @@
+# National media for the institutional stability scale (extra/stability.py): headlines only,
+# read in their own language. Checked from the server on 2026-11-17 (open RSS, answers).
+# tier 2 = public broadcaster or national news agency: counts on its own;
+# tier 3 = private outlet: counts once a second outlet of the country reports the same.
+# Changed only after the owner's review (like docs/sources.md).
+feeds:
+  AT: [{name: orf, tier: 2, url: "https://rss.orf.at/news.xml"}]
+  BE: [{name: vrt, tier: 2, url: "https://www.vrt.be/vrtnws/nl.rss.articles.xml"}]
+  BG:
+    - {name: dnevnik, tier: 3, url: "https://www.dnevnik.bg/rss/"}
+    - {name: mediapool, tier: 3, url: "https://www.mediapool.bg/rss/"}
+    - {name: novinite, tier: 3, url: "https://www.novinite.com/services/news_rdf.php"}
+  HR: [{name: index_hr, tier: 3, url: "https://www.index.hr/rss"}]
+  CY: [{name: cyprus_mail, tier: 3, url: "https://cyprus-mail.com/feed/"}]
+  CZ:
+    - {name: ct24, tier: 2, url: "https://ct24.ceskatelevize.cz/rss/hlavni-zpravy"}
+    - {name: irozhlas, tier: 2, url: "https://www.irozhlas.cz/rss/irozhlas"}
+  DK: [{name: dr, tier: 2, url: "https://www.dr.dk/nyheder/service/feeds/allenyheder"}]
+  EE: [{name: err, tier: 2, url: "https://www.err.ee/rss"}]
+  FI: [{name: yle, tier: 2, url: "https://feeds.yle.fi/uutiset/v1/majorHeadlines/YLE_UUTISET.rss"}]
+  FR:
+    - {name: franceinfo, tier: 2, url: "https://www.francetvinfo.fr/titres.rss"}
+    - {name: lemonde, tier: 3, url: "https://www.lemonde.fr/rss/une.xml"}
+  DE: [{name: tagesschau, tier: 2, url: "https://www.tagesschau.de/index~rss2.xml"}]
+  GR: [{name: ertnews, tier: 2, url: "https://www.ertnews.gr/feed/"}]
+  HU:
+    - {name: telex, tier: 3, url: "https://telex.hu/rss"}
+    - {name: hvg, tier: 3, url: "https://hvg.hu/rss"}
+  IE:
+    - {name: thejournal, tier: 3, url: "https://www.thejournal.ie/feed/"}
+    - {name: irishtimes, tier: 3, url: "https://www.irishtimes.com/arc/outboundfeeds/feed-irish-news/?outputType=xml"}
+  IT: [{name: ansa, tier: 2, url: "https://www.ansa.it/sito/ansait_rss.xml"}]
+  LV: [{name: lsm, tier: 2, url: "https://www.lsm.lv/rss/"}]
+  LT: [{name: delfi_lt, tier: 3, url: "https://www.delfi.lt/rss/feeds/daily.xml"}]
+  LU: [{name: rtl_lu, tier: 3, url: "https://www.rtl.lu/rss/national"}]
+  MT: [{name: times_of_malta, tier: 3, url: "https://timesofmalta.com/rss/national"}]
+  NL: [{name: nos, tier: 2, url: "https://feeds.nos.nl/nosnieuwsalgemeen"}]
+  PL: [{name: rmf24, tier: 3, url: "https://www.rmf24.pl/fakty/feed"}]
+  PT: [{name: publico, tier: 3, url: "https://feeds.feedburner.com/PublicoRSS"}]
+  RO:
+    - {name: digi24, tier: 3, url: "https://www.digi24.ro/rss"}
+    - {name: hotnews, tier: 3, url: "https://www.hotnews.ro/rss"}
+  SK:
+    - {name: rtvs, tier: 2, url: "https://spravy.rtvs.sk/feed/"}
+    - {name: aktuality, tier: 3, url: "https://www.aktuality.sk/rss/"}
+  SI: [{name: rtvslo, tier: 2, url: "https://www.rtvslo.si/feeds/00.xml"}]
+  ES: [{name: elpais, tier: 3, url: "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada"}]
+  SE: [{name: svt, tier: 2, url: "https://www.svt.se/nyheter/rss.xml"}]
+  GB: [{name: bbc_uk, tier: 2, url: "https://feeds.bbci.co.uk/news/uk/rss.xml"}]
+  "NO": [{name: nrk, tier: 2, url: "https://www.nrk.no/toppsaker.rss"}]
+  CH: [{name: srf, tier: 2, url: "https://www.srf.ch/news/bnf/rss/1646"}]
+  IS: [{name: ruv, tier: 2, url: "https://www.ruv.is/rss/frettir"}]
+  MD: [{name: newsmaker, tier: 3, url: "https://newsmaker.md/ro/feed/"}]
+  RS: [{name: n1_rs, tier: 3, url: "https://n1info.rs/feed/"}]
+  ME: [{name: vijesti, tier: 3, url: "https://www.vijesti.me/rss"}]
+  MK: [{name: mia, tier: 2, url: "https://mia.mk/feed"}]
+  AL: [{name: balkanweb, tier: 3, url: "https://www.balkanweb.com/feed/"}]
+  BA:
+    - {name: klix, tier: 3, url: "https://www.klix.ba/rss"}
+    - {name: n1_ba, tier: 3, url: "https://n1info.ba/feed/"}
+  XK:
+    - {name: koha, tier: 3, url: "https://www.koha.net/rss"}
+    - {name: kallxo, tier: 3, url: "https://kallxo.com/feed/"}

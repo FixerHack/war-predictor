@@ -25,9 +25,13 @@ An escalation-signal indicator for European countries on a 0–10 scale. The sys
 
 Countries: EU-27, UK, Norway, Switzerland, Iceland, Moldova, Western Balkans (38).
 
+**Government and security forces** is a separate 0–10 scale in the country panel: signals of instability from national media (decisions favouring the aggressor, security chiefs removed or arrested, armed men without insignia and attacks by people in uniform, attempts to seize power, the leader's disappearance or unexplained moves, violent unrest, falling trust). The most serious ones also raise the tension score. Sources: [docs/sources.md](docs/sources.md) (Ukrainian).
+
+**Languages.** Ukrainian and English are written by hand; 28 more languages of the listed countries are translated by Claude (`tension-index translate`, files in `src/tension_index/locales/`). The site follows the browser's language, the bot Telegram's; event summaries are also written in the country's own language.
+
 ## Bot
 
-1. `/start` → choose a language (Українська / English).
+1. `/start` → choose a language (30 languages, Telegram's first).
 2. Choose one of 38 countries (up to 5 can be followed later).
 3. A dashboard, edited in place with inline buttons. It shows:
    - the tension score (or "calibrating" while data is thin) and the main reasons with quotes;

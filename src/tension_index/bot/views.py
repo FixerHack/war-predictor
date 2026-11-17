@@ -11,6 +11,8 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from tension_index.bot.callbacks import CountryCb, LangCb, MenuCb, ViewCb
 from tension_index.countries import COUNTRIES, get_country
 from tension_index.i18n import t
+from tension_index.languages import LANGUAGES
+from tension_index.scoring import level_for, load_config
 from tension_index.storage import MAX_FOLLOWED
 from tension_index.war_status import ICONS, WarStatus
 
@@ -45,6 +47,7 @@ class DashboardData:
     # other followed countries: (code, score or None, level or None, war status)
     others: list[tuple[str, float | None, str | None, str]] = field(default_factory=list)
     refresh_hours: float | None = None  # how often the country is re-checked (refresh.py)
+    stability: float | None = None  # institutional stability scale 0-10 (extra/stability.py)
 
 
 def _flag(code: str) -> str:
@@ -55,7 +58,11 @@ def _name(code: str, lang: str) -> str:
     if code in COUNTRIES:
         return COUNTRIES[code].title(lang)
     uk, en = EXTRA_NAMES.get(code, (code, code))
-    return uk if lang == "uk" else en
+    if lang == "uk":
+        return uk
+    from tension_index.i18n import locale
+
+    return locale(lang).get("country", {}).get(code) or en
 
 
 def bar(score: float, width: int = 10) -> str:
@@ -63,16 +70,16 @@ def bar(score: float, width: int = 10) -> str:
     return "▰" * filled + "▱" * (width - filled)
 
 
-def language_screen() -> Screen:
-    kb = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(text="🇺🇦 Українська", callback_data=LangCb(code="uk").pack()),
-                InlineKeyboardButton(text="🇬🇧 English", callback_data=LangCb(code="en").pack()),
-            ]
-        ]
-    )
-    return t(None, "choose_lang"), kb
+def language_screen(suggested: str | None = None) -> Screen:
+    """All interface languages, three per row; the one from Telegram's settings first."""
+    first = [suggested] if suggested in LANGUAGES else []
+    rest = [code for code in LANGUAGES if code not in first]
+    rows = [[InlineKeyboardButton(text=f"⭐ {LANGUAGES[code]}", callback_data=LangCb(code=code).pack())]
+            for code in first]  # fmt: skip
+    for i in range(0, len(rest), 3):
+        rows.append([InlineKeyboardButton(text=LANGUAGES[code], callback_data=LangCb(code=code).pack())
+                     for code in rest[i : i + 3]])  # fmt: skip
+    return t(suggested, "choose_lang"), InlineKeyboardMarkup(inline_keyboard=rows)
 
 
 def country_screen(lang: str, followed: list[str] | None = None) -> Screen:
@@ -120,6 +127,9 @@ def dashboard_screen(d: DashboardData) -> Screen:
             lines += [f"• {escape(r)}" for r in d.reasons]
         lines += [f"ℹ️ {escape(n)}" for n in d.notes]
 
+    if d.stability is not None:
+        key = level_for(load_config(), d.stability)
+        lines.append(f"🏛 {t(lang, 'stability')}: {LEVEL_ICONS[key]} {d.stability:.1f} / 10")
     war = d.war
     lines.append(f"{t(lang, 'war_status')}: {ICONS[war.status]} {t(lang, 'war_' + war.status)}")
     if war.note(lang):
@@ -139,7 +149,7 @@ def dashboard_screen(d: DashboardData) -> Screen:
     lines.append("")
     lines.append(f"🔔 {t(lang, 'notifications')}: {t(lang, 'on' if d.notify else 'off')}")
     lines.append(f"📰 {t(lang, 'digest')}: {t(lang, 'on' if d.digest else 'off')}")
-    lines.append(f"🌐 {t(lang, 'language')}: {t(lang, 'lang_name')}")
+    lines.append(f"🌐 {t(lang, 'language')}: {LANGUAGES.get(lang, lang)}")
     if d.updated:
         line = f"🕒 {t(lang, 'updated')}: {d.updated.replace('T', ' ')[:16]} UTC"
         if d.refresh_hours:
@@ -171,7 +181,8 @@ def dashboard_screen(d: DashboardData) -> Screen:
                     callback_data=MenuCb(action="country").pack(),
                 ),
                 InlineKeyboardButton(
-                    text=t(lang, "btn_lang"), callback_data=MenuCb(action="lang").pack()
+                    text=f"🌐 {LANGUAGES.get(lang, lang)}",
+                    callback_data=MenuCb(action="lang").pack(),
                 ),
             ],
             [

@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.6.8**, updated 2026-11-17.
+Version **0.7.0**, updated 2026-11-17.
 
-**Overall progress: 92%** · left ≈ 3.9 days · ✅ 91 · 🟡 1 · ⬜ 2 · ⛔ 4
+**Overall progress: 93%** · left ≈ 4.0 days · ✅ 94 · 🟡 1 · ⬜ 2 · ⛔ 4
 
 ## Milestones
 
@@ -117,6 +117,9 @@ Branch: `dev-news`
   - From news: emergency, borders, mobilisation (2+ feeds only; drills do not count).
 - ✅ **S4.5** Markets: bonds and FX via ECB Data Portal
   - ECB: 10-year bond spread to Germany and the exchange rate, daily; works on the server.
+- ✅ **S4.6** Government and security forces scale: 48 national outlets of all 38 countries, headlines labelled by Claude with structured cross-checks, an own 0–10 scale in the country panel, the most serious signals in the domestic block
+- ✅ **S4.7** Approve the national media list (docs/sources.md, section Ж) _(manual)_
+  - Approved 17 Nov 2026; edited if an outlet turns out unreliable.
 
 ## S5. Historical archive — 100%
 
@@ -233,6 +236,7 @@ Branch: `dev-dashboard`
 - ✅ **S11.10** A real map of Europe with borders (Natural Earth): colour by level, highlight and tooltip on hover, selection by click and keyboard; Crimea is part of Ukraine
 - ✅ **S11.11** Mobile map: pinch and +/− zoom, panning a zoomed map, legend under the map, a back-to-map button
 - ✅ **S11.12** Country chronicle for 90 days: government advice changes with a summary, news and aviation signals, score jumps; marks what does not affect the score
+- ✅ **S11.13** Localization: 30 languages (uk and en by hand, 28 machine-translated by Claude), browser and Telegram language by default, event summaries in the language of the country
 
 ## S12. Operations — 86%
 
@@ -264,6 +268,8 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-11-17: The interface comes in the 30 languages of the listed countries, without Russian; machine translation by Claude, to be spot-checked by native speakers. Event texts in Ukrainian, English and the language of the country.
+- 2026-11-17: The government and security forces scale is separate, in the country panel; data from national media; decisions favouring the aggressor and attacks by people in uniform also raise the tension score.
 - 2026-11-17: Classification rules from the owner: unrest raises the score only with violence; a removed warning drops its contribution once re-checked; stray drones and debris from a war next door are their own reason, war spillover (0.5), deliberate incursions far from a war are hybrid attacks; a lone attacker (0.1) < terrorism (0.2) < an attack by another state's military or services (military threat).
 - 2026-10-08: France's level is read from the "Zones de vigilance" text: the colour of the whole country or of zones (*_parts: yellow 0.1, orange 0.3, red 0.45 — like the UK partial warnings); a country without a stated colour is green, as on the ministry's map.
 - 2026-10-08: RU/BY MFA advice to their citizens is taken from headlines of five Russian outlets (publisher ru_media, aggressor block); GDELT tone is not used.
@@ -307,6 +313,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.7.0** (2026-11-17)
+  - New: the government and security forces scale from national media of all 38 countries in the country panel and the bot; the interface in 30 languages with automatic language choice; event summaries in the language of the country; Norway shown as a neighbour of Russia again (YAML parsing fix).
 - **0.6.8** (2026-11-17)
   - The country panel has a 90-day chronicle: what governments changed and why, news, aviation, score jumps, with a note on events that do not affect the score. One file per country, so phones load only what they open.
 - **0.6.7** (2026-11-17)

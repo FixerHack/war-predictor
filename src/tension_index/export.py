@@ -17,9 +17,12 @@ MAX_SIGNALS = 15
 
 
 def _labels(publisher: str, kind: str) -> dict:
+    # uk/en inline; the codes let the page use its translated labels for other languages.
     return {
         "publisher": {lang: explain.publisher_label(publisher, lang) for lang in ("uk", "en")},
         "kind": {lang: explain.kind_label(kind, lang) for lang in ("uk", "en")},
+        "pcode": publisher,
+        "kcode": kind,
     }
 
 
@@ -87,6 +90,7 @@ async def build(db: aiosqlite.Connection, now: datetime | None = None) -> dict:
                 for sig in sorted(by_country.get(code, []), key=lambda s: -s.strength)[:MAX_SIGNALS]
             ],
             "history": sorted(daily.items()),
+            "stability": await _stability(db, code, now),
         }
     names = {"UA": ("Україна", "Ukraine"), "RU": ("Росія", "Russia"), "BY": ("Білорусь", "Belarus")}
     context = {
@@ -104,6 +108,35 @@ async def build(db: aiosqlite.Connection, now: datetime | None = None) -> dict:
     generated = max(computed) if computed else now.isoformat(timespec="seconds")
     return {"generated_at": generated, "version": __version__,
             "countries": countries, "context": context}  # fmt: skip
+
+
+STABILITY_EVENTS = 6
+
+
+async def _stability(db: aiosqlite.Connection, code: str, now: datetime) -> dict:
+    """The institutional stability scale for the panel: score and the strongest events."""
+    from tension_index.extra.stability import stability_score
+
+    result = await stability_score(db, code, now)
+    # One event in several headlines: show it once (the strongest per kind and day).
+    best: dict[tuple[str, str], dict] = {}
+    for e in result["events"]:
+        key = (e["category"], e["at"][:10])
+        if key not in best or e["value"] > best[key]["value"]:
+            best[key] = e
+    top = sorted(best.values(), key=lambda e: -e["value"])[:STABILITY_EVENTS]
+    return {"score": result["score"], "events": [_local_title(code, e) for e in top]}
+
+
+def _local_title(code: str, event: dict) -> dict:
+    """National headlines: shown as published in the country's own language."""
+    from tension_index.languages import local_languages
+
+    text = dict(event["text"])
+    local = local_languages(code)
+    if local:
+        text[local[0]] = text["orig"]
+    return {**event, "text": text}
 
 
 CHRONICLE_EVENTS = 80
@@ -135,14 +168,14 @@ async def chronicle(db: aiosqlite.Connection, code: str, now: datetime | None = 
             events.append({
                 "at": row["detected_at"][:16], "type": "advice", "change": cls.change_type,
                 "reason": cls.reason, "counted": bool(row["active"]),
-                "text": {"uk": cls.summary_uk or cls.summary_en, "en": cls.summary_en},
+                "text": {"uk": cls.summary_uk or cls.summary_en, "en": cls.summary_en} | cls.summaries,
                 "quote": cls.quote,
             } | _labels(row["source"], f"advisory_update:{cls.change_type}"))  # fmt: skip
 
     async with db.execute(
         "SELECT publisher, kind, observed_at, confirmed, active, note, note_uk FROM signals "
         "WHERE country = ? AND observed_at >= ? AND ref NOT LIKE 'change:%' "
-        "AND ref NOT LIKE 'snapshot:%'",
+        "AND ref NOT LIKE 'snapshot:%' AND ref NOT LIKE 'national:%'",  # those: type stability
         (code, since),
     ) as cur:
         for row in await cur.fetchall():
@@ -152,6 +185,17 @@ async def chronicle(db: aiosqlite.Connection, code: str, now: datetime | None = 
                 "confirmed": bool(row["confirmed"]),
                 "text": {"uk": row["note_uk"] or row["note"], "en": row["note"]},
             } | _labels(row["publisher"], row["kind"]))  # fmt: skip
+
+    from tension_index.extra.stability import confirmed
+    from tension_index.extra.stability import events as stability_events
+
+    rows = await stability_events(db, code, since)
+    for row in rows:
+        events.append(_local_title(code, {
+            "at": row["published"][:16], "type": "stability", "category": row["category"],
+            "counted": confirmed(row, rows), "feed": row["feed"],
+            "text": {"orig": row["title"], "uk": row["title_uk"] or row["title_en"], "en": row["title_en"]},
+        }))  # fmt: skip
 
     async with db.execute(
         "SELECT computed_at, score FROM scores WHERE country = ? AND computed_at >= ? "

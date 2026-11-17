@@ -336,6 +336,27 @@ async def _classify() -> int:
     return 0
 
 
+async def _translate(args: argparse.Namespace) -> int:
+    from tension_index.i18n import LOCALES
+    from tension_index.pipeline import make_classifier
+    from tension_index.translate import targets, translate_lang
+
+    settings = get_settings()
+    claude = make_classifier(settings)
+    if claude is None:
+        print("No Claude provider configured (CLASSIFIER_PROVIDER): nothing translated")
+        return 2
+    out = Path(args.out) if args.out else LOCALES
+    out.mkdir(parents=True, exist_ok=True)
+    for lang in targets(args.lang):
+        stats = await translate_lang(claude, lang, out, args.parallel)
+        print(f"{lang}: {stats}")
+        if claude.stopped:
+            print(f"stopped: {claude.stopped}")
+            return 2
+    return 0
+
+
 def _history_db(args: argparse.Namespace) -> Path:
     return Path(args.db)
 
@@ -476,6 +497,13 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("bot", help="run the Telegram bot (long polling)")
 
     sub.add_parser("classify", help="classify new changes and current advisories")
+
+    p = sub.add_parser("translate", help="machine-translate the interface (locales/<lang>.json)")
+    p.add_argument("--lang", type=_csv, help="language codes (default: all but uk and en)")
+    p.add_argument("--out", help="directory for the locale files (default: the package's locales/)")
+    p.add_argument(
+        "--parallel", type=int, default=2, help="model calls at once (spares usage limits)"
+    )
     sub.add_parser("digest", help="send the daily summary to users with the digest on")
 
     p = sub.add_parser("changes", help="show recent advisory changes with their diff")
@@ -554,6 +582,7 @@ def main(argv: list[str] | None = None) -> None:
         "war-check": lambda: _war_check(args),
         "probe": lambda: _probe(args),
         "classify": lambda: _classify(),
+        "translate": lambda: _translate(args),
         "run": lambda: _run(args),
         "gdelt": lambda: _gdelt(args),
         "digest": lambda: _digest(),

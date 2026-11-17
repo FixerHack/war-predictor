@@ -1,9 +1,50 @@
-"""User-facing strings for the bot (uk/en)."""
+"""User-facing strings for the bot (uk/en here; other languages from locales/<lang>.json).
+
+Ukrainian and English are written by hand below. `tension-index translate` machine-translates
+them, the site texts and the source/event labels into the other languages (languages.py);
+a key missing in a translation falls back to English.
+"""
 
 from __future__ import annotations
 
-LANGS = ("uk", "en")
+import json
+from functools import cache
+from pathlib import Path
+
+from tension_index.languages import LANGUAGES, SOURCE
+
+LANGS = tuple(LANGUAGES)
 DEFAULT_LANG = "uk"
+LOCALES = Path(__file__).resolve().parent / "locales"
+SITE_I18N = Path(__file__).resolve().parents[2] / "site" / "dashboard" / "i18n"
+
+
+@cache
+def locale(lang: str) -> dict:
+    """A machine-translated catalog: {"site": ..., "bot": ..., "pub": ..., "kind": ...,
+    "country": ...}; empty for source languages or when not translated yet."""
+    path = LOCALES / f"{lang}.json"
+    if lang in SOURCE or not path.exists():
+        return {}
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def site_catalog(lang: str) -> dict | None:
+    """The page's i18n/<lang>.json: site texts plus source and event labels."""
+    from tension_index import explain
+
+    if lang in SOURCE:
+        base = json.loads((SITE_I18N / f"{lang}.json").read_text(encoding="utf-8"))
+        i = SOURCE.index(lang)
+        return base | {
+            "pub": {k: v[i] for k, v in explain.PUBLISHERS.items()},
+            "kind": {k: v[i] for k, v in explain.KINDS.items()},
+        }
+    loc = locale(lang)
+    if not loc:
+        return None
+    return loc.get("site", {}) | {"pub": loc.get("pub", {}), "kind": loc.get("kind", {})}
+
 
 TEXTS: dict[str, dict[str, str]] = {
     "choose_lang": {
@@ -28,8 +69,8 @@ TEXTS: dict[str, dict[str, str]] = {
     "on": {"uk": "увімкнено", "en": "on"},
     "off": {"uk": "вимкнено", "en": "off"},
     "language": {"uk": "Мова", "en": "Language"},
-    "lang_name": {"uk": "українська", "en": "English"},
     "updated": {"uk": "Оновлено", "en": "Updated"},
+    "stability": {"uk": "Влада й силові структури", "en": "Government & security forces"},
     "refresh_every": {"uk": "перевірка кожні {hours} год", "en": "checked every {hours} h"},
     "refresh_hourly": {"uk": "перевірка щогодини", "en": "checked hourly"},
     "disclaimer": {
@@ -63,7 +104,6 @@ TEXTS: dict[str, dict[str, str]] = {
         "uk": "У регіоні без помітних змін.",
         "en": "No notable changes in the region.",
     },
-    "btn_lang": {"uk": "🌐 English", "en": "🌐 Українська"},
     "btn_refresh": {"uk": "🔄 Оновити", "en": "🔄 Refresh"},
     "btn_about": {"uk": "ℹ️ Як рахується", "en": "ℹ️ How it works"},
     "btn_back": {"uk": "« Назад", "en": "« Back"},
@@ -198,5 +238,11 @@ TEXTS: dict[str, dict[str, str]] = {
 
 def t(lang: str | None, key: str, **kwargs: object) -> str:
     entry = TEXTS[key]
-    text = entry.get(lang or DEFAULT_LANG) or entry[DEFAULT_LANG]
+    lang = lang or DEFAULT_LANG
+    text = (
+        entry.get(lang)
+        or locale(lang).get("bot", {}).get(key)
+        or entry.get("en")
+        or entry[DEFAULT_LANG]
+    )
     return text.format(**kwargs) if kwargs else text

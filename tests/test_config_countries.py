@@ -51,3 +51,23 @@ def test_bad_setting_gives_a_readable_error(monkeypatch, capsys):
     assert exit_info.value.code == 2
     err = capsys.readouterr().err
     assert "CLASSIFIER_PROVIDER = 'gpt'" in err and "Traceback" not in err
+
+
+def test_yaml_country_keys_are_not_booleans():
+    """Bare NO (Norway) is YAML for false: country keys must be quoted."""
+    import glob
+
+    import yaml
+
+    def walk(node, path):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                assert not isinstance(key, bool), f"{path}: a key read as {key}; quote it"
+                walk(value, path)
+        elif isinstance(node, list):
+            for value in node:
+                walk(value, path)
+
+    for path in glob.glob("config/*.yaml"):
+        with open(path, encoding="utf-8") as f:
+            walk(yaml.safe_load(f), path)

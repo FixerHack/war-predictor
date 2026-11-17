@@ -22,6 +22,7 @@ BLOCKS = {
     "gdelt": "media",
     "ru_mfa": "aggressor",
     "ecb": "markets",
+    "national": "domestic",  # stability.py, run by the runner for the countries due
 }
 
 # Collectors that run once a day: allowed staleness for health checks.

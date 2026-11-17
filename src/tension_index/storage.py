@@ -196,6 +196,24 @@ MIGRATIONS: list[str] = [
         WHERE kind = 'aggressor:mfa_advisory' AND (note LIKE '%выясня%' OR note LIKE '%пострадал%'
             OR note LIKE '%погиб%' OR note LIKE '%ранен%' OR note LIKE '%задержан%');
     """,
+    # 13: national media headlines for the institutional stability scale (extra/stability.py)
+    """
+    CREATE TABLE national_items (
+        url             TEXT PRIMARY KEY,
+        country         TEXT NOT NULL,
+        feed            TEXT NOT NULL,
+        tier            INTEGER NOT NULL,
+        title           TEXT NOT NULL,
+        published       TEXT NOT NULL,
+        seen_at         TEXT NOT NULL,
+        classified      INTEGER NOT NULL DEFAULT 0,
+        category        TEXT NOT NULL DEFAULT 'none',
+        severity        REAL NOT NULL DEFAULT 0,
+        title_uk        TEXT NOT NULL DEFAULT '',
+        title_en        TEXT NOT NULL DEFAULT ''
+    );
+    CREATE INDEX ix_national_items_country ON national_items (country, published);
+    """,
 ]
 
 

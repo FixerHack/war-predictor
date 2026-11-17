@@ -39,7 +39,7 @@ countries:
   LV: {status: none, borders_aggressor: [BY, RU]}
   EE: {status: none, borders_aggressor: [RU]}
   FI: {status: none, borders_aggressor: [RU]}
-  NO: {status: none, borders_aggressor: [RU]}
+  "NO": {status: none, borders_aggressor: [RU]}  # quoted: bare NO is YAML for false
   SK: {status: none, borders_war: [UA]}
   HU: {status: none, borders_war: [UA]}
   RO: {status: none, borders_war: [UA]}

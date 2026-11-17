@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.6.8
+  version: 0.7.0
   updated: 2026-11-17
 
 milestones:
@@ -108,6 +108,8 @@ stages:
       - {id: S4.3, status: done, days: 0.5, uk: "CrisisWatch: погіршення і Conflict Risk Alert", en: "CrisisWatch: deterioration and Conflict Risk Alerts", note_uk: "Стрічка Crisis Group серед новинних стрічок (рівень 2).", note_en: "Crisis Group feed among the news feeds (tier 2)."}
       - {id: S4.4, status: done, days: 1, uk: "Внутрішні заходи країни: мобілізація, надзвичайні укази, кордони", en: "Domestic measures: mobilisation, emergency decrees, border closures", note_uk: "З новин: надзвичайний стан, кордони, мобілізація (лише з 2+ стрічок; навчання не рахуються).", note_en: "From news: emergency, borders, mobilisation (2+ feeds only; drills do not count)."}
       - {id: S4.5, status: done, days: 0.5, uk: "Ринки: облігації і курси через ECB Data Portal", en: "Markets: bonds and FX via ECB Data Portal", note_uk: "ЄЦБ: спред 10-річних облігацій до Німеччини і курс валюти, раз на добу; працює на сервері.", note_en: "ECB: 10-year bond spread to Germany and the exchange rate, daily; works on the server."}
+      - {id: S4.6, status: done, days: 1.5, uk: "Шкала «Влада й силові структури»: 48 національних ЗМІ всіх 38 країн, класифікація заголовків через Claude зі структурними перевірками, власна шкала 0–10 у панелі країни, найсерйозніші сигнали — у блок внутрішніх заходів", en: "Government and security forces scale: 48 national outlets of all 38 countries, headlines labelled by Claude with structured cross-checks, an own 0–10 scale in the country panel, the most serious signals in the domestic block"}
+      - {id: S4.7, status: done, days: 0.2, owner: human, uk: "Затвердити перелік національних ЗМІ (docs/sources.md, розділ Ж)", en: "Approve the national media list (docs/sources.md, section Ж)", note_uk: "Затверджено 17.11.2026; редагується, якщо видання писатиме неякісне.", note_en: "Approved 17 Nov 2026; edited if an outlet turns out unreliable."}
 
   - id: S5
     branch: dev-history
@@ -208,6 +210,7 @@ stages:
       - {id: S11.10, status: done, days: 0.5, uk: "Справжня карта Європи з кордонами (Natural Earth): колір за рівнем, підсвічування й підказка при наведенні, вибір кліком і з клавіатури; Крим — частина України", en: "A real map of Europe with borders (Natural Earth): colour by level, highlight and tooltip on hover, selection by click and keyboard; Crimea is part of Ukraine"}
       - {id: S11.11, status: done, days: 0.5, uk: "Мобільна версія карти: масштаб двома пальцями й кнопками +/−, перетягування збільшеної карти, легенда під картою, кнопка повернення до карти", en: "Mobile map: pinch and +/− zoom, panning a zoomed map, legend under the map, a back-to-map button"}
       - {id: S11.12, status: done, days: 0.5, uk: "Хроніка країни за 90 днів: зміни рекомендацій урядів з описом, новинні й авіаційні сигнали, стрибки балу; позначено, що на бал не впливає", en: "Country chronicle for 90 days: government advice changes with a summary, news and aviation signals, score jumps; marks what does not affect the score"}
+      - {id: S11.13, status: done, days: 1, uk: "Локалізація: 30 мов (uk і en вручну, 28 машинно через Claude), мова браузера й Telegram за замовчуванням, описи подій мовою країни", en: "Localization: 30 languages (uk and en by hand, 28 machine-translated by Claude), browser and Telegram language by default, event summaries in the language of the country"}
   - id: S12
     branch: dev-ops
     uk: Експлуатація
@@ -233,6 +236,8 @@ stages:
       - {id: S13.3, status: done, days: 0.3, uk: "Кожне сповіщення містить джерело, опис зміни і цитату", en: "Every alert contains the source, a description of the change and a quote", note_uk: "Сповіщення про зміну рекомендації: джерело, опис (класифікатор) і цитата; про зміну балу: хто, що і цитати.", note_en: "Advisory alerts: source, description (classifier) and quote; score alerts: who, what and quotes."}
 
 decisions:
+  - {date: 2026-11-17, uk: "Інтерфейс — 30 мовами країн зі списку, без російської; машинний переклад через Claude, мови можна вибірково показати носіям. Тексти подій — українською, англійською й мовою відповідної країни.", en: "The interface comes in the 30 languages of the listed countries, without Russian; machine translation by Claude, to be spot-checked by native speakers. Event texts in Ukrainian, English and the language of the country."}
+  - {date: 2026-11-17, uk: "Шкала «Влада й силові структури» — окрема, у панелі країни; дані з національних ЗМІ; рішення на користь агресора й напади людей у формі також піднімають загальний бал.", en: "The government and security forces scale is separate, in the country panel; data from national media; decisions favouring the aggressor and attacks by people in uniform also raise the tension score."}
   - {date: 2026-11-17, uk: "Правила класифікації від власника: протести піднімають бал лише з насильством; зняте попередження знімає свій внесок одразу після повторної перевірки; випадкові дрони й уламки з війни поруч — окрема причина «наслідки війни поруч» (0.5), навмисні вторгнення далеко від війни — гібридна атака; напад одинака (0.1) < теракт (0.2) < атака військових чи спецслужб іншої держави (військова загроза).", en: "Classification rules from the owner: unrest raises the score only with violence; a removed warning drops its contribution once re-checked; stray drones and debris from a war next door are their own reason, war spillover (0.5), deliberate incursions far from a war are hybrid attacks; a lone attacker (0.1) < terrorism (0.2) < an attack by another state's military or services (military threat)."}
   - {date: 2026-10-08, uk: "Рівень Франції читається з тексту розділу «Zones de vigilance»: колір усієї країни або зони (*_parts: жовтий 0.1, помаранчевий 0.3, червоний 0.45 — як часткові попередження Британії); без названого кольору країна зелена, як на карті МЗС.", en: "France's level is read from the \"Zones de vigilance\" text: the colour of the whole country or of zones (*_parts: yellow 0.1, orange 0.3, red 0.45 — like the UK partial warnings); a country without a stated colour is green, as on the ministry's map."}
   - {date: 2026-10-08, uk: "Поради МЗС РФ/РБ своїм громадянам беруться із заголовків п'яти російських видань (публікатор ru_media, блок «агресор»); тональність GDELT не використовується.", en: "RU/BY MFA advice to their citizens is taken from headlines of five Russian outlets (publisher ru_media, aggressor block); GDELT tone is not used."}
@@ -274,6 +279,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.7.0
+    date: 2026-11-17
+    uk: ["Нове: шкала «Влада й силові структури» з національних ЗМІ всіх 38 країн у панелі країни й боті; інтерфейс 30 мовами з автоматичним вибором мови; описи подій мовою країни; Норвегія знову показана сусідом Росії (виправлено читання YAML)."]
+    en: ["New: the government and security forces scale from national media of all 38 countries in the country panel and the bot; the interface in 30 languages with automatic language choice; event summaries in the language of the country; Norway shown as a neighbour of Russia again (YAML parsing fix)."]
   - version: 0.6.8
     date: 2026-11-17
     uk: ["У панелі країни з'явилася хроніка за 90 днів: що змінили уряди й чому, новини, авіація, стрибки балу; біля подій, що не впливають на бал, є пояснення. Дані окремим файлом на країну, тож на телефоні вантажиться лише потрібне."]
