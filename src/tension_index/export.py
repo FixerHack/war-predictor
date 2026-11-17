@@ -118,7 +118,13 @@ async def _stability(db: aiosqlite.Connection, code: str, now: datetime) -> dict
     from tension_index.extra.stability import stability_score
 
     result = await stability_score(db, code, now)
-    top = sorted(result["events"], key=lambda e: -e["value"])[:STABILITY_EVENTS]
+    # One event in several headlines: show it once (the strongest per kind and day).
+    best: dict[tuple[str, str], dict] = {}
+    for e in result["events"]:
+        key = (e["category"], e["at"][:10])
+        if key not in best or e["value"] > best[key]["value"]:
+            best[key] = e
+    top = sorted(best.values(), key=lambda e: -e["value"])[:STABILITY_EVENTS]
     return {"score": result["score"], "events": [_local_title(code, e) for e in top]}
 
 
