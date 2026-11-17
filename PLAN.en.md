@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.6.6**, updated 2026-11-17.
+Version **0.6.7**, updated 2026-11-17.
 
-**Overall progress: 92%** · left ≈ 3.9 days · ✅ 89 · 🟡 1 · ⬜ 2 · ⛔ 4
+**Overall progress: 92%** · left ≈ 3.9 days · ✅ 90 · 🟡 1 · ⬜ 2 · ⛔ 4
 
 ## Milestones
 
@@ -231,6 +231,7 @@ Branch: `dev-dashboard`
 - ✅ **S11.9** Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)
   - Running since 2026-10-05: tension-pages.timer, deploy key server-pages (this repository only).
 - ✅ **S11.10** A real map of Europe with borders (Natural Earth): colour by level, highlight and tooltip on hover, selection by click and keyboard; Crimea is part of Ukraine
+- ✅ **S11.11** Mobile map: pinch and +/− zoom, panning a zoomed map, legend under the map, a back-to-map button
 
 ## S12. Operations — 86%
 
@@ -305,6 +306,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.6.7** (2026-11-17)
+  - The map zooms with two fingers, +/− buttons or a trackpad pinch and pans when zoomed; on phones it is on the first screen with the legend below, and a Map button appears after choosing a country.
 - **0.6.6** (2026-11-17)
   - Classifier after reviewing 50 changes: unrest counts only with violence, removed warnings drop their contribution, new reasons war spillover and lone attacker, verbatim quotes only; fixed Poland's false alarm (a consular news item of the Russian embassy counted as MFA advice).
 - **0.6.5** (2026-11-17)
