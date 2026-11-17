@@ -25,6 +25,7 @@ from tension_index.bot.callbacks import CountryCb, LangCb, MenuCb, ViewCb
 from tension_index.collector import collect_all, make_client
 from tension_index.config import Settings, get_settings
 from tension_index.countries import COUNTRIES
+from tension_index.extra.stability import stability_score
 from tension_index.health import run_checks
 from tension_index.i18n import LANGS, t
 from tension_index.languages import normalize
@@ -71,6 +72,7 @@ async def build_dashboard(db: aiosqlite.Connection, user: storage.User) -> views
         digest=user.digest,
         others=others,
         refresh_hours=interval_hours(score_row["score"] if published else None),
+        stability=(await stability_score(db, user.country))["score"],
     )
     return views.dashboard_screen(data)
 

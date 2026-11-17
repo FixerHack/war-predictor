@@ -19,6 +19,7 @@ PUBLISHERS = {
     "news": ("📰 Новини", "📰 News"),
     "ru_media": ("🇷🇺 Російські медіа про поради МЗС РФ/РБ", "🇷🇺 Russian media on RU/BY MFA advice"),
     "ecb": ("💶 Ринки (ЄЦБ)", "💶 Markets (ECB)"),
+    "national": ("🏛 Національні ЗМІ", "🏛 National media"),
 }
 KINDS = {
     "advisory_level": ("рівень рекомендації", "advisory level"),
@@ -41,6 +42,13 @@ KINDS = {
     "media:gdelt_surge": ("сплеск уваги медіа до військової теми", "surge of military-related coverage"),
     "markets:spread_jump": ("стрибок спреду облігацій", "bond spread jump"),
     "markets:fx_drop": ("падіння курсу валюти", "currency drop"),
+    "domestic:pro_aggressor_policy": ("рішення влади на користь агресора", "authorities' decisions favouring the aggressor"),
+    "domestic:security_purge": ("звільнення чи арешт керівників силових структур", "removal or arrest of security chiefs"),
+    "domestic:armed_unmarked": ("озброєні люди без розпізнавальних знаків, напади людей у формі", "armed men without insignia, attacks by people in uniform"),
+    "domestic:power_grab": ("спроба захоплення влади, неконституційні надзвичайні заходи", "attempt to seize power, unconstitutional emergency rule"),
+    "domestic:leader_absence": ("зникнення чи незвичні переміщення лідера", "the leader's disappearance or unexplained moves"),
+    "domestic:violent_unrest": ("насильницькі заворушення проти влади", "violent unrest against the authorities"),
+    "domestic:trust_drop": ("падіння довіри до влади, армії чи поліції", "falling trust in government, army or police"),
 }  # fmt: skip
 
 

@@ -148,3 +148,20 @@ levels:
 # score = 10 * R_adj ** curve_gamma. gamma < 1 spreads the low end of the scale so early,
 # moderate signals are visible; decisive events are handled by floors.
 curve_gamma: 0.7
+
+# Institutional stability (extra/stability.py): national media headlines about a country's own
+# government, president, army, police and security services. Its own 0-10 scale in the country
+# panel; the strongest kinds also add a domestic signal to the tension score (`tension`).
+stability:
+  window_days: 30            # events older than this are history (the chronicle keeps them)
+  half_life_days: 10
+  unconfirmed_factor: 0.5    # one private outlet only (tier 3) until a second one reports it
+  curve_gamma: 0.7           # same stretch of the low end as the tension score
+  categories:
+    pro_aggressor_policy: {weight: 0.6, tension: 0.35}   # decisions favouring Russia/Belarus
+    security_purge: {weight: 0.5, tension: 0.25}         # top military/police/intelligence removed or arrested
+    armed_unmarked: {weight: 0.8, tension: 0.6}          # armed men without insignia, attacks by people in uniform
+    power_grab: {weight: 0.9, tension: 0.5}              # coup attempt, irregular emergency rule, elections cancelled
+    leader_absence: {weight: 0.5, tension: 0.2}          # head of state disappears, unexplained moves, flees
+    violent_unrest: {weight: 0.4, tension: 0.15}         # violent mass protests against the authorities
+    trust_drop: {weight: 0.2, tension: 0.0}              # polls: low or falling trust in police, army, government

@@ -18,6 +18,7 @@ from tension_index import extra, storage
 from tension_index.collector import RunResult, collect_all, make_client
 from tension_index.config import Settings
 from tension_index.countries import COUNTRIES
+from tension_index.extra.stability import collect_stability
 from tension_index.pipeline import (
     ScoreUpdate,
     classification_of,
@@ -158,6 +159,14 @@ async def run_cycle(
                 continue
             log.info("collecting %s", name)
             report.results.append(await run_extra(db, client, settings, name))
+        # National media on the countries' own institutions (stability scale), countries due.
+        try:
+            stability = await asyncio.wait_for(
+                collect_stability(db, client, settings, countries=report.due), 300.0
+            )
+            report.results.append(stability)
+        except (httpx.HTTPError, ValueError, KeyError, TimeoutError) as exc:
+            log.warning("collector national failed: %s", exc)
         report.classified = await classify_pending(db, settings, make_classifier(settings))
         await derive_advisory_signals(db)
         report.updates = await score_all(db)

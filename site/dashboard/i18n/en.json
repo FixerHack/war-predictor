@@ -174,5 +174,21 @@
     "Sources: travel advice of the governments of the United Kingdom (contains public sector information licensed under the Open Government Licence v3.0), the United States, Germany, Canada and France; EASA bulletins; OpenSky Network; GDELT Project; ECB Data Portal; news feeds (headlines and links only); country shapes: Natural Earth (public domain). Rights to the materials belong to their owners."
    ]
   ]
- ]
+ ],
+ "stab": {
+  "title": "Government and security forces",
+  "value": "signals of instability",
+  "desc": "From the country's national media: decisions favouring the aggressor, security chiefs removed or arrested, armed men without insignia, the leader's disappearance, violent unrest, falling trust. 0 means no such signals. It describes what is reported, not a forecast.",
+  "none": "No such signals in the last 30 days.",
+  "unconfirmed": "one source, unconfirmed",
+  "cat": {
+   "pro_aggressor_policy": "Decisions favouring the aggressor",
+   "security_purge": "Security chiefs removed or arrested",
+   "armed_unmarked": "Armed men without insignia, attacks by people in uniform",
+   "power_grab": "Attempt to seize power",
+   "leader_absence": "Leader's disappearance or unexplained moves",
+   "violent_unrest": "Violent unrest",
+   "trust_drop": "Falling trust"
+  }
+ }
 }

@@ -12,6 +12,7 @@ from tension_index.bot.callbacks import CountryCb, LangCb, MenuCb, ViewCb
 from tension_index.countries import COUNTRIES, get_country
 from tension_index.i18n import t
 from tension_index.languages import LANGUAGES
+from tension_index.scoring import level_for, load_config
 from tension_index.storage import MAX_FOLLOWED
 from tension_index.war_status import ICONS, WarStatus
 
@@ -46,6 +47,7 @@ class DashboardData:
     # other followed countries: (code, score or None, level or None, war status)
     others: list[tuple[str, float | None, str | None, str]] = field(default_factory=list)
     refresh_hours: float | None = None  # how often the country is re-checked (refresh.py)
+    stability: float | None = None  # institutional stability scale 0-10 (extra/stability.py)
 
 
 def _flag(code: str) -> str:
@@ -125,6 +127,9 @@ def dashboard_screen(d: DashboardData) -> Screen:
             lines += [f"• {escape(r)}" for r in d.reasons]
         lines += [f"ℹ️ {escape(n)}" for n in d.notes]
 
+    if d.stability is not None:
+        key = level_for(load_config(), d.stability)
+        lines.append(f"🏛 {t(lang, 'stability')}: {LEVEL_ICONS[key]} {d.stability:.1f} / 10")
     war = d.war
     lines.append(f"{t(lang, 'war_status')}: {ICONS[war.status]} {t(lang, 'war_' + war.status)}")
     if war.note(lang):

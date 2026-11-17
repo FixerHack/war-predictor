@@ -62,6 +62,9 @@ h1 { font-size: clamp(1.4rem, 4vw, 2.1rem); margin: 0; line-height: 1.15; }
 .map { position: relative; }
 .geo { display: block; width: 100%; height: auto; background: var(--sea); border-radius: 10px; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
 .geo path, .geo circle { vector-effect: non-scaling-stroke; }
+.stab { display: flex; align-items: baseline; gap: 8px; margin: 4px 0; }
+.stab .sn { font-weight: 700; font-size: 1.25rem; padding: 1px 9px; border-radius: 6px; }
+.small { font-size: 0.8rem; margin: 4px 0 6px; }
 .cday { margin: 12px 0 4px; font-size: 0.8rem; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: .02em; }
 ul.chron { list-style: none; margin: 0; padding: 0 0 0 12px; border-left: 2px solid var(--line); }
 ul.chron li { margin: 0 0 8px; font-size: 0.88rem; line-height: 1.4; }
@@ -556,6 +559,13 @@ function chronicleView(code) {
   for (const e of shown) {
     const d = e.at.slice(0, 10);
     if (d !== day) { html += `${day ? "</ul>" : ""}<div class="cday">${esc(fmtDay(d))}</div><ul class="chron">`; day = d; }
+    if (e.type === "stability") {
+      const s = t.stab || { cat: {} };
+      const text = e.text[lang] || e.text.en || e.text.orig;
+      html += `<li${e.counted ? "" : ' class="quiet"'}><div class="cwho">🏛 ${esc(s.cat[e.category] || e.category)}
+        ${e.counted ? "" : `<span class="badge">${esc(s.unconfirmed || "")}</span>`}</div><div class="ctext">${esc(text)}</div></li>`;
+      continue;
+    }
     if (e.type === "score") {
       const up = e.to > e.from;
       html += `<li class="cscore ${up ? "up" : "down"}">${up ? "▲" : "▼"} ${esc(t.scoreMove)}: <b>${e.from.toFixed(1)} → ${e.to.toFixed(1)}</b></li>`;
@@ -575,6 +585,25 @@ function chronicleView(code) {
 function fmtDay(d) {
   const [y, m, dd] = d.split("-").map(Number);
   return new Date(Date.UTC(y, m - 1, dd)).toLocaleDateString(lang === "en" ? "en-GB" : lang, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+}
+
+const levelOf = (v) => (v < 3 ? "green" : v < 5 ? "yellow" : v < 7 ? "orange" : v < 9 ? "red" : "critical");
+
+function stabilityView(c) {
+  const t = T[lang], st = c.stability, s = t.stab || {};
+  if (!st || !s.title) return "";
+  const key = levelOf(st.score), i = LEVELS.indexOf(key);
+  const head = `<div class="sub">🏛 ${esc(s.title)}</div>
+    <div class="stab"><span class="sn" style="background:var(--l${i});color:var(--on${i})">${st.score.toFixed(1)}</span>
+    <span class="muted">/ 10 · ${esc(s.value)}</span></div><p class="muted small">${esc(s.desc)}</p>`;
+  if (!st.events.length) return `${head}<p class="muted">${esc(s.none)}</p>`;
+  const items = st.events.map((e) => {
+    const text = e.text[lang] || e.text.en || e.text.orig;
+    return `<li${e.confirmed ? "" : ' class="quiet"'}><div class="cwho">${esc(s.cat[e.category] || e.category)}
+      ${e.confirmed ? "" : `<span class="badge">${esc(s.unconfirmed)}</span>`}</div>
+      <div class="ctext">${esc(text)}</div><div class="muted small">${esc(fmtDay(e.at.slice(0, 10)))}</div></li>`;
+  }).join("");
+  return `${head}<ul class="chron">${items}</ul>`;
 }
 
 function currentCode() {
@@ -601,7 +630,7 @@ function renderPanel() {
   const war = `<div class="sub">${esc(t.war)}</div><div>${WAR[c.war.status] || "🟢"} ${esc(t.warS[c.war.status])}${c.war.note[lang] ? `<div class="muted">${esc(c.war.note[lang])}</div>` : ""}</div>`;
   const legacy = !c.blocks && c.reasons[lang].length ? `<div class="sub">${esc(t.why)}</div><ul>${c.reasons[lang].map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : "";
   const hist = c.history.length ? `<div class="sub">${esc(t.history)}</div>${chart(c.history)}` : "";
-  panel.innerHTML = `<h2>${c.flag} ${esc(c.name[lang])}</h2>${score}${summary(c)}${legacy}${blocksView(c)}${signalsView(c)}${war}${hist}` +
+  panel.innerHTML = `<h2>${c.flag} ${esc(c.name[lang])}</h2>${score}${summary(c)}${stabilityView(c)}${legacy}${blocksView(c)}${signalsView(c)}${war}${hist}` +
     chronicleView(code) + (c.updated ? `<p class="muted">${esc(t.updated)}: ${esc(fmtDate(c.updated))} UTC</p>` : "");
   wireChart(c.history);
   const more = document.getElementById("chronMore");

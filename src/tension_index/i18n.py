@@ -70,6 +70,7 @@ TEXTS: dict[str, dict[str, str]] = {
     "off": {"uk": "вимкнено", "en": "off"},
     "language": {"uk": "Мова", "en": "Language"},
     "updated": {"uk": "Оновлено", "en": "Updated"},
+    "stability": {"uk": "Влада й силові структури", "en": "Government & security forces"},
     "refresh_every": {"uk": "перевірка кожні {hours} год", "en": "checked every {hours} h"},
     "refresh_hourly": {"uk": "перевірка щогодини", "en": "checked hourly"},
     "disclaimer": {
