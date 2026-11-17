@@ -59,6 +59,7 @@
   "bot.others": "2914a4cdf1",
   "bot.refresh_every": "308d2c8362",
   "bot.refresh_hourly": "3aab97441c",
+  "bot.stability": "0fe47f774f",
   "bot.tension": "471e1c6039",
   "bot.title": "76fcb43076",
   "bot.updated": "f2f8570ddd",
@@ -116,9 +117,16 @@
   "kind.aviation:airspace_restricted": "2c319db532",
   "kind.aviation:czib": "bfb6a097ac",
   "kind.aviation:traffic_drop": "00b4c0d1b0",
+  "kind.domestic:armed_unmarked": "68ea26680f",
   "kind.domestic:borders_closed": "10400d69ec",
   "kind.domestic:emergency": "8dac24287a",
+  "kind.domestic:leader_absence": "84fd8b2324",
   "kind.domestic:mobilisation": "653b4d81f1",
+  "kind.domestic:power_grab": "b27ce5a80a",
+  "kind.domestic:pro_aggressor_policy": "ffbcdbaecb",
+  "kind.domestic:security_purge": "c9ac4e992d",
+  "kind.domestic:trust_drop": "aba595cb28",
+  "kind.domestic:violent_unrest": "1a3c075326",
   "kind.markets:fx_drop": "94274d5dbd",
   "kind.markets:spread_jump": "e89e6443e8",
   "kind.media:escalation_news": "414475d034",
@@ -135,6 +143,7 @@
   "pub.fr": "8b2a2e5330",
   "pub.gdelt": "8ec41a3c28",
   "pub.gov_uk": "3e1ba71886",
+  "pub.national": "1317b090ce",
   "pub.news": "d0b6c94924",
   "pub.opensky": "9a1619170e",
   "pub.ru_media": "b806c862c3",
@@ -200,6 +209,17 @@
   "site.mean.yellow": "ffbff608b1",
   "site.method": "bea938552b",
   "site.methodFull.0.0": "c766226e55",
+  "site.methodFull.0.1.0": "0a9cb5676e",
+  "site.methodFull.0.1.1": "a44916d509",
+  "site.methodFull.1.0": "a21e5c6be8",
+  "site.methodFull.1.1": "fca1c10086",
+  "site.methodFull.2.0": "087d1d3afd",
+  "site.methodFull.2.1": "30dd05781f",
+  "site.methodFull.3.0": "c863aeb9f6",
+  "site.methodFull.3.1.0": "8f3831e5ee",
+  "site.methodFull.3.1.1": "6158fc7c63",
+  "site.methodFull.3.1.2": "7e8c6e9656",
+  "site.methodFull.4.0": "ccdd482982",
   "site.methodFull.4.1.0": "28c971a261",
   "site.methodFull.4.1.1": "9632e1e6d7",
   "site.methodFull.4.1.2": "87534c65f3",
@@ -227,6 +247,18 @@
   "site.scoreMove": "40095d098f",
   "site.seenT": "2f2e87cde0",
   "site.sources": "2eb56be3c2",
+  "site.stab.cat.armed_unmarked": "977f994979",
+  "site.stab.cat.leader_absence": "cb621231e5",
+  "site.stab.cat.power_grab": "bd9f681388",
+  "site.stab.cat.pro_aggressor_policy": "1236bd7e38",
+  "site.stab.cat.security_purge": "932ae7d1b1",
+  "site.stab.cat.trust_drop": "a7273de34c",
+  "site.stab.cat.violent_unrest": "d9a6efa8b3",
+  "site.stab.desc": "86d4ee69db",
+  "site.stab.none": "3bfa263c25",
+  "site.stab.title": "cd03e85e6a",
+  "site.stab.unconfirmed": "28afd3e84e",
+  "site.stab.value": "9ffb1018c4",
   "site.state": "a9aa36b8a2",
   "site.strength": "57a4e7ca7f",
   "site.summaryT": "b32ef340ea",
@@ -374,28 +406,28 @@
    [
     "Czym jest i czym nie jest",
     [
-     "The Tension Index shows how many escalation signals are currently visible in open sources for each of 38 European countries, on a 0–10 scale. It is a state indicator, not a probability of war and not a forecast. A high score means “many sources are raising alarms at once”, not “a war will start”.",
-     "The score is not advice to leave or to stay. For decisions, follow your own government's official travel advice."
+     "Indeks napięcia pokazuje, ile sygnałów eskalacji jest obecnie widocznych w otwartych źródłach dla każdego z 38 krajów europejskich, na skali 0–10. Jest to wskaźnik stanu, a nie prawdopodobieństwo wojny ani prognoza. Wysoki wynik oznacza \"wiele źródeł jednocześnie sygnalizuje alarmy\", a nie \"wybuchnie война\".",
+     "Wynik nie jest poradą do wyjazdu ani pozostania. W przypadku decyzji postępuj zgodnie z oficjalnymi wskazówkami dotyczącymi podróży swojego rządu."
     ]
    ],
    [
-    "Scale levels",
-    "LEVELS"
+    "Poziomy skali",
+    "POZIOMY"
    ],
    [
-    "Six blocks",
-    "BLOCKS"
+    "Sześć bloków",
+    "BLOKI"
    ],
    [
-    "How blocks combine",
+    "Jak bloki się łączą",
     [
-     "Each block gets a value from 0 to 100%. Every block has a cap (government advice, aviation and domestic measures up to 60%, aggressor signals 40%, media 35%, markets 15%): one block, even fully alarmed, cannot produce the maximum score. Blocks combine as independent confirmations: each further alarmed block moves the total towards the maximum but never adds more than what is left.",
-     "Within a block one publisher counts once (its strongest signal), while different publishers reinforce each other. For EU and NATO members, government advice weighs a quarter less: allies rarely raise each other's danger level in advance.",
-     "One-off events (advice updates, news, traffic drops) fade over time, while states (the current advice level, a closed airspace) hold while they last. The total becomes a 0–10 score through a curve that stretches the low end of the scale so early, moderate signals are visible."
+     "Każdy blok otrzymuje wartość od 0 do 100%. Każdy blok ma limit (porady rządów, lotnictwo i działania wewnętrzne do 60%, sygnały agresora 40%, media 35%, rynki 15%): jeden blok, nawet w pełni aktywny, nie może produkować maksymalnego wyniku. Bloki łączą się jako niezależne potwierdzenia: każdy kolejny wyalarmowany blok przybliża całość do maksimum, ale nigdy nie dodaje więcej niż to, co zostało.",
+     "W obrębie bloku jedno wydawnictwo liczy się raz (jego najmocniejszy sygnał), natomiast różne wydawnictwa wzmacniają się nawzajem. Dla krajów członkowskich UE i NATO porady rządowe mają wagę o czwartę mniejszą: sojusznicy rzadko podwyższają sobie nawzajem poziom zagrożenia z wyprzedzeniem.",
+     "Zdarzenia jednorazowe (aktualizacje rekomendacji, wiadomości, spadki ruchu) zanikają z czasem, a stany (bieżący poziom rekomendacji, zamknięta przestrzeń powietrzna) trwają, dopóki się utrzymują. Całość przekształca się w wynik 0–10 za pomocą krzywej, która rozciąga dolny koniec skali, aby wcześnie widoczne były sygnały umiarkowanych skalę."
     ]
    ],
    [
-    "Threshold events",
+    "Zdarzenia progowe",
     [
      "Niektóre zdarzenia gwarantują minimalny wynik z powodu interpretacji skali:",
      "• autoryzowana ewakuacja personelu ambasady przez co najmniej jeden rząd: co najmniej 7;",
@@ -423,7 +455,23 @@
      "Źródła: porady podróżne rządów Wielkiej Brytanii (zawierają informacje sektora publicznego licencjonowane na podstawie Open Government Licence v3.0), Stanów Zjednoczonych, Niemiec, Kanady i Francji; biuletyny EASA; OpenSky Network; GDELT Project; ECB Data Portal; kanały wiadomości (tylko nagłówki i linki); kształty krajów: Natural Earth (domena publiczna). Prawa do materiałów należą do ich właścicieli."
     ]
    ]
-  ]
+  ],
+  "stab": {
+   "title": "Rząd i siły bezpieczeństwa",
+   "value": "sygnały niestabilności",
+   "desc": "Z krajowych mediów kraju: decyzje faworyzujące agresora, usunięcie lub aresztowanie szefów bezpieczeństwa, uzbroieni mężczyźni bez oznaczeń rozpoznawczych, zniknięcie przywódcy, zamieszki o charakterze przemocowym, spadek zaufania. 0 oznacza brak takich sygnałów. Opisuje to, co jest zgłaszane, a nie prognozę.",
+   "none": "Brak takich sygnałów w ciągu ostatnich 30 dni.",
+   "unconfirmed": "jedno źródło, niepotwierdzone",
+   "cat": {
+    "pro_aggressor_policy": "Decyzje faworyzujące agresora",
+    "security_purge": "Usunięcie lub aresztowanie szefów sił bezpieczeństwa",
+    "armed_unmarked": "Uzbrojena ludzie bez insygniów, ataki osób w mundurach",
+    "power_grab": "Próba przejęcia władzy",
+    "leader_absence": "Zniknięcie lidera lub niezwykłe przemieszczenia",
+    "violent_unrest": "Gwałtowne zamieszki",
+    "trust_drop": "Spadek zaufania"
+   }
+  }
  },
  "bot": {
   "about": "<b>Jak liczy się napięcie</b>\n\nSkala 0–10 łączy sześć bloków sygnałów: porady podróżne rządów i status personelu ambasady, lotnictwo i przestrzeń powietrzna, własne środki nadzwyczajne kraju, sygnały ze strony agresora, media i analiza, rynki.\n\nCo się liczy: podana przyczyna (konflikt zbrojny ma większą wagę niż terroryzm), liczba niezależnych źródeł, kilka rządów działających synchronicznie i odchylenie od zwyczajnego poziomu kraju. Zdarzenia decyzyjne (wyjazd personelu ambasady, zamknięcie przestrzeni powietrznej, mobilizacja) gwarantują wynik minimalny.\n\n🟢 0–2 podstawa · 🟡 3–4 izolowane zmiany · 🟠 5–6 kilka bloków · 🔴 7–8 wyjazd personelu, ograniczenia przestrzeni · 🟥 9–10 krytyczne\n\nStatus wojny jest pokazywany oddzielnie: skala mierzy eskalację, nie istniejący konflikt.",
@@ -485,6 +533,7 @@
   "others": "Również obserwujesz",
   "refresh_every": "sprawdzanie co {hours} h",
   "refresh_hourly": "sprawdzanie co godzinę",
+  "stability": "Władza i siły bezpieczeństwa",
   "tension": "Napięcie",
   "title": "Tension Index · panel",
   "updated": "Zaktualizowano",
@@ -505,6 +554,7 @@
   "fr": "🇫🇷 Ministerstwo Spraw Zagranicznych Francji",
   "gdelt": "📰 Media (GDELT)",
   "gov_uk": "🇬🇧 FCDO Wielkiej Brytanii",
+  "national": "🏛 Media krajowe",
   "news": "📰 Wiadomości",
   "opensky": "✈️ Ruch lotniczy (OpenSky)",
   "ru_media": "🇷🇺 Rosyjskie media o poradach MSZ RF/RB",
@@ -520,9 +570,16 @@
   "aviation:airspace_restricted": "ograniczenia przestrzeni powietrznej",
   "aviation:czib": "biuletyn EASA dotyczący strefy konfliktu",
   "aviation:traffic_drop": "gwałtowny spadek ruchu lotniczego",
+  "domestic:armed_unmarked": "uzbrojena ludzie bez znaków rozpoznawczych, ataki osób w mundurach",
   "domestic:borders_closed": "zamknięcia granic",
   "domestic:emergency": "nadzwyczajne środki w kraju",
+  "domestic:leader_absence": "zniknięcie lub niezwykłe przemieszczenia lidera",
   "domestic:mobilisation": "ogłoszono mobilizację",
+  "domestic:power_grab": "próba przejęcia władzy, niekonstytucyjne środki nadzwyczajne",
+  "domestic:pro_aggressor_policy": "decyzje władz na korzyść agresora",
+  "domestic:security_purge": "usunięcie lub aresztowanie szefów sił bezpieczeństwa",
+  "domestic:trust_drop": "spadek zaufania do władzy, armii lub policji",
+  "domestic:violent_unrest": "gwałtowne zamieszki wymierzone w władze",
   "markets:fx_drop": "spadek kursu waluty",
   "markets:spread_jump": "skok spreadu obligacji",
   "media:escalation_news": "wiadomości o eskalacji",

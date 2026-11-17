@@ -22,7 +22,7 @@ from tension_index.languages import ENGLISH_NAMES, LANGUAGES, SOURCE
 
 log = logging.getLogger(__name__)
 
-BATCH_CHARS = 1800  # each batch must finish within one model call's timeout
+BATCH_CHARS = 1000  # long paragraphs: each batch must finish within one model call
 PARALLEL = 4
 TOKENS = re.compile(r"\{[a-z_]+\}|<[^>]+>")
 SCHEMA = {
