@@ -170,11 +170,14 @@ def build(source: Path, out: Path, plan_dir: Path | None = None) -> dict:
         json.dumps(data, ensure_ascii=False, indent=2, default=str), encoding="utf-8"
     )
     shutil.copyfile(TEMPLATE, out / "index.html")
-    # Public dashboard page (its data, scores.json, comes from `tension-index export`).
-    dashboard = TEMPLATE.parent / "dashboard" / "index.html"
-    if dashboard.exists():
+    # Public dashboard: the page and its map shapes (europe.json, scripts/build_map.py); its
+    # data, scores.json, comes from `tension-index export`.
+    dashboard = TEMPLATE.parent / "dashboard"
+    if (dashboard / "index.html").exists():
         (out / "dashboard").mkdir(exist_ok=True)
-        shutil.copyfile(dashboard, out / "dashboard" / "index.html")
+        for name in ("index.html", "europe.json"):
+            if (dashboard / name).exists():
+                shutil.copyfile(dashboard / name, out / "dashboard" / name)
     (out / ".nojekyll").write_text("")
     if plan_dir is not None:
         (plan_dir / "PLAN.md").write_text(render_markdown(data, "uk"), encoding="utf-8")
