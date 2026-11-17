@@ -69,4 +69,5 @@ def test_yaml_country_keys_are_not_booleans():
                 walk(value, path)
 
     for path in glob.glob("config/*.yaml"):
-        walk(yaml.safe_load(open(path, encoding="utf-8")), path)
+        with open(path, encoding="utf-8") as f:
+            walk(yaml.safe_load(f), path)
