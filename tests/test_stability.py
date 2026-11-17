@@ -39,6 +39,11 @@ class FakeClaude:
                 "title_en": f"en {i}",
                 "institution": "army" if cat == "security_purge" else "government",
                 "benefits_aggressor": cat == "pro_aggressor_policy",
+                "own_authority_acts": True,
+                "security_leader": cat == "security_purge",
+                "violence": False,
+                "armed_people": False,
+                "poll": False,
             }  # fmt: skip
             for i, (cat, sev) in self.labels.items()
         ]
@@ -149,11 +154,24 @@ async def test_one_event_in_several_headlines_counts_once(settings):
 
 
 def test_cross_checks_drop_labels_the_structure_contradicts():
-    assert stability.checked("security_purge", {"institution": "other"}) == "none"
-    assert stability.checked("security_purge", {"institution": "army"}) == "security_purge"
-    assert stability.checked("pro_aggressor_policy", {"benefits_aggressor": False}) == "none"
+    """Live mislabels of 17 Nov 2026 are rejected by the structured answers."""
+    check = stability.checked
+    # a deputy culture minister resigning
+    assert check("security_purge", {"institution": "other", "security_leader": False}) == "none"
     assert (
-        stability.checked("pro_aggressor_policy", {"benefits_aggressor": True})
+        check("security_purge", {"institution": "army", "security_leader": True})
+        == "security_purge"
+    )
+    # "Russia accuses France of direct participation in the war"
+    assert (
+        check("pro_aggressor_policy", {"benefits_aggressor": True, "own_authority_acts": False})
+        == "none"
+    )
+    assert (
+        check("pro_aggressor_policy", {"benefits_aggressor": True, "own_authority_acts": True})
         == "pro_aggressor_policy"
     )
-    assert stability.checked("violent_unrest", {}) == "violent_unrest"
+    # peaceful rallies, a prison guards' strike
+    assert check("violent_unrest", {"violence": False}) == "none"
+    assert check("trust_drop", {"poll": False}) == "none"
+    assert check("leader_absence", {}) == "leader_absence"

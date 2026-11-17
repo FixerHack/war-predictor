@@ -39,6 +39,7 @@ CATEGORIES = (
     "leader_absence", "violent_unrest", "trust_drop", "none",
 )  # fmt: skip
 MAX_PER_CALL = 60
+LABEL_BUDGET_SECONDS = 240.0  # per cycle; the rest is labelled on the next one
 INSTITUTIONS = (
     "army", "police", "intelligence", "border_guard", "defence_ministry", "interior_ministry",
     "head_of_state", "government", "parliament", "other",
@@ -64,6 +65,11 @@ SCHEMA = {
                     "severity": {"type": "number"},
                     "institution": {"type": "string", "enum": list(INSTITUTIONS)},
                     "benefits_aggressor": {"type": "boolean"},
+                    "own_authority_acts": {"type": "boolean"},
+                    "security_leader": {"type": "boolean"},
+                    "violence": {"type": "boolean"},
+                    "armed_people": {"type": "boolean"},
+                    "poll": {"type": "boolean"},
                     "title_uk": {"type": "string"},
                     "title_en": {"type": "string"},
                 },
@@ -73,6 +79,11 @@ SCHEMA = {
                     "severity",
                     "institution",
                     "benefits_aggressor",
+                    "own_authority_acts",
+                    "security_leader",
+                    "violence",
+                    "armed_people",
+                    "poll",
                     "title_uk",
                     "title_en",
                 ],
@@ -107,9 +118,18 @@ explanation, makes unexplained or secret trips, flees the country.
 - trust_drop: a poll showing low or falling trust in the police, army or government.
 - none: everything else.
 
-institution: which institution of {country} the headline is about (other for companies, \
-power plants, agencies, courts or anything else). benefits_aggressor: true only if the \
-decision or event directly helps Russia or Belarus or weakens support for Ukraine.
+Answer these for every headline, strictly by what it states:
+- institution: which institution of {country} it is about (other for companies, power \
+plants, agencies, courts, culture or environment ministries, anything else).
+- own_authority_acts: {country}'s own government, head of state, army, police or security \
+services take the action (not foreign states, the opposition, unions or citizens).
+- benefits_aggressor: the decision directly helps Russia or Belarus or weakens support for \
+Ukraine (accusations made BY Russia are false).
+- security_leader: the person is a commander or head of the army, police, intelligence or \
+border guard, or the defence or interior minister.
+- violence: violence, riots, looting or clashes are reported (a strike or march alone is false).
+- armed_people: armed people are involved.
+- poll: the headline reports an opinion poll.
 severity 0..1: 1 = official and confirmed; 0.5 = reported, alleged or partial; 0.2 = talk, \
 plans or opposition claims. Label by what the headline states, not by alarming words.
 For every headline that is not none, give title_uk and title_en: the headline translated \
@@ -151,11 +171,19 @@ async def fetch_headlines(
     await db.commit()
 
 
-async def label_headlines(db: aiosqlite.Connection, claude, countries: list[str]) -> int:
-    """Label new headlines with Claude, one call per country (up to MAX_PER_CALL each)."""
+async def label_headlines(
+    db: aiosqlite.Connection, claude, countries: list[str], budget_seconds: float | None = None
+) -> int:
+    """Label new headlines with Claude, one call per country (up to MAX_PER_CALL each). With a
+    time budget, countries left over wait for the next cycle (their headlines stay unlabelled)."""
+    import time
+
+    started = time.monotonic()
     labelled = 0
     for code in countries:
         if claude is None or not claude.available:
+            break
+        if budget_seconds is not None and time.monotonic() - started > budget_seconds:
             break
         async with db.execute(
             "SELECT url, title FROM national_items WHERE country = ? AND classified = 0 "
@@ -214,11 +242,15 @@ async def events(db: aiosqlite.Connection, code: str, since: str) -> list[aiosql
 def checked(category: str, label: dict) -> str:
     """Structured cross-checks the prose of the prompt alone did not secure (live test,
     17 Nov 2026: a nuclear plant manager as a security purge, a business trip as pro-aggressor)."""
-    if category == "security_purge" and label.get("institution") not in SECURITY:
-        return "none"
-    if category == "pro_aggressor_policy" and not label.get("benefits_aggressor"):
-        return "none"
-    return category
+    rules = {
+        "security_purge": label.get("institution") in SECURITY and label.get("security_leader"),
+        "pro_aggressor_policy": label.get("benefits_aggressor") and label.get("own_authority_acts"),
+        "violent_unrest": label.get("violence"),
+        "armed_unmarked": label.get("armed_people"),
+        "trust_drop": label.get("poll"),
+        "power_grab": label.get("own_authority_acts"),
+    }
+    return category if rules.get(category, True) else "none"
 
 
 def confirmed(row, rows) -> bool:
@@ -308,8 +340,14 @@ async def collect_stability(
     result = RunResult(source="national")
     run_id = await storage.start_run(db, "national")
     targets = [c for c in (countries or list(COUNTRIES)) if c in load_feeds()]
-    await fetch_headlines(db, client, targets, result)
-    await label_headlines(db, make_classifier(settings), targets)
-    await derive_signals(db, targets, datetime.now(UTC))
-    await storage.finish(db, result, run_id)
+    try:
+        await fetch_headlines(db, client, targets, result)
+        claude = make_classifier(settings)
+        if claude is not None and claude.provider in ("gateway", "claude_code"):
+            # Haiku mislabelled institutions in the live test; the task is small: a stronger model.
+            claude.model = load_config()["stability"].get("model") or claude.model
+        await label_headlines(db, claude, targets, budget_seconds=LABEL_BUDGET_SECONDS)
+        await derive_signals(db, targets, datetime.now(UTC))
+    finally:
+        await storage.finish(db, result, run_id)
     return result
