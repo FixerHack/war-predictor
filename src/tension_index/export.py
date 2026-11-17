@@ -106,6 +106,85 @@ async def build(db: aiosqlite.Connection, now: datetime | None = None) -> dict:
             "countries": countries, "context": context}  # fmt: skip
 
 
+CHRONICLE_EVENTS = 80
+SCORE_MOVE = 0.5  # a day-to-day score change worth a line in the chronicle
+QUIET_CHANGES = ("editorial", "none")
+
+
+async def chronicle(db: aiosqlite.Connection, code: str, now: datetime | None = None) -> list[dict]:
+    """What happened in a country over HISTORY_DAYS, newest first: government advice changes
+    (with their summary), news/aviation/aggressor signals, and notable score moves. Each item
+    says whether it counts in the score, so the page can explain quiet events too."""
+    from tension_index.classifier import Classification
+
+    now = now or datetime.now(UTC)
+    since = (now - timedelta(days=HISTORY_DAYS)).isoformat()
+    events: list[dict] = []
+
+    async with db.execute(
+        "SELECT c.id, c.source, c.detected_at, k.payload, s.active, s.strength FROM changes c "
+        "JOIN classifications k ON k.ref_type = 'change' AND k.ref_id = c.id "
+        "LEFT JOIN signals s ON s.ref = 'change:' || c.id "
+        "WHERE c.country = ? AND c.detected_at >= ?",
+        (code, since),
+    ) as cur:
+        for row in await cur.fetchall():
+            cls = Classification.from_json(row["payload"])
+            if cls.change_type in QUIET_CHANGES:
+                continue
+            events.append({
+                "at": row["detected_at"][:16], "type": "advice", "change": cls.change_type,
+                "reason": cls.reason, "counted": bool(row["active"]),
+                "text": {"uk": cls.summary_uk or cls.summary_en, "en": cls.summary_en},
+                "quote": cls.quote,
+            } | _labels(row["source"], f"advisory_update:{cls.change_type}"))  # fmt: skip
+
+    async with db.execute(
+        "SELECT publisher, kind, observed_at, confirmed, active, note, note_uk FROM signals "
+        "WHERE country = ? AND observed_at >= ? AND ref NOT LIKE 'change:%' "
+        "AND ref NOT LIKE 'snapshot:%'",
+        (code, since),
+    ) as cur:
+        for row in await cur.fetchall():
+            events.append({
+                "at": row["observed_at"][:16], "type": "signal",
+                "counted": bool(row["active"] and row["confirmed"]),
+                "confirmed": bool(row["confirmed"]),
+                "text": {"uk": row["note_uk"] or row["note"], "en": row["note"]},
+            } | _labels(row["publisher"], row["kind"]))  # fmt: skip
+
+    async with db.execute(
+        "SELECT computed_at, score FROM scores WHERE country = ? AND computed_at >= ? "
+        "AND score IS NOT NULL ORDER BY id",
+        (code, since),
+    ) as cur:
+        daily: dict[str, tuple[str, float]] = {}
+        for row in await cur.fetchall():
+            daily[row["computed_at"][:10]] = (row["computed_at"][:16], row["score"])
+    previous = None
+    for at, score in daily.values():
+        if previous is not None and abs(score - previous) >= SCORE_MOVE:
+            events.append({"at": at, "type": "score", "from": previous, "to": score})
+        previous = score
+
+    events.sort(key=lambda e: e["at"], reverse=True)
+    return events[:CHRONICLE_EVENTS]
+
+
+async def chronicles(db: aiosqlite.Connection, now: datetime | None = None) -> dict[str, list]:
+    return {code: await chronicle(db, code, now) for code in COUNTRIES}
+
+
+def write_chronicles(all_events: dict[str, list], out_dir: Path) -> int:
+    """chronicle/<CODE>.json for every country, loaded by the page when a country is opened."""
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for code, events in all_events.items():
+        (out_dir / f"{code}.json").write_text(
+            json.dumps({"country": code, "events": events}, ensure_ascii=False), encoding="utf-8"
+        )
+    return len(all_events)
+
+
 def write(data: dict, out: Path) -> dict:
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")

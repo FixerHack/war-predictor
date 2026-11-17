@@ -62,6 +62,16 @@ h1 { font-size: clamp(1.4rem, 4vw, 2.1rem); margin: 0; line-height: 1.15; }
 .map { position: relative; }
 .geo { display: block; width: 100%; height: auto; background: var(--sea); border-radius: 10px; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
 .geo path, .geo circle { vector-effect: non-scaling-stroke; }
+.cday { margin: 12px 0 4px; font-size: 0.8rem; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: .02em; }
+ul.chron { list-style: none; margin: 0; padding: 0 0 0 12px; border-left: 2px solid var(--line); }
+ul.chron li { margin: 0 0 8px; font-size: 0.88rem; line-height: 1.4; }
+ul.chron li.quiet { color: var(--ink-3); }
+.cwho { font-weight: 600; }
+.ctext { margin-top: 1px; overflow-wrap: anywhere; }
+.badge { display: inline-block; font-weight: 500; font-size: 0.72rem; padding: 0 6px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-3); white-space: nowrap; }
+.cscore { font-size: 0.86rem; }
+.cscore.up b { color: var(--l3); } .cscore.down b { color: var(--l0); }
+.btn.more { margin-top: 4px; width: 100%; }
 .zoomctl { position: absolute; top: 8px; right: 8px; display: flex; flex-direction: column; gap: 4px; }
 .zoomctl .btn { width: 36px; height: 36px; padding: 0; font-size: 1.15rem; line-height: 1; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
 .zoomctl .btn:disabled { opacity: .45; cursor: default; }
@@ -184,6 +194,9 @@ const T = {
         lvl: { green: "низький", yellow: "помірний", orange: "підвищений", red: "високий", critical: "критичний" },
         hint: "Натисніть на країну, щоб побачити деталі. Збільшуйте двома пальцями або кнопками +/−. Посилання на країну: …/dashboard/#PL",
         zoomIn: "Збільшити", zoomOut: "Зменшити", zoomReset: "Уся Європа", toMap: "🗺 Карта",
+        chronicle: "Хроніка за 90 днів", chronLoading: "Завантаження…", chronEmpty: "Подій за 90 днів не було.",
+        chronMore: "Показати всі ({n})", chronLess: "Згорнути", scoreMove: "Бал змінився", notCounted: "на бал не впливає",
+        unconfirmed: "одне джерело, не підтверджено",
         war: "Статус війни", why: "Чому", flags: "Позначки", history: "Бал за 90 днів", calibrating: "⏳ Даних ще недостатньо для балу.",
         warS: { none: "збройного конфлікту немає", frozen: "заморожений конфлікт / окупація частини території", clashes: "окремі збройні інциденти", active: "збройний конфлікт", war: "війна" },
         table: "Таблиця всіх країн", country: "Країна", score: "Бал", level: "Рівень",
@@ -231,6 +244,9 @@ const T = {
         lvl: { green: "low", yellow: "moderate", orange: "elevated", red: "high", critical: "critical" },
         hint: "Select a country for details. Zoom with two fingers or the +/− buttons. Link to a country: …/dashboard/#PL",
         zoomIn: "Zoom in", zoomOut: "Zoom out", zoomReset: "All of Europe", toMap: "🗺 Map",
+        chronicle: "Last 90 days", chronLoading: "Loading…", chronEmpty: "No events in the last 90 days.",
+        chronMore: "Show all ({n})", chronLess: "Show less", scoreMove: "Score changed", notCounted: "does not affect the score",
+        unconfirmed: "one source, unconfirmed",
         war: "War status", why: "Why", flags: "Flags", history: "Score, last 90 days", calibrating: "⏳ Not enough data for a score yet.",
         warS: { none: "no armed conflict", frozen: "frozen conflict / partial occupation", clashes: "sporadic armed clashes", active: "armed conflict", war: "war" },
         table: "Table of all countries", country: "Country", score: "Score", level: "Level",
@@ -573,6 +589,56 @@ function signalsView(c) {
   return html;
 }
 
+// Chronicle: chronicle/<CODE>.json, fetched when a country is opened (small on phones).
+const chron = {}, chronOpen = {};
+function loadChronicle(code) {
+  if (code in chron) return;
+  chron[code] = undefined;
+  fetch(`chronicle/${code}.json`, { cache: "no-store" })
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then((j) => { chron[code] = j.events || []; })
+    .catch(() => { chron[code] = null; })
+    .finally(() => { if (currentCode() === code) renderPanel(); });
+}
+
+function chronicleView(code) {
+  const t = T[lang];
+  const head = `<div class="sub">${esc(t.chronicle)}</div>`;
+  if (!(code in chron) || chron[code] === undefined) { loadChronicle(code); return `${head}<p class="muted">${esc(t.chronLoading)}</p>`; }
+  const events = chron[code];
+  if (!events || !events.length) return `${head}<p class="muted">${esc(t.chronEmpty)}</p>`;
+  const shown = chronOpen[code] ? events : events.slice(0, 10);
+  let day = "", html = "";
+  for (const e of shown) {
+    const d = e.at.slice(0, 10);
+    if (d !== day) { html += `${day ? "</ul>" : ""}<div class="cday">${esc(fmtDay(d))}</div><ul class="chron">`; day = d; }
+    if (e.type === "score") {
+      const up = e.to > e.from;
+      html += `<li class="cscore ${up ? "up" : "down"}">${up ? "▲" : "▼"} ${esc(t.scoreMove)}: <b>${e.from.toFixed(1)} → ${e.to.toFixed(1)}</b></li>`;
+      continue;
+    }
+    const text = ((e.text && (e.text[lang] || e.text.en)) || "").replace(/\s*\(\d+ feeds?\)$/, "");
+    const note = e.counted ? "" : `<span class="badge">${esc(e.type === "signal" && !e.confirmed ? t.unconfirmed : t.notCounted)}</span>`;
+    html += `<li${e.counted ? "" : ' class="quiet"'}><div class="cwho">${esc(e.publisher[lang])} · ${esc(e.kind[lang])} ${note}</div>` +
+      (text ? `<div class="ctext">${esc(text)}</div>` : "") + `</li>`;
+  }
+  html += "</ul>";
+  const toggle = events.length > 10
+    ? `<button type="button" class="btn more" id="chronMore">${esc(chronOpen[code] ? t.chronLess : t.chronMore.replace("{n}", events.length))}</button>` : "";
+  return `${head}${html}${toggle}`;
+}
+
+function fmtDay(d) {
+  const [y, m, dd] = d.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, dd)).toLocaleDateString(lang === "uk" ? "uk-UA" : "en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+}
+
+function currentCode() {
+  if (!data) return null;
+  return selected && data.countries[selected] ? selected
+    : Object.entries(data.countries).sort((a, b) => (b[1].score ?? -1) - (a[1].score ?? -1))[0][0];
+}
+
 function renderPanel() {
   const t = T[lang], panel = document.getElementById("panel");
   if (!data) { panel.innerHTML = `<p>${esc(t.empty)}</p>`; return; }
@@ -583,8 +649,7 @@ function renderPanel() {
       (ctx.note[lang] ? `<p>${esc(ctx.note[lang])}</p>` : "") + `<p class="muted">${esc(t.ctxNote)}</p>`;
     return;
   }
-  const code = selected && data.countries[selected] ? selected
-    : Object.entries(data.countries).sort((a, b) => (b[1].score ?? -1) - (a[1].score ?? -1))[0][0];
+  const code = currentCode();
   const c = data.countries[code];
   const score = c.score != null
     ? `<div class="big"><span class="n">${c.score.toFixed(1)}</span><span class="lv">/ 10 · ${esc(t.lvl[c.level])}</span></div>`
@@ -593,8 +658,10 @@ function renderPanel() {
   const legacy = !c.blocks && c.reasons[lang].length ? `<div class="sub">${esc(t.why)}</div><ul>${c.reasons[lang].map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : "";
   const hist = c.history.length ? `<div class="sub">${esc(t.history)}</div>${chart(c.history)}` : "";
   panel.innerHTML = `<h2>${c.flag} ${esc(c.name[lang])}</h2>${score}${summary(c)}${legacy}${blocksView(c)}${signalsView(c)}${war}${hist}` +
-    (c.updated ? `<p class="muted">${esc(t.updated)}: ${esc(fmtDate(c.updated))} UTC</p>` : "");
+    chronicleView(code) + (c.updated ? `<p class="muted">${esc(t.updated)}: ${esc(fmtDate(c.updated))} UTC</p>` : "");
   wireChart(c.history);
+  const more = document.getElementById("chronMore");
+  if (more) more.onclick = () => { chronOpen[code] = !chronOpen[code]; renderPanel(); };
 }
 
 function renderMethod() {

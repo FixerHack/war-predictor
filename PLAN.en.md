@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.6.7**, updated 2026-11-17.
+Version **0.6.8**, updated 2026-11-17.
 
-**Overall progress: 92%** · left ≈ 3.9 days · ✅ 90 · 🟡 1 · ⬜ 2 · ⛔ 4
+**Overall progress: 92%** · left ≈ 3.9 days · ✅ 91 · 🟡 1 · ⬜ 2 · ⛔ 4
 
 ## Milestones
 
@@ -232,6 +232,7 @@ Branch: `dev-dashboard`
   - Running since 2026-10-05: tension-pages.timer, deploy key server-pages (this repository only).
 - ✅ **S11.10** A real map of Europe with borders (Natural Earth): colour by level, highlight and tooltip on hover, selection by click and keyboard; Crimea is part of Ukraine
 - ✅ **S11.11** Mobile map: pinch and +/− zoom, panning a zoomed map, legend under the map, a back-to-map button
+- ✅ **S11.12** Country chronicle for 90 days: government advice changes with a summary, news and aviation signals, score jumps; marks what does not affect the score
 
 ## S12. Operations — 86%
 
@@ -306,6 +307,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.6.8** (2026-11-17)
+  - The country panel has a 90-day chronicle: what governments changed and why, news, aviation, score jumps, with a note on events that do not affect the score. One file per country, so phones load only what they open.
 - **0.6.7** (2026-11-17)
   - The map zooms with two fingers, +/− buttons or a trackpad pinch and pans when zoomed; on phones it is on the first screen with the legend below, and a Map button appears after choosing a country.
 - **0.6.6** (2026-11-17)
