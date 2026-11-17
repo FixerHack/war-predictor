@@ -63,6 +63,51 @@
 
 Мобілізація, надзвичайний стан, перевірка укриттів, закриття кордонів, EU-Alert. Єдиного API немає. Джерела: урядові сайти й новини рівня 1, класифікація через Claude.
 
+## Ж. Влада й силові структури (окрема шкала, також блок В)
+
+Заголовки національних ЗМІ кожної країни, мовою оригіналу (`config/national_feeds.yaml`, перевірено із сервера 17.11.2026). Claude шукає сигнали про власні інституції країни: рішення на користь агресора, звільнення чи арешт керівників силових структур, озброєних людей без знаків і напади людей у формі, захоплення влади, зникнення чи незвичні переміщення лідера, насильницькі заворушення, падіння довіри. Рівень 2 (суспільний мовник, агенція) рахується сам; рівень 3 (приватне видання) — після підтвердження другим виданням. **Перелік потребує затвердження власником.**
+
+| Країна | Стрічки |
+|---|---|
+| Австрія | [orf](https://rss.orf.at/news.xml) (рівень 2) |
+| Бельгія | [vrt](https://www.vrt.be/vrtnws/nl.rss.articles.xml) (рівень 2) |
+| Болгарія | [dnevnik](https://www.dnevnik.bg/rss/) (рівень 3), [mediapool](https://www.mediapool.bg/rss/) (рівень 3), [novinite](https://www.novinite.com/services/news_rdf.php) (рівень 3) |
+| Хорватія | [index_hr](https://www.index.hr/rss) (рівень 3) |
+| Кіпр | [cyprus_mail](https://cyprus-mail.com/feed/) (рівень 3) |
+| Чехія | [ct24](https://ct24.ceskatelevize.cz/rss/hlavni-zpravy) (рівень 2), [irozhlas](https://www.irozhlas.cz/rss/irozhlas) (рівень 2) |
+| Данія | [dr](https://www.dr.dk/nyheder/service/feeds/allenyheder) (рівень 2) |
+| Естонія | [err](https://www.err.ee/rss) (рівень 2) |
+| Фінляндія | [yle](https://feeds.yle.fi/uutiset/v1/majorHeadlines/YLE_UUTISET.rss) (рівень 2) |
+| Франція | [franceinfo](https://www.francetvinfo.fr/titres.rss) (рівень 2), [lemonde](https://www.lemonde.fr/rss/une.xml) (рівень 3) |
+| Німеччина | [tagesschau](https://www.tagesschau.de/index~rss2.xml) (рівень 2) |
+| Греція | [ertnews](https://www.ertnews.gr/feed/) (рівень 2) |
+| Угорщина | [telex](https://telex.hu/rss) (рівень 3), [hvg](https://hvg.hu/rss) (рівень 3) |
+| Ірландія | [thejournal](https://www.thejournal.ie/feed/) (рівень 3), [irishtimes](https://www.irishtimes.com/arc/outboundfeeds/feed-irish-news/?outputType=xml) (рівень 3) |
+| Італія | [ansa](https://www.ansa.it/sito/ansait_rss.xml) (рівень 2) |
+| Латвія | [lsm](https://www.lsm.lv/rss/) (рівень 2) |
+| Литва | [delfi_lt](https://www.delfi.lt/rss/feeds/daily.xml) (рівень 3) |
+| Люксембург | [rtl_lu](https://www.rtl.lu/rss/national) (рівень 3) |
+| Мальта | [times_of_malta](https://timesofmalta.com/rss/national) (рівень 3) |
+| Нідерланди | [nos](https://feeds.nos.nl/nosnieuwsalgemeen) (рівень 2) |
+| Польща | [rmf24](https://www.rmf24.pl/fakty/feed) (рівень 3) |
+| Португалія | [publico](https://feeds.feedburner.com/PublicoRSS) (рівень 3) |
+| Румунія | [digi24](https://www.digi24.ro/rss) (рівень 3), [hotnews](https://www.hotnews.ro/rss) (рівень 3) |
+| Словаччина | [rtvs](https://spravy.rtvs.sk/feed/) (рівень 2), [aktuality](https://www.aktuality.sk/rss/) (рівень 3) |
+| Словенія | [rtvslo](https://www.rtvslo.si/feeds/00.xml) (рівень 2) |
+| Іспанія | [elpais](https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada) (рівень 3) |
+| Швеція | [svt](https://www.svt.se/nyheter/rss.xml) (рівень 2) |
+| Велика Британія | [bbc_uk](https://feeds.bbci.co.uk/news/uk/rss.xml) (рівень 2) |
+| Норвегія | [nrk](https://www.nrk.no/toppsaker.rss) (рівень 2) |
+| Швейцарія | [srf](https://www.srf.ch/news/bnf/rss/1646) (рівень 2) |
+| Ісландія | [ruv](https://www.ruv.is/rss/frettir) (рівень 2) |
+| Молдова | [newsmaker](https://newsmaker.md/ro/feed/) (рівень 3) |
+| Сербія | [n1_rs](https://n1info.rs/feed/) (рівень 3) |
+| Чорногорія | [vijesti](https://www.vijesti.me/rss) (рівень 3) |
+| Північна Македонія | [mia](https://mia.mk/feed) (рівень 2) |
+| Албанія | [balkanweb](https://www.balkanweb.com/feed/) (рівень 3) |
+| Боснія і Герцеговина | [klix](https://www.klix.ba/rss) (рівень 3), [n1_ba](https://n1info.ba/feed/) (рівень 3) |
+| Косово | [koha](https://www.koha.net/rss) (рівень 3), [kallxo](https://kallxo.com/feed/) (рівень 3) |
+
 ## Е. Ринки
 
 | Джерело | Що дає | Доступ |
