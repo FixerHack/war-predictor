@@ -54,13 +54,21 @@ h1 { font-size: clamp(1.4rem, 4vw, 2.1rem); margin: 0; line-height: 1.15; }
 .btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .notice { margin: 18px 0; padding: 12px 14px; background: var(--surface); border-left: 4px solid var(--l2);
   border-radius: 0 6px 6px 0; font-size: 0.92rem; color: var(--ink-2); }
-.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 0.85rem; color: var(--ink-2); margin: 8px 0 14px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 0.85rem; color: var(--ink-2); margin: 10px 0 6px; }
 .legend span { display: inline-flex; align-items: center; gap: 6px; }
 .sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
 .cols { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: start; }
 @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
 .map { position: relative; }
-.geo { display: block; width: 100%; height: auto; background: var(--sea); border-radius: 10px; touch-action: manipulation; }
+.geo { display: block; width: 100%; height: auto; background: var(--sea); border-radius: 10px; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.geo path, .geo circle { vector-effect: non-scaling-stroke; }
+.zoomctl { position: absolute; top: 8px; right: 8px; display: flex; flex-direction: column; gap: 4px; }
+.zoomctl .btn { width: 36px; height: 36px; padding: 0; font-size: 1.15rem; line-height: 1; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+.zoomctl .btn:disabled { opacity: .45; cursor: default; }
+.tomap { position: fixed; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 20; display: none;
+  padding: 10px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  font: inherit; font-weight: 600; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+.tomap.show { display: block; }
 .geo .other { fill: var(--land); stroke: var(--border); stroke-width: 0.6; }
 .geo .c { stroke: var(--border); stroke-width: 0.8; stroke-linejoin: round; cursor: pointer; outline: none; }
 .geo .c:hover, .geo .c:focus-visible { stroke: var(--ink); stroke-width: 1.8; filter: brightness(1.06); }
@@ -118,11 +126,14 @@ td button.link { all: unset; cursor: pointer; }
 td button.link:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 /* Phones */
 @media (max-width: 600px) {
+  .wrap { padding-left: 10px; padding-right: 10px; }
+  .geo { border-radius: 8px; }
+  .zoomctl .btn { width: 42px; height: 42px; font-size: 1.3rem; }
   .wrap { padding: 14px 12px 40px; }
   header { gap: 8px; }
   .controls .btn { padding: 6px 10px; }
   .notice { margin: 12px 0; font-size: 0.86rem; padding: 10px 12px; }
-  .legend { gap: 6px 10px; font-size: 0.78rem; }
+  .legend { gap: 4px 10px; font-size: 0.76rem; margin: 8px 0 4px; }
   .panel { padding: 14px 12px; }
   .big .n { font-size: 2.2rem; }
   .blocks { grid-template-columns: minmax(0, 7.6em) minmax(0, 1fr) 2.6em; font-size: 0.82rem; }
@@ -147,14 +158,15 @@ a { color: var(--focus); }
     </div>
   </header>
   <div class="notice" id="notice"></div>
-  <div class="legend" id="legend"></div>
   <div class="cols">
     <div>
       <div class="map" id="map"></div>
+      <div class="legend" id="legend"></div>
       <p class="muted" id="maphint"></p>
     </div>
     <div class="panel" id="panel" aria-live="polite"></div>
   </div>
+  <button type="button" class="tomap" id="tomap"></button>
   <details id="tablebox"><summary id="tabletitle"></summary><div id="table"></div></details>
   <section class="method" id="method"></section>
   <footer id="foot"></footer>
@@ -170,7 +182,8 @@ const T = {
         notice: "Індикатор стану сигналів ескалації (0–10) за офіційними рекомендаціями урядів, авіацією, новинами й ринками. Це не прогноз і не порада щодо виїзду.",
         levels: { green: "0–2 низький: базовий фон", yellow: "3–4 помірний: поодинокі зміни", orange: "5–6 підвищений: кілька блоків", red: "7–8 високий: виїзд персоналу, небо", critical: "9–10 критичний" },
         lvl: { green: "низький", yellow: "помірний", orange: "підвищений", red: "високий", critical: "критичний" },
-        hint: "Натисніть на країну, щоб побачити деталі. Посилання на країну: …/dashboard/#PL",
+        hint: "Натисніть на країну, щоб побачити деталі. Збільшуйте двома пальцями або кнопками +/−. Посилання на країну: …/dashboard/#PL",
+        zoomIn: "Збільшити", zoomOut: "Зменшити", zoomReset: "Уся Європа", toMap: "🗺 Карта",
         war: "Статус війни", why: "Чому", flags: "Позначки", history: "Бал за 90 днів", calibrating: "⏳ Даних ще недостатньо для балу.",
         warS: { none: "збройного конфлікту немає", frozen: "заморожений конфлікт / окупація частини території", clashes: "окремі збройні інциденти", active: "збройний конфлікт", war: "війна" },
         table: "Таблиця всіх країн", country: "Країна", score: "Бал", level: "Рівень",
@@ -216,7 +229,8 @@ const T = {
         notice: "An indicator of escalation signals (0–10) from governments' travel advice, aviation, news and markets. Not a forecast and not advice to leave.",
         levels: { green: "0–2 low: baseline", yellow: "3–4 moderate: isolated changes", orange: "5–6 elevated: several blocks", red: "7–8 high: staff departure, airspace", critical: "9–10 critical" },
         lvl: { green: "low", yellow: "moderate", orange: "elevated", red: "high", critical: "critical" },
-        hint: "Select a country for details. Link to a country: …/dashboard/#PL",
+        hint: "Select a country for details. Zoom with two fingers or the +/− buttons. Link to a country: …/dashboard/#PL",
+        zoomIn: "Zoom in", zoomOut: "Zoom out", zoomReset: "All of Europe", toMap: "🗺 Map",
         war: "War status", why: "Why", flags: "Flags", history: "Score, last 90 days", calibrating: "⏳ Not enough data for a score yet.",
         warS: { none: "no armed conflict", frozen: "frozen conflict / partial occupation", clashes: "sporadic armed clashes", active: "armed conflict", war: "war" },
         table: "Table of all countries", country: "Country", score: "Score", level: "Level",
@@ -291,11 +305,62 @@ function tipText(code) {
   return x ? `${x.flag} <b>${esc(x.name[lang])}</b><br>⚔ ${esc(t.ctxRole[x.role])}` : esc(code);
 }
 
+let view = null; // current map window [x, y, w, h] in SVG units; kept across re-renders
+// Window-level gesture handlers are added once; each render points them at its own map.
+const mapGesture = { move: null, end: null };
+window.addEventListener("pointermove", (ev) => mapGesture.move?.(ev), { passive: true });
+window.addEventListener("pointerup", (ev) => mapGesture.end?.(ev));
+window.addEventListener("pointercancel", (ev) => mapGesture.end?.(ev));
+const COARSE = matchMedia("(pointer: coarse)").matches; // touch screens: bigger targets
+
+function baseBox() { return geo.viewBox.split(" ").map(Number); }
+
+function labelsSvg(k) {
+  const out = [];
+  for (const [code, [lx, ly, r]] of Object.entries(geo.labels)) {
+    const c = data?.countries?.[code];
+    const x = data?.context?.[code];
+    if (r * k < 8 || (r < SMALL && k < 3)) continue; // too small on screen: tooltip and panel name it
+    const size = Math.min(22, Math.max(13, r * 0.7 * k)) / k; // constant on screen while zooming
+    const color = c ? ink(c) : "var(--ink)";
+    const value = c ? (c.score != null ? c.score.toFixed(1) : "⏳") : x ? (x.role === "aggressor_ally" ? "" : "⚔") : "";
+    out.push(`<text x="${lx}" y="${ly - size * 0.15}" font-size="${size}" style="fill:${color};stroke:${c ? fill(c) : "var(--surface)"};stroke-width:${2.5 / k}px">
+      <tspan x="${lx}">${code}</tspan><tspan class="s" x="${lx}" dy="1.05em" font-size="${size * 0.92}">${value}</tspan></text>`);
+  }
+  return out.join("");
+}
+
+function applyView(svg) {
+  const [, , BW] = baseBox();
+  const k = BW / view[2];
+  svg.setAttribute("viewBox", view.join(" "));
+  svg.querySelector("#labels").innerHTML = labelsSvg(k);
+  svg.querySelectorAll(".dot").forEach((d) => d.setAttribute("r", (COARSE ? 11 : 7) / k));
+  svg.style.touchAction = k > 1.01 ? "none" : "pan-y"; // zoomed in: one finger pans the map
+  const reset = document.getElementById("zoomReset");
+  if (reset) reset.disabled = k <= 1.01;
+}
+
+function zoomAt(svg, factor, cx, cy) {
+  const [, , BW, BH] = baseBox();
+  const w = Math.min(BW, Math.max(BW / 10, view[2] / factor));
+  const h = (w * BH) / BW;
+  const x = cx - ((cx - view[0]) * w) / view[2];
+  const y = cy - ((cy - view[1]) * h) / view[3];
+  view = [Math.min(BW - w, Math.max(0, x)), Math.min(BH - h, Math.max(0, y)), w, h];
+  applyView(svg);
+}
+
+function toSvg(svg, clientX, clientY) {
+  const r = svg.getBoundingClientRect();
+  return [view[0] + ((clientX - r.left) / r.width) * view[2], view[1] + ((clientY - r.top) / r.height) * view[3]];
+}
+
 function renderMap() {
   const map = document.getElementById("map");
   if (!geo) { map.innerHTML = ""; return; }
   const t = T[lang];
-  const [, , W] = geo.viewBox.split(" ").map(Number);
+  view = view || baseBox();
   const shape = (code, d, cls, style) => {
     const c = data?.countries?.[code];
     const x = data?.context?.[code];
@@ -305,31 +370,15 @@ function renderMap() {
     return `<path class="${cls}${code === selected ? " sel" : ""}" d="${d}" data-code="${code}" style="${style}"
       tabindex="0" role="button" aria-pressed="${code === selected}" aria-label="${esc(label)}"></path>`;
   };
-  const countries = Object.entries(geo.countries).map(([code, d]) => {
-    const c = data?.countries?.[code];
-    return shape(code, d, "c", `fill:${fill(c)}`);
-  });
+  const countries = Object.entries(geo.countries).map(([code, d]) => shape(code, d, "c", `fill:${fill(data?.countries?.[code])}`));
   const context = Object.entries(geo.context).map(([code, d]) => {
     const x = data?.context?.[code];
     return shape(code, d, `c ctx${x?.role === "aggressor_ally" ? " ally" : ""}`, "");
   });
-  const dots = [], labels = [];
-  for (const [code, [lx, ly, r]] of Object.entries(geo.labels)) {
-    const c = data?.countries?.[code];
-    const x = data?.context?.[code];
-    if (r < SMALL && geo.countries[code]) {
-      dots.push(`<circle class="c dot${code === selected ? " sel" : ""}" cx="${lx}" cy="${ly}" r="7" data-code="${code}"
-        style="fill:${fill(c)}" tabindex="-1" aria-hidden="true"></circle>`);
-      continue;
-    }
-    if (r < 8) continue; // too small for text: the tooltip and the panel name it
-    const size = Math.min(22, Math.max(13, r * 0.7));
-    const color = c ? ink(c) : "var(--ink)";
-    const value = c ? (c.score != null ? c.score.toFixed(1) : "⏳") : x ? (x.role === "aggressor_ally" ? "" : "⚔") : "";
-    labels.push(`<text x="${lx}" y="${ly - size * 0.15}" font-size="${size}" style="fill:${color};stroke:${c ? fill(c) : "var(--surface)"}">
-      <tspan x="${lx}">${code}</tspan><tspan class="s" x="${lx}" dy="1.05em" font-size="${size * 0.92}">${value}</tspan></text>`);
-  }
-  map.innerHTML = `<svg class="geo" viewBox="${geo.viewBox}" role="group" aria-label="${esc(t.title)}">
+  const dots = Object.entries(geo.labels).filter(([code, [, , r]]) => r < SMALL && geo.countries[code]).map(([code, [lx, ly]]) =>
+    `<circle class="c dot${code === selected ? " sel" : ""}" cx="${lx}" cy="${ly}" r="7" data-code="${code}"
+      style="fill:${fill(data?.countries?.[code])}" tabindex="-1" aria-hidden="true"></circle>`);
+  map.innerHTML = `<svg class="geo" viewBox="${view.join(" ")}" role="group" aria-label="${esc(t.title)}">
     <defs>
       <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
         <rect width="7" height="7" fill="var(--surface)"/><rect width="2.5" height="7" fill="var(--hatch)"/></pattern>
@@ -338,10 +387,21 @@ function renderMap() {
     </defs>
     <path class="other" d="${geo.other}"/>
     <g id="shapes">${context.join("")}${countries.join("")}${dots.join("")}</g>
-    <g>${labels.join("")}</g>
-  </svg><div class="maptip" id="maptip" hidden></div>`;
+    <g id="labels"></g>
+  </svg><div class="maptip" id="maptip" hidden></div>
+  <div class="zoomctl">
+    <button type="button" class="btn" id="zoomIn" aria-label="${esc(t.zoomIn)}" title="${esc(t.zoomIn)}">+</button>
+    <button type="button" class="btn" id="zoomOut" aria-label="${esc(t.zoomOut)}" title="${esc(t.zoomOut)}">−</button>
+    <button type="button" class="btn" id="zoomReset" aria-label="${esc(t.zoomReset)}" title="${esc(t.zoomReset)}">⟲</button>
+  </div>`;
 
   const svg = map.querySelector("svg"), tip = map.querySelector("#maptip"), shapes = map.querySelector("#shapes");
+  applyView(svg);
+  const centre = () => [view[0] + view[2] / 2, view[1] + view[3] / 2];
+  map.querySelector("#zoomIn").onclick = () => zoomAt(svg, 1.6, ...centre());
+  map.querySelector("#zoomOut").onclick = () => zoomAt(svg, 1 / 1.6, ...centre());
+  map.querySelector("#zoomReset").onclick = () => { view = baseBox(); applyView(svg); };
+
   const showTip = (el, ev) => {
     tip.innerHTML = tipText(el.dataset.code);
     tip.hidden = false;
@@ -353,14 +413,65 @@ function renderMap() {
     tip.style.left = `${Math.max(4, Math.min(box.width - w - 4, px + 14))}px`;
     tip.style.top = `${py - h - 12 < 0 ? py + 18 : py - h - 12}px`;
   };
+
+  // Gestures: two fingers zoom, one finger (or a mouse drag) pans a zoomed map; a drag never
+  // counts as a tap on a country.
+  const pts = new Map();
+  let gesture = null, dragged = false;
+  const start = () => {
+    const list = [...pts.values()];
+    if (list.length === 2) {
+      const [a, b] = list;
+      gesture = { pinch: true, dist: Math.hypot(a.x - b.x, a.y - b.y), mid: toSvg(svg, (a.x + b.x) / 2, (a.y + b.y) / 2), view: [...view] };
+    } else if (list.length === 1) {
+      gesture = { pinch: false, x: list[0].x, y: list[0].y, view: [...view] };
+    }
+  };
+  svg.addEventListener("pointerdown", (ev) => {
+    if (ev.pointerType === "mouse" && ev.button !== 0) return;
+    pts.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    dragged = false;
+    start();
+  });
+  mapGesture.move = (ev) => {
+    if (!pts.has(ev.pointerId) || !gesture) return;
+    pts.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    const list = [...pts.values()];
+    const r = svg.getBoundingClientRect();
+    if (gesture.pinch && list.length === 2) {
+      const [a, b] = list;
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      view = [...gesture.view];
+      zoomAt(svg, d / gesture.dist, ...gesture.mid);
+      dragged = true;
+    } else if (!gesture.pinch) {
+      const dx = ev.clientX - gesture.x, dy = ev.clientY - gesture.y;
+      if (Math.hypot(dx, dy) > 6) dragged = true;
+      const [, , BW, BH] = baseBox();
+      if (dragged && view[2] < BW - 0.5) {
+        const nx = gesture.view[0] - (dx * view[2]) / r.width, ny = gesture.view[1] - (dy * view[3]) / r.height;
+        view = [Math.min(BW - view[2], Math.max(0, nx)), Math.min(BH - view[3], Math.max(0, ny)), view[2], view[3]];
+        applyView(svg);
+        tip.hidden = true;
+      }
+    }
+  };
+  mapGesture.end = (ev) => { if (pts.delete(ev.pointerId)) start(); };
+  svg.addEventListener("wheel", (ev) => {
+    if (!ev.ctrlKey) return; // plain wheel scrolls the page; pinch on a trackpad comes with ctrl
+    ev.preventDefault();
+    zoomAt(svg, Math.exp(-ev.deltaY * 0.01), ...toSvg(svg, ev.clientX, ev.clientY));
+  }, { passive: false });
+  svg.addEventListener("dblclick", (ev) => { ev.preventDefault(); zoomAt(svg, 2, ...toSvg(svg, ev.clientX, ev.clientY)); });
+
   shapes.querySelectorAll(".c").forEach((el) => {
     // Raise the hovered shape so its whole border is drawn on top of the neighbours'.
     el.addEventListener("pointerenter", (ev) => { const next = el.nextElementSibling; if (!el.classList.contains("dot") && next && !next.classList.contains("dot")) shapes.insertBefore(el, shapes.querySelector(".dot")); if (ev.pointerType === "mouse") showTip(el, ev); });
-    el.addEventListener("pointermove", (ev) => { if (ev.pointerType === "mouse") showTip(el, ev); });
+    el.addEventListener("pointermove", (ev) => { if (ev.pointerType === "mouse" && !pts.size) showTip(el, ev); });
     el.addEventListener("pointerleave", () => { tip.hidden = true; });
     el.addEventListener("focus", () => showTip(el));
     el.addEventListener("blur", () => { tip.hidden = true; });
-    el.addEventListener("click", () => select(el.dataset.code, true));
+    el.addEventListener("click", () => { if (!dragged) select(el.dataset.code, true); });
     el.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(el.dataset.code, true); } });
   });
   // The selected country on top, so its outline is complete.
@@ -519,10 +630,19 @@ function render() {
   document.title = t.title;
   document.getElementById("notice").textContent = t.notice;
   document.getElementById("maphint").textContent = t.hint;
+  document.getElementById("tomap").textContent = t.toMap;
   document.getElementById("meta").textContent = data ? `${t.updated}: ${data.generated_at.replace("T", " ").slice(0, 16)} UTC` : "";
   renderMethod();
   document.getElementById("foot").textContent = data ? `v${data.version}` : "";
   renderLegend(); renderMap(); renderPanel(); renderTable();
+}
+
+// Phones: once the map is scrolled away (to read a country), a button brings it back.
+const toMap = document.getElementById("tomap");
+toMap.onclick = () => document.getElementById("map").scrollIntoView({ behavior: "smooth", block: "start" });
+if ("IntersectionObserver" in window) {
+  new IntersectionObserver(([e]) => toMap.classList.toggle("show",
+    !e.isIntersecting && matchMedia("(max-width: 860px)").matches && !!selected)).observe(document.getElementById("map"));
 }
 
 function select(code, byUser = false) {
