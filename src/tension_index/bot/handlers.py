@@ -27,6 +27,7 @@ from tension_index.config import Settings, get_settings
 from tension_index.countries import COUNTRIES
 from tension_index.health import run_checks
 from tension_index.i18n import LANGS, t
+from tension_index.languages import normalize
 from tension_index.refresh import interval_hours
 
 router = Router(name="main")
@@ -74,10 +75,13 @@ async def build_dashboard(db: aiosqlite.Connection, user: storage.User) -> views
     return views.dashboard_screen(data)
 
 
-async def next_screen(db: aiosqlite.Connection, user: storage.User | None) -> views.Screen:
-    """Whatever the user still has to set up, else the dashboard."""
+async def next_screen(
+    db: aiosqlite.Connection, user: storage.User | None, tg_lang: str | None = None
+) -> views.Screen:
+    """Whatever the user still has to set up, else the dashboard. `tg_lang`: the language of
+    the person's Telegram app, offered first when they choose."""
     if user is None or user.lang not in LANGS:
-        return views.language_screen()
+        return views.language_screen(normalize(tg_lang))
     if not user.followed or user.country not in COUNTRIES:
         return views.country_screen(user.lang)
     return await build_dashboard(db, user)
@@ -105,7 +109,9 @@ async def cmd_start(message: Message, settings: Settings) -> None:
     assert message.from_user
     async with storage.connect(settings.database_path) as db:
         user = await storage.get_user(db, message.from_user.id)
-        await reply(message, await next_screen(db, user))
+        await reply(
+            message, await next_screen(db, user, getattr(message.from_user, "language_code", None))
+        )
 
 
 @router.message(Command("help"))
@@ -181,7 +187,8 @@ async def on_menu(callback: CallbackQuery, callback_data: MenuCb, settings: Sett
             case "digest":
                 user = await storage.upsert_user(db, uid, digest=not user.digest)
             case "lang":
-                user = await storage.upsert_user(db, uid, lang="en" if user.lang == "uk" else "uk")
+                await show(callback, views.language_screen(user.lang))
+                return
             case "country":
                 await show(callback, views.country_screen(user.lang, user.followed))
                 return

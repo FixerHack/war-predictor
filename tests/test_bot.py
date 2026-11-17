@@ -14,9 +14,12 @@ def texts(kb) -> list[str]:
     return [b.text for row in kb.inline_keyboard for b in row]
 
 
-def test_language_screen_offers_both():
+def test_language_screen_offers_every_language_telegrams_first():
     text, kb = views.language_screen()
-    assert texts(kb) == ["🇺🇦 Українська", "🇬🇧 English"]
+    assert texts(kb)[:3] == ["Українська", "English", "Deutsch"] and len(texts(kb)) == 30
+    text, kb = views.language_screen("pl")
+    assert texts(kb)[0] == "⭐ Polski" and texts(kb).count("Polski") == 0
+    assert views.language_screen("xx")[1].inline_keyboard[0][0].text == "Українська"
 
 
 def test_country_screen_first_choice_and_follow_list():
@@ -48,7 +51,7 @@ def test_dashboard_indicators():
     assert "калібрування" in text
     assert "збройного конфлікту немає" in text
     assert "🇺🇦 Україна (війна)" in text and "🇷🇺 Росія" in text
-    assert "Сповіщення: увімкнено" in text and "Мова: українська" in text
+    assert "Сповіщення: увімкнено" in text and "Мова: Українська" in text
     assert "не прогноз" in text
     assert texts(kb)[0] == "🔔 Сповіщення: увімк."
 
@@ -68,7 +71,7 @@ def test_dashboard_indicators():
     assert "frozen conflict" in text and "Transnistria" in text
     assert "Notifications: off" in text
     assert texts(kb)[0] == "🔕 Notifications: off"
-    assert "🌐 Українська" in texts(kb)
+    assert "🌐 English" in texts(kb)  # the current language; it opens the chooser
 
 
 # --- Handler flow ---------------------------------------------------------------------------
@@ -116,6 +119,9 @@ async def test_onboarding_and_toggles(db_settings):
 
     cb = make_callback()
     await handlers.on_menu(cb, MenuCb(action="lang"), s)
+    assert "⭐ Українська" in last_edit(cb)[1]  # the chooser, current language first
+    cb = make_callback()
+    await handlers.on_lang(cb, LangCb(code="en"), s)
     assert "🇪🇪 <b>Estonia</b>" in last_edit(cb)[0]
 
     cb = make_callback()

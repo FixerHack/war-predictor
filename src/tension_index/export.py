@@ -138,7 +138,7 @@ async def chronicle(db: aiosqlite.Connection, code: str, now: datetime | None = 
             events.append({
                 "at": row["detected_at"][:16], "type": "advice", "change": cls.change_type,
                 "reason": cls.reason, "counted": bool(row["active"]),
-                "text": {"uk": cls.summary_uk or cls.summary_en, "en": cls.summary_en},
+                "text": {"uk": cls.summary_uk or cls.summary_en, "en": cls.summary_en} | cls.summaries,
                 "quote": cls.quote,
             } | _labels(row["source"], f"advisory_update:{cls.change_type}"))  # fmt: skip
 
