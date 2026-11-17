@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.6.7
+  version: 0.6.8
   updated: 2026-11-17
 
 milestones:
@@ -207,6 +207,7 @@ stages:
       - {id: S11.9, status: done, days: 0.3, uk: "Автопублікація карти з сервера кожні 30 хв (лише коли дані змінилися, gh-pages — один коміт)", en: "Server publishes the map every 30 min (only when the data changed, gh-pages keeps one commit)", note_uk: "Працює з 2026-10-05: tension-pages.timer, deploy key server-pages (лише цей репозиторій).", note_en: "Running since 2026-10-05: tension-pages.timer, deploy key server-pages (this repository only)."}
       - {id: S11.10, status: done, days: 0.5, uk: "Справжня карта Європи з кордонами (Natural Earth): колір за рівнем, підсвічування й підказка при наведенні, вибір кліком і з клавіатури; Крим — частина України", en: "A real map of Europe with borders (Natural Earth): colour by level, highlight and tooltip on hover, selection by click and keyboard; Crimea is part of Ukraine"}
       - {id: S11.11, status: done, days: 0.5, uk: "Мобільна версія карти: масштаб двома пальцями й кнопками +/−, перетягування збільшеної карти, легенда під картою, кнопка повернення до карти", en: "Mobile map: pinch and +/− zoom, panning a zoomed map, legend under the map, a back-to-map button"}
+      - {id: S11.12, status: done, days: 0.5, uk: "Хроніка країни за 90 днів: зміни рекомендацій урядів з описом, новинні й авіаційні сигнали, стрибки балу; позначено, що на бал не впливає", en: "Country chronicle for 90 days: government advice changes with a summary, news and aviation signals, score jumps; marks what does not affect the score"}
   - id: S12
     branch: dev-ops
     uk: Експлуатація
@@ -273,6 +274,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.6.8
+    date: 2026-11-17
+    uk: ["У панелі країни з'явилася хроніка за 90 днів: що змінили уряди й чому, новини, авіація, стрибки балу; біля подій, що не впливають на бал, є пояснення. Дані окремим файлом на країну, тож на телефоні вантажиться лише потрібне."]
+    en: ["The country panel has a 90-day chronicle: what governments changed and why, news, aviation, score jumps, with a note on events that do not affect the score. One file per country, so phones load only what they open."]
   - version: 0.6.7
     date: 2026-11-17
     uk: ["Карту можна збільшувати двома пальцями, кнопками +/− чи жестом трекпада й перетягувати; на телефоні карта одразу на першому екрані, легенда під нею, а після вибору країни з'являється кнопка «Карта»."]

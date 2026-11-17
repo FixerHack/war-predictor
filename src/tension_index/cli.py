@@ -149,13 +149,15 @@ async def _run(args: argparse.Namespace) -> int:
 
 
 async def _export(args: argparse.Namespace) -> int:
-    from tension_index.export import build, write
+    from tension_index.export import build, chronicles, write, write_chronicles
 
     settings = get_settings()
     async with storage.connect(settings.database_path) as db:
         await storage.migrate(db)
         data = await build(db)
+        events = await chronicles(db)
     write(data, Path(args.out))
+    write_chronicles(events, Path(args.out).parent / "chronicle")
     published = sum(1 for c in data["countries"].values() if c["score"] is not None)
     print(f"exported {published}/{len(data['countries'])} published scores -> {args.out}")
     return 0
