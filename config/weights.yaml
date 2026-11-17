@@ -23,8 +23,10 @@ reason_relevance:
   armed_conflict: 1.0
   military_threat: 1.0
   hybrid_attack: 0.7      # sabotage, drones over infrastructure, GPS jamming
+  war_spillover: 0.5      # stray drones / debris from a war next door, brief closures
   civil_unrest: 0.3
   terrorism: 0.2
+  criminal_attack: 0.1    # a lone or mentally ill attacker, no organisation or political aim
   unknown: 0.5
   crime: 0.05
   health: 0.05

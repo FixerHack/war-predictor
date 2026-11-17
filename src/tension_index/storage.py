@@ -186,6 +186,16 @@ MIGRATIONS: list[str] = [
         checked_at      TEXT NOT NULL
     );
     """,
+    # 12: classification rules reviewed by the owner (Nov 2026): unrest counts only with
+    # violence, removed warnings, war spillover, lone attackers. Redo the last 45 days of
+    # change classifications, and drop RU/BY "MFA advice" that was consular routine.
+    """
+    DELETE FROM classifications WHERE ref_type = 'change' AND ref_id IN (
+        SELECT id FROM changes WHERE detected_at >= datetime('now', '-45 days'));
+    UPDATE signals SET active = 0
+        WHERE kind = 'aggressor:mfa_advisory' AND (note LIKE '%выясня%' OR note LIKE '%пострадал%'
+            OR note LIKE '%погиб%' OR note LIKE '%ранен%' OR note LIKE '%задержан%');
+    """,
 ]
 
 

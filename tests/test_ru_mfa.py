@@ -17,9 +17,17 @@ def test_advice_headlines_filter():
         ("В МИД предупредили о возможных инцидентах из-за действий ЕС", "l2", None),  # no country
         ("МИД Латвии вызвал российского дипломата", "l3", None),  # someone else's ministry
         ("Туристы в Латвии жалуются на погоду", "l4", None),  # no ministry
+        # Consular routine after the Kraków shooting (7 Nov 2026), not travel advice:
+        (
+            "Посольство РФ в Польше выясняет, пострадали ли россияне при стрельбе в Кракове",
+            "l5",
+            None,
+        ),
+        ("Посольство России в Польше: среди погибших в Кракове россиян нет", "l6", None),
+        ("Посольство РФ призвало россиян покинуть Эстонию", "l7", None),
     ]
     found = ru_mfa.advice_headlines(items, "tass.ru")
-    assert [a["url"] for a in found] == ["l1"] and found[0]["domain"] == "tass.ru"
+    assert [a["url"] for a in found] == ["l1", "l7"] and found[0]["domain"] == "tass.ru"
 
 
 async def test_collect_two_outlets_confirm(settings):

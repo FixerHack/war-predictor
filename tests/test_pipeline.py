@@ -1,8 +1,8 @@
 # ruff: noqa: E501
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from tension_index import storage
-from tension_index.classifier import classify_rules
+from tension_index.classifier import Classification, classify_rules
 from tension_index.explain import explain, reasons
 from tension_index.notify import render_change, render_score
 from tension_index.pipeline import (
@@ -283,3 +283,60 @@ def test_staff_departure_for_an_unspecified_security_reason_counts():
             "state": True, "note": ""}  # fmt: skip
     kinds = [s.kind for s in advisory_state_signals(load_config(), cls, "3", base)]
     assert "staff_posture:authorized_departure" in kinds
+
+
+async def _classified_change(db, prev, new, change_type, reason, country="FR"):
+    cid = await storage.insert_change(
+        db, source="de", country=country, prev_snapshot=prev, new_snapshot=new, diff="d"
+    )
+    cls = Classification(reason=reason, change_type=change_type, method="claude")
+    await storage.save_classification(
+        db, ref_type="change", ref_id=cid, country=country, publisher="de", method="claude",
+        payload=cls.to_json(),
+    )  # fmt: skip
+    return cid
+
+
+async def _active(db) -> set[str]:
+    async with db.execute("SELECT ref FROM signals WHERE active = 1 AND state = 0") as cur:
+        return {r["ref"] for r in await cur.fetchall()}
+
+
+async def test_removed_warning_ends_its_event_once_rechecked(settings):
+    async with storage.connect(settings.database_path) as db:
+        s1 = await seed(db, source="de", country="FR", level=None, text="Ruhig.")
+        s2 = await storage.insert_snapshot(
+            db, source="de", country="FR", url="u", text="Unruhen in Paris.", level=None
+        )
+        riots = await _classified_change(db, s1, s2, "security_update", "civil_unrest")
+        s3 = await storage.insert_snapshot(
+            db, source="de", country="FR", url="u", text="Ruhig wieder.", level=None
+        )
+        removed = await _classified_change(db, s2, s3, "warning_removed", "civil_unrest")
+        await derive_advisory_signals(db)
+        assert f"change:{riots}" in await _active(db)  # removal not re-checked yet
+
+        async with db.execute("SELECT detected_at FROM changes WHERE id = ?", (removed,)) as cur:
+            detected = (await cur.fetchone())[0]
+        later = (datetime.fromisoformat(detected) + timedelta(hours=1)).isoformat()
+        await storage.mark_checked(db, ["FR"], later)  # a later fetch saw the same version
+        await derive_advisory_signals(db)
+        assert f"change:{riots}" not in await _active(db)
+
+
+async def test_change_reread_as_editorial_loses_its_event(settings):
+    async with storage.connect(settings.database_path) as db:
+        s1 = await seed(db, source="de", country="PL", level=None, text="A.")
+        s2 = await storage.insert_snapshot(
+            db, source="de", country="PL", url="u", text="B.", level=None
+        )
+        cid = await _classified_change(db, s1, s2, "security_update", "civil_unrest", "PL")
+        await derive_advisory_signals(db)
+        assert f"change:{cid}" in await _active(db)
+        cls = Classification(reason="civil_unrest", change_type="editorial", method="claude")
+        await storage.save_classification(
+            db, ref_type="change", ref_id=cid, country="PL", publisher="de", method="claude",
+            payload=cls.to_json(),
+        )  # fmt: skip
+        await derive_advisory_signals(db)
+        assert f"change:{cid}" not in await _active(db)

@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.6.5**, updated 2026-11-17.
+Version **0.6.6**, updated 2026-11-17.
 
-**Overall progress: 90%** · left ≈ 4.9 days · ✅ 88 · 🟡 1 · ⬜ 3 · ⛔ 4
+**Overall progress: 92%** · left ≈ 3.9 days · ✅ 89 · 🟡 1 · ⬜ 2 · ⛔ 4
 
 ## Milestones
 
@@ -130,7 +130,7 @@ Branch: `dev-history`
   - 4 episodes loaded, backtest on 0.2.106: all PASS (Ukraine 7 at 66 days, Israel at 134 days, Armenia reaction in 2 days, France 2016 control max 3.0).
 - ✅ **S5.5** Wayback archive: long timeouts, retries on 429/5xx, progress in logs
 
-## S6. Change classification (Claude API) — 78%
+## S6. Change classification (Claude API) — 100%
 
 _Claude determines the reason and type of each change and turns it into a signal._
 
@@ -139,8 +139,8 @@ Branch: `dev-classifier`
 - ✅ **S6.1** Prompt and JSON schema: reason, change type, staff, borders, quote
 - ✅ **S6.2** Call only on changed fragments, prompt caching, spend cap
   - Changed fragments only, cached system prompt, CLASSIFIER_MAX_CALLS cap; rules work without a key.
-- ⬜ **S6.3** Manual check on 50 examples _(manual)_
-  - Sheet: tension-index review → reports/classification-review.md (the same edit across countries is one entry); 30 distinct edits as of 2026-10-08; mark right/wrong.
+- ✅ **S6.3** Manual check on 50 examples _(manual)_
+  - 17 Nov 2026: 50 classifications reviewed with the owner, average 8.9/10; rules refined (unrest only with violence, removed warnings, war spillover, terrorism grades, verbatim quotes only).
 - ✅ **S6.7** Classifier through the local Claude Code CLI (claude -p, no API key)
   - CLASSIFIER_PROVIDER=claude_code: claude -p with a JSON schema, no tools, no saved sessions; uses the subscription's limits. On a server, claude setup-token is needed.
 - ✅ **S6.8** Separate claude-gateway tool: HTTP API (own, OpenAI- and Anthropic-compatible) and MCP on top of Claude Code
@@ -262,6 +262,7 @@ Branch: `—`
 
 ## Decisions
 
+- 2026-11-17: Classification rules from the owner: unrest raises the score only with violence; a removed warning drops its contribution once re-checked; stray drones and debris from a war next door are their own reason, war spillover (0.5), deliberate incursions far from a war are hybrid attacks; a lone attacker (0.1) < terrorism (0.2) < an attack by another state's military or services (military threat).
 - 2026-10-08: France's level is read from the "Zones de vigilance" text: the colour of the whole country or of zones (*_parts: yellow 0.1, orange 0.3, red 0.45 — like the UK partial warnings); a country without a stated colour is green, as on the ministry's map.
 - 2026-10-08: RU/BY MFA advice to their citizens is taken from headlines of five Russian outlets (publisher ru_media, aggressor block); GDELT tone is not used.
 - 2026-10-06: Operator messages to TELEGRAM_CHAT_ID use the language the chat owner chose in the bot (Ukrainian by default); the original source text is shown folded.
@@ -304,6 +305,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.6.6** (2026-11-17)
+  - Classifier after reviewing 50 changes: unrest counts only with violence, removed warnings drop their contribution, new reasons war spillover and lone attacker, verbatim quotes only; fixed Poland's false alarm (a consular news item of the Russian embassy counted as MFA advice).
 - **0.6.5** (2026-11-17)
   - Tiles replaced with a real map of Europe with borders: colour by level, highlight and tooltip on hover, Malta, Luxembourg and Cyprus as dots; Crimea is shown as part of Ukraine.
 - **0.6.4** (2026-10-22)
