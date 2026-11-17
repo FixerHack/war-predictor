@@ -13,7 +13,7 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.7.0
+  version: 0.7.1
   updated: 2026-11-17
 
 milestones:
@@ -279,6 +279,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.7.1
+    date: 2026-11-17
+    uk: ["Шкала влади точніша: розмітку робить Sonnet, кожен тип сигналу має структурну перевірку (чи діє саме влада країни, чи це керівник силових структур, чи було насильство, чи це опитування); хибні сигнали після перерозмітки вимикаються."]
+    en: ["The government scale is more precise: Sonnet labels, every kind has a structured check (own authorities act, a security chief, violence, a poll); false signals are switched off after relabelling."]
   - version: 0.7.0
     date: 2026-11-17
     uk: ["Нове: шкала «Влада й силові структури» з національних ЗМІ всіх 38 країн у панелі країни й боті; інтерфейс 30 мовами з автоматичним вибором мови; описи подій мовою країни; Норвегія знову показана сусідом Росії (виправлено читання YAML)."]

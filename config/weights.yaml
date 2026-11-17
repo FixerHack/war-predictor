@@ -157,6 +157,7 @@ stability:
   half_life_days: 10
   unconfirmed_factor: 0.5    # one private outlet only (tier 3) until a second one reports it
   curve_gamma: 0.7           # same stretch of the low end as the tension score
+  model: sonnet              # labelling model (gateway / claude_code): needs judgement, few calls
   categories:
     pro_aggressor_policy: {weight: 0.6, tension: 0.35}   # decisions favouring Russia/Belarus
     security_purge: {weight: 0.5, tension: 0.25}         # top military/police/intelligence removed or arrested

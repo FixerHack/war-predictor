@@ -162,7 +162,7 @@ async def run_cycle(
         # National media on the countries' own institutions (stability scale), countries due.
         try:
             stability = await asyncio.wait_for(
-                collect_stability(db, client, settings, countries=report.due), 300.0
+                collect_stability(db, client, settings, countries=report.due), 420.0
             )
             report.results.append(stability)
         except (httpx.HTTPError, ValueError, KeyError, TimeoutError) as exc:

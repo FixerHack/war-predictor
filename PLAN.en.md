@@ -2,7 +2,7 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.7.0**, updated 2026-11-17.
+Version **0.7.1**, updated 2026-11-17.
 
 **Overall progress: 93%** · left ≈ 4.0 days · ✅ 94 · 🟡 1 · ⬜ 2 · ⛔ 4
 
@@ -313,6 +313,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.7.1** (2026-11-17)
+  - The government scale is more precise: Sonnet labels, every kind has a structured check (own authorities act, a security chief, violence, a poll); false signals are switched off after relabelling.
 - **0.7.0** (2026-11-17)
   - New: the government and security forces scale from national media of all 38 countries in the country panel and the bot; the interface in 30 languages with automatic language choice; event summaries in the language of the country; Norway shown as a neighbour of Russia again (YAML parsing fix).
 - **0.6.8** (2026-11-17)
