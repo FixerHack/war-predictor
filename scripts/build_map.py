@@ -29,7 +29,22 @@ MONITORED = {
     "008": "AL", "070": "BA",
 }  # fmt: skip
 CONTEXT = {"804": "UA", "643": "RU", "112": "BY"}  # neighbours at war: hatched, never scored
-BY_NAME = {"Kosovo": "XK", "N. Cyprus": "CY"}  # the island is shown as Cyprus
+# Kosovo has no id; the whole island is shown as Cyprus; Aland is Finland; the Crown
+# dependencies are drawn with the United Kingdom, which is responsible for their defence.
+BY_NAME = {"Kosovo": "XK", "N. Cyprus": "CY", "Åland": "FI", "Jersey": "GB", "Guernsey": "GB",
+           "Isle of Man": "GB"}  # fmt: skip
+# Not monitored, drawn grey; the page names them ("not available yet") by these codes.
+OTHERS = {
+    "012": "DZ", "020": "AD", "031": "AZ", "051": "AM", "234": "FO", "268": "GE", "275": "PS",
+    "304": "GL", "364": "IR", "368": "IQ", "376": "IL", "398": "KZ", "400": "JO", "422": "LB",
+    "434": "LY", "438": "LI", "492": "MC", "504": "MA", "674": "SM", "682": "SA", "760": "SY",
+    "788": "TN", "792": "TR", "818": "EG", "336": "VA", "887": "YE", "860": "UZ", "840": "US",
+    "784": "AE", "795": "TM", "762": "TJ", "729": "SD", "706": "SO", "686": "SN", "634": "QA",
+    "512": "OM", "562": "NE", "732": "EH", "496": "MN", "478": "MR", "466": "ML", "417": "KG",
+    "414": "KW", "270": "GM", "666": "PM", "231": "ET", "232": "ER", "262": "DJ", "156": "CN",
+    "148": "TD", "132": "CV", "124": "CA", "048": "BH", "004": "AF",
+}  # fmt: skip
+OTHERS_BY_NAME = {"Somaliland": "SO"}
 # Natural Earth draws Crimea as part of Russia; it is Ukraine (UN GA resolution 68/262).
 # It is a separate polygon of Russia's MultiPolygon: moved to Ukraine by its centre.
 CRIMEA = (32.3, 44.2, 36.8, 46.3)  # lon/lat box
@@ -38,7 +53,7 @@ LON0, LAT0 = 12.0, 53.0  # projection centre
 FRAME = (-24.5, 34.5, 41.0, 71.2)  # lon/lat box the view must show (Iceland .. Cyprus)
 WIDTH = 1000.0  # SVG units across the frame
 SIMPLIFY = 0.35  # Douglas-Peucker tolerance, SVG units
-MARGIN = 30.0  # keep this much outside the frame before clipping
+MARGIN = 300.0  # land kept outside the frame: phones show more than the frame around it
 # Label points the automatic search would put oddly (lon, lat).
 LABEL_AT = {"RU": (37.5, 56.5), "UA": (31.5, 49.0), "NO": (9.5, 61.5), "FR": (2.5, 46.8),
             "GB": (-1.8, 52.8), "GR": (22.0, 39.6), "DK": (9.2, 56.1)}  # fmt: skip
@@ -251,7 +266,7 @@ def main(src: Path) -> None:
     arcs = decode_arcs(topo, to_svg)
 
     shapes: dict[str, list] = {}
-    other = []
+    other: dict[str, list] = {}
     for geom in topo["objects"]["countries"]["geometries"]:
         code = MONITORED.get(geom.get("id")) or CONTEXT.get(geom.get("id"))
         code = code or BY_NAME.get(geom["properties"]["name"])
@@ -271,7 +286,11 @@ def main(src: Path) -> None:
         if code:
             shapes.setdefault(code, []).extend(clipped)
         else:
-            other.extend(clipped)
+            name = geom["properties"]["name"]
+            key = OTHERS.get(geom.get("id")) or OTHERS_BY_NAME.get(name)
+            if key is None:
+                sys.exit(f"no code for {name}: add it to OTHERS")
+            other.setdefault(key, []).extend(clipped)
 
     missing = set(MONITORED.values()) | set(CONTEXT.values()) | {"XK"}
     missing -= set(shapes)
@@ -296,7 +315,7 @@ def main(src: Path) -> None:
         "viewBox": f"0 0 {width:.0f} {height:.0f}",
         "countries": {c: path(shapes[c]) for c in sorted(shapes) if c not in CONTEXT.values()},
         "context": {c: path(shapes[c]) for c in sorted(CONTEXT.values())},
-        "other": path(other),
+        "others": {c: path(other[c]) for c in sorted(other)},
         "labels": dict(sorted(labels.items())),
     }
     OUT.write_text(json.dumps(data, separators=(",", ":")), encoding="utf-8")

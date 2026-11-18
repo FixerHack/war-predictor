@@ -47,3 +47,12 @@ def test_crimea_is_ukraine_and_cities_land_in_their_country():
     assert owner(21.16, 42.66) == ["XK"]  # Pristina
     assert owner(14.51, 35.90) == ["MT"]  # Valletta
     assert owner(33.40, 35.30) == ["CY"]  # the north of the island is shown as Cyprus
+
+
+def test_grey_countries_are_named_and_dependencies_join_their_country():
+    assert GEO["others"] and not set(GEO["others"]) & (set(COUNTRIES) | {"UA", "RU", "BY", "ZZ"})
+    assert all(re.fullmatch(r"[A-Z]{2}", c) for c in GEO["others"])
+    assert owner(-4.48, 54.15) == ["GB"]  # Douglas, Isle of Man
+    assert owner(19.94, 60.10) == ["FI"]  # Mariehamn, Aland
+    page = (ROOT / "site" / "dashboard" / "index.html").read_text(encoding="utf-8")
+    assert "geo.others" in page and "geo.other}" not in page
