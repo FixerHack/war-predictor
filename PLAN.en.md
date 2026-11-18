@@ -2,9 +2,9 @@
 
 > Generated from `roadmap/roadmap.yaml` by `uv run tension-index roadmap`. Do not edit by hand. [Українська версія](PLAN.md)
 
-Version **0.7.1**, updated 2026-11-17.
+Version **0.7.2**, updated 2026-11-18.
 
-**Overall progress: 93%** · left ≈ 4.0 days · ✅ 94 · 🟡 1 · ⬜ 2 · ⛔ 4
+**Overall progress: 93%** · left ≈ 4.0 days · ✅ 95 · 🟡 1 · ⬜ 2 · ⛔ 4
 
 ## Milestones
 
@@ -237,6 +237,8 @@ Branch: `dev-dashboard`
 - ✅ **S11.11** Mobile map: pinch and +/− zoom, panning a zoomed map, legend under the map, a back-to-map button
 - ✅ **S11.12** Country chronicle for 90 days: government advice changes with a summary, news and aviation signals, score jumps; marks what does not affect the score
 - ✅ **S11.13** Localization: 30 languages (uk and en by hand, 28 machine-translated by Claude), browser and Telegram language by default, event summaries in the language of the country
+- ✅ **S11.14** Phone interface in the style of map apps: a full-screen map, capsules on top (update time, the chosen country with a list and search, language with flags), a draggable bottom sheet with the country; grey countries say "not available yet"
+  - Aland is shown as Finland; the Isle of Man, Jersey and Guernsey with the United Kingdom.
 
 ## S12. Operations — 86%
 
@@ -313,6 +315,8 @@ Branch: `—`
 
 ## Changelog
 
+- **0.7.2** (2026-11-18)
+  - A new phone version of the map: a full-screen map, capsules on top with the update time, the chosen country (a tap opens a searchable list) and the language with flags; a bottom sheet with the country that drags up and down. Tapping a country outside the index says it is not available yet.
 - **0.7.1** (2026-11-17)
   - The government scale is more precise: Sonnet labels, every kind has a structured check (own authorities act, a security chief, violence, a poll); false signals are switched off after relabelling.
 - **0.7.0** (2026-11-17)

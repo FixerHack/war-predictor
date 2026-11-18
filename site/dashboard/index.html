@@ -155,23 +155,83 @@ td button.link:focus-visible { outline: 2px solid var(--focus); outline-offset: 
   section.method { font-size: 0.9rem; }
 }
 a { color: var(--focus); }
+.geo .other { cursor: pointer; }
+/* Phone layout (body.m): the map fills the screen, capsules on top, a bottom sheet with the
+   chosen country. Set by layout() from MOBILE below. */
+.topbar, .sheet { display: none; }
+body.m { overflow: hidden; height: 100dvh; overscroll-behavior: none; }
+body.m .wrap { display: none; }
+body.m #map { position: fixed; inset: 0; z-index: 0; background: var(--sea); }
+body.m .geo { width: 100%; height: 100%; border-radius: 0; touch-action: none; }
+body.m .zoomctl, body.m .tomap, body.m .maptip { display: none !important; }
+body.m .topbar { display: flex; position: fixed; z-index: 30; left: 12px; right: 12px;
+  top: calc(env(safe-area-inset-top, 0px) + 10px); gap: 8px; align-items: center; pointer-events: none; }
+.cap { pointer-events: auto; height: 46px; border-radius: 999px; background: var(--surface); color: var(--ink);
+  border: 0; box-shadow: 0 2px 8px rgba(0,0,0,.22); font: inherit; display: inline-flex; align-items: center;
+  gap: 8px; padding: 0 14px; cursor: pointer; -webkit-tap-highlight-color: transparent; flex: none; }
+.cap:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.cap.time { font-size: .9rem; font-weight: 600; padding: 0 12px; }
+.cap.country { flex: 1; min-width: 0; font-weight: 600; }
+.cap .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; text-align: left; }
+.chip { flex: none; font-size: .85rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; min-width: 2.7em; text-align: center; }
+.cap.lang { width: 46px; padding: 0; justify-content: center; position: relative; font-size: 1.45rem; }
+.cap.lang select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 16px; cursor: pointer; }
+body.m .sheet { display: flex; flex-direction: column; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: var(--surface); border-radius: 18px 18px 0 0; box-shadow: 0 -4px 18px rgba(0,0,0,.2);
+  transition: transform .28s cubic-bezier(.2,.8,.2,1); will-change: transform; }
+.grab { all: unset; flex: none; height: 26px; display: flex; align-items: center; justify-content: center; cursor: grab; }
+.grab span { width: 40px; height: 5px; border-radius: 3px; background: var(--line); }
+.sheetbody { flex: 1; min-height: 0; overflow: hidden; padding: 0 16px calc(28px + env(safe-area-inset-bottom, 0px));
+  overscroll-behavior: contain; }
+.sheet.full .sheetbody { overflow-y: auto; }
+body.m .panel { border: 0; padding: 0 0 8px; background: transparent; }
+body.m .notice { margin: 14px 0; }
+.picker[hidden], .toast[hidden] { display: none; }
+.picker { display: flex; position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.35); align-items: flex-start;
+  justify-content: center; padding: calc(env(safe-area-inset-top, 0px) + 64px) 12px calc(12px + env(safe-area-inset-bottom, 0px)); }
+.pickbox { background: var(--surface); border-radius: 16px; width: 100%; max-width: 480px; max-height: 100%;
+  display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 28px rgba(0,0,0,.3); }
+.pickbox input { font: inherit; font-size: 16px; margin: 10px; padding: 10px 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.picklist { overflow-y: auto; overscroll-behavior: contain; padding-bottom: 8px; }
+.picklist button { all: unset; box-sizing: border-box; display: flex; width: 100%; align-items: center; gap: 10px;
+  padding: 11px 16px; cursor: pointer; }
+.picklist .nm { flex: 1; }
+.picklist button[aria-current="true"] { background: var(--band); font-weight: 600; }
+.picklist button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.toast { position: fixed; z-index: 35; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 66px);
+  transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px); background: var(--ink); color: var(--surface);
+  padding: 9px 14px; border-radius: 12px; font-size: .9rem; line-height: 1.35; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
+<div class="topbar" id="topbar">
+  <button type="button" class="cap time" id="timeCap"></button>
+  <button type="button" class="cap country" id="countryCap" aria-haspopup="dialog"></button>
+  <label class="cap lang" id="langCap"><span id="langFlag" aria-hidden="true"></span></label>
+</div>
+<div class="sheet" id="sheet" data-state="half">
+  <button type="button" class="grab" id="grab"><span></span></button>
+  <div class="sheetbody" id="sheetBody"></div>
+</div>
+<div class="picker" id="picker" hidden role="dialog" aria-modal="true">
+  <div class="pickbox"><input type="search" id="pickSearch" autocomplete="off"><div class="picklist" id="pickList"></div></div>
+</div>
+<div class="toast" id="toast" hidden role="status"></div>
+<div class="wrap" id="wrap">
+  <header id="hdr">
     <div>
       <h1 id="title">Індекс напруги: Європа</h1>
       <div class="meta" id="meta"></div>
     </div>
-    <div class="controls">
+    <div class="controls" id="controls">
       <select class="btn" id="langSel" aria-label="Language"></select>
       <button class="btn" id="themeBtn" type="button" aria-label="Theme">◐</button>
     </div>
   </header>
   <div class="notice" id="notice"></div>
-  <div class="cols">
-    <div>
+  <div class="cols" id="cols">
+    <div id="mapcol">
       <div class="map" id="map"></div>
       <div class="legend" id="legend"></div>
       <p class="muted" id="maphint"></p>
@@ -192,6 +252,7 @@ const WAR = { none: "", frozen: "🧊", clashes: "🟠", active: "🔴", war: "�
 // Interface texts: i18n/<lang>.json (uk and en written by hand, the rest machine-translated by
 // `tension-index translate`), merged over English so a missing key never shows blank.
 const LANG_NAMES = { uk: "Українська", en: "English", de: "Deutsch", fr: "Français", nl: "Nederlands", it: "Italiano", es: "Español", pt: "Português", pl: "Polski", cs: "Čeština", sk: "Slovenčina", hu: "Magyar", ro: "Română", bg: "Български", el: "Ελληνικά", hr: "Hrvatski", sl: "Slovenščina", sr: "Српски", bs: "Bosanski", mk: "Македонски", sq: "Shqip", da: "Dansk", sv: "Svenska", nb: "Norsk", fi: "Suomi", et: "Eesti", lv: "Latviešu", lt: "Lietuvių", is: "Íslenska", mt: "Malti" };
+const LANG_FLAGS = { uk: "🇺🇦", en: "🇬🇧", de: "🇩🇪", fr: "🇫🇷", nl: "🇳🇱", it: "🇮🇹", es: "🇪🇸", pt: "🇵🇹", pl: "🇵🇱", cs: "🇨🇿", sk: "🇸🇰", hu: "🇭🇺", ro: "🇷🇴", bg: "🇧🇬", el: "🇬🇷", hr: "🇭🇷", sl: "🇸🇮", sr: "🇷🇸", bs: "🇧🇦", mk: "🇲🇰", sq: "🇦🇱", da: "🇩🇰", sv: "🇸🇪", nb: "🇳🇴", fi: "🇫🇮", et: "🇪🇪", lv: "🇱🇻", lt: "🇱🇹", is: "🇮🇸", mt: "🇲🇹" };
 const T = {};
 const merge = (base, over) => {
   if (over === undefined || over === null || over === "") return base;
@@ -274,19 +335,48 @@ window.addEventListener("pointermove", (ev) => mapGesture.move?.(ev), { passive:
 window.addEventListener("pointerup", (ev) => mapGesture.end?.(ev));
 window.addEventListener("pointercancel", (ev) => mapGesture.end?.(ev));
 const COARSE = matchMedia("(pointer: coarse)").matches; // touch screens: bigger targets
+const MOBILE = matchMedia("(max-width: 700px)"); // phones: full-screen map and a bottom sheet
+let mobile = MOBILE.matches;
 
 function baseBox() { return geo.viewBox.split(" ").map(Number); }
+// Height / width of the map window: the frame's on wide screens, the screen's on phones.
+function aspect(svg) {
+  const [, , BW, BH] = baseBox();
+  const r = mobile && svg ? svg.getBoundingClientRect() : null;
+  return r && r.width ? r.height / r.width : BH / BW;
+}
+// Wide screens: the window stays inside the frame. Phones: its centre does.
+function clampView([x, y, w, h]) {
+  const [, , BW, BH] = baseBox();
+  if (!mobile) return [Math.min(BW - w, Math.max(0, x)), Math.min(BH - h, Math.max(0, y)), w, h];
+  const cx = Math.min(BW, Math.max(0, x + w / 2)), cy = Math.min(BH, Math.max(0, y + h / 2));
+  return [cx - w / 2, cy - h / 2, w, h];
+}
+// Starting window. Phones: Europe in the band between the capsules and the half-open sheet.
+const BAND = [0.09, 0.56]; // top and bottom of that band, share of the screen height
+function homeView(svg) {
+  const [, , BW, BH] = baseBox();
+  if (!mobile) return [0, 0, BW, BH];
+  const a = aspect(svg), band = BAND[1] - BAND[0];
+  let w = BW * 0.8;
+  if (w * a * band < BH * 0.85) w = (BH * 0.85) / (a * band); // short screens: fit the height
+  w = Math.min(w, maxWidth(svg));
+  const h = w * a;
+  return clampView([BW * 0.55 - w / 2, BH * 0.56 - h * (BAND[0] + band / 2), w, h]);
+}
+const maxWidth = () => { const [, , BW] = baseBox(); return mobile ? BW * 1.1 : BW; };
 
-function labelsSvg(k) {
+function labelsSvg(k, s) {
+  // k: zoom against the whole frame; s: screen pixels per SVG unit.
   const out = [];
   for (const [code, [lx, ly, r]] of Object.entries(geo.labels)) {
     const c = data?.countries?.[code];
     const x = data?.context?.[code];
-    if (r * k < 8 || (r < SMALL && k < 3)) continue; // too small on screen: tooltip and panel name it
-    const size = Math.min(22, Math.max(13, r * 0.7 * k)) / k; // constant on screen while zooming
+    if (r * s < 6 || (r < SMALL && k < 3)) continue; // too small on screen: tooltip and panel name it
+    const size = Math.min(16, Math.max(10, r * 0.7 * s)) / s; // constant on screen while zooming
     const color = c ? ink(c) : "var(--ink)";
     const value = c ? (c.score != null ? c.score.toFixed(1) : "⏳") : x ? (x.role === "aggressor_ally" ? "" : "⚔") : "";
-    out.push(`<text x="${lx}" y="${ly - size * 0.15}" font-size="${size}" style="fill:${color};stroke:${c ? fill(c) : "var(--surface)"};stroke-width:${2.5 / k}px">
+    out.push(`<text x="${lx}" y="${ly - size * 0.15}" font-size="${size}" style="fill:${color};stroke:${c ? fill(c) : "var(--surface)"};stroke-width:${2.5 / s}px">
       <tspan x="${lx}">${code}</tspan><tspan class="s" x="${lx}" dy="1.05em" font-size="${size * 0.92}">${value}</tspan></text>`);
   }
   return out.join("");
@@ -294,24 +384,22 @@ function labelsSvg(k) {
 
 function applyView(svg) {
   const [, , BW] = baseBox();
-  const k = BW / view[2];
+  const k = BW / view[2], s = (svg.getBoundingClientRect().width || BW) / view[2];
   svg.setAttribute("viewBox", view.join(" "));
-  svg.querySelector("#labels").innerHTML = labelsSvg(k);
-  svg.querySelectorAll(".dot").forEach((d) => d.setAttribute("r", (COARSE ? 11 : 7) / k));
-  svg.style.touchAction = k > 1.01 ? "none" : "pan-y"; // zoomed in: one finger pans the map
+  svg.querySelector("#labels").innerHTML = labelsSvg(k, s);
+  svg.querySelectorAll(".dot").forEach((d) => d.setAttribute("r", (COARSE ? 9 : 6) / s));
+  svg.style.touchAction = mobile || k > 1.01 ? "none" : "pan-y"; // zoomed in: one finger pans the map
   const reset = document.getElementById("zoomReset");
   if (reset) reset.disabled = k <= 1.01;
 }
 
-function zoomAt(svg, factor, cx, cy) {
-  const [, , BW, BH] = baseBox();
-  const w = Math.min(BW, Math.max(BW / 10, view[2] / factor));
-  const h = (w * BH) / BW;
-  const x = cx - ((cx - view[0]) * w) / view[2];
-  const y = cy - ((cy - view[1]) * h) / view[3];
-  view = [Math.min(BW - w, Math.max(0, x)), Math.min(BH - h, Math.max(0, y)), w, h];
-  applyView(svg);
+function zoomView(svg, v, factor, cx, cy) {
+  const [, , BW] = baseBox();
+  const w = Math.min(maxWidth(svg), Math.max(BW / 12, v[2] / factor));
+  const h = w * aspect(svg);
+  return clampView([cx - ((cx - v[0]) * w) / v[2], cy - ((cy - v[1]) * h) / v[3], w, h]);
 }
+function zoomAt(svg, factor, cx, cy) { view = zoomView(svg, view, factor, cx, cy); applyView(svg); }
 
 function toSvg(svg, clientX, clientY) {
   const r = svg.getBoundingClientRect();
@@ -322,6 +410,7 @@ function renderMap() {
   const map = document.getElementById("map");
   if (!geo) { map.innerHTML = ""; return; }
   const t = T[lang];
+  const home = !view;
   view = view || baseBox();
   const shape = (code, d, cls, style) => {
     const c = data?.countries?.[code];
@@ -347,7 +436,7 @@ function renderMap() {
       <pattern id="hatch2" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
         <rect width="7" height="7" fill="var(--surface)"/><rect width="2.5" height="7" fill="var(--hatch-2)"/></pattern>
     </defs>
-    <path class="other" d="${geo.other}"/>
+    ${Object.entries(geo.others || {}).map(([code, d]) => `<path class="other" data-other="${code}" d="${d}"/>`).join("")}
     <g id="shapes">${context.join("")}${countries.join("")}${dots.join("")}</g>
     <g id="labels"></g>
   </svg><div class="maptip" id="maptip" hidden></div>
@@ -358,11 +447,12 @@ function renderMap() {
   </div>`;
 
   const svg = map.querySelector("svg"), tip = map.querySelector("#maptip"), shapes = map.querySelector("#shapes");
+  if (home) view = homeView(svg);
   applyView(svg);
   const centre = () => [view[0] + view[2] / 2, view[1] + view[3] / 2];
   map.querySelector("#zoomIn").onclick = () => zoomAt(svg, 1.6, ...centre());
   map.querySelector("#zoomOut").onclick = () => zoomAt(svg, 1 / 1.6, ...centre());
-  map.querySelector("#zoomReset").onclick = () => { view = baseBox(); applyView(svg); };
+  map.querySelector("#zoomReset").onclick = () => { view = homeView(svg); applyView(svg); };
 
   const showTip = (el, ev) => {
     tip.innerHTML = tipText(el.dataset.code);
@@ -403,16 +493,19 @@ function renderMap() {
     if (gesture.pinch && list.length === 2) {
       const [a, b] = list;
       const d = Math.hypot(a.x - b.x, a.y - b.y);
-      view = [...gesture.view];
-      zoomAt(svg, d / gesture.dist, ...gesture.mid);
+      view = zoomView(svg, gesture.view, d / gesture.dist, ...gesture.mid);
+      // ...and follow the fingers: the point between them stays under them.
+      const [mx, my] = toSvg(svg, (a.x + b.x) / 2, (a.y + b.y) / 2);
+      view = clampView([view[0] + gesture.mid[0] - mx, view[1] + gesture.mid[1] - my, view[2], view[3]]);
+      applyView(svg);
       dragged = true;
     } else if (!gesture.pinch) {
       const dx = ev.clientX - gesture.x, dy = ev.clientY - gesture.y;
       if (Math.hypot(dx, dy) > 6) dragged = true;
-      const [, , BW, BH] = baseBox();
-      if (dragged && view[2] < BW - 0.5) {
+      const [, , BW] = baseBox();
+      if (dragged && (mobile || view[2] < BW - 0.5)) {
         const nx = gesture.view[0] - (dx * view[2]) / r.width, ny = gesture.view[1] - (dy * view[3]) / r.height;
-        view = [Math.min(BW - view[2], Math.max(0, nx)), Math.min(BH - view[3], Math.max(0, ny)), view[2], view[3]];
+        view = clampView([nx, ny, view[2], view[3]]);
         applyView(svg);
         tip.hidden = true;
       }
@@ -431,7 +524,7 @@ function renderMap() {
     el.addEventListener("pointerenter", (ev) => { const next = el.nextElementSibling; if (!el.classList.contains("dot") && next && !next.classList.contains("dot")) shapes.insertBefore(el, shapes.querySelector(".dot")); if (ev.pointerType === "mouse") showTip(el, ev); });
     el.addEventListener("pointermove", (ev) => { if (ev.pointerType === "mouse" && !pts.size) showTip(el, ev); });
     el.addEventListener("pointerleave", () => { tip.hidden = true; });
-    el.addEventListener("focus", () => showTip(el));
+    el.addEventListener("focus", () => { if (!mobile) showTip(el); });
     el.addEventListener("blur", () => { tip.hidden = true; });
     el.addEventListener("click", () => { if (!dragged) select(el.dataset.code, true); });
     el.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(el.dataset.code, true); } });
@@ -440,6 +533,10 @@ function renderMap() {
   const sel = shapes.querySelector(".c.sel:not(.dot)");
   if (sel) shapes.insertBefore(sel, shapes.querySelector(".dot"));
   svg.addEventListener("pointerleave", () => { tip.hidden = true; });
+  // Countries outside the index: say so instead of doing nothing.
+  svg.querySelectorAll(".other").forEach((el) => el.addEventListener("click", () => {
+    if (!dragged) toast(T[lang].unavailable.replace("{name}", regionName(el.dataset.other) || el.dataset.other));
+  }));
 }
 
 function chart(history) {
@@ -659,15 +756,16 @@ function renderTable() {
     rows.map(([code, c]) => `<tr data-code="${code}"><td><button class="link" type="button">${c.flag} ${esc(c.name[lang])}</button></td><td class="num">${c.score != null ? c.score.toFixed(1) : "—"}</td>` +
       `<td>${c.score != null ? esc(t.lvl[c.level]) : "⏳"}</td><td>${WAR[c.war.status] || "🟢"} ${esc(t.warS[c.war.status])}</td></tr>`).join("") +
     `</tbody></table>`;
-  document.querySelectorAll("#table tbody tr").forEach((tr) => tr.onclick = () => select(tr.dataset.code, true));
+  document.querySelectorAll("#table tbody tr").forEach((tr) => tr.onclick = () => select(tr.dataset.code, true, true));
 }
 
 function render() {
   const t = T[lang];
   document.documentElement.lang = lang;
   const sel = document.getElementById("langSel");
-  if (!sel.options.length) sel.innerHTML = Object.entries(LANG_NAMES).map(([k, v]) => `<option value="${k}">${esc(v)}</option>`).join("");
+  if (!sel.options.length) sel.innerHTML = Object.entries(LANG_NAMES).map(([k, v]) => `<option value="${k}">${LANG_FLAGS[k]} ${esc(v)}</option>`).join("");
   sel.value = lang;
+  document.getElementById("langFlag").textContent = LANG_FLAGS[lang];
   localizeData();
   document.getElementById("title").textContent = t.title;
   document.title = t.title;
@@ -677,7 +775,155 @@ function render() {
   document.getElementById("meta").textContent = data ? `${t.updated}: ${data.generated_at.replace("T", " ").slice(0, 16)} UTC` : "";
   renderMethod();
   document.getElementById("foot").textContent = data ? `v${data.version}` : "";
-  renderLegend(); renderMap(); renderPanel(); renderTable();
+  renderLegend(); renderMap(); renderPanel(); renderTable(); renderTop();
+}
+
+const locTag = () => (lang === "en" ? "en-GB" : lang); // 24-hour clock and day-first dates in English
+
+// ---- Phones: capsules on top, a bottom sheet, a country list -------------------------------
+const $ = (id) => document.getElementById(id);
+const parseTime = (iso) => new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(iso) ? iso : `${iso}Z`);
+
+function renderTop() {
+  const t = T[lang];
+  $("langCap").title = t.language;
+  $("langSel").setAttribute("aria-label", t.language);
+  $("pickSearch").placeholder = t.search;
+  $("timeCap").textContent = data ? `🕒 ${parseTime(data.generated_at).toLocaleTimeString(locTag(), { hour: "2-digit", minute: "2-digit" })}` : "🕒 —";
+  $("timeCap").setAttribute("aria-label", data ? `${t.updated}: ${fmtDate(data.generated_at)} UTC` : t.updated);
+  const ctx = selected && data?.context?.[selected];
+  const code = ctx ? selected : currentCode();
+  const c = ctx || data?.countries?.[code];
+  if (!c) { $("countryCap").innerHTML = `<span class="nm">${esc(t.pick)}</span>`; return; }
+  const chip = ctx ? `<span class="chip" style="background:var(--empty)">⚔</span>`
+    : `<span class="chip" style="background:${fill(c)};color:${ink(c)}">${c.score != null ? c.score.toFixed(1) : "⏳"}</span>`;
+  $("countryCap").innerHTML = `<span aria-hidden="true">${c.flag}</span><span class="nm">${esc(c.name[lang])}</span>${chip}`;
+  $("countryCap").setAttribute("aria-label", `${t.pick}: ${c.name[lang]}`);
+}
+
+let toastTimer = null;
+function toast(text, ms = 2800) {
+  const el = $("toast");
+  el.textContent = text; el.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms);
+}
+$("timeCap").onclick = () => { if (data) toast(`${T[lang].updated}: ${parseTime(data.generated_at).toLocaleString(locTag(), { dateStyle: "medium", timeStyle: "short" })}`); };
+
+function renderPicker() {
+  const q = $("pickSearch").value.trim().toLocaleLowerCase(lang);
+  const code = currentCode();
+  const rows = Object.entries(data?.countries || {})
+    .filter(([k, c]) => !q || c.name[lang].toLocaleLowerCase(lang).includes(q) || c.name.en.toLowerCase().includes(q) || k.toLowerCase() === q)
+    .sort((a, b) => a[1].name[lang].localeCompare(b[1].name[lang], lang));
+  $("pickList").innerHTML = rows.map(([k, c]) => `<button type="button" data-code="${k}" aria-current="${k === code}">
+    <span aria-hidden="true">${c.flag}</span><span class="nm">${esc(c.name[lang])}</span>
+    <span class="chip" style="background:${fill(c)};color:${ink(c)}">${c.score != null ? c.score.toFixed(1) : "⏳"}</span></button>`).join("")
+    || `<p class="muted" style="padding:0 16px">${esc(T[lang].nodata)}</p>`;
+  $("pickList").querySelectorAll("button").forEach((b) => b.onclick = () => { closePicker(); select(b.dataset.code, true, true); });
+}
+function openPicker() { if (!data) return; $("pickSearch").value = ""; renderPicker(); $("picker").hidden = false; $("pickList").querySelector('[aria-current="true"]')?.scrollIntoView({ block: "center" }); if (!COARSE) $("pickSearch").focus(); }
+function closePicker() { $("picker").hidden = true; }
+$("countryCap").onclick = openPicker;
+$("pickSearch").oninput = renderPicker;
+$("picker").addEventListener("click", (ev) => { if (ev.target === $("picker")) closePicker(); });
+document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !$("picker").hidden) closePicker(); });
+
+// Bottom sheet: three stops. Dragging it (or the content from its top) moves it; a tap on the
+// handle steps it up.
+const STOPS = ["full", "half", "min"];
+let sheetState = "half";
+const sheetHeight = () => innerHeight - ($("topbar").getBoundingClientRect().bottom + 8);
+function sheetPos(state) {
+  const H = sheetHeight();
+  return state === "full" ? 0 : state === "half" ? Math.max(0, H - Math.round(innerHeight * (1 - BAND[1]))) : Math.max(0, H - 118);
+}
+function setSheet(state, animate = true) {
+  const sh = $("sheet");
+  sheetState = state;
+  sh.style.height = `${sheetHeight()}px`;
+  sh.style.transition = animate ? "" : "none";
+  sh.style.transform = `translateY(${sheetPos(state)}px)`;
+  sh.classList.toggle("full", state === "full");
+  sh.dataset.state = state;
+  if (state !== "full") $("sheetBody").scrollTop = 0;
+}
+$("grab").onclick = () => setSheet(sheetState === "min" ? "half" : sheetState === "half" ? "full" : "half");
+let sdrag = null;
+$("sheet").addEventListener("touchstart", (ev) => {
+  if (!mobile || ev.touches.length !== 1) { sdrag = null; return; }
+  const p = ev.touches[0];
+  sdrag = { x: p.clientX, y: p.clientY, base: sheetPos(sheetState), at: performance.now(), on: false, last: null,
+            body: $("sheetBody").contains(ev.target) };
+}, { passive: true });
+$("sheet").addEventListener("touchmove", (ev) => {
+  if (!sdrag) return;
+  const p = ev.touches[0], dy = p.clientY - sdrag.y;
+  if (!sdrag.on) {
+    // The open sheet scrolls its content; only a pull down from the very top moves it.
+    if (sheetState === "full" && sdrag.body && (dy < 0 || $("sheetBody").scrollTop > 0)) { sdrag = null; return; }
+    sdrag.on = true;
+    $("sheet").style.transition = "none";
+  }
+  ev.preventDefault();
+  sdrag.last = Math.min(sheetPos("min"), Math.max(0, sdrag.base + dy));
+  $("sheet").style.transform = `translateY(${sdrag.last}px)`;
+}, { passive: false });
+const endSheetDrag = () => {
+  const d = sdrag; sdrag = null;
+  if (!d || !d.on || d.last == null || Math.abs(d.last - d.base) < 4) { if (d?.on) setSheet(sheetState); return; }
+  const moved = d.last - d.base, fast = Math.abs(moved) / Math.max(1, performance.now() - d.at) > 0.45;
+  const i = STOPS.indexOf(sheetState);
+  const near = STOPS.reduce((a, b) => (Math.abs(sheetPos(b) - d.last) < Math.abs(sheetPos(a) - d.last) ? b : a));
+  // A flick moves at least one stop; a long drag lands on the nearest one.
+  const next = fast && near === sheetState ? STOPS[Math.max(0, Math.min(2, i + (moved > 0 ? 1 : -1)))] : near;
+  setSheet(next);
+};
+$("sheet").addEventListener("touchend", endSheetDrag);
+$("sheet").addEventListener("touchcancel", endSheetDrag);
+
+// Move the same blocks between the wide layout and the phone one.
+function layout() {
+  mobile = MOBILE.matches;
+  document.body.classList.toggle("m", mobile);
+  if (mobile) {
+    document.body.prepend($("map"));
+    $("sheetBody").append($("panel"), $("legend"), $("notice"), $("tablebox"), $("method"), $("foot"));
+    $("langCap").append($("langSel"));
+  } else {
+    $("mapcol").prepend($("map"));
+    $("mapcol").insertBefore($("legend"), $("maphint"));
+    $("cols").append($("panel"));
+    $("hdr").after($("notice"));
+    $("wrap").append($("tablebox"), $("method"), $("foot"));
+    $("controls").prepend($("langSel"));
+  }
+  view = null; // a new starting window for the new screen
+}
+layout();
+if (mobile) setSheet("half", false);
+MOBILE.addEventListener("change", () => { layout(); renderMap(); if (mobile) setSheet(sheetState, false); });
+let resizeTimer = null;
+window.addEventListener("resize", () => {
+  if (!mobile) return;
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    setSheet(sheetState, false);
+    const svg = document.querySelector("#map svg");
+    if (!svg || !view) return;
+    // Keep the centre and the width; the height follows the new screen shape.
+    const w = view[2], h = w * aspect(svg), cx = view[0] + w / 2, cy = view[1] + view[3] / 2;
+    view = clampView([cx - w / 2, cy - h / 2, w, h]);
+    applyView(svg);
+  }, 120);
+});
+
+// Bring a country chosen from the list into the visible band of the map.
+function centreOn(code) {
+  const svg = document.querySelector("#map svg"), at = geo?.labels?.[code];
+  if (!svg || !at || !view) return;
+  const band = BAND[1] - BAND[0];
+  view = clampView([at[0] - view[2] / 2, at[1] - view[3] * (BAND[0] + band / 2), view[2], view[3]]);
+  applyView(svg);
 }
 
 // Phones: once the map is scrolled away (to read a country), a button brings it back.
@@ -688,10 +934,16 @@ if ("IntersectionObserver" in window) {
     !e.isIntersecting && matchMedia("(max-width: 860px)").matches && !!selected)).observe(document.getElementById("map"));
 }
 
-function select(code, byUser = false) {
+function select(code, byUser = false, fromList = false) {
   selected = code;
   history.replaceState(null, "", `#${code}`);
-  renderMap(); renderPanel();
+  renderMap(); renderPanel(); renderTop();
+  if (mobile) {
+    if (fromList) centreOn(code);
+    if (byUser) setSheet(sheetState === "full" ? "full" : "half");
+    $("sheetBody").scrollTop = 0;
+    return;
+  }
   // On one-column layouts the panel is below the map: bring it into view.
   if (byUser && matchMedia("(max-width: 860px)").matches) {
     document.getElementById("panel").scrollIntoView({ behavior: "smooth", block: "start" });

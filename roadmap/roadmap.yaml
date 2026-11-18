@@ -13,8 +13,8 @@ project:
   name_uk: "Індекс напруги: Європа"
   name_en: "Tension Index: Europe"
   repo: FixerHack/war-predictor
-  version: 0.7.1
-  updated: 2026-11-17
+  version: 0.7.2
+  updated: 2026-11-18
 
 milestones:
   - id: M1
@@ -211,6 +211,7 @@ stages:
       - {id: S11.11, status: done, days: 0.5, uk: "Мобільна версія карти: масштаб двома пальцями й кнопками +/−, перетягування збільшеної карти, легенда під картою, кнопка повернення до карти", en: "Mobile map: pinch and +/− zoom, panning a zoomed map, legend under the map, a back-to-map button"}
       - {id: S11.12, status: done, days: 0.5, uk: "Хроніка країни за 90 днів: зміни рекомендацій урядів з описом, новинні й авіаційні сигнали, стрибки балу; позначено, що на бал не впливає", en: "Country chronicle for 90 days: government advice changes with a summary, news and aviation signals, score jumps; marks what does not affect the score"}
       - {id: S11.13, status: done, days: 1, uk: "Локалізація: 30 мов (uk і en вручну, 28 машинно через Claude), мова браузера й Telegram за замовчуванням, описи подій мовою країни", en: "Localization: 30 languages (uk and en by hand, 28 machine-translated by Claude), browser and Telegram language by default, event summaries in the language of the country"}
+      - {id: S11.14, status: done, days: 0.5, uk: "Телефонний інтерфейс як у картах: карта на весь екран, зверху капсули (час оновлення, обрана країна зі списком і пошуком, мова з прапорами), знизу лист із країною, що тягнеться пальцем; сірі країни кажуть «поки недоступна»", en: "Phone interface in the style of map apps: a full-screen map, capsules on top (update time, the chosen country with a list and search, language with flags), a draggable bottom sheet with the country; grey countries say \"not available yet\"", note_uk: "Аландські острови показані як Фінляндія, острови Мен, Джерсі й Гернсі — разом із Великою Британією.", note_en: "Aland is shown as Finland; the Isle of Man, Jersey and Guernsey with the United Kingdom."}
   - id: S12
     branch: dev-ops
     uk: Експлуатація
@@ -279,6 +280,10 @@ risks:
   - {uk: "Автоматичні трекери війн згадують країни, зачеплені лише побічно; потрібна ручна перевірка", en: "Automatic war trackers list countries hit only by spillover; manual review needed"}
 
 changelog:
+  - version: 0.7.2
+    date: 2026-11-18
+    uk: ["Нова телефонна версія карти: карта на весь екран, зверху капсули з часом оновлення, обраною країною (натиск відкриває список із пошуком) і мовою з прапорами; знизу лист із даними країни, який тягнеться вгору й вниз. Натиск на країну поза індексом показує, що вона поки недоступна."]
+    en: ["A new phone version of the map: a full-screen map, capsules on top with the update time, the chosen country (a tap opens a searchable list) and the language with flags; a bottom sheet with the country that drags up and down. Tapping a country outside the index says it is not available yet."]
   - version: 0.7.1
     date: 2026-11-17
     uk: ["Шкала влади точніша: розмітку робить Sonnet, кожен тип сигналу має структурну перевірку (чи діє саме влада країни, чи це керівник силових структур, чи було насильство, чи це опитування); хибні сигнали після перерозмітки вимикаються."]
