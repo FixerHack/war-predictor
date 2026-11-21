@@ -1,0 +1,981 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tension Index · Europe</title>
+<meta name="description" content="Escalation-signal indicator for European countries (0–10). Not a forecast.">
+<!-- Data: scores.json next to this page, written by `tension-index export`. -->
+<style>
+:root {
+  --bg: #f4f5f3; --surface: #fcfcfb; --ink: #1b2129; --ink-2: #4a5462; --ink-3: #6b7480;
+  --line: #d6dad6; --focus: #2d5b8c; --empty: #e4e6e2; --empty-ink: #4a5462;
+  --sea: #e3ebf0; --land: #d9dcd6; --border: #ffffff;
+  /* Level colours = the bot's and README's: green, yellow, orange, red, critical */
+  --l0: #2e8049; --l1: #e3c341; --l2: #ec8a2d; --l3: #c62f25; --l4: #6e1220;
+  --on0: #ffffff; --on1: #1b2129; --on2: #1b2129; --on3: #ffffff; --on4: #ffffff;
+  --chart: #1b2129; --band: rgba(156, 53, 39, 0.07);
+  --hatch: rgba(111, 32, 25, 0.38); --hatch-2: rgba(74, 84, 98, 0.30);
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121412; --surface: #1a1a19; --ink: #e8eae6; --ink-2: #aab1b9; --ink-3: #8a929b;
+    --line: #33373a; --focus: #7fa9d6; --empty: #26292a; --empty-ink: #aab1b9;
+    --sea: #141a1f; --land: #2a2d2d; --border: #121412;
+    /* Dark: same hues, lifted for the dark surface; dark text on every step */
+    --l0: #3f9d5f; --l1: #dcbd45; --l2: #e8862f; --l3: #e5534a; --l4: #a3162b;
+    --on0: #0f1411; --on1: #121412; --on2: #121412; --on3: #121412; --on4: #ffffff;
+    --chart: #e8eae6; --band: rgba(227, 138, 98, 0.08);
+    --hatch: rgba(245, 181, 151, 0.42); --hatch-2: rgba(170, 177, 185, 0.32);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121412; --surface: #1a1a19; --ink: #e8eae6; --ink-2: #aab1b9; --ink-3: #8a929b;
+  --line: #33373a; --focus: #7fa9d6; --empty: #26292a; --empty-ink: #aab1b9;
+  --sea: #141a1f; --land: #2a2d2d; --border: #121412;
+  --l0: #3f9d5f; --l1: #dcbd45; --l2: #e8862f; --l3: #e5534a; --l4: #a3162b;
+  --on0: #0f1411; --on1: #121412; --on2: #121412; --on3: #121412; --on4: #ffffff;
+  --chart: #e8eae6; --band: rgba(227, 138, 98, 0.08);
+  --hatch: rgba(245, 181, 151, 0.42); --hatch-2: rgba(170, 177, 185, 0.32);
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-variant-numeric: tabular-nums; padding-bottom: env(safe-area-inset-bottom, 0); }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 56px; }
+header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+h1 { font-size: clamp(1.4rem, 4vw, 2.1rem); margin: 0; line-height: 1.15; }
+.meta { color: var(--ink-2); font-size: 0.9rem; margin-top: 4px; }
+.controls { display: flex; gap: 6px; }
+.btn { font: inherit; font-size: 0.85rem; padding: 6px 12px; border-radius: 6px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); cursor: pointer; text-decoration: none; }
+.btn[aria-pressed="true"] { border-color: var(--focus); color: var(--focus); }
+.btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.notice { margin: 18px 0; padding: 12px 14px; background: var(--surface); border-left: 4px solid var(--l2);
+  border-radius: 0 6px 6px 0; font-size: 0.92rem; color: var(--ink-2); }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 0.85rem; color: var(--ink-2); margin: 10px 0 6px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+.cols { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+@media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+.map { position: relative; }
+.geo { display: block; width: 100%; height: auto; background: var(--sea); border-radius: 10px; touch-action: pan-y; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.geo path, .geo circle { vector-effect: non-scaling-stroke; }
+.stab { display: flex; align-items: baseline; gap: 8px; margin: 4px 0; }
+.stab .sn { font-weight: 700; font-size: 1.25rem; padding: 1px 9px; border-radius: 6px; }
+.small { font-size: 0.8rem; margin: 4px 0 6px; }
+.cday { margin: 12px 0 4px; font-size: 0.8rem; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: .02em; }
+ul.chron { list-style: none; margin: 0; padding: 0 0 0 12px; border-left: 2px solid var(--line); }
+ul.chron li { margin: 0 0 8px; font-size: 0.88rem; line-height: 1.4; }
+ul.chron li.quiet { color: var(--ink-3); }
+.cwho { font-weight: 600; }
+.ctext { margin-top: 1px; overflow-wrap: anywhere; }
+.badge { display: inline-block; font-weight: 500; font-size: 0.72rem; padding: 0 6px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-3); white-space: nowrap; }
+.cscore { font-size: 0.86rem; }
+.cscore.up b { color: var(--l3); } .cscore.down b { color: var(--l0); }
+.btn.more { margin-top: 4px; width: 100%; }
+.zoomctl { position: absolute; top: 8px; right: 8px; display: flex; flex-direction: column; gap: 4px; }
+.zoomctl .btn { width: 36px; height: 36px; padding: 0; font-size: 1.15rem; line-height: 1; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
+.zoomctl .btn:disabled { opacity: .45; cursor: default; }
+.tomap { position: fixed; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); z-index: 20; display: none;
+  padding: 10px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  font: inherit; font-weight: 600; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+.tomap.show { display: block; }
+.geo .other { fill: var(--land); stroke: var(--border); stroke-width: 0.6; }
+.geo .c { stroke: var(--border); stroke-width: 0.8; stroke-linejoin: round; cursor: pointer; outline: none; }
+.geo .c:hover, .geo .c:focus-visible { stroke: var(--ink); stroke-width: 1.8; filter: brightness(1.06); }
+.geo .c.sel { stroke: var(--ink); stroke-width: 2.6; }
+.geo .ctx { fill: url(#hatch); stroke: var(--hatch); stroke-width: 0.9; }
+.geo .ctx.ally { fill: url(#hatch2); stroke: var(--hatch-2); }
+.geo .dot { stroke-width: 1.4; }
+.geo text { pointer-events: none; text-anchor: middle; font-weight: 700; paint-order: stroke; stroke-width: 2.5px; stroke-linejoin: round; }
+.geo text .s { font-weight: 500; }
+.maptip { position: absolute; z-index: 5; pointer-events: none; max-width: 240px; padding: 6px 9px; border-radius: 6px;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line); box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  font-size: 0.85rem; line-height: 1.35; white-space: nowrap; }
+.maptip[hidden] { display: none; }
+.maptip b { font-weight: 700; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+.panel h2 { margin: 0; font-size: 1.25rem; }
+.big { display: flex; align-items: baseline; gap: 10px; margin: 8px 0 4px; }
+.big .n { font-size: 2.6rem; font-weight: 700; line-height: 1; }
+.big .lv { color: var(--ink-2); }
+.panel ul { margin: 6px 0 0; padding-left: 18px; }
+.panel li { margin: 4px 0; font-size: 0.92rem; }
+.sub { font-weight: 600; margin-top: 14px; font-size: 0.95rem; }
+.muted { color: var(--ink-3); font-size: 0.85rem; }
+svg.chart { width: 100%; height: auto; display: block; margin-top: 8px; overflow: visible; }
+.chart text { fill: var(--ink-3); font-size: 10px; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--surface); font-size: 0.8rem;
+  padding: 4px 8px; border-radius: 4px; white-space: nowrap; transform: translate(-50%, -120%); display: none; }
+.chartbox { position: relative; }
+details { margin-top: 24px; }
+summary { cursor: pointer; font-weight: 600; }
+table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.9rem; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--ink-2); font-weight: 600; }
+td.num { text-align: right; }
+section.method { margin-top: 28px; font-size: 0.95rem; color: var(--ink-2); }
+.summary { margin: 10px 0 4px; font-size: 0.95rem; }
+.summary p { margin: 6px 0; }
+.blocks { display: grid; grid-template-columns: minmax(0, 9.5em) minmax(0, 1fr) 3em; gap: 6px 10px; align-items: center; margin-top: 8px; font-size: 0.88rem; }
+.blocks .bar { height: 10px; background: var(--empty); border-radius: 5px; overflow: hidden; }
+.blocks .bar span { display: block; height: 100%; background: var(--l2); border-radius: 5px; }
+.blocks .pct { text-align: right; color: var(--ink-2); }
+.panel li .q { display: block; color: var(--ink-3); font-size: 0.85rem; }
+section.method h3 { font-size: 1rem; color: var(--ink); margin: 18px 0 4px; }
+section.method dl { margin: 6px 0; }
+section.method dt { font-weight: 600; color: var(--ink); margin-top: 8px; }
+section.method dd { margin: 2px 0 0; }
+section.method ul { padding-left: 20px; }
+section.method h2 { font-size: 1.1rem; color: var(--ink); }
+footer { margin-top: 28px; font-size: 0.8rem; color: var(--ink-3); }
+/* Neighbours at war: context only, never scored - hatched, not a level colour */
+.sw.hatch { background: repeating-linear-gradient(135deg, transparent 0 3px, var(--hatch) 3px 5px); box-shadow: inset 0 0 0 1px var(--hatch); }
+tbody tr { cursor: pointer; }
+tbody tr:hover td { background: var(--band); }
+td button.link { all: unset; cursor: pointer; }
+td button.link:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* Phones */
+@media (max-width: 600px) {
+  .wrap { padding-left: 10px; padding-right: 10px; }
+  .geo { border-radius: 8px; }
+  .zoomctl .btn { width: 42px; height: 42px; font-size: 1.3rem; }
+  .wrap { padding: 14px 12px 40px; }
+  header { gap: 8px; }
+  .controls .btn { padding: 6px 10px; }
+  .notice { margin: 12px 0; font-size: 0.86rem; padding: 10px 12px; }
+  .legend { gap: 4px 10px; font-size: 0.76rem; margin: 8px 0 4px; }
+  .panel { padding: 14px 12px; }
+  .big .n { font-size: 2.2rem; }
+  .blocks { grid-template-columns: minmax(0, 7.6em) minmax(0, 1fr) 2.6em; font-size: 0.82rem; }
+  table { font-size: 0.84rem; }
+  th, td { padding: 7px 4px; }
+  section.method { font-size: 0.9rem; }
+}
+a { color: var(--focus); }
+.geo .other { cursor: pointer; }
+/* Phone layout (body.m): the map fills the screen, capsules on top, a bottom sheet with the
+   chosen country. Set by layout() from MOBILE below. */
+.topbar, .sheet { display: none; }
+body.m { overflow: hidden; height: 100dvh; overscroll-behavior: none; }
+body.m .wrap { display: none; }
+body.m #map { position: fixed; inset: 0; z-index: 0; background: var(--sea); }
+body.m .geo { width: 100%; height: 100%; border-radius: 0; touch-action: none; }
+body.m .zoomctl, body.m .tomap, body.m .maptip { display: none !important; }
+body.m .topbar { display: flex; position: fixed; z-index: 30; left: 12px; right: 12px;
+  top: calc(env(safe-area-inset-top, 0px) + 10px); gap: 8px; align-items: center; pointer-events: none; }
+.cap { pointer-events: auto; height: 46px; border-radius: 999px; background: var(--surface); color: var(--ink);
+  border: 0; box-shadow: 0 2px 8px rgba(0,0,0,.22); font: inherit; display: inline-flex; align-items: center;
+  gap: 8px; padding: 0 14px; cursor: pointer; -webkit-tap-highlight-color: transparent; flex: none; }
+.cap:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.cap.time { font-size: .9rem; font-weight: 600; padding: 0 12px; }
+.cap.country { flex: 1; min-width: 0; font-weight: 600; }
+.cap .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; text-align: left; }
+.chip { flex: none; font-size: .85rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; min-width: 2.7em; text-align: center; }
+.cap.lang { width: 46px; padding: 0; justify-content: center; position: relative; font-size: 1.45rem; }
+.cap.lang select { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; font-size: 16px; cursor: pointer; }
+body.m .sheet { display: flex; flex-direction: column; position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: var(--surface); border-radius: 18px 18px 0 0; box-shadow: 0 -4px 18px rgba(0,0,0,.2);
+  transition: transform .28s cubic-bezier(.2,.8,.2,1); will-change: transform; }
+.grab { all: unset; flex: none; height: 26px; display: flex; align-items: center; justify-content: center; cursor: grab; }
+.grab span { width: 40px; height: 5px; border-radius: 3px; background: var(--line); }
+.sheetbody { flex: 1; min-height: 0; overflow: hidden; padding: 0 16px calc(28px + env(safe-area-inset-bottom, 0px));
+  overscroll-behavior: contain; }
+.sheet.full .sheetbody { overflow-y: auto; }
+body.m .panel { border: 0; padding: 0 0 8px; background: transparent; }
+body.m .notice { margin: 14px 0; }
+.picker[hidden], .toast[hidden] { display: none; }
+.picker { display: flex; position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.35); align-items: flex-start;
+  justify-content: center; padding: calc(env(safe-area-inset-top, 0px) + 64px) 12px calc(12px + env(safe-area-inset-bottom, 0px)); }
+.pickbox { background: var(--surface); border-radius: 16px; width: 100%; max-width: 480px; max-height: 100%;
+  display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 8px 28px rgba(0,0,0,.3); }
+.pickbox input { font: inherit; font-size: 16px; margin: 10px; padding: 10px 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.picklist { overflow-y: auto; overscroll-behavior: contain; padding-bottom: 8px; }
+.picklist button { all: unset; box-sizing: border-box; display: flex; width: 100%; align-items: center; gap: 10px;
+  padding: 11px 16px; cursor: pointer; }
+.picklist .nm { flex: 1; }
+.picklist button[aria-current="true"] { background: var(--band); font-weight: 600; }
+.picklist button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.toast { position: fixed; z-index: 35; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 66px);
+  transform: translateX(-50%); width: max-content; max-width: calc(100% - 32px); background: var(--ink); color: var(--surface);
+  padding: 9px 14px; border-radius: 12px; font-size: .9rem; line-height: 1.35; box-shadow: 0 4px 14px rgba(0,0,0,.25); }
+</style>
+</head>
+<body>
+<div class="topbar" id="topbar">
+  <button type="button" class="cap time" id="timeCap"></button>
+  <button type="button" class="cap country" id="countryCap" aria-haspopup="dialog"></button>
+  <label class="cap lang" id="langCap"><span id="langFlag" aria-hidden="true"></span></label>
+</div>
+<div class="sheet" id="sheet" data-state="half">
+  <button type="button" class="grab" id="grab"><span></span></button>
+  <div class="sheetbody" id="sheetBody"></div>
+</div>
+<div class="picker" id="picker" hidden role="dialog" aria-modal="true">
+  <div class="pickbox"><input type="search" id="pickSearch" autocomplete="off"><div class="picklist" id="pickList"></div></div>
+</div>
+<div class="toast" id="toast" hidden role="status"></div>
+<div class="wrap" id="wrap">
+  <header id="hdr">
+    <div>
+      <h1 id="title">Індекс напруги: Європа</h1>
+      <div class="meta" id="meta"></div>
+    </div>
+    <div class="controls" id="controls">
+      <select class="btn" id="langSel" aria-label="Language"></select>
+      <button class="btn" id="themeBtn" type="button" aria-label="Theme">◐</button>
+    </div>
+  </header>
+  <div class="notice" id="notice"></div>
+  <div class="cols" id="cols">
+    <div id="mapcol">
+      <div class="map" id="map"></div>
+      <div class="legend" id="legend"></div>
+      <p class="muted" id="maphint"></p>
+    </div>
+    <div class="panel" id="panel" aria-live="polite"></div>
+  </div>
+  <button type="button" class="tomap" id="tomap"></button>
+  <details id="tablebox"><summary id="tabletitle"></summary><div id="table"></div></details>
+  <section class="method" id="method"></section>
+  <footer id="foot"></footer>
+</div>
+<script>
+// Country shapes: europe.json, built by scripts/build_map.py (Natural Earth, public domain).
+let geo = null;
+const SMALL = 5; // label radius below which a country gets a clickable dot
+const LEVELS = ["green", "yellow", "orange", "red", "critical"];
+const WAR = { none: "", frozen: "🧊", clashes: "🟠", active: "🔴", war: "🟥" };
+// Interface texts: i18n/<lang>.json (uk and en written by hand, the rest machine-translated by
+// `tension-index translate`), merged over English so a missing key never shows blank.
+const LANG_NAMES = { uk: "Українська", en: "English", de: "Deutsch", fr: "Français", nl: "Nederlands", it: "Italiano", es: "Español", pt: "Português", pl: "Polski", cs: "Čeština", sk: "Slovenčina", hu: "Magyar", ro: "Română", bg: "Български", el: "Ελληνικά", hr: "Hrvatski", sl: "Slovenščina", sr: "Српски", bs: "Bosanski", mk: "Македонски", sq: "Shqip", da: "Dansk", sv: "Svenska", nb: "Norsk", fi: "Suomi", et: "Eesti", lv: "Latviešu", lt: "Lietuvių", is: "Íslenska", mt: "Malti" };
+const LANG_FLAGS = { uk: "🇺🇦", en: "🇬🇧", de: "🇩🇪", fr: "🇫🇷", nl: "🇳🇱", it: "🇮🇹", es: "🇪🇸", pt: "🇵🇹", pl: "🇵🇱", cs: "🇨🇿", sk: "🇸🇰", hu: "🇭🇺", ro: "🇷🇴", bg: "🇧🇬", el: "🇬🇷", hr: "🇭🇷", sl: "🇸🇮", sr: "🇷🇸", bs: "🇧🇦", mk: "🇲🇰", sq: "🇦🇱", da: "🇩🇰", sv: "🇸🇪", nb: "🇳🇴", fi: "🇫🇮", et: "🇪🇪", lv: "🇱🇻", lt: "🇱🇹", is: "🇮🇸", mt: "🇲🇹" };
+const T = {};
+const merge = (base, over) => {
+  if (over === undefined || over === null || over === "") return base;
+  if (Array.isArray(base)) return base.map((b, i) => merge(b, Array.isArray(over) ? over[i] : undefined));
+  if (base && typeof base === "object") {
+    const out = { ...base };
+    for (const k of Object.keys(over || {})) out[k] = k in base ? merge(base[k], over[k]) : over[k];
+    return out;
+  }
+  return over;
+};
+async function loadLang(l) {
+  const get = (x) => fetch(`i18n/${x}.json`).then((r) => (r.ok ? r.json() : {})).catch(() => ({}));
+  if (!T.en) T.en = await get("en");
+  if (!T[l]) T[l] = l === "en" ? T.en : merge(T.en, await get(l));
+}
+function browserLang() {
+  for (const raw of navigator.languages || [navigator.language]) {
+    let b = String(raw || "").toLowerCase().split(/[-_]/)[0];
+    b = { no: "nb", nn: "nb" }[b] || b;
+    if (b in LANG_NAMES) return b;
+  }
+  return "en";
+}
+// Data fields exist in uk/en: fill the chosen language from translations or English.
+const regionName = (code) => { try { return new Intl.DisplayNames([lang], { type: "region" }).of(code); } catch { return null; } };
+function localize(node) {
+  if (!node || typeof node !== "object" || lang === "uk" || lang === "en") return;
+  if (Array.isArray(node)) { node.forEach(localize); return; }
+  if ("uk" in node && "en" in node && !(lang in node)) node[lang] = node.en;
+  if (node.pcode && node.publisher) node.publisher[lang] = T[lang]?.pub?.[node.pcode] || node.publisher.en;
+  if (node.kcode && node.kind) node.kind[lang] = T[lang]?.kind?.[node.kcode] || node.kind.en;
+  for (const v of Object.values(node)) if (v && typeof v === "object") localize(v);
+}
+function localizeData() {
+  if (!data) return;
+  localize(data);
+  if (lang === "uk" || lang === "en") return;
+  for (const [code, c] of [...Object.entries(data.countries || {}), ...Object.entries(data.context || {})]) {
+    const n = regionName(code);
+    if (n && n !== code) c.name[lang] = n;
+  }
+}
+const REPO = "https://github.com/FixerHack/war-predictor/blob/main/";
+const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+                set(k, v) { try { localStorage.setItem(k, v); } catch {} } };
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let lang = store.get("lang") in LANG_NAMES ? store.get("lang") : browserLang();
+let data = null;
+let selected = (location.hash || "").slice(1).toUpperCase() || null;
+
+const idx = (level) => LEVELS.indexOf(level);
+const fill = (c) => c && c.score != null && idx(c.level) >= 0 ? `var(--l${idx(c.level)})` : "var(--empty)";
+const ink = (c) => c && c.score != null && idx(c.level) >= 0 ? `var(--on${idx(c.level)})` : "var(--empty-ink)";
+
+function renderLegend() {
+  const t = T[lang];
+  document.getElementById("legend").innerHTML = LEVELS.map((l, i) =>
+    `<span><span class="sw" style="background:var(--l${i})"></span>${esc(t.levels[l])}</span>`).join("") +
+    `<span><span class="sw" style="background:var(--empty)"></span>⏳ ${esc(t.nodata)}</span>` +
+    `<span><span class="sw hatch"></span>⚔ ${esc(t.ctxLegend)}</span>`;
+}
+
+function tipText(code) {
+  const t = T[lang];
+  const c = data?.countries?.[code];
+  if (c) {
+    const war = WAR[c.war.status];
+    const value = c.score != null ? `<b>${c.score.toFixed(1)}</b> / 10 · ${esc(t.lvl[c.level])}` : esc(t.nodata);
+    return `${c.flag} <b>${esc(c.name[lang])}</b><br>${value}${war ? " " + war : ""}`;
+  }
+  const x = data?.context?.[code];
+  return x ? `${x.flag} <b>${esc(x.name[lang])}</b><br>⚔ ${esc(t.ctxRole[x.role])}` : esc(code);
+}
+
+let view = null; // current map window [x, y, w, h] in SVG units; kept across re-renders
+// Window-level gesture handlers are added once; each render points them at its own map.
+const mapGesture = { move: null, end: null };
+window.addEventListener("pointermove", (ev) => mapGesture.move?.(ev), { passive: true });
+window.addEventListener("pointerup", (ev) => mapGesture.end?.(ev));
+window.addEventListener("pointercancel", (ev) => mapGesture.end?.(ev));
+const COARSE = matchMedia("(pointer: coarse)").matches; // touch screens: bigger targets
+const MOBILE = matchMedia("(max-width: 700px)"); // phones: full-screen map and a bottom sheet
+let mobile = MOBILE.matches;
+
+function baseBox() { return geo.viewBox.split(" ").map(Number); }
+// Height / width of the map window: the frame's on wide screens, the screen's on phones.
+function aspect(svg) {
+  const [, , BW, BH] = baseBox();
+  const r = mobile && svg ? svg.getBoundingClientRect() : null;
+  return r && r.width ? r.height / r.width : BH / BW;
+}
+// Wide screens: the window stays inside the frame. Phones: its centre does.
+function clampView([x, y, w, h]) {
+  const [, , BW, BH] = baseBox();
+  if (!mobile) return [Math.min(BW - w, Math.max(0, x)), Math.min(BH - h, Math.max(0, y)), w, h];
+  const cx = Math.min(BW, Math.max(0, x + w / 2)), cy = Math.min(BH, Math.max(0, y + h / 2));
+  return [cx - w / 2, cy - h / 2, w, h];
+}
+// Starting window. Phones: Europe in the band between the capsules and the half-open sheet.
+const BAND = [0.09, 0.56]; // top and bottom of that band, share of the screen height
+function homeView(svg) {
+  const [, , BW, BH] = baseBox();
+  if (!mobile) return [0, 0, BW, BH];
+  const a = aspect(svg), band = BAND[1] - BAND[0];
+  let w = BW * 0.8;
+  if (w * a * band < BH * 0.85) w = (BH * 0.85) / (a * band); // short screens: fit the height
+  w = Math.min(w, maxWidth(svg));
+  const h = w * a;
+  return clampView([BW * 0.55 - w / 2, BH * 0.56 - h * (BAND[0] + band / 2), w, h]);
+}
+const maxWidth = () => { const [, , BW] = baseBox(); return mobile ? BW * 1.1 : BW; };
+
+function labelsSvg(k, s) {
+  // k: zoom against the whole frame; s: screen pixels per SVG unit.
+  const out = [];
+  for (const [code, [lx, ly, r]] of Object.entries(geo.labels)) {
+    const c = data?.countries?.[code];
+    const x = data?.context?.[code];
+    if (r * s < 6 || (r < SMALL && k < 3)) continue; // too small on screen: tooltip and panel name it
+    const size = Math.min(16, Math.max(10, r * 0.7 * s)) / s; // constant on screen while zooming
+    const color = c ? ink(c) : "var(--ink)";
+    const value = c ? (c.score != null ? c.score.toFixed(1) : "⏳") : x ? (x.role === "aggressor_ally" ? "" : "⚔") : "";
+    out.push(`<text x="${lx}" y="${ly - size * 0.15}" font-size="${size}" style="fill:${color};stroke:${c ? fill(c) : "var(--surface)"};stroke-width:${2.5 / s}px">
+      <tspan x="${lx}">${code}</tspan><tspan class="s" x="${lx}" dy="1.05em" font-size="${size * 0.92}">${value}</tspan></text>`);
+  }
+  return out.join("");
+}
+
+function applyView(svg) {
+  const [, , BW] = baseBox();
+  const k = BW / view[2], s = (svg.getBoundingClientRect().width || BW) / view[2];
+  svg.setAttribute("viewBox", view.join(" "));
+  svg.querySelector("#labels").innerHTML = labelsSvg(k, s);
+  svg.querySelectorAll(".dot").forEach((d) => d.setAttribute("r", (COARSE ? 9 : 6) / s));
+  svg.style.touchAction = mobile || k > 1.01 ? "none" : "pan-y"; // zoomed in: one finger pans the map
+  const reset = document.getElementById("zoomReset");
+  if (reset) reset.disabled = k <= 1.01;
+}
+
+function zoomView(svg, v, factor, cx, cy) {
+  const [, , BW] = baseBox();
+  const w = Math.min(maxWidth(svg), Math.max(BW / 12, v[2] / factor));
+  const h = w * aspect(svg);
+  return clampView([cx - ((cx - v[0]) * w) / v[2], cy - ((cy - v[1]) * h) / v[3], w, h]);
+}
+function zoomAt(svg, factor, cx, cy) { view = zoomView(svg, view, factor, cx, cy); applyView(svg); }
+
+function toSvg(svg, clientX, clientY) {
+  const r = svg.getBoundingClientRect();
+  return [view[0] + ((clientX - r.left) / r.width) * view[2], view[1] + ((clientY - r.top) / r.height) * view[3]];
+}
+
+function renderMap() {
+  const map = document.getElementById("map");
+  if (!geo) { map.innerHTML = ""; return; }
+  const t = T[lang];
+  const home = !view;
+  view = view || baseBox();
+  const shape = (code, d, cls, style) => {
+    const c = data?.countries?.[code];
+    const x = data?.context?.[code];
+    const name = c ? c.name[lang] : x ? x.name[lang] : code;
+    const label = c ? `${name}: ${c.score != null ? `${c.score.toFixed(1)} (${t.lvl[c.level]})` : t.nodata}`
+                    : x ? `${name}: ${t.ctxRole[x.role]}` : name;
+    return `<path class="${cls}${code === selected ? " sel" : ""}" d="${d}" data-code="${code}" style="${style}"
+      tabindex="0" role="button" aria-pressed="${code === selected}" aria-label="${esc(label)}"></path>`;
+  };
+  const countries = Object.entries(geo.countries).map(([code, d]) => shape(code, d, "c", `fill:${fill(data?.countries?.[code])}`));
+  const context = Object.entries(geo.context).map(([code, d]) => {
+    const x = data?.context?.[code];
+    return shape(code, d, `c ctx${x?.role === "aggressor_ally" ? " ally" : ""}`, "");
+  });
+  const dots = Object.entries(geo.labels).filter(([code, [, , r]]) => r < SMALL && geo.countries[code]).map(([code, [lx, ly]]) =>
+    `<circle class="c dot${code === selected ? " sel" : ""}" cx="${lx}" cy="${ly}" r="7" data-code="${code}"
+      style="fill:${fill(data?.countries?.[code])}" tabindex="-1" aria-hidden="true"></circle>`);
+  map.innerHTML = `<svg class="geo" viewBox="${view.join(" ")}" role="group" aria-label="${esc(t.title)}">
+    <defs>
+      <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="7" height="7" fill="var(--surface)"/><rect width="2.5" height="7" fill="var(--hatch)"/></pattern>
+      <pattern id="hatch2" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="7" height="7" fill="var(--surface)"/><rect width="2.5" height="7" fill="var(--hatch-2)"/></pattern>
+    </defs>
+    ${Object.entries(geo.others || {}).map(([code, d]) => `<path class="other" data-other="${code}" d="${d}"/>`).join("")}
+    <g id="shapes">${context.join("")}${countries.join("")}${dots.join("")}</g>
+    <g id="labels"></g>
+  </svg><div class="maptip" id="maptip" hidden></div>
+  <div class="zoomctl">
+    <button type="button" class="btn" id="zoomIn" aria-label="${esc(t.zoomIn)}" title="${esc(t.zoomIn)}">+</button>
+    <button type="button" class="btn" id="zoomOut" aria-label="${esc(t.zoomOut)}" title="${esc(t.zoomOut)}">−</button>
+    <button type="button" class="btn" id="zoomReset" aria-label="${esc(t.zoomReset)}" title="${esc(t.zoomReset)}">⟲</button>
+  </div>`;
+
+  const svg = map.querySelector("svg"), tip = map.querySelector("#maptip"), shapes = map.querySelector("#shapes");
+  if (home) view = homeView(svg);
+  applyView(svg);
+  const centre = () => [view[0] + view[2] / 2, view[1] + view[3] / 2];
+  map.querySelector("#zoomIn").onclick = () => zoomAt(svg, 1.6, ...centre());
+  map.querySelector("#zoomOut").onclick = () => zoomAt(svg, 1 / 1.6, ...centre());
+  map.querySelector("#zoomReset").onclick = () => { view = homeView(svg); applyView(svg); };
+
+  const showTip = (el, ev) => {
+    tip.innerHTML = tipText(el.dataset.code);
+    tip.hidden = false;
+    const box = map.getBoundingClientRect();
+    let px, py;
+    if (ev && ev.clientX != null) { px = ev.clientX - box.left; py = ev.clientY - box.top; }
+    else { const b = el.getBoundingClientRect(); px = b.left + b.width / 2 - box.left; py = b.top - box.top; }
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = `${Math.max(4, Math.min(box.width - w - 4, px + 14))}px`;
+    tip.style.top = `${py - h - 12 < 0 ? py + 18 : py - h - 12}px`;
+  };
+
+  // Gestures: two fingers zoom, one finger (or a mouse drag) pans a zoomed map; a drag never
+  // counts as a tap on a country.
+  const pts = new Map();
+  let gesture = null, dragged = false;
+  const start = () => {
+    const list = [...pts.values()];
+    if (list.length === 2) {
+      const [a, b] = list;
+      gesture = { pinch: true, dist: Math.hypot(a.x - b.x, a.y - b.y), mid: toSvg(svg, (a.x + b.x) / 2, (a.y + b.y) / 2), view: [...view] };
+    } else if (list.length === 1) {
+      gesture = { pinch: false, x: list[0].x, y: list[0].y, view: [...view] };
+    }
+  };
+  svg.addEventListener("pointerdown", (ev) => {
+    if (ev.pointerType === "mouse" && ev.button !== 0) return;
+    pts.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    dragged = false;
+    start();
+  });
+  mapGesture.move = (ev) => {
+    if (!pts.has(ev.pointerId) || !gesture) return;
+    pts.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    const list = [...pts.values()];
+    const r = svg.getBoundingClientRect();
+    if (gesture.pinch && list.length === 2) {
+      const [a, b] = list;
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      view = zoomView(svg, gesture.view, d / gesture.dist, ...gesture.mid);
+      // ...and follow the fingers: the point between them stays under them.
+      const [mx, my] = toSvg(svg, (a.x + b.x) / 2, (a.y + b.y) / 2);
+      view = clampView([view[0] + gesture.mid[0] - mx, view[1] + gesture.mid[1] - my, view[2], view[3]]);
+      applyView(svg);
+      dragged = true;
+    } else if (!gesture.pinch) {
+      const dx = ev.clientX - gesture.x, dy = ev.clientY - gesture.y;
+      if (Math.hypot(dx, dy) > 6) dragged = true;
+      const [, , BW] = baseBox();
+      if (dragged && (mobile || view[2] < BW - 0.5)) {
+        const nx = gesture.view[0] - (dx * view[2]) / r.width, ny = gesture.view[1] - (dy * view[3]) / r.height;
+        view = clampView([nx, ny, view[2], view[3]]);
+        applyView(svg);
+        tip.hidden = true;
+      }
+    }
+  };
+  mapGesture.end = (ev) => { if (pts.delete(ev.pointerId)) start(); };
+  svg.addEventListener("wheel", (ev) => {
+    if (!ev.ctrlKey) return; // plain wheel scrolls the page; pinch on a trackpad comes with ctrl
+    ev.preventDefault();
+    zoomAt(svg, Math.exp(-ev.deltaY * 0.01), ...toSvg(svg, ev.clientX, ev.clientY));
+  }, { passive: false });
+  svg.addEventListener("dblclick", (ev) => { ev.preventDefault(); zoomAt(svg, 2, ...toSvg(svg, ev.clientX, ev.clientY)); });
+
+  shapes.querySelectorAll(".c").forEach((el) => {
+    // Raise the hovered shape so its whole border is drawn on top of the neighbours'.
+    el.addEventListener("pointerenter", (ev) => { const next = el.nextElementSibling; if (!el.classList.contains("dot") && next && !next.classList.contains("dot")) shapes.insertBefore(el, shapes.querySelector(".dot")); if (ev.pointerType === "mouse") showTip(el, ev); });
+    el.addEventListener("pointermove", (ev) => { if (ev.pointerType === "mouse" && !pts.size) showTip(el, ev); });
+    el.addEventListener("pointerleave", () => { tip.hidden = true; });
+    el.addEventListener("focus", () => { if (!mobile) showTip(el); });
+    el.addEventListener("blur", () => { tip.hidden = true; });
+    el.addEventListener("click", () => { if (!dragged) select(el.dataset.code, true); });
+    el.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(el.dataset.code, true); } });
+  });
+  // The selected country on top, so its outline is complete.
+  const sel = shapes.querySelector(".c.sel:not(.dot)");
+  if (sel) shapes.insertBefore(sel, shapes.querySelector(".dot"));
+  svg.addEventListener("pointerleave", () => { tip.hidden = true; });
+  // Countries outside the index: say so instead of doing nothing.
+  svg.querySelectorAll(".other").forEach((el) => el.addEventListener("click", () => {
+    if (!dragged) toast(T[lang].unavailable.replace("{name}", regionName(el.dataset.other) || el.dataset.other));
+  }));
+}
+
+function chart(history) {
+  const W = 480, H = 170, L = 26, R = 8, TOP = 8, B = 20;
+  const pts = history.map(([d, v]) => ({ d, v }));
+  if (!pts.length) return "";
+  const x = (i) => L + (pts.length === 1 ? (W - L - R) / 2 : (i * (W - L - R)) / (pts.length - 1));
+  const y = (v) => TOP + (1 - v / 10) * (H - TOP - B);
+  const grid = [0, 3, 5, 7, 9, 10].map((v) =>
+    `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)" stroke-width="1" ${v % 10 ? 'stroke-dasharray="3 3"' : ""}/>` +
+    `<text x="${L - 6}" y="${y(v) + 3}" text-anchor="end">${v}</text>`).join("");
+  let path = "", open = false;
+  pts.forEach((p, i) => {
+    if (p.v == null) { open = false; return; }
+    path += `${open ? "L" : "M"}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`; open = true;
+  });
+  const last = [...pts.keys()].reverse().find((i) => pts[i].v != null);
+  const marker = last != null ? `<circle cx="${x(last)}" cy="${y(pts[last].v)}" r="4" fill="var(--chart)" stroke="var(--surface)" stroke-width="2"/>` : "";
+  const first = pts[0].d, lastD = pts[pts.length - 1].d;
+  return `<div class="chartbox"><svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(T[lang].history)}">
+    ${grid}<path d="${path}" fill="none" stroke="var(--chart)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    ${marker}<line class="cross" y1="${TOP}" y2="${H - B}" stroke="var(--ink-3)" stroke-width="1" visibility="hidden"/>
+    <text x="${L}" y="${H - 4}">${esc(first)}</text><text x="${W - R}" y="${H - 4}" text-anchor="end">${esc(lastD)}</text>
+    <rect class="hit" x="${L}" y="0" width="${W - L - R}" height="${H}" fill="transparent"/></svg><div class="tip"></div></div>`;
+}
+
+function wireChart(history) {
+  const box = document.querySelector(".chartbox");
+  if (!box) return;
+  const svg = box.querySelector("svg"), tip = box.querySelector(".tip"), cross = svg.querySelector(".cross");
+  const W = 480, L = 26, R = 8;
+  const move = (ev) => {
+    const r = svg.getBoundingClientRect();
+    const vx = ((ev.clientX - r.left) / r.width) * W;
+    const i = Math.max(0, Math.min(history.length - 1, Math.round(((vx - L) / (W - L - R)) * (history.length - 1))));
+    const [d, v] = history[i];
+    const px = L + (history.length === 1 ? (W - L - R) / 2 : (i * (W - L - R)) / (history.length - 1));
+    cross.setAttribute("x1", px); cross.setAttribute("x2", px); cross.setAttribute("visibility", "visible");
+    tip.style.display = "block"; tip.style.left = `${(px / W) * 100}%`; tip.style.top = "0";
+    tip.textContent = `${d} · ${T[lang].tt} ${v == null ? "—" : v.toFixed(1)}`;
+  };
+  const hide = () => { tip.style.display = "none"; cross.setAttribute("visibility", "hidden"); };
+  svg.addEventListener("pointermove", move); svg.addEventListener("pointerleave", hide);
+}
+
+const BLOCKS = ["advisories", "aviation", "domestic", "aggressor", "media", "markets"];
+const fmtDate = (iso) => String(iso || "").replace("T", " ").slice(0, 16);
+
+function flagText(key) {
+  const t = T[lang], [name, n] = key.split(":");
+  return t.flagText[name] ? t.flagText[name].replace("{n}", n || "") : "";
+}
+
+function summary(c) {
+  const t = T[lang], out = [];
+  if (c.score == null) return "";
+  out.push(`<strong>${esc(c.name[lang])}: ${c.score.toFixed(1)} ${esc(t.outOf)}, ${esc(t.lvl[c.level])} ${esc(t.levelWord)}.</strong> ${esc(t.mean[c.level])}`);
+  const main = (c.contributors || []).filter((x) => x.value > 0.05).slice(0, 3);
+  out.push(main.length ? `${esc(t.main)}: ${main.map((x) => `${esc(x.publisher[lang])} (${esc(x.kind[lang])})`).join("; ")}.` : esc(t.quiet));
+  if ((c.floors || []).length) out.push(esc(t.floorHit));
+  (c.flag_keys || []).map(flagText).filter(Boolean).forEach((f) => out.push(esc(f)));
+  out.push(`<span class="muted">${esc(t.notForecast)}</span>`);
+  return `<div class="sub">${esc(t.summaryT)}</div><div class="summary">${out.map((x) => `<p>${x}</p>`).join("")}</div>`;
+}
+
+function blocksView(c) {
+  const t = T[lang], b = c.blocks || {};
+  if (!Object.keys(b).length) return "";
+  return `<div class="sub">${esc(t.blocksT)}</div><div class="blocks">` + BLOCKS.map((k) => {
+    const v = Math.max(0, Math.min(1, b[k] || 0)), pct = Math.round(v * 100);
+    return `<span title="${esc(t.blk[k][1])}">${esc(t.blk[k][0])}</span>` +
+      `<span class="bar" role="img" aria-label="${esc(t.blk[k][0])}: ${pct}%"><span style="width:${pct}%"></span></span><span class="pct">${pct}%</span>`;
+  }).join("") + `</div>`;
+}
+
+function signalItem(s, gov) {
+  const t = T[lang];
+  const what = gov ? (s.strength >= 0.1 ? `${t.raised} (${t.strength} ${s.strength.toFixed(2)})` : t.normal)
+    : `${s.kind[lang]} · ${s.state ? t.state : t.event} · ${t.strength} ${s.strength.toFixed(2)}`;
+  // Ukrainian summary when there is one (not a verbatim quote), else the original quote.
+  const note = lang === "uk" && s.note_uk ? `<span class="q">${esc(s.note_uk.slice(0, 220))}</span>`
+    : s.note ? `<span class="q">«${esc(s.note.slice(0, 220))}»</span>` : "";
+  return `<li>${esc(s.publisher[lang])}: ${esc(what)} <span class="muted">${esc(fmtDate(s.observed_at))}</span>${note}</li>`;
+}
+
+function signalsView(c) {
+  const t = T[lang], all = c.signals || [];
+  const gov = all.filter((s) => s.kind.en === "advisory level");
+  const seen = all.filter((s) => s.kind.en !== "advisory level" && s.strength > 0);
+  let html = "";
+  if (gov.length) html += `<div class="sub">${esc(t.govT)}</div><ul>${gov.map((s) => signalItem(s, true)).join("")}</ul>`;
+  if (all.length) html += `<div class="sub">${esc(t.seenT)}</div>` + (seen.length ? `<ul>${seen.map((s) => signalItem(s, false)).join("")}</ul>` : `<p class="muted">${esc(t.noSignals)}</p>`);
+  return html;
+}
+
+// Chronicle: chronicle/<CODE>.json, fetched when a country is opened (small on phones).
+const chron = {}, chronOpen = {};
+function loadChronicle(code) {
+  if (code in chron) return;
+  chron[code] = undefined;
+  fetch(`chronicle/${code}.json`, { cache: "no-store" })
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then((j) => { chron[code] = j.events || []; localize(chron[code]); })
+    .catch(() => { chron[code] = null; })
+    .finally(() => { if (currentCode() === code) renderPanel(); });
+}
+
+function chronicleView(code) {
+  const t = T[lang];
+  const head = `<div class="sub">${esc(t.chronicle)}</div>`;
+  if (!(code in chron) || chron[code] === undefined) { loadChronicle(code); return `${head}<p class="muted">${esc(t.chronLoading)}</p>`; }
+  const events = chron[code];
+  localize(events);
+  if (!events || !events.length) return `${head}<p class="muted">${esc(t.chronEmpty)}</p>`;
+  const shown = chronOpen[code] ? events : events.slice(0, 10);
+  let day = "", html = "";
+  for (const e of shown) {
+    const d = e.at.slice(0, 10);
+    if (d !== day) { html += `${day ? "</ul>" : ""}<div class="cday">${esc(fmtDay(d))}</div><ul class="chron">`; day = d; }
+    if (e.type === "stability") {
+      const s = t.stab || { cat: {} };
+      const text = e.text[lang] || e.text.en || e.text.orig;
+      html += `<li${e.counted ? "" : ' class="quiet"'}><div class="cwho">🏛 ${esc(s.cat[e.category] || e.category)}
+        ${e.counted ? "" : `<span class="badge">${esc(s.unconfirmed || "")}</span>`}</div><div class="ctext">${esc(text)}</div></li>`;
+      continue;
+    }
+    if (e.type === "score") {
+      const up = e.to > e.from;
+      html += `<li class="cscore ${up ? "up" : "down"}">${up ? "▲" : "▼"} ${esc(t.scoreMove)}: <b>${e.from.toFixed(1)} → ${e.to.toFixed(1)}</b></li>`;
+      continue;
+    }
+    const text = ((e.text && (e.text[lang] || e.text.en)) || "").replace(/\s*\(\d+ feeds?\)$/, "");
+    const note = e.counted ? "" : `<span class="badge">${esc(e.type === "signal" && !e.confirmed ? t.unconfirmed : t.notCounted)}</span>`;
+    html += `<li${e.counted ? "" : ' class="quiet"'}><div class="cwho">${esc(e.publisher[lang])} · ${esc(e.kind[lang])} ${note}</div>` +
+      (text ? `<div class="ctext">${esc(text)}</div>` : "") + `</li>`;
+  }
+  html += "</ul>";
+  const toggle = events.length > 10
+    ? `<button type="button" class="btn more" id="chronMore">${esc(chronOpen[code] ? t.chronLess : t.chronMore.replace("{n}", events.length))}</button>` : "";
+  return `${head}${html}${toggle}`;
+}
+
+function fmtDay(d) {
+  const [y, m, dd] = d.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, dd)).toLocaleDateString(lang === "en" ? "en-GB" : lang, { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
+}
+
+const levelOf = (v) => (v < 3 ? "green" : v < 5 ? "yellow" : v < 7 ? "orange" : v < 9 ? "red" : "critical");
+
+function stabilityView(c) {
+  const t = T[lang], st = c.stability, s = t.stab || {};
+  if (!st || !s.title) return "";
+  const key = levelOf(st.score), i = LEVELS.indexOf(key);
+  const head = `<div class="sub">🏛 ${esc(s.title)}</div>
+    <div class="stab"><span class="sn" style="background:var(--l${i});color:var(--on${i})">${st.score.toFixed(1)}</span>
+    <span class="muted">/ 10 · ${esc(s.value)}</span></div><p class="muted small">${esc(s.desc)}</p>`;
+  if (!st.events.length) return `${head}<p class="muted">${esc(s.none)}</p>`;
+  const items = st.events.map((e) => {
+    const text = e.text[lang] || e.text.en || e.text.orig;
+    return `<li${e.confirmed ? "" : ' class="quiet"'}><div class="cwho">${esc(s.cat[e.category] || e.category)}
+      ${e.confirmed ? "" : `<span class="badge">${esc(s.unconfirmed)}</span>`}</div>
+      <div class="ctext">${esc(text)}</div><div class="muted small">${esc(fmtDay(e.at.slice(0, 10)))}</div></li>`;
+  }).join("");
+  return `${head}<ul class="chron">${items}</ul>`;
+}
+
+function currentCode() {
+  if (!data) return null;
+  return selected && data.countries[selected] ? selected
+    : Object.entries(data.countries).sort((a, b) => (b[1].score ?? -1) - (a[1].score ?? -1))[0][0];
+}
+
+function renderPanel() {
+  const t = T[lang], panel = document.getElementById("panel");
+  if (!data) { panel.innerHTML = `<p>${esc(t.empty)}</p>`; return; }
+  const ctx = selected && data.context?.[selected];
+  if (ctx) {
+    panel.innerHTML = `<h2>${ctx.flag} ${esc(ctx.name[lang])}</h2>` +
+      `<div class="big"><span class="n" aria-hidden="true">⚔</span><span class="lv">${esc(t.ctxRole[ctx.role])}</span></div>` +
+      (ctx.note[lang] ? `<p>${esc(ctx.note[lang])}</p>` : "") + `<p class="muted">${esc(t.ctxNote)}</p>`;
+    return;
+  }
+  const code = currentCode();
+  const c = data.countries[code];
+  const score = c.score != null
+    ? `<div class="big"><span class="n">${c.score.toFixed(1)}</span><span class="lv">/ 10 · ${esc(t.lvl[c.level])}</span></div>`
+    : `<p>${esc(t.calibrating)}</p>`;
+  const war = `<div class="sub">${esc(t.war)}</div><div>${WAR[c.war.status] || "🟢"} ${esc(t.warS[c.war.status])}${c.war.note[lang] ? `<div class="muted">${esc(c.war.note[lang])}</div>` : ""}</div>`;
+  const legacy = !c.blocks && c.reasons[lang].length ? `<div class="sub">${esc(t.why)}</div><ul>${c.reasons[lang].map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : "";
+  const hist = c.history.length ? `<div class="sub">${esc(t.history)}</div>${chart(c.history)}` : "";
+  panel.innerHTML = `<h2>${c.flag} ${esc(c.name[lang])}</h2>${score}${summary(c)}${stabilityView(c)}${legacy}${blocksView(c)}${signalsView(c)}${war}${hist}` +
+    chronicleView(code) + (c.updated ? `<p class="muted">${esc(t.updated)}: ${esc(fmtDate(c.updated))} UTC</p>` : "");
+  wireChart(c.history);
+  const more = document.getElementById("chronMore");
+  if (more) more.onclick = () => { chronOpen[code] = !chronOpen[code]; renderPanel(); };
+}
+
+function renderMethod() {
+  const t = T[lang];
+  const body = t.methodFull.map(([h, content]) => {
+    let inner;
+    if (content === "LEVELS") inner = `<dl>${LEVELS.map((l) => `<dt>${esc(t.levels[l])}</dt><dd>${esc(t.mean[l])}</dd>`).join("")}</dl>`;
+    else if (content === "BLOCKS") inner = `<dl>${BLOCKS.map((k) => `<dt>${esc(t.blk[k][0])}</dt><dd>${esc(t.blk[k][1])}</dd>`).join("")}</dl>`;
+    else inner = content.map((x) => `<p>${esc(x)}</p>`).join("");
+    return `<h3>${esc(h)}</h3>${inner}`;
+  }).join("");
+  document.getElementById("method").innerHTML = `<h2>${esc(t.methodTitle)}</h2><p>${esc(t.method)}</p>${body}` +
+    `<p><a href="${REPO}docs/algorithm.md">${esc(t.algo)}</a> · <a href="${REPO}docs/sources.md">${esc(t.sources)}</a> · <a href="../">${esc(t.progress)}</a></p>`;
+}
+
+function renderTable() {
+  const t = T[lang];
+  document.getElementById("tabletitle").textContent = t.table;
+  if (!data) { document.getElementById("table").innerHTML = ""; return; }
+  const rows = Object.entries(data.countries).sort((a, b) => (b[1].score ?? -1) - (a[1].score ?? -1) || a[1].name[lang].localeCompare(b[1].name[lang]));
+  document.getElementById("table").innerHTML = `<table><thead><tr><th>${esc(t.country)}</th><th class="num">${esc(t.score)}</th><th>${esc(t.level)}</th><th>${esc(t.war)}</th></tr></thead><tbody>` +
+    rows.map(([code, c]) => `<tr data-code="${code}"><td><button class="link" type="button">${c.flag} ${esc(c.name[lang])}</button></td><td class="num">${c.score != null ? c.score.toFixed(1) : "—"}</td>` +
+      `<td>${c.score != null ? esc(t.lvl[c.level]) : "⏳"}</td><td>${WAR[c.war.status] || "🟢"} ${esc(t.warS[c.war.status])}</td></tr>`).join("") +
+    `</tbody></table>`;
+  document.querySelectorAll("#table tbody tr").forEach((tr) => tr.onclick = () => select(tr.dataset.code, true, true));
+}
+
+function render() {
+  const t = T[lang];
+  document.documentElement.lang = lang;
+  const sel = document.getElementById("langSel");
+  if (!sel.options.length) sel.innerHTML = Object.entries(LANG_NAMES).map(([k, v]) => `<option value="${k}">${LANG_FLAGS[k]} ${esc(v)}</option>`).join("");
+  sel.value = lang;
+  document.getElementById("langFlag").textContent = LANG_FLAGS[lang];
+  localizeData();
+  document.getElementById("title").textContent = t.title;
+  document.title = t.title;
+  document.getElementById("notice").textContent = t.notice;
+  document.getElementById("maphint").textContent = t.hint;
+  document.getElementById("tomap").textContent = t.toMap;
+  document.getElementById("meta").textContent = data ? `${t.updated}: ${data.generated_at.replace("T", " ").slice(0, 16)} UTC` : "";
+  renderMethod();
+  document.getElementById("foot").textContent = data ? `v${data.version}` : "";
+  renderLegend(); renderMap(); renderPanel(); renderTable(); renderTop();
+}
+
+const locTag = () => (lang === "en" ? "en-GB" : lang); // 24-hour clock and day-first dates in English
+
+// ---- Phones: capsules on top, a bottom sheet, a country list -------------------------------
+const $ = (id) => document.getElementById(id);
+const parseTime = (iso) => new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(iso) ? iso : `${iso}Z`);
+
+function renderTop() {
+  const t = T[lang];
+  $("langCap").title = t.language;
+  $("langSel").setAttribute("aria-label", t.language);
+  $("pickSearch").placeholder = t.search;
+  $("timeCap").textContent = data ? `🕒 ${parseTime(data.generated_at).toLocaleTimeString(locTag(), { hour: "2-digit", minute: "2-digit" })}` : "🕒 —";
+  $("timeCap").setAttribute("aria-label", data ? `${t.updated}: ${fmtDate(data.generated_at)} UTC` : t.updated);
+  const ctx = selected && data?.context?.[selected];
+  const code = ctx ? selected : currentCode();
+  const c = ctx || data?.countries?.[code];
+  if (!c) { $("countryCap").innerHTML = `<span class="nm">${esc(t.pick)}</span>`; return; }
+  const chip = ctx ? `<span class="chip" style="background:var(--empty)">⚔</span>`
+    : `<span class="chip" style="background:${fill(c)};color:${ink(c)}">${c.score != null ? c.score.toFixed(1) : "⏳"}</span>`;
+  $("countryCap").innerHTML = `<span aria-hidden="true">${c.flag}</span><span class="nm">${esc(c.name[lang])}</span>${chip}`;
+  $("countryCap").setAttribute("aria-label", `${t.pick}: ${c.name[lang]}`);
+}
+
+let toastTimer = null;
+function toast(text, ms = 2800) {
+  const el = $("toast");
+  el.textContent = text; el.hidden = false;
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms);
+}
+$("timeCap").onclick = () => { if (data) toast(`${T[lang].updated}: ${parseTime(data.generated_at).toLocaleString(locTag(), { dateStyle: "medium", timeStyle: "short" })}`); };
+
+function renderPicker() {
+  const q = $("pickSearch").value.trim().toLocaleLowerCase(lang);
+  const code = currentCode();
+  const rows = Object.entries(data?.countries || {})
+    .filter(([k, c]) => !q || c.name[lang].toLocaleLowerCase(lang).includes(q) || c.name.en.toLowerCase().includes(q) || k.toLowerCase() === q)
+    .sort((a, b) => a[1].name[lang].localeCompare(b[1].name[lang], lang));
+  $("pickList").innerHTML = rows.map(([k, c]) => `<button type="button" data-code="${k}" aria-current="${k === code}">
+    <span aria-hidden="true">${c.flag}</span><span class="nm">${esc(c.name[lang])}</span>
+    <span class="chip" style="background:${fill(c)};color:${ink(c)}">${c.score != null ? c.score.toFixed(1) : "⏳"}</span></button>`).join("")
+    || `<p class="muted" style="padding:0 16px">${esc(T[lang].nodata)}</p>`;
+  $("pickList").querySelectorAll("button").forEach((b) => b.onclick = () => { closePicker(); select(b.dataset.code, true, true); });
+}
+function openPicker() { if (!data) return; $("pickSearch").value = ""; renderPicker(); $("picker").hidden = false; $("pickList").querySelector('[aria-current="true"]')?.scrollIntoView({ block: "center" }); if (!COARSE) $("pickSearch").focus(); }
+function closePicker() { $("picker").hidden = true; }
+$("countryCap").onclick = openPicker;
+$("pickSearch").oninput = renderPicker;
+$("picker").addEventListener("click", (ev) => { if (ev.target === $("picker")) closePicker(); });
+document.addEventListener("keydown", (ev) => { if (ev.key === "Escape" && !$("picker").hidden) closePicker(); });
+
+// Bottom sheet: three stops. Dragging it (or the content from its top) moves it; a tap on the
+// handle steps it up.
+const STOPS = ["full", "half", "min"];
+let sheetState = "half";
+const sheetHeight = () => innerHeight - ($("topbar").getBoundingClientRect().bottom + 8);
+function sheetPos(state) {
+  const H = sheetHeight();
+  return state === "full" ? 0 : state === "half" ? Math.max(0, H - Math.round(innerHeight * (1 - BAND[1]))) : Math.max(0, H - 118);
+}
+function setSheet(state, animate = true) {
+  const sh = $("sheet");
+  sheetState = state;
+  sh.style.height = `${sheetHeight()}px`;
+  sh.style.transition = animate ? "" : "none";
+  sh.style.transform = `translateY(${sheetPos(state)}px)`;
+  sh.classList.toggle("full", state === "full");
+  sh.dataset.state = state;
+  if (state !== "full") $("sheetBody").scrollTop = 0;
+}
+$("grab").onclick = () => setSheet(sheetState === "min" ? "half" : sheetState === "half" ? "full" : "half");
+let sdrag = null;
+$("sheet").addEventListener("touchstart", (ev) => {
+  if (!mobile || ev.touches.length !== 1) { sdrag = null; return; }
+  const p = ev.touches[0];
+  sdrag = { x: p.clientX, y: p.clientY, base: sheetPos(sheetState), at: performance.now(), on: false, last: null,
+            body: $("sheetBody").contains(ev.target) };
+}, { passive: true });
+$("sheet").addEventListener("touchmove", (ev) => {
+  if (!sdrag) return;
+  const p = ev.touches[0], dy = p.clientY - sdrag.y;
+  if (!sdrag.on) {
+    // The open sheet scrolls its content; only a pull down from the very top moves it.
+    if (sheetState === "full" && sdrag.body && (dy < 0 || $("sheetBody").scrollTop > 0)) { sdrag = null; return; }
+    sdrag.on = true;
+    $("sheet").style.transition = "none";
+  }
+  ev.preventDefault();
+  sdrag.last = Math.min(sheetPos("min"), Math.max(0, sdrag.base + dy));
+  $("sheet").style.transform = `translateY(${sdrag.last}px)`;
+}, { passive: false });
+const endSheetDrag = () => {
+  const d = sdrag; sdrag = null;
+  if (!d || !d.on || d.last == null || Math.abs(d.last - d.base) < 4) { if (d?.on) setSheet(sheetState); return; }
+  const moved = d.last - d.base, fast = Math.abs(moved) / Math.max(1, performance.now() - d.at) > 0.45;
+  const i = STOPS.indexOf(sheetState);
+  const near = STOPS.reduce((a, b) => (Math.abs(sheetPos(b) - d.last) < Math.abs(sheetPos(a) - d.last) ? b : a));
+  // A flick moves at least one stop; a long drag lands on the nearest one.
+  const next = fast && near === sheetState ? STOPS[Math.max(0, Math.min(2, i + (moved > 0 ? 1 : -1)))] : near;
+  setSheet(next);
+};
+$("sheet").addEventListener("touchend", endSheetDrag);
+$("sheet").addEventListener("touchcancel", endSheetDrag);
+
+// Move the same blocks between the wide layout and the phone one.
+function layout() {
+  mobile = MOBILE.matches;
+  document.body.classList.toggle("m", mobile);
+  if (mobile) {
+    document.body.prepend($("map"));
+    $("sheetBody").append($("panel"), $("legend"), $("notice"), $("tablebox"), $("method"), $("foot"));
+    $("langCap").append($("langSel"));
+  } else {
+    $("mapcol").prepend($("map"));
+    $("mapcol").insertBefore($("legend"), $("maphint"));
+    $("cols").append($("panel"));
+    $("hdr").after($("notice"));
+    $("wrap").append($("tablebox"), $("method"), $("foot"));
+    $("controls").prepend($("langSel"));
+  }
+  view = null; // a new starting window for the new screen
+}
+layout();
+if (mobile) setSheet("half", false);
+MOBILE.addEventListener("change", () => { layout(); renderMap(); if (mobile) setSheet(sheetState, false); });
+let resizeTimer = null;
+window.addEventListener("resize", () => {
+  if (!mobile) return;
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    setSheet(sheetState, false);
+    const svg = document.querySelector("#map svg");
+    if (!svg || !view) return;
+    // Keep the centre and the width; the height follows the new screen shape.
+    const w = view[2], h = w * aspect(svg), cx = view[0] + w / 2, cy = view[1] + view[3] / 2;
+    view = clampView([cx - w / 2, cy - h / 2, w, h]);
+    applyView(svg);
+  }, 120);
+});
+
+// Bring a country chosen from the list into the visible band of the map.
+function centreOn(code) {
+  const svg = document.querySelector("#map svg"), at = geo?.labels?.[code];
+  if (!svg || !at || !view) return;
+  const band = BAND[1] - BAND[0];
+  view = clampView([at[0] - view[2] / 2, at[1] - view[3] * (BAND[0] + band / 2), view[2], view[3]]);
+  applyView(svg);
+}
+
+// Phones: once the map is scrolled away (to read a country), a button brings it back.
+const toMap = document.getElementById("tomap");
+toMap.onclick = () => document.getElementById("map").scrollIntoView({ behavior: "smooth", block: "start" });
+if ("IntersectionObserver" in window) {
+  new IntersectionObserver(([e]) => toMap.classList.toggle("show",
+    !e.isIntersecting && matchMedia("(max-width: 860px)").matches && !!selected)).observe(document.getElementById("map"));
+}
+
+function select(code, byUser = false, fromList = false) {
+  selected = code;
+  history.replaceState(null, "", `#${code}`);
+  renderMap(); renderPanel(); renderTop();
+  if (mobile) {
+    if (fromList) centreOn(code);
+    if (byUser) setSheet(sheetState === "full" ? "full" : "half");
+    $("sheetBody").scrollTop = 0;
+    return;
+  }
+  // On one-column layouts the panel is below the map: bring it into view.
+  if (byUser && matchMedia("(max-width: 860px)").matches) {
+    document.getElementById("panel").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
+document.getElementById("langSel").addEventListener("change", async (ev) => {
+  lang = ev.target.value; store.set("lang", lang);
+  await loadLang(lang); render();
+});
+const savedTheme = store.get("theme");
+if (savedTheme === "light" || savedTheme === "dark") document.documentElement.dataset.theme = savedTheme;
+document.getElementById("themeBtn").addEventListener("click", () => {
+  const cur = document.documentElement.dataset.theme;
+  const dark = cur ? cur === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const next = dark ? "light" : "dark";
+  document.documentElement.dataset.theme = next; store.set("theme", next);
+});
+window.addEventListener("hashchange", () => { const c = location.hash.slice(1).toUpperCase(); if (c) select(c); });
+
+(async () => {
+await loadLang(lang);
+render();
+fetch("europe.json")
+  .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then((json) => { geo = json; renderMap(); })
+  .catch(() => { document.getElementById("map").textContent = T[lang].nodata; });
+fetch("scores.json", { cache: "no-store" })
+  .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then((json) => { data = json; render(); })
+  .catch(() => { data = null; render(); });
+})();
+</script>
+</body>
+</html>
